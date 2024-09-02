@@ -1,0 +1,40 @@
+.container {
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  /* Hide tabs on smaller screens */
+  visibility: hidden;
+
+  /* Remove gray border bottom from buttons list */
+  .list::before {
+    content: none;
+  }
+  /* Change tabs underline width */
+  .tab-dark, .tab-light {
+    border-bottom-width: 1px;
+  }
+  /* Change tabs underline color */
+  .tab-light[data-active] {
+    border-bottom-color: black;
+  }
+  .tab-dark[data-active] {
+    border-bottom-color: white;
+  }
+  /* Show tabs on medium screens */
+  @media (min-width: $mantine-breakpoint-md) {
+    visibility: visible;
+  }
+  /* Stick tabs to the left side on wider screens */
+  @media (min-width: $mantine-breakpoint-xl) {
+    left: 0;
+    transform: translate(0, -50%);
+  }
+  /* Tabs labels */
+  .text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+  }
+}

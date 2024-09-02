@@ -1,0 +1,1 @@
+export { WideScreenTabs } from './tabs'

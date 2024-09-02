@@ -1,12 +1,22 @@
-import '@mantine/core/styles.css';
-import React from 'react';
-import { MantineProvider, ColorSchemeScript } from '@mantine/core';
-import { theme } from '../theme';
+import '@mantine/core/styles.css'
+import React from 'react'
+import { Metadata, Viewport } from 'next'
+import { MantineProvider, ColorSchemeScript, Box, Stack } from '@mantine/core'
+import { theme } from '../theme'
+import './global.css'
+import { Footer, Header } from './components'
+import { companyName } from './config/constants'
 
-export const metadata = {
-  title: 'Mantine Next.js template',
-  description: 'I am using Mantine with Next.js!',
-};
+export const metadata: Metadata = {
+  title: companyName,
+  description: 'History of antique barometers',
+}
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+}
 
 export default function RootLayout({ children }: { children: any }) {
   return (
@@ -20,8 +30,16 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <Stack h="100vh" gap={0}>
+            <Header />
+            <Box bg="#efefef" style={{ flexGrow: 1 }}>
+              {children}
+            </Box>
+            <Footer />
+          </Stack>
+        </MantineProvider>
       </body>
     </html>
-  );
+  )
 }

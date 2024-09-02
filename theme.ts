@@ -1,7 +1,19 @@
-'use client';
+'use client'
 
-import { createTheme } from '@mantine/core';
+import { createTheme, virtualColor } from '@mantine/core'
+import { Raleway } from 'next/font/google'
+
+const raleway = Raleway({
+  subsets: ['cyrillic', 'latin'],
+})
 
 export const theme = createTheme({
-  /* Put your mantine theme override here */
-});
+  fontFamily: raleway.style.fontFamily,
+  colors: {
+    tabsUnderline: virtualColor({
+      name: 'tabsUnderline',
+      dark: 'green',
+      light: 'red',
+    }),
+  },
+})

@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['mantine', 'plugin:@next/next/recommended', 'plugin:jest/recommended'],
+  extends: ['mantine', 'plugin:@next/next/recommended', 'plugin:jest/recommended', "plugin:prettier/recommended"],
   plugins: ['testing-library', 'jest'],
   overrides: [
     {
@@ -14,4 +14,4 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'import/extensions': 'off',
   },
-};
+}
