@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Center, CenterProps, Tabs, Text, useMantineColorScheme } from '@mantine/core'
+import { Center, CenterProps, Tabs, Text, useComputedColorScheme } from '@mantine/core'
+import dynamic from 'next/dynamic'
 import styles from './tabs.module.scss'
 
 const menuData = [
@@ -23,16 +24,16 @@ const menuData = [
   },
 ]
 
-export const WideScreenTabs = (props: CenterProps) => {
+const WideScreenTabs = (props: CenterProps) => {
   const router = useRouter()
   const pathname = usePathname()
-  const { colorScheme } = useMantineColorScheme()
+  const scheme = useComputedColorScheme()
   return (
     <Center {...props} className={styles.container}>
       <Tabs value={pathname} onChange={value => router.push(value ?? '/')}>
         <Tabs.List className={styles.list}>
           {menuData.map(({ id, link, text }) => (
-            <Tabs.Tab className={styles[`tab-${colorScheme}`]} value={link} key={id}>
+            <Tabs.Tab className={styles[`tab-${scheme}`]} value={link} key={id}>
               <Text className={styles.text}>{text}</Text>
             </Tabs.Tab>
           ))}
@@ -41,3 +42,4 @@ export const WideScreenTabs = (props: CenterProps) => {
     </Center>
   )
 }
+export default dynamic(() => Promise.resolve(WideScreenTabs), { ssr: true })

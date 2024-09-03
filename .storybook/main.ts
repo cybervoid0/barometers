@@ -1,7 +1,10 @@
 import type { StorybookConfig } from '@storybook/nextjs';
 
 const config: StorybookConfig = {
-  stories: ['../components/**/*.(stories|story).@(js|jsx|ts|tsx)'],
+  stories: [
+    '../components/**/*.(stories|story).@(js|jsx|ts|tsx)',
+    '../app/**/*.(stories|story).@(js|jsx|mjs|ts|tsx)',
+  ],
   addons: [
     '@storybook/addon-essentials',
     'storybook-dark-mode',
@@ -11,6 +14,6 @@ const config: StorybookConfig = {
     name: '@storybook/nextjs',
     options: {},
   },
-};
+}
 
 export default config;

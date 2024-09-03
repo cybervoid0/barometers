@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>
+        <MantineProvider defaultColorScheme="light" theme={theme}>
           <Stack h="100vh" gap={0}>
             <Header />
             <Box bg="#efefef" style={{ flexGrow: 1 }}>
