@@ -5,7 +5,6 @@ import NextImage from 'next/image'
 import NextLink from 'next/link'
 import { Center, Group, Burger, rem, Image, Space, Box, Anchor } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { companyName } from '../../config/constants'
 import { WideScreenTabs } from './tabs'
 import styles from './header.module.scss'
 
@@ -19,7 +18,7 @@ export function Header() {
           <Anchor component={NextLink} href="/">
             <Image
               component={NextImage}
-              alt={companyName}
+              alt="Antiques"
               width={295}
               height={87.5}
               src="/Jason_Clarke_Antiques_Long_Centre_Logo_295x@2x.webp"

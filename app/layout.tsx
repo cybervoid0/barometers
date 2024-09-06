@@ -1,14 +1,13 @@
-import '@mantine/core/styles.css'
 import React from 'react'
 import { Metadata, Viewport } from 'next'
-import { MantineProvider, ColorSchemeScript, Box, Stack } from '@mantine/core'
-import { theme } from '../theme'
-import './global.css'
+import { ColorSchemeScript, Box, Stack } from '@mantine/core'
+import '@mantine/core/styles.css'
+import './global.scss'
 import { Footer, Header } from './components'
-import { companyName } from './config/constants'
+import Providers from './providers'
 
 export const metadata: Metadata = {
-  title: companyName,
+  title: 'Antique Barometers',
   description: 'History of antique barometers',
 }
 export const viewport: Viewport = {
@@ -30,7 +29,7 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider defaultColorScheme="light" theme={theme}>
+        <Providers>
           <Stack h="100vh" gap={0}>
             <Header />
             <Box bg="#efefef" style={{ flexGrow: 1 }}>
@@ -38,7 +37,7 @@ export default function RootLayout({ children }: { children: any }) {
             </Box>
             <Footer />
           </Stack>
-        </MantineProvider>
+        </Providers>
       </body>
     </html>
   )
