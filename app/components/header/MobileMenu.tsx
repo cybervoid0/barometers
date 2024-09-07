@@ -7,7 +7,12 @@ import { instagram, email } from '@/app/constants'
 
 export const MobileMenu: FC<DrawerProps> = props => {
   return (
-    <Drawer.Root {...props}>
+    <Drawer.Root
+      transitionProps={{
+        duration: 500,
+      }}
+      {...props}
+    >
       <Drawer.Overlay />
       <Drawer.Content>
         <Drawer.Header className={sx.header}>
@@ -24,9 +29,9 @@ export const MobileMenu: FC<DrawerProps> = props => {
             {/* Footer */}
             <Box
               component={motion.div}
-              initial={{ y: 50 }}
+              initial={{ y: 70 }}
               animate={{ y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
               className={sx.footer}
             >
               <Anchor target="_blank" href={instagram}>
