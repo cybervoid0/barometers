@@ -5,9 +5,9 @@ import NextImage from 'next/image'
 import NextLink from 'next/link'
 import { Center, Group, Burger, rem, Image, Space, Box, Anchor } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { WideScreenTabs } from './tabs'
+import { WideScreenTabs } from './Tabs'
 import { MobileMenu } from './MobileMenu'
-import styles from './header.module.scss'
+import styles from './Header.module.scss'
 
 export function Header() {
   const [opened, { close, open }] = useDisclosure()

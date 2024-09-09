@@ -15,7 +15,7 @@ import {
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import styles from './tabs.module.scss'
-import { menuData, hasChildren } from '../menu'
+import { menuData, hasChildren } from '../menuData'
 
 const WideScreenTabs = (props: CenterProps) => {
   const router = useRouter()
@@ -67,18 +67,17 @@ const WideScreenTabs = (props: CenterProps) => {
                 <Menu.Target>{renderTab()}</Menu.Target>
                 <Menu.Dropdown>
                   {menuitem.children.map(submenu => (
-                    <Menu.Item key={submenu.id}>
-                      <Box px="xs">
-                        <Anchor
-                          href={`/${menuitem.link}/${submenu.link}`}
-                          component={Link}
-                          c="inherit"
-                          underline="never"
-                        >
-                          {submenu.label}
-                        </Anchor>
-                      </Box>
-                    </Menu.Item>
+                    <Anchor
+                      key={submenu.id}
+                      href={`/${menuitem.link}/${submenu.link}`}
+                      component={Link}
+                      c="inherit"
+                      underline="never"
+                    >
+                      <Menu.Item>
+                        <Box px="xs">{submenu.label}</Box>
+                      </Menu.Item>
+                    </Anchor>
                   ))}
                 </Menu.Dropdown>
               </Menu>

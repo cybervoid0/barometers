@@ -19,7 +19,7 @@ import * as motion from 'framer-motion/client'
 import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
 import { instagram, email } from '@/app/constants'
-import { menuData, hasChildren } from './menu'
+import { menuData, hasChildren } from '../menuData'
 
 export const MobileMenu: FC<DrawerProps> = props => {
   const [opened, setOpened] = useState<Record<number, boolean>>({})
@@ -76,6 +76,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                               c="inherit"
                               component={Link}
                               href={`/${outer.link}/${inner.link}`}
+                              onClick={props.onClose}
                             >
                               <Text size="xs" tt="capitalize" lts="0.1rem" fw={400}>
                                 {inner.label}
@@ -88,7 +89,12 @@ export const MobileMenu: FC<DrawerProps> = props => {
                   </>
                 ) : (
                   <List.Item py="md">
-                    <Anchor c="inherit" component={Link} href={outer.link}>
+                    <Anchor
+                      c="inherit"
+                      component={Link}
+                      href={`/${outer.link}`}
+                      onClick={props.onClose}
+                    >
                       <Text size="sm" tt="uppercase" lts="0.15rem" fw={500}>
                         {outer.label}
                       </Text>
