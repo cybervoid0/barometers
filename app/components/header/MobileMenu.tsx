@@ -19,7 +19,7 @@ import * as motion from 'framer-motion/client'
 import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
 import { instagram, email } from '@/app/constants'
-import { menuData, isSingleMenuItem } from './menu'
+import { menuData, hasChildren } from './menu'
 
 export const MobileMenu: FC<DrawerProps> = props => {
   const [opened, setOpened] = useState<Record<number, boolean>>({})
@@ -30,6 +30,12 @@ export const MobileMenu: FC<DrawerProps> = props => {
       size="sm"
       transitionProps={{
         duration: 500,
+      }}
+      styles={{
+        body: {
+          padding: 0,
+          height: 'calc(100% - 4rem)',
+        },
       }}
       {...props}
     >
@@ -44,15 +50,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
           <List px="xl" listStyleType="none">
             {menuData.map((outer, i, arr) => (
               <Fragment key={outer.id}>
-                {isSingleMenuItem(outer) ? (
-                  <List.Item py="md">
-                    <Anchor c="inherit" component={Link} href={outer.link}>
-                      <Text size="sm" tt="uppercase" lts="0.15rem" fw={500}>
-                        {outer.label}
-                      </Text>
-                    </Anchor>
-                  </List.Item>
-                ) : (
+                {hasChildren(outer) ? (
                   <>
                     <List.Item py="md">
                       <UnstyledButton onClick={() => toggle(i)}>
@@ -74,7 +72,11 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       <List px="xl" listStyleType="none">
                         {outer.children.map(inner => (
                           <List.Item pb="sm" key={inner.id}>
-                            <Anchor c="inherit" component={Link} href={outer.link + inner.link}>
+                            <Anchor
+                              c="inherit"
+                              component={Link}
+                              href={`/${outer.link}/${inner.link}`}
+                            >
                               <Text size="xs" tt="capitalize" lts="0.1rem" fw={400}>
                                 {inner.label}
                               </Text>
@@ -84,6 +86,14 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       </List>
                     </Collapse>
                   </>
+                ) : (
+                  <List.Item py="md">
+                    <Anchor c="inherit" component={Link} href={outer.link}>
+                      <Text size="sm" tt="uppercase" lts="0.15rem" fw={500}>
+                        {outer.label}
+                      </Text>
+                    </Anchor>
+                  </List.Item>
                 )}
                 {i < arr.length - 1 && <Divider />}
               </Fragment>
