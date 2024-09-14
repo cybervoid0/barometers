@@ -15,7 +15,7 @@ import {
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import styles from './tabs.module.scss'
-import { menuData, hasChildren } from '../menuData'
+import { menuData, hasChildren } from '../menudata'
 
 const WideScreenTabs = (props: CenterProps) => {
   const router = useRouter()

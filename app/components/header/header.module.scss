@@ -1,21 +1,7 @@
-.container {
-  width: 100%;
-  max-width: $mantine-breakpoint-xl;
-  margin: 0 auto;
-  padding: rem(15px) rem(18px);
-  @media (min-width: $mantine-breakpoint-sm) {
-    padding: rem(18px) rem(30px);
-  }
-  @media (min-width: $mantine-breakpoint-md) {
-    padding: rem(18px) rem(50px) rem(24px) rem(50px);
-    /* Increase the height to fit the Tabs bar */
-    height: 148px;
-  }
-  @media (min-width: $mantine-breakpoint-xl) {
-    /* On wider screens, the Tabs bar moves up, so the height is being unset */
-    height: unset;
-  }
-  .center {
-    flex-grow: 1;
+.title {
+  line-height: 80%;
+  font-size: 1.8rem;
+  @media (min-width: $mantine-breakpoint-xs) {
+    font-size: 2rem;
   }
 }
