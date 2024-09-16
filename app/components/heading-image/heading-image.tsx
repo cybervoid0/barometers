@@ -7,9 +7,11 @@ export const HeadingImage: FC = () => {
     <Box className={styles.container}>
       <Box className={styles.bg} />
       <Flex className={styles.content}>
-        <Title order={3} className={styles.heading}>
-          Industrial Era Barometer Collection
-        </Title>
+        <Box className={styles.headingBg}>
+          <Title order={3} className={styles.heading}>
+            Industrial Era Barometer Collection
+          </Title>
+        </Box>
       </Flex>
     </Box>
   )
