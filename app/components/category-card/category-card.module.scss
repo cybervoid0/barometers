@@ -8,10 +8,6 @@
     transform: scale(1.2);
     z-index: 3;
   }
-  /* &:hover .title {
-    background-color: rgba(255,255,255, 0.5);
-    color: black;
-  } */
 }
 .bg_image {
   position: absolute;
@@ -32,5 +28,4 @@
   background-color: rgba(0, 0, 0, 0.4);
   color: white;
   z-index: 4;
-  //transition: background-color 0.8s ease-out, color 0.8s ease-out;
 }

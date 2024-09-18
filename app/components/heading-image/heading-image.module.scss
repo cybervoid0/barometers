@@ -1,8 +1,8 @@
 .container {
   position: relative;
   max-width: calc(var(--container-size-xl) - 2rem);
-  height: 40vh;
-  @media (min-width: $mantine-breakpoint-sm) {
+  height: 50vh;
+  @include xs {
     height: 10rem;
   }
   overflow: hidden;
@@ -34,7 +34,7 @@
     slideUp 1.8s ease-out,
     fadeInContent 1.8s ease-out;
 
-  @media (min-width: $mantine-breakpoint-sm) {
+  @include sm {
     align-items: center;
   }
 
@@ -47,7 +47,7 @@
     font-weight: 600;
     text-transform: uppercase;
     background-color: rgba(0, 0, 0, 0.4);
-    @media (min-width: $mantine-breakpoint-sm) {
+    @include sm {
       margin-left: 5rem;
       margin-bottom: 0;
     }

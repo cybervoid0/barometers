@@ -50,6 +50,32 @@ $mantine-breakpoint-xl: 88em;
   }
 }
 
+@mixin xs() {
+  @include larger-than($mantine-breakpoint-xs) {
+    @content;
+  }
+}
+@mixin sm() {
+  @include larger-than($mantine-breakpoint-sm) {
+    @content;
+  }
+}
+@mixin md() {
+  @include larger-than($mantine-breakpoint-md) {
+    @content;
+  }
+}
+@mixin lg() {
+  @include larger-than($mantine-breakpoint-lg) {
+    @content;
+  }
+}
+@mixin xl() {
+  @include larger-than($mantine-breakpoint-xl) {
+    @content;
+  }
+}
+
 // Add direction mixins if you need rtl support
 @mixin rtl {
   [dir='rtl'] & {
