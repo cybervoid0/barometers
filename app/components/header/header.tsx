@@ -3,7 +3,7 @@
 import NextImage from 'next/image'
 import NextLink from 'next/link'
 import { Group, Burger, Image, Anchor, Title, Container, Box, Flex } from '@mantine/core'
-import { useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { useDisclosure } from '@mantine/hooks'
 import { Cormorant_SC } from 'next/font/google'
 import { Tabs } from './tabs'
 import { MobileMenu } from './mobile-menu'
@@ -16,7 +16,6 @@ const cormorantSc = Cormorant_SC({
 
 export function Header() {
   const [opened, { close, open }] = useDisclosure()
-  const largerThanMd = useMediaQuery(`(min-width: var(--mantine-breakpoint-xs))`)
   return (
     <>
       <Box className={styles.indent}>
@@ -24,12 +23,7 @@ export function Header() {
           <Container size="xl">
             <Group align="center" justify="space-between" gap="0.3rem">
               <Box>
-                <Burger
-                  size={largerThanMd ? 'lg' : 'sm'}
-                  hiddenFrom="md"
-                  opened={opened}
-                  onClick={open}
-                />
+                <Burger size="sm" hiddenFrom="md" opened={opened} onClick={open} />
                 <Tabs visibleFrom="md" />
               </Box>
               <Flex align="center" gap="md">
