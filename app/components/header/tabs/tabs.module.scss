@@ -1,9 +1,4 @@
 .container {
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translate(-50%, 100%);
-
   /* Remove gray border bottom from buttons list */
   .list::before {
     content: none;
@@ -19,10 +14,5 @@
   }
   .tab-dark[data-active] {
     border-bottom-color: white;
-  }
-  /* Stick tabs to the left side on wider screens */
-  @media (min-width: $mantine-breakpoint-xl) {
-    left: 0;
-    transform: translate(0, -100%);
   }
 }

@@ -1,18 +1,20 @@
-import { Box, Flex, Title } from '@mantine/core'
+import { Flex, Title, Container, BackgroundImage, Overlay } from '@mantine/core'
 import { FC } from 'react'
 import styles from './heading-image.module.scss'
 
 export const HeadingImage: FC = () => {
   return (
-    <Box className={styles.container}>
-      <Box className={styles.bg} />
+    <Container className={styles.container}>
+      <Overlay
+        zIndex={2}
+        gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)"
+      />
+      <BackgroundImage src="/images/header-bg.jpeg" className={styles.bg} />
       <Flex className={styles.content}>
-        <Box className={styles.headingBg}>
-          <Title order={3} className={styles.heading}>
-            Industrial Era Barometer Collection
-          </Title>
-        </Box>
+        <Title order={3} className={styles.title}>
+          Industrial Era Barometer Collection
+        </Title>
       </Flex>
-    </Box>
+    </Container>
   )
 }

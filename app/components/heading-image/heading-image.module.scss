@@ -1,15 +1,16 @@
 .container {
-  width: 100%;
-  height: 40vh;
   position: relative;
-  overflow: hidden;
-
+  max-width: calc(var(--container-size-xl) - 2rem);
+  height: 40vh;
   @media (min-width: $mantine-breakpoint-sm) {
     height: 10rem;
   }
+  overflow: hidden;
 }
 .bg {
   position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
   background-color: #827f6f;
@@ -37,7 +38,7 @@
     align-items: center;
   }
 
-  .heading {
+  .title {
     margin-left: 1rem;
     margin-bottom: 3rem;
     color: white;

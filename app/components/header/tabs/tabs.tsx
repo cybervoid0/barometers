@@ -12,12 +12,13 @@ import {
   Anchor,
   Box,
 } from '@mantine/core'
+import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import styles from './tabs.module.scss'
+import sx from './tabs.module.scss'
 import { menuData, hasChildren } from '../menudata'
 
-const WideScreenTabs = (props: CenterProps) => {
+const WideScreenTabs = ({ className, ...props }: CenterProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const scheme = useComputedColorScheme()
@@ -42,12 +43,12 @@ const WideScreenTabs = (props: CenterProps) => {
   }, [pathname])
 
   return (
-    <Center visibleFrom="md" {...props} className={styles.container}>
+    <Center {...props} className={clsx(className, sx.container)}>
       <Tabs value={String(activeTab)} onChange={selectTab}>
-        <Tabs.List className={styles.list}>
+        <Tabs.List className={sx.list}>
           {menuData.map((menuitem, i) => {
             const renderTab = (key?: Key) => (
-              <Tabs.Tab className={styles[`tab-${scheme}`]} value={String(i)} key={key}>
+              <Tabs.Tab className={sx[`tab-${scheme}`]} value={String(i)} key={key}>
                 <Text size="xs" tt="uppercase" fw={600} lts=".2rem">
                   {menuitem.label}
                 </Text>

@@ -1,0 +1,21 @@
+.proportions {
+  height: 6.9rem;
+}
+
+.container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  
+  background-color: white;
+  padding-inline: var(--mantine-spacing-md);
+  padding-block: var(--mantine-spacing-sm);
+  z-index: 10;
+  @media screen and (min-width: $mantine-breakpoint-md) {
+    padding-bottom: 0;
+  }
+ 
+  @media screen and (min-width: $mantine-breakpoint-xl) {
+    padding-bottom: var(--mantine-spacing-sm);
+  }
+}
