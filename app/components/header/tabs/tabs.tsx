@@ -15,10 +15,13 @@ import {
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import sx from './tabs.module.scss'
 import { menuData, hasChildren } from '../menudata'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
+  const { status } = useSession()
+  const isLoggedId = status === 'authenticated'
   const router = useRouter()
   const pathname = usePathname()
   const scheme = useComputedColorScheme()
@@ -43,49 +46,54 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
   }, [pathname])
 
   return (
-    <Center {...props} className={clsx(className, sx.container)}>
+    <Center component="nav" {...props} className={clsx(className, sx.container)}>
       <Tabs value={String(activeTab)} onChange={selectTab}>
         <Tabs.List className={sx.list}>
-          {menuData.map((menuitem, i) => {
-            const renderTab = (key?: Key) => (
-              <Tabs.Tab className={sx[`tab-${scheme}`]} value={String(i)} key={key}>
-                <Text size="xs" tt="uppercase" fw={600} lts=".2rem">
-                  {menuitem.label}
-                </Text>
-              </Tabs.Tab>
+          {menuData
+            .filter(
+              ({ visibleFor }) =>
+                typeof visibleFor === 'undefined' || (isLoggedId && visibleFor === 'Admin'),
             )
-            return hasChildren(menuitem) ? (
-              <Menu
-                trigger="click-hover"
-                menuItemTabIndex={0}
-                shadow="xl"
-                offset={0}
-                loop={false}
-                key={menuitem.id}
-                opened={opened[i]}
-                onChange={state => onMenuChange(i, state)}
-              >
-                <Menu.Target>{renderTab()}</Menu.Target>
-                <Menu.Dropdown>
-                  {menuitem.children.map(submenu => (
-                    <Anchor
-                      key={submenu.id}
-                      href={`/${menuitem.link}/${submenu.link}`}
-                      component={Link}
-                      c="inherit"
-                      underline="never"
-                    >
-                      <Menu.Item>
-                        <Box px="xs">{submenu.label}</Box>
-                      </Menu.Item>
-                    </Anchor>
-                  ))}
-                </Menu.Dropdown>
-              </Menu>
-            ) : (
-              renderTab(menuitem.id)
-            )
-          })}
+            .map((menuitem, i) => {
+              const renderTab = (key?: Key) => (
+                <Tabs.Tab className={sx[`tab-${scheme}`]} value={String(i)} key={key}>
+                  <Text size="xs" tt="uppercase" fw={600} lts=".2rem">
+                    {menuitem.label}
+                  </Text>
+                </Tabs.Tab>
+              )
+              return hasChildren(menuitem) ? (
+                <Menu
+                  trigger="click-hover"
+                  menuItemTabIndex={0}
+                  shadow="xl"
+                  offset={0}
+                  loop={false}
+                  key={menuitem.id}
+                  opened={opened[i]}
+                  onChange={state => onMenuChange(i, state)}
+                >
+                  <Menu.Target>{renderTab()}</Menu.Target>
+                  <Menu.Dropdown>
+                    {menuitem.children.map(submenu => (
+                      <Anchor
+                        key={submenu.id}
+                        href={`/${menuitem.link}/${submenu.link}`}
+                        component={Link}
+                        c="inherit"
+                        underline="never"
+                      >
+                        <Menu.Item>
+                          <Box px="xs">{submenu.label}</Box>
+                        </Menu.Item>
+                      </Anchor>
+                    ))}
+                  </Menu.Dropdown>
+                </Menu>
+              ) : (
+                renderTab(menuitem.id)
+              )
+            })}
         </Tabs.List>
       </Tabs>
     </Center>

@@ -11,6 +11,7 @@ export default withBundleAnalyzer({
   },
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
+    serverComponentsExternalPackages: ['mongoose']
   },
   sassOptions: {
     prependData: `@import "./_mantine.scss";`,

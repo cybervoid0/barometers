@@ -1,7 +1,9 @@
+type UserType = 'Simple' | 'Admin'
 interface BaseMenuItem {
   id: number
   label: string
   link: string
+  visibleFor?: UserType
 }
 
 interface MenuItemWithChildren extends BaseMenuItem {
@@ -65,5 +67,11 @@ export const menuData: MenuItem[] = [
     id: 3,
     label: 'About',
     link: 'about',
+  },
+  {
+    id: 10,
+    label: 'Admin',
+    link: 'admin',
+    visibleFor: 'Admin',
   },
 ]
