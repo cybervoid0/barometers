@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { Button, Stack, Title, TextInput, PasswordInput, Center, Box } from '@mantine/core'
 import { IconAt, IconUser } from '@tabler/icons-react'
-import { NotificationData, notifications } from '@mantine/notifications'
 import { isEmail, isLength } from 'validator'
 import { useForm } from '@mantine/form'
 import { register } from '@/actions/register'
+import { showError, showInfo } from '@/utils/notification'
 
 export default function Register() {
   const router = useRouter()
@@ -33,27 +33,12 @@ export default function Register() {
   })
 
   const handleSubmit = async (values: typeof form.values) => {
-    const msgParams: Partial<NotificationData> = {
-      title: 'User registration',
-      position: 'top-center',
-      withBorder: true,
-    }
     try {
       await register(values)
-      notifications.show({
-        ...msgParams,
-        message: `${values.name} was successfully registered`,
-        color: 'green',
-        bg: 'green.0',
-      })
+      showInfo(`${values.name} was successfully registered`, 'User registration')
       router.push('/signin')
     } catch (error) {
-      notifications.show({
-        ...msgParams,
-        message: error instanceof Error ? error.message : 'Registration error',
-        color: 'red',
-        bg: 'red.0',
-      })
+      showError(error instanceof Error ? error.message : 'Registration error')
     }
   }
 

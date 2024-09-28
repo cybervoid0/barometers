@@ -3,10 +3,10 @@
 import { signIn } from 'next-auth/react'
 import { Button, TextInput, PasswordInput, Box, Stack } from '@mantine/core'
 import { IconAt } from '@tabler/icons-react'
-import { notifications } from '@mantine/notifications'
 import { useForm } from '@mantine/form'
 import { isEmail } from 'validator'
 import { useRouter } from 'next/navigation'
+import { showError, showInfo } from '@/utils/notification'
 
 export function SignInForm() {
   const router = useRouter()
@@ -29,16 +29,11 @@ export function SignInForm() {
       redirect: false,
     })
     if (res?.ok) {
+      showInfo('You have successfully logged in.', 'Log In')
       router.push('/admin')
     }
     if (res?.error) {
-      notifications.show({
-        title: 'Login error',
-        message: res.error,
-        position: 'top-center',
-        color: 'red',
-        bg: 'red.0',
-      })
+      showError(res.error)
     }
   }
   return (

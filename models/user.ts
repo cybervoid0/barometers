@@ -1,14 +1,13 @@
 import { Schema, model, Document, models, type Model } from 'mongoose'
-import { isLength, isEmail, isURL } from 'validator'
+import { isEmail, isURL } from 'validator'
 
 export enum AccessRole {
-  USER = 'user',
-  OWNER = 'owner',
-  ADMIN = 'admin',
+  USER = 'USER',
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
 }
 
 export interface IUser extends Document {
-  _id: string
   email: string
   password?: string
   name: string
@@ -33,10 +32,8 @@ const userSchema = new Schema<IUser>(
     name: {
       type: String,
       required: [true, 'Name is required'],
-      validate: [
-        (val: string) => isLength(val, { min: 2, max: 50 }),
-        'Name should be 2 to 50 characters long',
-      ],
+      minlength: 2,
+      maxlength: 50,
     },
     role: {
       type: String,
