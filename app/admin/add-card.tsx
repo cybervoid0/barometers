@@ -15,8 +15,9 @@ import {
 } from '@mantine/core'
 import { IconTrash, IconSquareRoundedPlus, IconPhotoPlus } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
-import axios from 'axios'
-import { useEffect } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios, { AxiosError } from 'axios'
+import { useEffect, useState } from 'react'
 import { isLength } from 'validator'
 import { showInfo, showError } from '@/utils/notification'
 import { useBarometers } from '../hooks/useBarometers'
@@ -34,6 +35,8 @@ interface FormProps {
 }
 
 export function AddCard() {
+  const [uploadedImage, setUploadedImage] = useState('')
+  const [thumbnail, setThumbnail] = useState('')
   const { condition, types, manufacturers } = useBarometers()
 
   const form = useForm<FormProps>({
@@ -54,6 +57,30 @@ export function AddCard() {
     },
   })
 
+  const queryClient = useQueryClient()
+  const { mutate } = useMutation({
+    mutationFn: (values: FormProps) =>
+      axios
+        .post('/api/barometers', values, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(({ data }) => data),
+    onSuccess: (_, { name }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['barometers'],
+      })
+      form.reset()
+      showInfo(`Added ${name} to the database`)
+    },
+    onError: (error: AxiosError) => {
+      showError(
+        (error.response?.data as { message: string })?.message ||
+          error.message ||
+          'Error adding barometer',
+      )
+    },
+  })
+
   useEffect(() => {
     if (types.data.length === 0) return
     form.setFieldValue('type', String(types.data[0]._id))
@@ -70,20 +97,9 @@ export function AddCard() {
     form.insertListItem('dimensions', { dim: '', value: '' })
   }
 
-  // Удаление пары ключ-значение по индексу
+  // delete key-value pair by index
   const removeDimension = (index: number) => {
     form.removeListItem('dimensions', index)
-  }
-
-  const addBarometer = async (values: FormProps) => {
-    try {
-      const res = await axios.post('/api/barometers', values, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      showInfo(`Added barometer #${res.data.id ?? 0} to the collection`, 'Add new barometer')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : "Couldn't create new barometer")
-    }
   }
 
   return (
@@ -91,7 +107,7 @@ export function AddCard() {
       <Title mb="lg" order={3} tt="capitalize">
         Add barometer
       </Title>
-      <Box component="form" onSubmit={form.onSubmit(addBarometer)}>
+      <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
         <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
         <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
         <TextInput label="Dating" key={form.key('dating')} {...form.getInputProps('dating')} />
@@ -136,6 +152,7 @@ export function AddCard() {
             </ActionIcon>
           </Stack>
         </Fieldset>
+
         <FileInput label="Load image" rightSection={<IconPhotoPlus />} />
         <Textarea label="Description" autosize minRows={2} {...form.getInputProps('description')} />
         <Button mt="lg" type="submit" variant="outline" color="dark">
