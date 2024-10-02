@@ -4,7 +4,7 @@ import { IBarometerType } from './type'
 import { IBarometerCondition } from './condition'
 
 export interface IBarometer {
-  _id: string
+  _id?: string
   collectionId: string
   name: string
   type: IBarometerType
@@ -13,6 +13,7 @@ export interface IBarometer {
   manufacturer?: IManufacturer
   dimensions?: { dim: string; value: string }[]
   description?: string
+  images?: string[]
 }
 
 const barometerSchema = new Schema<IBarometer>(
@@ -54,6 +55,10 @@ const barometerSchema = new Schema<IBarometer>(
     },
     description: {
       type: String,
+      required: false,
+    },
+    images: {
+      type: [String],
       required: false,
     },
   },

@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "types": ["node", "jest", "@testing-library/jest-dom"],
-    "target": "es5",
+    "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,

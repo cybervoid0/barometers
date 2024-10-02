@@ -8,7 +8,6 @@ import { cleanObject } from '@/utils/misc'
 
 export async function GET() {
   await connectMongoose()
-
   try {
     const barometers = await Barometer.find().populate(['type', 'condition', 'manufacturer'])
     return NextResponse.json(barometers, { status: 201 })
@@ -22,7 +21,6 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   await connectMongoose()
-
   try {
     const barometerData: IBarometer = await req.json()
     const cleanData = cleanObject(barometerData)
