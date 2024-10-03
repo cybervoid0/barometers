@@ -1,18 +1,6 @@
 'use client'
 
-import {
-  Box,
-  Title,
-  Button,
-  TextInput,
-  Select,
-  Textarea,
-  Fieldset,
-  ActionIcon,
-  Group,
-  Stack,
-} from '@mantine/core'
-import { IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
+import { Box, Title, Button, TextInput, Select, Textarea } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios, { AxiosError } from 'axios'
@@ -21,29 +9,21 @@ import { isLength } from 'validator'
 import { showInfo, showError } from '@/utils/notification'
 import { useBarometers } from '../hooks/useBarometers'
 import { FileUpload } from './file-upload'
-
-interface FormProps {
-  collectionId: string
-  name: string
-  type: string
-  dating: string
-  manufacturer: string
-  condition: string
-  description: string
-  dimensions: { dim: string; value: string }[]
-}
+import { AddManufacturer } from './add-manufacturer'
+import { Dimensions } from './dimensions'
+import type { BarometerFormProps } from './types'
 
 export function AddCard() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const { condition, types, manufacturers } = useBarometers()
 
-  const form = useForm<FormProps>({
+  const form = useForm<BarometerFormProps>({
     initialValues: {
       collectionId: '',
       name: '',
       type: '',
       dating: '',
-      manufacturer: '',
+      manufacturer: '0',
       condition: '',
       description: '',
       dimensions: [],
@@ -56,10 +36,11 @@ export function AddCard() {
 
   const queryClient = useQueryClient()
   const { mutate } = useMutation({
-    mutationFn: async (values: FormProps) => {
+    mutationFn: async (values: BarometerFormProps) => {
       const barometerWithImages = {
         ...values,
-        images: uploadedImages,
+        manufacturer: manufacturers.data.at(+values.manufacturer),
+        images: uploadedImages.map(image => image.split('/').at(-1)),
       }
       const { data } = await axios.post('/api/barometers', barometerWithImages, {
         headers: { 'Content-Type': 'application/json' },
@@ -95,20 +76,10 @@ export function AddCard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [condition.data])
 
-  const addDimension = () => {
-    if (form.values.dimensions.length > 6) return
-    form.insertListItem('dimensions', { dim: '', value: '' })
-  }
-
-  // delete key-value pair by index
-  const removeDimension = (index: number) => {
-    form.removeListItem('dimensions', index)
-  }
-
   return (
-    <Box flex={1}>
+    <Box mt="lg" flex={1}>
       <Title mb="lg" order={3} tt="capitalize">
-        Add barometer
+        Add new barometer
       </Title>
       <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
         <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
@@ -121,15 +92,24 @@ export function AddCard() {
           }))}
           label="Type"
           required
+          allowDeselect={false}
           {...form.getInputProps('type')}
         />
         <Select
-          data={manufacturers.data.map(({ name, _id }) => ({
+          data={manufacturers.data.map(({ name }, i) => ({
             label: name,
-            value: String(_id),
+            value: String(i),
           }))}
           label="Manufacturer"
+          allowDeselect={false}
+          /* отсюда открывать модальное окно с производителями */
+          leftSection={<AddManufacturer />}
           {...form.getInputProps('manufacturer')}
+          styles={{
+            input: {
+              paddingLeft: '2.5rem',
+            },
+          }}
         />
         <Select
           label="Condition"
@@ -137,35 +117,13 @@ export function AddCard() {
             label: name,
             value: String(_id),
           }))}
+          allowDeselect={false}
           {...form.getInputProps('condition')}
         />
         {/* Images upload */}
         <FileUpload fileNames={uploadedImages} setFileNames={setUploadedImages} />
         {/* Dimensions */}
-        <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Dimensions">
-          <Stack gap="xs" align="flex-end">
-            {form.values.dimensions?.map((_, i) => (
-              <Group w="100%" wrap="nowrap" gap="xs" key={form.key(`dimensions.${i}`)}>
-                <TextInput
-                  flex={1}
-                  placeholder="Unit"
-                  {...form.getInputProps(`dimensions.${i}.dim`)}
-                />
-                <TextInput
-                  flex={1}
-                  placeholder="Value"
-                  {...form.getInputProps(`dimensions.${i}.value`)}
-                />
-                <ActionIcon variant="default" onClick={() => removeDimension(i)}>
-                  <IconTrash color="grey" size={20} />
-                </ActionIcon>
-              </Group>
-            ))}
-            <ActionIcon variant="default" onClick={addDimension}>
-              <IconSquareRoundedPlus color="grey" />
-            </ActionIcon>
-          </Stack>
-        </Fieldset>
+        <Dimensions form={form} />
         <Textarea label="Description" autosize minRows={2} {...form.getInputProps('description')} />
         <Button mt="lg" type="submit" variant="outline" color="dark">
           Add new barometer

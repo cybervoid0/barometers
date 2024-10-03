@@ -10,6 +10,7 @@ import {
   Stack,
   Group,
   Paper,
+  Tooltip,
 } from '@mantine/core'
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import axios, { AxiosError } from 'axios'
@@ -78,36 +79,40 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
   }
   return (
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
-      <Stack gap="xs" align="flex-end">
-        <Group gap="0.4rem" wrap="wrap">
-          {fileNames.map((fileName, i) => (
-            <Paper key={fileName} withBorder pos="relative">
-              <CloseButton
-                p={0}
-                c="dark.3"
-                radius={100}
-                size="1rem"
-                right={1}
-                top={1}
-                pos="absolute"
-                icon={<IconXboxX />}
-                bg="white"
-                onClick={() => handleDeleteFile(i)}
-              />
-              <Image h="3rem" w="3rem" src={fileName} />
-            </Paper>
-          ))}
+      <Stack gap="xs" align="flex-start">
+        <Group w="100%" justify="space-between">
           <FileButton
             onChange={handleFileUpload}
             accept="image/png,image/jpeg,image/svg+xml"
             multiple
           >
             {props => (
-              <ActionIcon loading={isUploading} variant="default" {...props}>
-                <IconPhotoPlus color="grey" />
-              </ActionIcon>
+              <Tooltip color="dark.3" withArrow label="Add image">
+                <ActionIcon loading={isUploading} variant="default" {...props}>
+                  <IconPhotoPlus color="grey" />
+                </ActionIcon>
+              </Tooltip>
             )}
           </FileButton>
+          <Group gap="0.4rem" wrap="wrap">
+            {fileNames.map((fileName, i) => (
+              <Paper key={fileName} withBorder pos="relative">
+                <CloseButton
+                  p={0}
+                  c="dark.3"
+                  radius={100}
+                  size="1rem"
+                  right={1}
+                  top={1}
+                  pos="absolute"
+                  icon={<IconXboxX />}
+                  bg="white"
+                  onClick={() => handleDeleteFile(i)}
+                />
+                <Image h="3rem" w="3rem" src={fileName} />
+              </Paper>
+            ))}
+          </Group>
         </Group>
       </Stack>
     </Fieldset>
