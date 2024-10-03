@@ -13,7 +13,6 @@ export const authConfig: AuthOptions = {
         email: { label: 'email', type: 'email', required: true },
         password: { label: 'password', type: 'password', required: true },
       },
-
       authorize: async credentials => {
         if (!credentials) throw new Error('Unknown credentials')
         await connectMongoose()
@@ -31,5 +30,8 @@ export const authConfig: AuthOptions = {
   pages: {
     // redirect on protected routes
     signIn: '/signin',
+  },
+  session: {
+    strategy: 'jwt',
   },
 }
