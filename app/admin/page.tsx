@@ -1,7 +1,5 @@
-import { FC } from 'react'
 import { AddCard } from './add-card'
 
-export const Admin: FC = () => {
+export default function Admin() {
   return <AddCard />
 }
-export default Admin
