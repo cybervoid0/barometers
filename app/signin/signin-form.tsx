@@ -1,6 +1,6 @@
 'use client'
 
-import { signIn, useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { Button, TextInput, PasswordInput, Box, Stack } from '@mantine/core'
 import { IconAt } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
@@ -9,8 +9,6 @@ import { useRouter } from 'next/navigation'
 import { showError, showInfo } from '@/utils/notification'
 
 export function SignInForm() {
-  const session = useSession()
-  console.log('🚀 ~ SignInForm ~ session:', session)
   const router = useRouter()
   const form = useForm({
     name: 'sign-in',
