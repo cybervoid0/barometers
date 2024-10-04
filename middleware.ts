@@ -7,6 +7,7 @@ export default async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   console.log('Token:', token)
   console.log('NEXTAUTH_SECRET', process.env.NEXTAUTH_SECRET)
+  console.log('NEXTAUTH_URL', process.env.NEXTAUTH_URL)
 
   // Если токена нет, перенаправляем на страницу логина
   if (!token) {
