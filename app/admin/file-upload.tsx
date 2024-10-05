@@ -26,9 +26,8 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   // upload images to backend
   const handleFileUpload = async (files: File[] | null) => {
-    const formData = new FormData()
     if (!files || !Array.isArray(files) || files.length === 0) return
-
+    const formData = new FormData()
     files.forEach((file, i) => {
       formData.append(`image_${i}`, file)
     })
@@ -81,11 +80,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
       <Stack gap="xs" align="flex-start">
         <Group w="100%" justify="space-between">
-          <FileButton
-            onChange={handleFileUpload}
-            accept="image/png,image/jpeg,image/svg+xml"
-            multiple
-          >
+          <FileButton onChange={handleFileUpload} accept="image/*" multiple>
             {props => (
               <Tooltip color="dark.3" withArrow label="Add image">
                 <ActionIcon loading={isUploading} variant="default" {...props}>
