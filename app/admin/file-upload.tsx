@@ -15,8 +15,9 @@ import {
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import axios, { AxiosError } from 'axios'
 import { showError } from '@/utils/notification'
+import { FileDto, UrlDto } from '../api/barometers/upload/images/types'
 
-const imageRoute = '/api/barometers/upload/images/'
+const imageUploadRoute = '/api/barometers/upload/images/'
 
 interface FileUploadProps {
   fileNames: string[]
@@ -24,29 +25,37 @@ interface FileUploadProps {
 }
 export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
-  // upload images to backend
-  const handleFileUpload = async (files: File[] | null) => {
+
+  // upload images to Google cloud
+  const googleUploadImages = async (files: File[] | null) => {
     if (!files || !Array.isArray(files) || files.length === 0) return
-    const formData = new FormData()
-    files.forEach((file, i) => {
-      formData.append(`image_${i}`, file)
-    })
+    setIsUploading(true)
     try {
-      setIsUploading(true)
-      const res = await axios.post(imageRoute, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      const uploadedFiles = res.data.images as string[] | undefined
-      if (
-        typeof uploadedFiles === 'undefined' ||
-        !Array.isArray(uploadedFiles) ||
-        uploadedFiles.length === 0
+      const {
+        data: { urls },
+      } = await axios.post<UrlDto>(
+        imageUploadRoute,
+        {
+          files: files.map(file => ({
+            fileName: file.name,
+            contentType: file.type,
+          })),
+        } as FileDto,
+        { headers: { 'Content-Type': 'application/json' } },
       )
-        throw new Error('Files were not uploaded')
-      setFileNames(old => [...old, ...uploadedFiles])
-    } catch (error: unknown) {
+      // upload all files concurrently
+      await Promise.all(
+        urls.map(async ({ signed }, index) => {
+          const file = files[index]
+          await axios.put(signed, file, {
+            headers: {
+              'Content-Type': file.type,
+            },
+          })
+        }),
+      )
+      setFileNames(old => [...old, ...urls.map(url => url.public)])
+    } catch (error) {
       const defaultErrMsg = 'Error uploading files'
       if (error instanceof AxiosError) {
         showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
@@ -61,7 +70,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
   const handleDeleteFile = async (index: number) => {
     const fileName = fileNames.at(index)?.split('/').at(-1)
     try {
-      await axios.delete(imageRoute, {
+      await axios.delete(imageUploadRoute, {
         params: {
           fileName,
         },
@@ -80,7 +89,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
       <Stack gap="xs" align="flex-start">
         <Group w="100%" justify="space-between">
-          <FileButton onChange={handleFileUpload} accept="image/*" multiple>
+          <FileButton onChange={googleUploadImages} accept="image/*" multiple>
             {props => (
               <Tooltip color="dark.3" withArrow label="Add image">
                 <ActionIcon loading={isUploading} variant="default" {...props}>

@@ -1,18 +1,13 @@
 'use client'
 
+import React from 'react'
 import NextImage from 'next/image'
 import NextLink from 'next/link'
 import { Group, Burger, Image, Anchor, Title, Container, Box, Flex } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { Cormorant_SC } from 'next/font/google'
 import { Tabs } from './tabs'
 import { MobileMenu } from './mobile-menu'
 import styles from './header.module.scss'
-
-const cormorantSc = Cormorant_SC({
-  subsets: ['latin'],
-  weight: '700',
-})
 
 export function Header() {
   const [opened, { close, open }] = useDisclosure()
@@ -28,13 +23,7 @@ export function Header() {
               </Box>
               <Flex align="center" gap="md">
                 <Anchor underline="never" component={NextLink} href="/">
-                  <Title
-                    lh="100%"
-                    ta="right"
-                    fz={{ base: 'h3', sm: 'h1' }}
-                    c="black"
-                    ff={cormorantSc.style.fontFamily}
-                  >
+                  <Title lh="100%" ta="right" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={600}>
                     Barometers Realm
                   </Title>
                 </Anchor>
@@ -42,11 +31,11 @@ export function Header() {
                   <Image
                     component={NextImage}
                     alt="Antiques"
-                    width={295}
-                    height={87.5}
-                    src="/images/head-logo.png"
-                    w={{ base: '3rem', sm: '5rem' }}
-                    h={{ base: '3rem', sm: '5rem' }}
+                    width={236}
+                    height={236}
+                    src="/images/logo_circle.png"
+                    w={{ base: '3rem', sm: '4rem' }}
+                    h={{ base: '3rem', sm: '4rem' }}
                   />
                 </Anchor>
               </Flex>

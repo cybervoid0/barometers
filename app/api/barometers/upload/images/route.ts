@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import { Storage } from '@google-cloud/storage'
-
-const allowedExtensions = ['.jpeg', '.png', '.svg']
+import { v4 as uuid } from 'uuid'
+import { GetSignedUrlConfig, Storage } from '@google-cloud/storage'
+import { FileDto, UrlDto, UrlProps } from './types'
 
 const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID,
@@ -17,37 +16,34 @@ const bucket = storage.bucket(process.env.GCP_BUCKET_NAME)
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData()
-    // parallel files upload
-    const uploadedImages: string[] = (
-      await Promise.allSettled(
-        Array.from(formData.values()).map(async file => {
-          if (!(file instanceof File)) throw new Error('Not a file')
-          const extension = path.extname(file.name).toLowerCase()
-          if (!allowedExtensions.includes(extension)) throw new Error('Wrong file type')
-
-          const fileName = `${uuidv4()}${extension}`
-          const arrayBuffer = await file.arrayBuffer()
-          const buffer = new Uint8Array(arrayBuffer)
-
-          // save to google cloud
-          const cloudFile = bucket.file(fileName)
-          await cloudFile.save(buffer, {
-            resumable: false,
-            contentType: file.type,
-            public: true,
-          })
-
-          return cloudFile.publicUrl()
-        }),
-      )
+    const { files }: FileDto = await req.json()
+    const signedUrls = await Promise.all(
+      files.map<Promise<UrlProps>>(async ({ fileName, contentType }) => {
+        // give unique names to files
+        const extension = path.extname(fileName).toLowerCase()
+        const newFileName = uuid() + extension
+        const options: GetSignedUrlConfig = {
+          version: 'v4',
+          action: 'write',
+          expires: Date.now() + 15 * 60 * 1000, // 15 min
+          contentType,
+        }
+        const cloudFile = bucket.file(newFileName)
+        // generate signed URL for each file
+        const [signedUrl] = await cloudFile.getSignedUrl(options)
+        return {
+          signed: signedUrl,
+          public: cloudFile.publicUrl(),
+        }
+      }),
     )
-      .filter(result => result.status === 'fulfilled')
-      .map(result => result.value)
-
     revalidatePath('/')
-
-    return NextResponse.json({ images: uploadedImages }, { status: 201 })
+    return NextResponse.json<UrlDto>(
+      {
+        urls: signedUrls,
+      },
+      { status: 201 },
+    )
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error uploading files' },
