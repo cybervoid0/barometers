@@ -34,18 +34,16 @@ export default async function HomePage() {
         {errorMessage ? (
           <ShowError message={errorMessage} />
         ) : (
-          <Grid gutter={{ base: 'xs', sm: 'lg' }}>
-            {barometerTypes
-              .filter(({ image }) => image)
-              .map(({ image, _id, label, name }) => (
-                <GridCol key={String(_id)} span={{ base: 12, xs: 6, lg: 4 }}>
-                  <CategoryCard
-                    image={googleStorageImagesFolder + image}
-                    name={label}
-                    link={`/collection/${name.toLowerCase()}`}
-                  />
-                </GridCol>
-              ))}
+          <Grid justify="center" gutter={{ base: 'xs', sm: 'lg' }}>
+            {barometerTypes.map(({ image, _id, label, name }) => (
+              <GridCol key={String(_id)} span={{ base: 12, xs: 6, lg: 4 }}>
+                <CategoryCard
+                  image={googleStorageImagesFolder + image}
+                  name={label}
+                  link={`/collection/${name.toLowerCase()}`}
+                />
+              </GridCol>
+            ))}
           </Grid>
         )}
       </Container>
