@@ -1,7 +1,7 @@
 'use server'
 
 import React from 'react'
-import { Container, Grid, GridCol, Title } from '@mantine/core'
+import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { barometerTypesApiRoute, googleStorageImagesFolder } from './constants'
@@ -31,9 +31,6 @@ export default async function HomePage() {
     <>
       <HeadingImage />
       <Container size="xl" pb="2.3rem">
-        <Title ta="center" order={1} size="h2" py={{ base: 'lg', lg: 'xl' }}>
-          Welcome to Barometers Realm
-        </Title>
         {errorMessage ? (
           <ShowError message={errorMessage} />
         ) : (
