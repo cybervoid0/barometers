@@ -13,3 +13,14 @@
   background-color: white;
   z-index: 10;
 }
+
+.logo {
+  height: 3rem;
+  aspect-ratio: 1.24 / 1;
+  @include sm {
+    height: 4rem;
+  }
+  background-image: url('/images/logo-arrow.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+}

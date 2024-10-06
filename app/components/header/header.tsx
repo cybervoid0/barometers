@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import NextImage from 'next/image'
 import NextLink from 'next/link'
-import { Group, Burger, Image, Anchor, Title, Container, Box, Flex } from '@mantine/core'
+import { Group, Burger, Anchor, Title, Container, Box, Flex } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Tabs } from './tabs'
 import { MobileMenu } from './mobile-menu'
@@ -16,7 +15,7 @@ export function Header() {
       <Box className={styles.indent}>
         <Box className={styles.container}>
           <Container size="xl">
-            <Group align="center" justify="space-between" gap="0.3rem">
+            <Group justify="space-between" gap="0.3rem" wrap="nowrap">
               <Box>
                 <Burger size="sm" hiddenFrom="md" opened={opened} onClick={open} />
                 <Tabs visibleFrom="md" />
@@ -27,15 +26,10 @@ export function Header() {
                     Barometers Realm
                   </Title>
                 </Anchor>
+
                 <Anchor underline="never" component={NextLink} href="/">
-                  <Image
-                    component={NextImage}
-                    alt="Antiques"
-                    width={236}
-                    height={236}
-                    src="/images/logo-arrow.png"
-                    h={{ base: '3rem', sm: '4rem' }}
-                  />
+                  {/* Logo image */}
+                  <Box className={styles.logo} />
                 </Anchor>
               </Flex>
             </Group>
