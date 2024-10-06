@@ -4,7 +4,7 @@ import styles from './heading-image.module.scss'
 
 export const HeadingImage: FC = () => {
   return (
-    <Container mb="lg" className={styles.container}>
+    <Container mb="3rem" className={styles.container}>
       <Overlay
         zIndex={2}
         gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)"
