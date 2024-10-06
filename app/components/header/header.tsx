@@ -23,7 +23,7 @@ export function Header() {
               </Box>
               <Flex align="center" gap="md">
                 <Anchor underline="never" component={NextLink} href="/">
-                  <Title lh="100%" ta="right" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={600}>
+                  <Title lh="100%" ta="right" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={700}>
                     Barometers Realm
                   </Title>
                 </Anchor>
@@ -33,8 +33,7 @@ export function Header() {
                     alt="Antiques"
                     width={236}
                     height={236}
-                    src="/images/logo_circle.png"
-                    w={{ base: '3rem', sm: '4rem' }}
+                    src="/images/logo-arrow.png"
                     h={{ base: '3rem', sm: '4rem' }}
                   />
                 </Anchor>
