@@ -3,6 +3,9 @@ import { Schema, model, Document, models, type Model } from 'mongoose'
 export interface IBarometerType extends Document {
   name: string
   description?: string
+  label: string
+  order: number
+  image?: string
 }
 
 /**
@@ -17,6 +20,18 @@ const barometerTypeSchema = new Schema<IBarometerType>({
   description: {
     type: String,
     required: false,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+  order: {
+    type: Number,
+    required: true,
   },
 })
 

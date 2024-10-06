@@ -12,6 +12,7 @@ import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
 import type { BarometerFormProps } from './types'
+import { barometersApiRoute } from '../constants'
 
 export function AddCard() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
@@ -42,7 +43,7 @@ export function AddCard() {
         manufacturer: manufacturers.data.at(+values.manufacturer),
         images: uploadedImages.map(image => image.split('/').at(-1)),
       }
-      const { data } = await axios.post('/api/barometers', barometerWithImages, {
+      const { data } = await axios.post(barometersApiRoute, barometerWithImages, {
         headers: { 'Content-Type': 'application/json' },
       })
       return data

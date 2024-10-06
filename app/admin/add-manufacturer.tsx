@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconSquareRoundedPlus } from '@tabler/icons-react'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
+import { manufacturersApiRoute } from '../constants'
 
 export function AddManufacturer() {
   const [opened, { open, close }] = useDisclosure(false)
@@ -36,7 +37,7 @@ export function AddManufacturer() {
   const { mutate } = useMutation({
     mutationFn: (values: IManufacturer) =>
       axios
-        .post('/api/barometers/manufacturers/', values, {
+        .post(manufacturersApiRoute, values, {
           headers: { 'Content-Type': 'application/json' },
         })
         .then(({ data }) => data),

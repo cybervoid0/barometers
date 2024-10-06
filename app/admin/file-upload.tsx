@@ -16,8 +16,7 @@ import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import axios, { AxiosError } from 'axios'
 import { showError } from '@/utils/notification'
 import { FileDto, UrlDto } from '../api/barometers/upload/images/types'
-
-const imageUploadRoute = '/api/barometers/upload/images/'
+import { imageUploadRoute } from '../constants'
 
 interface FileUploadProps {
   fileNames: string[]

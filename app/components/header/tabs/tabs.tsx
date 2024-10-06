@@ -17,9 +17,11 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import sx from './tabs.module.scss'
-import { menuData, hasChildren } from '../menudata'
+import { menuData } from '../menudata'
+import { useBarometers } from '@/app/hooks/useBarometers'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
+  const { types } = useBarometers()
   const { status } = useSession()
   const isLoggedId = status === 'authenticated'
   const router = useRouter()
@@ -35,7 +37,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
     const index = Number(val ?? 0)
     const menuItem = menuData[index]
     if (!menuItem) return
-    if (!hasChildren(menuItem)) router.push(`/${menuItem.link}`)
+    if (menuItem.label !== 'Collection') router.push(`/${menuItem.link}`)
   }
 
   // set active tab when the router path changes
@@ -62,7 +64,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                   </Text>
                 </Tabs.Tab>
               )
-              return hasChildren(menuitem) ? (
+              return menuitem.label === 'Collection' ? (
                 <Menu
                   trigger="click-hover"
                   menuItemTabIndex={0}
@@ -75,16 +77,16 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                 >
                   <Menu.Target>{renderTab()}</Menu.Target>
                   <Menu.Dropdown>
-                    {menuitem.children.map(submenu => (
+                    {types.data.map(({ label, _id, name }) => (
                       <Anchor
-                        key={submenu.id}
-                        href={`/${menuitem.link}/${submenu.link}`}
+                        key={String(_id)}
+                        href={`/collection/${name.toLocaleLowerCase()}`}
                         component={Link}
                         c="inherit"
                         underline="never"
                       >
                         <Menu.Item>
-                          <Box px="xs">{submenu.label}</Box>
+                          <Box px="xs">{label}</Box>
                         </Menu.Item>
                       </Anchor>
                     ))}

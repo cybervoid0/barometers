@@ -1,4 +1,4 @@
-import { FC, useState, Fragment } from 'react'
+import React, { FC, useState, Fragment } from 'react'
 import {
   Drawer,
   DrawerProps,
@@ -19,11 +19,13 @@ import * as motion from 'framer-motion/client'
 import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
 import { instagram, email } from '@/app/constants'
-import { menuData, hasChildren } from '../menudata'
+import { menuData } from '../menudata'
+import { useBarometers } from '@/app/hooks/useBarometers'
 
 export const MobileMenu: FC<DrawerProps> = props => {
   const [opened, setOpened] = useState<Record<number, boolean>>({})
   const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
+  const { types } = useBarometers()
 
   return (
     <Drawer
@@ -50,7 +52,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
           <List px="xl" listStyleType="none">
             {menuData.map((outer, i, arr) => (
               <Fragment key={outer.id}>
-                {hasChildren(outer) ? (
+                {outer.label === 'Collection' ? (
                   <>
                     <List.Item py="md">
                       <UnstyledButton onClick={() => toggle(i)}>
@@ -70,16 +72,16 @@ export const MobileMenu: FC<DrawerProps> = props => {
                     </List.Item>
                     <Collapse transitionDuration={500} in={opened[i]}>
                       <List px="xl" listStyleType="none">
-                        {outer.children.map(inner => (
-                          <List.Item pb="sm" key={inner.id}>
+                        {types.data.map(({ name, label, _id }) => (
+                          <List.Item pb="sm" key={String(_id)}>
                             <Anchor
                               c="inherit"
                               component={Link}
-                              href={`/${outer.link}/${inner.link}`}
+                              href={`/collection/${name.toLowerCase()}`}
                               onClick={props.onClose}
                             >
                               <Text size="xs" tt="capitalize" lts="0.1rem" fw={400}>
-                                {inner.label}
+                                {label}
                               </Text>
                             </Anchor>
                           </List.Item>

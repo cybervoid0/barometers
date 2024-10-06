@@ -1,10 +1,15 @@
 import { Overlay, AspectRatio, BackgroundImage, Title, Anchor, Box } from '@mantine/core'
 import NextLink from 'next/link'
 import { FC } from 'react'
-import type { Category } from './types'
 import styles from './category-card.module.scss'
 
-export const CategoryCard: FC<Category> = ({ name, link, image }) => {
+interface CategoryCardProps {
+  name: string
+  link: string
+  image: string
+}
+
+export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
   return (
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
