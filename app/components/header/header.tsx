@@ -22,7 +22,7 @@ export function Header() {
               </Box>
               <Flex align="center" gap="md">
                 <Anchor underline="never" component={NextLink} href="/">
-                  <Title lh="100%" ta="right" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={700}>
+                  <Title lh="100%" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={500}>
                     Barometers Realm
                   </Title>
                 </Anchor>
