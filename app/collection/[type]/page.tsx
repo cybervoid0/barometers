@@ -31,7 +31,7 @@ export default async function Collection({ params: { type } }: CollectionProps) 
           {type}
         </Title>
       </Flex>
-      <Grid gutter="xl">
+      <Grid justify="center" gutter="xl">
         {barometersOfType
           ?.filter(({ images }) => Boolean(images?.[0]))
           .map(({ name, _id, images }) => (
