@@ -4,9 +4,15 @@ import React from 'react'
 import { Container, Flex, Grid, GridCol, Title } from '@mantine/core'
 import { IBarometerType } from '@/models/type'
 import { IBarometer } from '@/models/barometer'
-import { barometerTypesApiRoute, barometersApiRoute } from '../../constants'
+import {
+  barometerRoute,
+  barometerTypesApiRoute,
+  barometersApiRoute,
+  googleStorageImagesFolder,
+} from '../../../constants'
 import { BarometerCard } from './barometer-card'
 import { ShowError } from '@/app/components/show-error'
+import { slug } from '@/utils/misc'
 
 interface CollectionProps {
   params: {
@@ -14,7 +20,7 @@ interface CollectionProps {
   }
 }
 export default async function Collection({ params: { type } }: CollectionProps) {
-  const res = await fetch(`${process.env.NEXTAUTH_URL + barometersApiRoute}?type=${type}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute}?type=${type}`, {
     next: { revalidate: 600 },
   })
 
@@ -36,7 +42,11 @@ export default async function Collection({ params: { type } }: CollectionProps) 
           ?.filter(({ images }) => Boolean(images?.[0]))
           .map(({ name, _id, images }) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
-              <BarometerCard image={images![0]} name={name} />
+              <BarometerCard
+                image={googleStorageImagesFolder + images![0]}
+                name={name}
+                link={barometerRoute + slug(name)}
+              />
             </GridCol>
           ))}
       </Grid>
@@ -45,10 +55,10 @@ export default async function Collection({ params: { type } }: CollectionProps) 
 }
 
 export async function generateStaticParams() {
-  const res = await fetch(process.env.NEXTAUTH_URL + barometerTypesApiRoute)
+  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometerTypesApiRoute)
   const barometerTypes: IBarometerType[] = await res.json()
 
   return barometerTypes.map((type: { name: string }) => ({
-    type: type.name.toLowerCase(), // Генерируем параметры на основе типов
+    type: type.name.toLowerCase(),
   }))
 }

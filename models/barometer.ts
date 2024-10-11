@@ -7,6 +7,7 @@ export interface IBarometer {
   _id?: string
   collectionId: string
   name: string
+  slug?: string
   type: IBarometerType
   condition: IBarometerCondition
   dating?: string
@@ -29,6 +30,11 @@ const barometerSchema = new Schema<IBarometer>(
       required: true,
       minlength: 2,
       maxlength: 200,
+    },
+    slug: {
+      unique: true,
+      type: String,
+      required: true,
     },
     type: {
       type: Schema.Types.ObjectId,

@@ -7,15 +7,15 @@ import '@/models/manufacturer'
 
 interface Params {
   params: {
-    id: string
+    slug: string
   }
 }
 
-export async function GET(req: NextRequest, { params: { id } }: Params) {
+export async function GET(_req: NextRequest, { params: { slug } }: Params) {
   await connectMongoose()
 
   try {
-    const barometers = await Barometer.findOne({ collectionId: id }).populate([
+    const barometers = await Barometer.findOne({ slug }).populate([
       'type',
       'condition',
       'manufacturer',

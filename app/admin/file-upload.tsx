@@ -16,7 +16,7 @@ import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import axios, { AxiosError } from 'axios'
 import { showError } from '@/utils/notification'
 import { FileDto, UrlDto } from '../api/barometers/upload/images/types'
-import { imageUploadRoute } from '../constants'
+import { imageUploadApiRoute } from '../constants'
 
 interface FileUploadProps {
   fileNames: string[]
@@ -33,7 +33,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
       const {
         data: { urls },
       } = await axios.post<UrlDto>(
-        imageUploadRoute,
+        imageUploadApiRoute,
         {
           files: files.map(file => ({
             fileName: file.name,
@@ -69,7 +69,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
   const handleDeleteFile = async (index: number) => {
     const fileName = fileNames.at(index)?.split('/').at(-1)
     try {
-      await axios.delete(imageUploadRoute, {
+      await axios.delete(imageUploadApiRoute, {
         params: {
           fileName,
         },

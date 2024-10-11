@@ -19,6 +19,7 @@ import { useSession } from 'next-auth/react'
 import sx from './tabs.module.scss'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { barometerTypesRoute } from '@/app/constants'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
   const { types } = useBarometers()
@@ -80,7 +81,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                     {types.data.map(({ label, _id, name }) => (
                       <Anchor
                         key={String(_id)}
-                        href={`/collection/${name.toLocaleLowerCase()}`}
+                        href={barometerTypesRoute + name.toLocaleLowerCase()}
                         component={Link}
                         c="inherit"
                         underline="never"

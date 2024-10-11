@@ -4,7 +4,7 @@ import Barometer, { IBarometer } from '@/models/barometer'
 import BarometerType from '@/models/type'
 import '@/models/condition'
 import '@/models/manufacturer'
-import { cleanObject } from '@/utils/misc'
+import { cleanObject, slug as slugify } from '@/utils/misc'
 
 export async function GET(req: NextRequest) {
   await connectMongoose()
@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
   try {
     const barometerData: IBarometer = await req.json()
     const cleanData = cleanObject(barometerData)
+    cleanData.slug = slugify(cleanData.name)
     const newBarometer = new Barometer(cleanData)
     await newBarometer.save()
     return NextResponse.json({ id: newBarometer._id }, { status: 201 })

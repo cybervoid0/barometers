@@ -4,7 +4,7 @@ import React from 'react'
 import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
-import { barometerTypesApiRoute, googleStorageImagesFolder } from './constants'
+import { barometerTypesApiRoute, barometerTypesRoute, googleStorageImagesFolder } from './constants'
 import { IBarometerType } from '@/models/type'
 import { ShowError } from './components/show-error'
 
@@ -40,7 +40,7 @@ export default async function HomePage() {
                 <CategoryCard
                   image={googleStorageImagesFolder + image}
                   name={label}
-                  link={`/collection/${name.toLowerCase()}`}
+                  link={barometerTypesRoute + name.toLowerCase()}
                 />
               </GridCol>
             ))}

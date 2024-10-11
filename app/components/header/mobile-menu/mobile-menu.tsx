@@ -18,7 +18,7 @@ import Link from 'next/link'
 import * as motion from 'framer-motion/client'
 import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
-import { instagram, email } from '@/app/constants'
+import { instagram, email, barometerTypesRoute } from '@/app/constants'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
 
@@ -77,7 +77,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                             <Anchor
                               c="inherit"
                               component={Link}
-                              href={`/collection/${name.toLowerCase()}`}
+                              href={barometerTypesRoute + name.toLowerCase()}
                               onClick={props.onClose}
                             >
                               <Text size="xs" tt="capitalize" lts="0.1rem" fw={400}>

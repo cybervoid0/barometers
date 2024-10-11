@@ -1,3 +1,4 @@
+import slugify from 'slugify'
 import traverse from 'traverse'
 
 /**
@@ -18,4 +19,8 @@ export function cleanObject<T>(obj: T): T {
       this.remove()
     }
   })
+}
+
+export function slug(text: string): string {
+  return encodeURIComponent(slugify(text, { lower: true, replacement: '_', remove: /[,.'"]/g }))
 }
