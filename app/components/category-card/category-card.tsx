@@ -1,5 +1,6 @@
-import { Overlay, AspectRatio, BackgroundImage, Title, Anchor, Box } from '@mantine/core'
+import { Overlay, AspectRatio, Title, Anchor, Box } from '@mantine/core'
 import NextLink from 'next/link'
+import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './category-card.module.scss'
 
@@ -18,7 +19,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
             zIndex={2}
             gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 100%)"
           />
-          <BackgroundImage className={styles.bg_image} src={image} />
+          <NextImage fill src={image} alt={name} className={styles.bg_image} />
           <Title className={styles.title}>{name}</Title>
         </Box>
       </AspectRatio>
