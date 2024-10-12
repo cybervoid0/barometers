@@ -8,7 +8,7 @@ export const googleStorageImagesFolder = 'https://storage.googleapis.com/baromet
 export const barometersApiRoute = '/api/barometers/'
 export const barometerTypesApiRoute = '/api/barometers/types/'
 export const manufacturersApiRoute = '/api/barometers/manufacturers/'
-export const conditionsApiRoute = '/api/barometers/conditions'
+export const conditionsApiRoute = '/api/barometers/conditions/'
 export const imageUploadApiRoute = '/api/barometers/upload/images/'
 // Frontend routes
 export const barometerTypesRoute = '/collection/types/'
