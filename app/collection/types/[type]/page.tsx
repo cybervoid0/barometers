@@ -31,7 +31,7 @@ export default async function Collection({ params: { type } }: CollectionProps) 
   const barometersOfType: IBarometer[] = await res.json() // Парсим JSON данные из ответа
 
   return (
-    <Container size="xl">
+    <Container pb="xl" size="xl">
       <Flex h="5rem" align="center">
         <Title fw={500} order={2} tt="capitalize">
           {type}

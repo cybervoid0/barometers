@@ -67,15 +67,41 @@ export async function generateMetadata({
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   try {
-    const { name, images, description, manufacturer, dating, dimensions, condition }: IBarometer =
-      await fetchBarometer(slug)
+    const {
+      name,
+      images,
+      description,
+      manufacturer,
+      dating,
+      dimensions,
+      condition,
+      collectionId,
+    }: IBarometer = await fetchBarometer(slug)
 
     return (
       <Container pt={{ base: 'none', sm: '5rem' }} size="xl">
         <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
           <ImageCarousel images={images?.map(image => googleStorageImagesFolder + image) ?? []} />
-          <Title fw={500} mt={{ base: 'lg', sm: '5rem' }} mb="md" tt="capitalize">
+          <Title
+            w="fit-content"
+            pos="relative"
+            fw={500}
+            mt={{ base: 'lg', sm: '5rem' }}
+            mb="md"
+            tt="capitalize"
+          >
             {name}
+            <Text
+              pos="absolute"
+              top="0"
+              right="0"
+              c="dark.2"
+              fw={300}
+              size="xs"
+              style={{ textTransform: 'capitalize', transform: 'translateX(100%)' }}
+            >
+              {collectionId}
+            </Text>
           </Title>
 
           {manufacturer && (
@@ -84,7 +110,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
                 Manufacturer:&nbsp;
               </Title>
               <Title c="dark.3" fw={400} display="inline" order={3}>
-                {manufacturer.name}, {manufacturer.city}
+                {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
               </Title>
             </Box>
           )}

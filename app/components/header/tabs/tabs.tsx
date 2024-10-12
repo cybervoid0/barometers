@@ -59,7 +59,15 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
             )
             .map((menuitem, i) => {
               const renderTab = (key?: Key) => (
-                <Tabs.Tab className={sx[`tab-${scheme}`]} value={String(i)} key={key}>
+                <Tabs.Tab
+                  className={sx[`tab-${scheme}`]}
+                  value={String(i)}
+                  key={key}
+                  onClick={() => {
+                    // close opened menu
+                    if (opened[i]) setOpened(old => ({ ...old, [i]: false }))
+                  }}
+                >
                   <Text size="xs" tt="uppercase" fw={600} lts=".2rem">
                     {menuitem.label}
                   </Text>

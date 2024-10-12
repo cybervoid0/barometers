@@ -19,7 +19,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
             zIndex={2}
             gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 100%)"
           />
-          <NextImage fill src={image} alt={name} className={styles.bg_image} />
+          <NextImage fill sizes="100%" src={image} alt={name} className={styles.bg_image} />
           <Title className={styles.title}>{name}</Title>
         </Box>
       </AspectRatio>

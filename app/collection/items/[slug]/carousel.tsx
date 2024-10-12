@@ -18,7 +18,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
     <Box w="100%" h="40rem">
       <Swiper
         style={{ position: 'relative', width: '100%', height: '100%' }}
-        loop
+        loop={images.length > 1}
         zoom
         navigation
         spaceBetween={50}
@@ -26,7 +26,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
       >
         {images.map(image => (
           <SwiperSlide key={image}>
-            <Box className="swiper-zoom-container">
+            <Box pos="relative" className="swiper-zoom-container">
               <NextImage fill src={image} alt="barometer" style={{ objectFit: 'contain' }} />
             </Box>
           </SwiperSlide>

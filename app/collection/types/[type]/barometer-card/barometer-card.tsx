@@ -14,7 +14,7 @@ export async function BarometerCard({ name, image, link }: BarometerCardProps) {
     <Box>
       <Anchor c="dark" component={Link} href={link}>
         <Box className={styles.bg_gradient}>
-          <NextImage src={image} alt={name} layout="fill" objectFit="contain" />
+          <NextImage src={image} alt={name} fill sizes="100%" style={{ objectFit: 'contain' }} />
         </Box>
         <Text size="xs" fw={500} lts={1} tt="uppercase" ta="center">
           {name}
