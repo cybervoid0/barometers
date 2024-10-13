@@ -1,15 +1,24 @@
-import { Flex, Title, Container, BackgroundImage, Overlay } from '@mantine/core'
+import { Flex, Title, Container, Overlay } from '@mantine/core'
+import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './heading-image.module.scss'
+import { googleStorageImagesFolder } from '@/app/constants'
 
 export const HeadingImage: FC = () => {
   return (
     <Container mb="3rem" className={styles.container}>
       <Overlay
         zIndex={2}
-        gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)"
+        gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%)"
       />
-      <BackgroundImage src="/images/header-bg.jpeg" className={styles.bg} />
+      <NextImage
+        priority
+        sizes="100%"
+        alt="Barograph"
+        src={`${googleStorageImagesFolder}65c97a01-7ab7-4670-9353-78e46df2ea3d.png`}
+        fill
+        className={styles.bg}
+      />
       <Flex className={styles.content}>
         <Title order={3} className={styles.title}>
           Industrial Era Barometer Collection

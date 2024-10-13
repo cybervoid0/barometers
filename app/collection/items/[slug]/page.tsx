@@ -16,6 +16,7 @@ import { AccessRole } from '@/models/user'
 import { TextFieldEdit } from './edit-fields/textfield-edit'
 import { DescriptionEdit } from './edit-fields/description-edit'
 import { ConditionEdit } from './edit-fields/condition-edit'
+// import { AddManufacturer } from '@/app/admin/add-manufacturer'
 
 interface BarometerItemProps {
   params: {
