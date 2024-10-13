@@ -1,6 +1,14 @@
 'use client'
 
-import { Modal, UnstyledButton, UnstyledButtonProps, Textarea, Button, Stack } from '@mantine/core'
+import {
+  Modal,
+  UnstyledButton,
+  UnstyledButtonProps,
+  Textarea,
+  Button,
+  Stack,
+  Tooltip,
+} from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
 import { IBarometer } from '@/models/barometer'
 import { useEditField } from './useEditField'
@@ -16,9 +24,11 @@ export function DescriptionEdit({ size = 18, barometer, ...props }: DescriptionE
   const { open, opened, close, form, update } = useEditField({ property, barometer })
   return (
     <>
-      <UnstyledButton {...props} onClick={open}>
-        <IconEdit color="brown" size={size} />
-      </UnstyledButton>
+      <Tooltip label={`Edit ${property}`}>
+        <UnstyledButton {...props} onClick={open}>
+          <IconEdit color="brown" size={size} />
+        </UnstyledButton>
+      </Tooltip>
       <Modal
         centered
         opened={opened}

@@ -1,4 +1,4 @@
-import React from 'react'
+import { ReactNode } from 'react'
 import {
   Box,
   Popover,
@@ -13,9 +13,10 @@ import { IBarometerCondition } from '@/models/condition'
 
 interface ConditionProps {
   condition: IBarometerCondition
+  editButton: ReactNode
 }
 
-export function Condition({ condition }: ConditionProps) {
+export function Condition({ condition, editButton }: ConditionProps) {
   return (
     <Box w="fit-content" pos="relative">
       <Title fw={500} display="inline" order={3}>
@@ -23,6 +24,7 @@ export function Condition({ condition }: ConditionProps) {
       </Title>
       <Title c="dark.3" fw={400} display="inline" order={4}>
         {condition.name}
+        {editButton}
       </Title>
       <Popover width={200} position="bottom" offset={0} withArrow shadow="md">
         <PopoverTarget>
