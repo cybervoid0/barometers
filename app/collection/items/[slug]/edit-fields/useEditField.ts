@@ -9,11 +9,15 @@ import { showError, showInfo } from '@/utils/notification'
 interface Props {
   barometer: IBarometer
   property: keyof IBarometer
+  validate?: (value: IBarometer[keyof IBarometer]) => string | null
 }
 
-export function useEditField({ property, barometer }: Props) {
+export function useEditField({ property, barometer, validate }: Props) {
   const form = useForm<Partial<IBarometer>>({
     initialValues: { [property]: '' },
+    validate: {
+      [property]: validate,
+    },
   })
   const [opened, { open, close }] = useDisclosure(false)
 

@@ -162,12 +162,10 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
               <Divider
                 mx="lg"
                 my="lg"
-                {...(isAdmin
-                  ? {
-                      label: <DescriptionEdit barometer={barometer} />,
-                      labelPosition: 'right',
-                    }
-                  : {})}
+                {...(isAdmin && {
+                  label: <DescriptionEdit barometer={barometer} />,
+                  labelPosition: 'right',
+                })}
               />
 
               <Spoiler

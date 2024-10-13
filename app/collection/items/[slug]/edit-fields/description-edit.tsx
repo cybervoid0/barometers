@@ -8,6 +8,7 @@ import {
   Button,
   Stack,
   Tooltip,
+  Box,
 } from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
 import { IBarometer } from '@/models/barometer'
@@ -38,12 +39,14 @@ export function DescriptionEdit({ size = 18, barometer, ...props }: DescriptionE
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Stack>
-          <Textarea autosize {...form.getInputProps(property)} />
-          <Button fullWidth color="dark" variant="outline" onClick={update}>
-            Save
-          </Button>
-        </Stack>
+        <Box component="form" onSubmit={form.onSubmit(update)}>
+          <Stack>
+            <Textarea autosize {...form.getInputProps(property)} />
+            <Button fullWidth color="dark" variant="outline" type="submit">
+              Save
+            </Button>
+          </Stack>
+        </Box>
       </Modal>
     </>
   )

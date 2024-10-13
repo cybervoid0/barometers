@@ -8,6 +8,7 @@ import {
   Stack,
   Select,
   Tooltip,
+  Box,
 } from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
 import { IBarometer } from '@/models/barometer'
@@ -38,23 +39,25 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Stack>
-          <Select
-            data={condition.data.map(({ name, _id }) => ({
-              label: name,
-              value: String(_id),
-            }))}
-            value={String(form.values.condition?._id)}
-            onChange={id => {
-              const newCondition = condition.data.find(({ _id }) => _id === id)
-              form.setValues({ condition: newCondition })
-            }}
-            allowDeselect={false}
-          />
-          <Button fullWidth color="dark" variant="outline" onClick={update}>
-            Save
-          </Button>
-        </Stack>
+        <Box component="form" onSubmit={update}>
+          <Stack>
+            <Select
+              data={condition.data.map(({ name, _id }) => ({
+                label: name,
+                value: String(_id),
+              }))}
+              value={String(form.values.condition?._id)}
+              onChange={id => {
+                const newCondition = condition.data.find(({ _id }) => _id === id)
+                form.setValues({ condition: newCondition })
+              }}
+              allowDeselect={false}
+            />
+            <Button fullWidth color="dark" variant="outline" type="submit">
+              Save
+            </Button>
+          </Stack>
+        </Box>
       </Modal>
     </>
   )
