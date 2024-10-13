@@ -7,12 +7,12 @@ import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { isLength } from 'validator'
 import { showInfo, showError } from '@/utils/notification'
-import { useBarometers } from '../hooks/useBarometers'
+import { useBarometers } from '@/app/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
-import type { BarometerFormProps } from './types'
-import { barometersApiRoute } from '../constants'
+import type { BarometerFormProps } from '../types'
+import { barometersApiRoute } from '@/app/constants'
 
 export function AddCard() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])

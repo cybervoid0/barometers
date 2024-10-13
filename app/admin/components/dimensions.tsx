@@ -1,7 +1,7 @@
 import { Fieldset, TextInput, Group, ActionIcon, Tooltip, Stack } from '@mantine/core'
 import { IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
 import { UseFormReturnType } from '@mantine/form'
-import { type BarometerFormProps } from './types'
+import { type BarometerFormProps } from '../types'
 
 interface DimensionsProps {
   form: UseFormReturnType<BarometerFormProps>

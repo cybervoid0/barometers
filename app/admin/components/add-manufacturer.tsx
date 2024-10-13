@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconSquareRoundedPlus } from '@tabler/icons-react'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { manufacturersApiRoute } from '../constants'
+import { manufacturersApiRoute } from '@/app/constants'
 
 export function AddManufacturer() {
   const [opened, { open, close }] = useDisclosure(false)

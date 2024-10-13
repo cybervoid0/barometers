@@ -5,7 +5,7 @@ import { IBarometerCondition } from '@/models/condition'
 import { IBarometerType } from '@/models/type'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError } from '@/utils/notification'
-import { conditionsApiRoute, barometerTypesApiRoute, manufacturersApiRoute } from '../constants'
+import { conditionsApiRoute, barometerTypesApiRoute, manufacturersApiRoute } from '@/app/constants'
 
 export const useBarometers = () => {
   const {
