@@ -29,9 +29,7 @@ export function useEditField({ property, barometer, validate }: Props) {
         return
       }
       const updatedBarometer = { ...barometer, [property]: newValue }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer, {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
       window.location.href = barometerRoute + (data.slug ?? '')

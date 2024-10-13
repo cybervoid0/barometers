@@ -43,9 +43,7 @@ export function AddCard() {
         manufacturer: manufacturers.data.at(+values.manufacturer),
         images: uploadedImages.map(image => image.split('/').at(-1)),
       }
-      const { data } = await axios.post(barometersApiRoute, barometerWithImages, {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const { data } = await axios.post(barometersApiRoute, barometerWithImages)
       return data
     },
     onSuccess: (_, { name }) => {

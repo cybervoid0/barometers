@@ -36,11 +36,7 @@ export function AddManufacturer() {
   const queryClient = useQueryClient()
   const { mutate } = useMutation({
     mutationFn: (values: IManufacturer) =>
-      axios
-        .post(manufacturersApiRoute, values, {
-          headers: { 'Content-Type': 'application/json' },
-        })
-        .then(({ data }) => data),
+      axios.post(manufacturersApiRoute, values).then(({ data }) => data),
     onSuccess: ({ id }, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['manufacturers'],

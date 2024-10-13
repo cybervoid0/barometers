@@ -16,7 +16,7 @@ import { AccessRole } from '@/models/user'
 import { TextFieldEdit } from './edit-fields/textfield-edit'
 import { DescriptionEdit } from './edit-fields/description-edit'
 import { ConditionEdit } from './edit-fields/condition-edit'
-// import { AddManufacturer } from '@/app/admin/add-manufacturer'
+import { ManufacturerEdit } from './edit-fields/manufacturer-edit'
 
 interface BarometerItemProps {
   params: {
@@ -123,6 +123,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
               </Title>
               <Title c="dark.3" fw={400} display="inline" order={3}>
                 {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
+                {isAdmin && <ManufacturerEdit barometer={barometer} />}
               </Title>
             </Box>
           )}

@@ -4,9 +4,14 @@ import { connectMongoose } from '@/utils/mongoose'
 import Barometer, { IBarometer } from '@/models/barometer'
 import BarometerType from '@/models/type'
 import '@/models/condition'
-import '@/models/manufacturer'
+import Manufacturer from '@/models/manufacturer'
 import { cleanObject, slug as slugify } from '@/utils/misc'
 
+/**
+ * Get barometer list
+ *
+ * GET /api/barometers?type=type
+ */
 export async function GET(req: NextRequest) {
   await connectMongoose()
   try {
@@ -38,6 +43,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ * Add new barometer
+ *
+ * POST /api/barometers
+ */
 export async function POST(req: NextRequest) {
   await connectMongoose()
   try {
@@ -57,14 +67,22 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ * Update barometer data
+ *
+ * PUT /api/barometers
+ */
 export async function PUT(req: NextRequest) {
   await connectMongoose()
   try {
     const barometerData: IBarometer = await req.json()
-    const cleanData = cleanObject(barometerData)
-    const slug = slugify(cleanData.name)
-    cleanData.slug = slug
-    const updatedBarometer = await Barometer.findByIdAndUpdate(cleanData._id, cleanData)
+    const slug = slugify(barometerData.name)
+    barometerData.slug = slug
+    await Manufacturer.findByIdAndUpdate(
+      barometerData.manufacturer?._id,
+      barometerData.manufacturer,
+    )
+    const updatedBarometer = await Barometer.findByIdAndUpdate(barometerData._id, barometerData)
     if (!updatedBarometer)
       return NextResponse.json({ message: 'Barometer not found' }, { status: 404 })
     revalidatePath(`/collection/items/${slug}`)
