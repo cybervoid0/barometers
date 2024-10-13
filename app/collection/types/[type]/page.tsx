@@ -10,7 +10,7 @@ import {
   barometersApiRoute,
   googleStorageImagesFolder,
 } from '../../../constants'
-import { BarometerCard } from './barometer-card'
+import { BarometerCard } from './components/barometer-card'
 import { ShowError } from '@/app/components/show-error'
 import { slug } from '@/utils/misc'
 

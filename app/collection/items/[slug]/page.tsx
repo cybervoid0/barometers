@@ -10,13 +10,13 @@ import {
   twitterAccount,
 } from '@/app/constants'
 import { ShowError } from '@/app/components/show-error'
-import { ImageCarousel } from './carousel'
-import { Condition } from './condition'
+import { ImageCarousel } from './components/carousel'
+import { Condition } from './components/condition'
 import { AccessRole } from '@/models/user'
-import { TextFieldEdit } from './edit-fields/textfield-edit'
-import { DescriptionEdit } from './edit-fields/description-edit'
-import { ConditionEdit } from './edit-fields/condition-edit'
-import { ManufacturerEdit } from './edit-fields/manufacturer-edit'
+import { TextFieldEdit } from './components/edit-fields/textfield-edit'
+import { DescriptionEdit } from './components/edit-fields/description-edit'
+import { ConditionEdit } from './components/edit-fields/condition-edit'
+import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 
 interface BarometerItemProps {
   params: {

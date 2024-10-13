@@ -1,6 +1,6 @@
 import { Stack, Title, Center, Anchor } from '@mantine/core'
 import Link from 'next/link'
-import { SignInForm } from './signin-form'
+import { SignInForm } from './components/signin-form'
 
 export default function SignIn() {
   return (
