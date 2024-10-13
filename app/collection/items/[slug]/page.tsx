@@ -72,9 +72,13 @@ export async function generateMetadata({
 }
 
 async function isAuthorized(): Promise<boolean> {
-  const session = await getServerSession(authConfig)
-  const { role } = await getUserByEmail(session?.user?.email)
-  return role === AccessRole.ADMIN
+  try {
+    const session = await getServerSession(authConfig)
+    const { role } = await getUserByEmail(session?.user?.email)
+    return role === AccessRole.ADMIN
+  } catch (error) {
+    return false
+  }
 }
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
