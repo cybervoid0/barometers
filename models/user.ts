@@ -1,4 +1,4 @@
-import { Schema, model, Document, models, type Model } from 'mongoose'
+import { Schema, model, models, type Model } from 'mongoose'
 import { isEmail, isURL } from 'validator'
 
 export enum AccessRole {
@@ -7,7 +7,8 @@ export enum AccessRole {
   ADMIN = 'ADMIN',
 }
 
-export interface IUser extends Document {
+export interface IUser {
+  _id?: string
   email: string
   password?: string
   name: string

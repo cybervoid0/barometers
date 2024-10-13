@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
 import path from 'path'
 import { v4 as uuid } from 'uuid'
 import { GetSignedUrlConfig, Storage } from '@google-cloud/storage'
@@ -37,7 +36,6 @@ export async function POST(req: NextRequest) {
         }
       }),
     )
-    revalidatePath('/')
     return NextResponse.json<UrlDto>(
       {
         urls: signedUrls,
@@ -61,8 +59,6 @@ export async function DELETE(req: NextRequest) {
     // delete file from google cloud storage
     const file = bucket.file(fileName)
     await file.delete()
-
-    revalidatePath('/')
 
     return NextResponse.json({ message: `${fileName} was deleted` }, { status: 200 })
   } catch (error) {

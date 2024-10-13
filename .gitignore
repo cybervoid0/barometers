@@ -133,3 +133,4 @@ dist
 
 # uploaded files
 public/uploads
+.vercel

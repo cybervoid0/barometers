@@ -1,5 +1,7 @@
 import { type Metadata } from 'next'
+import { getServerSession } from 'next-auth'
 import { Container, Title, Text, Spoiler, Box, Divider } from '@mantine/core'
+import { authConfig, getUserByEmail } from '@/utils/auth'
 import { IBarometer } from '@/models/barometer'
 import {
   barometersApiRoute,
@@ -10,6 +12,9 @@ import {
 import { ShowError } from '@/app/components/show-error'
 import { ImageCarousel } from './carousel'
 import { Condition } from './condition'
+import { AccessRole } from '@/models/user'
+import { TextFieldEdit } from './edit-fields/textfield-edit'
+import { DescriptionEdit } from './edit-fields/description-edit'
 
 interface BarometerItemProps {
   params: {
@@ -65,18 +70,18 @@ export async function generateMetadata({
   }
 }
 
+async function isAuthorized(): Promise<boolean> {
+  const session = await getServerSession(authConfig)
+  const { role } = await getUserByEmail(session?.user?.email)
+  return role === AccessRole.ADMIN
+}
+
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   try {
-    const {
-      name,
-      images,
-      description,
-      manufacturer,
-      dating,
-      dimensions,
-      condition,
-      collectionId,
-    }: IBarometer = await fetchBarometer(slug)
+    const isAdmin = await isAuthorized()
+    const barometer: IBarometer = await fetchBarometer(slug)
+    const { name, images, description, manufacturer, dating, dimensions, condition, collectionId } =
+      barometer
 
     return (
       <Container pt={{ base: 'none', sm: '5rem' }} size="xl">
@@ -91,6 +96,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             tt="capitalize"
           >
             {name}
+            {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
             <Text
               pos="absolute"
               top="0"
@@ -122,6 +128,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
               </Title>
               <Title c="dark.3" fw={400} display="inline" order={3}>
                 {dating}
+                {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
               </Title>
             </Box>
           )}
@@ -144,7 +151,16 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
 
           {description && (
             <>
-              <Divider mx="lg" my="lg" />
+              <Divider
+                mx="lg"
+                my="lg"
+                {...(isAdmin
+                  ? {
+                      label: <DescriptionEdit barometer={barometer} />,
+                      labelPosition: 'right',
+                    }
+                  : {})}
+              />
 
               <Spoiler
                 maxHeight={120}

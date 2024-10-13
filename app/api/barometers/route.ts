@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { connectMongoose } from '@/utils/mongoose'
 import Barometer, { IBarometer } from '@/models/barometer'
 import BarometerType from '@/models/type'
@@ -42,13 +43,35 @@ export async function POST(req: NextRequest) {
   try {
     const barometerData: IBarometer = await req.json()
     const cleanData = cleanObject(barometerData)
-    cleanData.slug = slugify(cleanData.name)
+    const slug = slugify(cleanData.name)
+    cleanData.slug = slug
     const newBarometer = new Barometer(cleanData)
     await newBarometer.save()
+    revalidatePath(`/collection/items/${slug}`)
     return NextResponse.json({ id: newBarometer._id }, { status: 201 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error adding new barometer' },
+      { status: 500 },
+    )
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  await connectMongoose()
+  try {
+    const barometerData: IBarometer = await req.json()
+    const cleanData = cleanObject(barometerData)
+    const slug = slugify(cleanData.name)
+    cleanData.slug = slug
+    const updatedBarometer = await Barometer.findByIdAndUpdate(cleanData._id, cleanData)
+    if (!updatedBarometer)
+      return NextResponse.json({ message: 'Barometer not found' }, { status: 404 })
+    revalidatePath(`/collection/items/${slug}`)
+    return NextResponse.json({ slug }, { status: 200 })
+  } catch (error) {
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Error updating barometer' },
       { status: 500 },
     )
   }
