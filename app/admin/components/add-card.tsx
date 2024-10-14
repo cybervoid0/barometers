@@ -24,7 +24,7 @@ export function AddCard() {
       name: '',
       type: '',
       dating: '',
-      manufacturer: '0',
+      manufacturer: '',
       condition: '',
       description: '',
       dimensions: [],
@@ -40,7 +40,7 @@ export function AddCard() {
     mutationFn: async (values: BarometerFormProps) => {
       const barometerWithImages = {
         ...values,
-        manufacturer: manufacturers.data.at(+values.manufacturer),
+        manufacturer: manufacturers.data.find(({ _id }) => _id === values.manufacturer),
         images: uploadedImages.map(image => image.split('/').at(-1)),
       }
       const { data } = await axios.post(barometersApiRoute, barometerWithImages)
@@ -63,17 +63,31 @@ export function AddCard() {
     },
   })
 
+  // set default barometer type
   useEffect(() => {
     if (types.data.length === 0) return
     form.setFieldValue('type', String(types.data[0]._id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types.data])
 
+  // set default barometer condition
   useEffect(() => {
     if (condition.data.length === 0) return
     form.setFieldValue('condition', String(condition.data.at(-1)?._id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [condition.data])
+
+  // set default manufacturer
+  useEffect(() => {
+    // if there are no manufacturers or manufacturer is already set, do nothing
+    if (manufacturers.data.length === 0 || form.values.manufacturer) return
+    form.setFieldValue('manufacturer', String(manufacturers.data[0]._id))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manufacturers.data])
+
+  const onAddManufacturer = (id: string) => {
+    form.setFieldValue('manufacturer', id)
+  }
 
   return (
     <Box mt="lg" flex={1}>
@@ -95,14 +109,13 @@ export function AddCard() {
           {...form.getInputProps('type')}
         />
         <Select
-          data={manufacturers.data.map(({ name }, i) => ({
+          data={manufacturers.data.map(({ name, _id }) => ({
             label: name,
-            value: String(i),
+            value: _id!,
           }))}
           label="Manufacturer"
           allowDeselect={false}
-          /* отсюда открывать модальное окно с производителями */
-          leftSection={<AddManufacturer />}
+          leftSection={<AddManufacturer onAddManufacturer={onAddManufacturer} />}
           {...form.getInputProps('manufacturer')}
           styles={{
             input: {

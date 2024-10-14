@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Modal,
   UnstyledButton,
+  ActionIcon,
   UnstyledButtonProps,
   TextInput,
   Button,
@@ -11,16 +12,19 @@ import {
   Box,
   Textarea,
   Title,
+  Select,
+  Group,
 } from '@mantine/core'
 import axios, { AxiosError } from 'axios'
 import { useDisclosure } from '@mantine/hooks'
 import { isLength } from 'validator'
-import { IconEdit } from '@tabler/icons-react'
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import { IBarometer } from '@/models/barometer'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
 import { barometerRoute, barometersApiRoute } from '@/app/constants'
+import { useBarometers } from '@/app/hooks/useBarometers'
 
 interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -28,6 +32,8 @@ interface ManufacturerEditProps extends UnstyledButtonProps {
 }
 
 export function ManufacturerEdit({ size = 18, barometer, ...props }: ManufacturerEditProps) {
+  const { manufacturers } = useBarometers()
+  const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
   const form = useForm<IManufacturer>({
     initialValues: {
       name: '',
@@ -49,12 +55,43 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
 
   const [opened, { open, close }] = useDisclosure()
 
+  // Reset selected manufacturer index
+  const resetManufacturerIndex = useCallback(() => {
+    const manufacturerIndex = manufacturers.data.findIndex(
+      ({ _id }) => _id === barometer.manufacturer?._id,
+    )
+    setSelectedManufacturerIndex(manufacturerIndex)
+  }, [barometer.manufacturer?._id, manufacturers.data])
+
+  // Reset selected manufacturer index when modal is opened
+  useEffect(() => {
+    if (!opened) return
+    resetManufacturerIndex()
+  }, [opened, resetManufacturerIndex])
+
+  // Set form values when selected manufacturer index changes
+  useEffect(() => {
+    const selectedManufacturer = manufacturers?.data[selectedManufacturerIndex]
+    // pick all manufacturer fields and put empty string if not present
+    const manufacturerFormData: IManufacturer = {
+      _id: selectedManufacturer?._id ?? '',
+      name: selectedManufacturer?.name ?? '',
+      city: selectedManufacturer?.city ?? '',
+      country: selectedManufacturer?.country ?? '',
+      description: selectedManufacturer?.description ?? '',
+    }
+    form.setValues(manufacturerFormData)
+    form.resetDirty(manufacturerFormData)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedManufacturerIndex, manufacturers])
+
   const update = async (manufacturer: IManufacturer) => {
     try {
+      const selectedManufacturer = manufacturers.data[selectedManufacturerIndex]
       const updatedBarometer = {
         ...barometer,
         manufacturer: {
-          ...barometer.manufacturer,
+          ...selectedManufacturer,
           ...manufacturer,
         },
       }
@@ -73,34 +110,33 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     }
   }
 
-  // set initial form values after modal is opened
-  useEffect(() => {
-    if (barometer) {
-      const { manufacturer } = barometer
-      const validManufacturer = {
-        name: manufacturer?.name || '',
-        city: manufacturer?.city || '',
-        country: manufacturer?.country || '',
-        description: manufacturer?.description || '',
-      }
-      form.setValues(validManufacturer)
-      form.resetDirty(validManufacturer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [barometer])
-
-  // Reset form when modal is reopened
-  useEffect(() => {
-    if (opened) form.reset()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opened])
   return (
     <>
       <Modal opened={opened} onClose={close} centered>
         <Box flex={1} component="form" onSubmit={form.onSubmit(update)}>
-          <Title mb="lg" order={3}>
-            Edit Manufacturer
-          </Title>
+          <Group mb="lg" align="center">
+            <Title order={3}>Edit Manufacturer</Title>
+            <Tooltip label="Delete manufacturer">
+              <ActionIcon
+                variant="outline"
+                color="dark"
+                onClick={() =>
+                  manufacturers.delete(manufacturers.data[selectedManufacturerIndex]._id!)
+                }
+              >
+                <IconTrash />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+          <Select
+            value={String(selectedManufacturerIndex)}
+            data={manufacturers.data.map(({ name }, i) => ({
+              value: String(i),
+              label: name,
+            }))}
+            label="Manufacturer"
+            onChange={index => setSelectedManufacturerIndex(Number(index))}
+          />
           <TextInput id="manufacturer-name" required label="Name" {...form.getInputProps('name')} />
           <TextInput label="Country" {...form.getInputProps('country')} />
           <TextInput label="City" {...form.getInputProps('city')} />

@@ -1,13 +1,14 @@
 import { useMemo, useEffect } from 'react'
-import axios from 'axios'
-import { useQuery } from '@tanstack/react-query'
+import axios, { AxiosError } from 'axios'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { IBarometerCondition } from '@/models/condition'
 import { IBarometerType } from '@/models/type'
 import { IManufacturer } from '@/models/manufacturer'
-import { showError } from '@/utils/notification'
+import { showError, showInfo } from '@/utils/notification'
 import { conditionsApiRoute, barometerTypesApiRoute, manufacturersApiRoute } from '@/app/constants'
 
 export const useBarometers = () => {
+  const queryClient = useQueryClient()
   const {
     data: condition,
     error: conditionError,
@@ -33,29 +34,54 @@ export const useBarometers = () => {
     queryFn: () => axios.get(manufacturersApiRoute).then(({ data }) => data),
   })
 
+  const { mutate: deleteManufacturer } = useMutation({
+    mutationFn: (id: string) =>
+      axios.delete(`${manufacturersApiRoute}/${id}`).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['manufacturers'],
+      })
+      showInfo('Manufacturer deleted', 'Success')
+    },
+    onError: (error: AxiosError) => {
+      showError(
+        (error.response?.data as { message: string })?.message ||
+          error.message ||
+          'Error deleting manufacturer',
+      )
+    },
+  })
+
   useEffect(() => {
     ;[typesError, conditionError, manufacturersError].forEach(err => {
       if (err instanceof Error) showError(err.message)
     })
   }, [typesError, conditionError, manufacturersError])
 
-  type ReturnType<T> = Record<string, { data: T[]; isLoading: boolean }>
   return useMemo(
-    () =>
-      ({
-        condition: {
-          data: condition ?? [],
-          isLoading: conditionIsLoading,
-        },
-        types: {
-          data: types ?? [],
-          isLoading: typesIsLoading,
-        },
-        manufacturers: {
-          data: manufacturers ?? [],
-          isLoading: manufacturersIsLoading,
-        },
-      }) satisfies ReturnType<unknown>,
-    [condition, types, conditionIsLoading, typesIsLoading, manufacturers, manufacturersIsLoading],
+    () => ({
+      condition: {
+        data: condition ?? [],
+        isLoading: conditionIsLoading,
+      },
+      types: {
+        data: types ?? [],
+        isLoading: typesIsLoading,
+      },
+      manufacturers: {
+        data: manufacturers ?? [],
+        isLoading: manufacturersIsLoading,
+        delete: deleteManufacturer,
+      },
+    }),
+    [
+      condition,
+      conditionIsLoading,
+      types,
+      typesIsLoading,
+      manufacturers,
+      manufacturersIsLoading,
+      deleteManufacturer,
+    ],
   )
 }

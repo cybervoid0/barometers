@@ -12,7 +12,11 @@ import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
 import { manufacturersApiRoute } from '@/app/constants'
 
-export function AddManufacturer() {
+interface AddManufacturerProps {
+  onAddManufacturer: (newId: string) => void
+}
+
+export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   const [opened, { open, close }] = useDisclosure(false)
 
   const form = useForm<IManufacturer>({
@@ -42,6 +46,7 @@ export function AddManufacturer() {
         queryKey: ['manufacturers'],
       })
       form.reset()
+      onAddManufacturer(id)
       close()
       showInfo(`${variables.name} has been recorded as a manufacturer #${id ?? 0}`, 'Success')
     },
