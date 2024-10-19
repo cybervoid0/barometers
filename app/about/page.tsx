@@ -13,7 +13,7 @@ export default function About() {
       <Text className={styles.paragraph}>
         <Image
           priority
-          w="fit-content"
+          w={{ base: '100%', xs: 'fit-content' }}
           h={{ base: '300px', sm: '400px' }}
           alt="Leo"
           width={116}
