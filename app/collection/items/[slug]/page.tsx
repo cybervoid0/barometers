@@ -72,6 +72,26 @@ export async function generateMetadata({
   }
 }
 
+/**
+ * This function fetches all barometers from the API and maps their slugs
+ * to be used as static parameters for Next.js static generation.
+ *
+ * @returns {Promise<Array<{ slug: string }>>} A promise that resolves to an array of objects containing slugs.
+ *
+ * @throws {Error} If the fetch request fails or the response cannot be parsed as JSON.
+ */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute)
+  const barometers: IBarometer[] = await res.json()
+
+  return barometers.map(
+    ({ slug }) =>
+      ({
+        slug,
+      }) as { slug: string },
+  )
+}
+
 async function isAuthorized(): Promise<boolean> {
   try {
     const session = await getServerSession(authConfig)
@@ -92,7 +112,10 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
     return (
       <Container pt={{ base: 'none', sm: '5rem' }} size="xl">
         <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
-          <ImageCarousel images={images?.map(image => googleStorageImagesFolder + image) ?? []} />
+          <ImageCarousel
+            name={barometer.name}
+            images={images?.map(image => googleStorageImagesFolder + image) ?? []}
+          />
           <Title
             w="fit-content"
             pos="relative"
@@ -192,13 +215,4 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
       <ShowError message={error instanceof Error ? error.message : 'Error fetching barometer'} />
     )
   }
-}
-
-export async function generateStaticParams() {
-  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute)
-  const barometers: IBarometer[] = await res.json()
-
-  return barometers.map(({ slug }) => ({
-    slug,
-  }))
 }
