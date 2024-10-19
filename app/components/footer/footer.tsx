@@ -1,4 +1,5 @@
 import { Anchor, Box, Center, Container, Flex, Image, Stack, Text } from '@mantine/core'
+import Link from 'next/link'
 import NextImage from 'next/image'
 
 export function Footer() {
@@ -30,9 +31,9 @@ export function Footer() {
         </Stack>
         <Center style={{ flexGrow: 1, flexDirection: 'column' }}>
           <Box fw={500} w="max-content">
-            <Text size="sm" display="inline" fw="inherit">
+            <Text size="xs" display="inline" fw="inherit">
               By using this website, you agree to our{' '}
-              <Anchor href="https://barometers.info" target="_blank">
+              <Anchor fw="600" c="dark" component={Link} href="/terms-and-conditions">
                 <Text size="sm" component="span" fw="inherit">
                   Terms&Conditions
                 </Text>
