@@ -17,6 +17,7 @@ import { TextFieldEdit } from './components/edit-fields/textfield-edit'
 import { DescriptionEdit } from './components/edit-fields/description-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
+import { BreadcrumbsComponent } from './components/breadcrumbs'
 
 interface BarometerItemProps {
   params: {
@@ -110,8 +111,9 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
       barometer
 
     return (
-      <Container pt={{ base: 'none', sm: '5rem' }} size="xl">
+      <Container size="xl">
         <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
+          <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.type.name} />
           <ImageCarousel
             name={barometer.name}
             images={images?.map(image => googleStorageImagesFolder + image) ?? []}
