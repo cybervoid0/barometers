@@ -6,8 +6,8 @@ import styles from './styles.module.scss'
 
 export default function About() {
   return (
-    <Container pt="xl">
-      <Title mb="md" order={4}>
+    <Container p="xl">
+      <Title mb="md" order={3} component="h2">
         Hi, my name is Leo.
       </Title>
       <Text className={styles.paragraph}>

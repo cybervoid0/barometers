@@ -1,4 +1,8 @@
 .paragraph {
   margin-bottom: 1rem;
   text-indent: 2rem;
+  text-align: justify;
+  @include xs() {
+    text-align: left;
+  }
 }
