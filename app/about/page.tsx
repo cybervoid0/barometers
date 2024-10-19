@@ -1,36 +1,38 @@
 import React from 'react'
 import NextImage from 'next/image'
-import { Container, Image, Text } from '@mantine/core'
+import { Container, Image, Text, Title } from '@mantine/core'
 import { googleStorageImagesFolder } from '../constants'
 import styles from './styles.module.scss'
 
 export default function About() {
   return (
-    <Container pt={{ base: 0, sm: 'xl' }}>
+    <Container pt="xl">
+      <Title mb="md" order={4}>
+        Hi, my name is Leo.
+      </Title>
       <Text className={styles.paragraph}>
         <Image
           priority
-          w={{ base: '100%', sm: '50%' }}
-          h="500px"
+          w="fit-content"
+          h={{ base: '300px', sm: '400px' }}
           alt="Leo"
           width={116}
           height={125}
           sizes="(max-width: 768px) 100vw, 50vw"
           src={`${googleStorageImagesFolder}a98daba6-1f4e-4614-aecd-ab5cb189fcaf.png`}
           style={{
-            float: 'right',
+            float: 'left',
             objectFit: 'contain',
           }}
           component={NextImage}
         />
-        Hi, my name is Leo. I am a collector and restorer of antique barometers, a member of the
-        Society for the History of Technology (SHOT) and European Society for Environmental History
-        (ESEH). I have dedicated myself to assembling a unique collection of weather instruments
-        that represent masterpieces of the industrial era, spanning from the early 19th to the
-        mid-20th century. For the past five years, I have passionately curated a diverse collection
-        of barometers and other weather instruments, driven by a deep fascination with the history
-        of meteorology. This dedication has also inspired me to write a book that delves into the
-        evolution of barometers over time.
+        I am a collector and restorer of antique barometers, a member of the Society for the History
+        of Technology (SHOT) and European Society for Environmental History (ESEH). I have dedicated
+        myself to assembling a unique collection of weather instruments that represent masterpieces
+        of the industrial era, spanning from the early 19th to the mid-20th century. For the past
+        five years, I have passionately curated a diverse collection of barometers and other weather
+        instruments, driven by a deep fascination with the history of meteorology. This dedication
+        has also inspired me to write a book that delves into the evolution of barometers over time.
       </Text>
       <Text className={styles.paragraph}>
         My collection features around 100 rare and exceptional items, including mercury and aneroid
