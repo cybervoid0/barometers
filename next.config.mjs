@@ -17,6 +17,7 @@ export default withBundleAnalyzer({
     prependData: `@import "./_mantine.scss";`,
   },
   images: {
+    formats: ['image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
