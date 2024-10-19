@@ -1,9 +1,8 @@
-import { Stack, Text, Flex, Center, Image, Anchor, Box, Container } from '@mantine/core'
+import { Anchor, Box, Center, Container, Flex, Image, Stack, Text } from '@mantine/core'
 import NextImage from 'next/image'
-import { email } from '@/app/constants'
 
 export function Footer() {
-  const cvImageSize = 60
+  const cvImageSize = 45
   return (
     <Container size="xl" w="100%">
       <Flex
@@ -14,37 +13,36 @@ export function Footer() {
         gap={{ base: 'sm', xs: 0 }}
       >
         <Stack w="10rem" align="center" gap={0}>
-          <Image
-            component={NextImage}
-            src="/images/cybervoid.jpeg"
-            width={cvImageSize}
-            w={cvImageSize}
-            height={cvImageSize}
-            h={cvImageSize}
-            alt="Lamp"
-          />
+          <Anchor href="https://github.com/shenshin">
+            <Image
+              component={NextImage}
+              src="/images/cybervoid.jpeg"
+              width={cvImageSize}
+              w={cvImageSize}
+              height={cvImageSize}
+              h={cvImageSize}
+              alt="Lamp"
+            />
+          </Anchor>
           <Text size="0.7rem" fw={600}>
             Created by CyberVoid
           </Text>
         </Stack>
-        <Center style={{ flexGrow: 1 }}>
+        <Center style={{ flexGrow: 1, flexDirection: 'column' }}>
+          <Box fw={500} w="max-content">
+            <Text size="sm" display="inline" fw="inherit">
+              By using this website, you agree to our{' '}
+              <Anchor href="https://barometers.info" target="_blank">
+                <Text size="sm" component="span" fw="inherit">
+                  Terms&Conditions
+                </Text>
+              </Anchor>
+            </Text>
+          </Box>
           <Box fw={500} w="max-content">
             <Text size="sm" display="inline" fw="inherit">
               &copy; {new Date().getFullYear()}
-              {` `}
-            </Text>
-            <Anchor
-              underline="always"
-              display="inline"
-              size="sm"
-              fw="inherit"
-              c="inherit"
-              href={`mailto:${email}`}
-            >
-              Leo Shirokov
-            </Anchor>
-            <Text display="inline" size="sm" fw="inherit">
-              {` `}& CyberVoid
+              {` `} Leo Shirokov. All right reserved.
             </Text>
           </Box>
         </Center>
