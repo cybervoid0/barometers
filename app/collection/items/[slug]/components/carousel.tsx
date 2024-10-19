@@ -30,10 +30,10 @@ export function ImageCarousel({ images, name }: ImageCarouselProps) {
         },
       }}
     >
-      {images.map((image, index) => (
+      {images.map(image => (
         <SwiperSlide key={image}>
           <Image
-            priority={index === 0}
+            priority
             quality={50}
             width={200}
             height={200}
