@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 import { getServerSession } from 'next-auth'
-import { Container, Title, Text, Spoiler, Box, Divider } from '@mantine/core'
+import { Container, Title, Text, Spoiler, Box, Divider, Tooltip } from '@mantine/core'
 import { authConfig, getUserByEmail } from '@/utils/auth'
 import { IBarometer } from '@/models/barometer'
 import {
@@ -18,6 +18,7 @@ import { DescriptionEdit } from './components/edit-fields/description-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
+import sx from './styles.module.scss'
 
 interface BarometerItemProps {
   params: {
@@ -118,28 +119,16 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             name={barometer.name}
             images={images?.map(image => googleStorageImagesFolder + image) ?? []}
           />
-          <Title
-            w="fit-content"
-            pos="relative"
-            fw={500}
-            mt={{ base: 'lg', sm: '5rem' }}
-            mb="md"
-            tt="capitalize"
-          >
-            {name}
-            {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
-            <Text
-              pos="absolute"
-              top="0"
-              right="0"
-              c="dark.2"
-              fw={300}
-              size="xs"
-              style={{ textTransform: 'capitalize', transform: 'translateX(100%)' }}
-            >
-              {collectionId}
-            </Text>
-          </Title>
+          <Box>
+            <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
+            <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
+              {name.split(' ').at(-1)}
+              {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
+            </Title>
+            <Tooltip label="Collection ID">
+              <Text className={sx.collectionId}>{collectionId}</Text>
+            </Tooltip>
+          </Box>
 
           {manufacturer && (
             <Box>
