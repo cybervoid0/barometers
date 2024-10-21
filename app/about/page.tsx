@@ -8,7 +8,7 @@ export default function About() {
   return (
     <Container p="xl">
       <Title mb="md" order={3} component="h2">
-        Hi, my name is Leo.
+        Greetings, my name is Leo.
       </Title>
       <Text className={styles.paragraph}>
         <Image
