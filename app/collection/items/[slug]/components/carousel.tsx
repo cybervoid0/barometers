@@ -4,21 +4,24 @@ import React from 'react'
 import { Box, Image } from '@mantine/core'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Zoom, Navigation, Pagination } from 'swiper/modules'
+import NextImage from 'next/image'
+import { ImagesEdit } from './edit-fields/images-edit'
 import 'swiper/css'
 import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import NextImage from 'next/image'
 import './styles.css'
+import { IBarometer } from '@/models/barometer'
 
 interface ImageCarouselProps {
   images: string[]
-  name: string
+  barometer: IBarometer
 }
 
-export function ImageCarousel({ images, name }: ImageCarouselProps) {
+export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
   return (
-    <Box style={{ overflow: 'hidden' }}>
+    <Box style={{ overflow: 'hidden', position: 'relative' }}>
+      <ImagesEdit barometer={barometer} />
       <Swiper
         zoom
         loop={images.length > 1}
@@ -40,7 +43,7 @@ export function ImageCarousel({ images, name }: ImageCarouselProps) {
                 width={200}
                 height={200}
                 src={image}
-                alt={name}
+                alt={barometer.name}
                 component={NextImage}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
