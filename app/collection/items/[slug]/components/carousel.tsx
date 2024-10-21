@@ -16,12 +16,13 @@ import { IBarometer } from '@/models/barometer'
 interface ImageCarouselProps {
   images: string[]
   barometer: IBarometer
+  isAdmin: boolean
 }
 
-export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
+export function ImageCarousel({ images, barometer, isAdmin }: ImageCarouselProps) {
   return (
     <Box style={{ overflow: 'hidden', position: 'relative' }}>
-      <ImagesEdit barometer={barometer} />
+      {isAdmin && <ImagesEdit barometer={barometer} />}
       <Swiper
         zoom
         loop={images.length > 1}
