@@ -1,0 +1,40 @@
+.page {
+  padding-block: 2rem;
+}
+.paragraph {
+  margin-bottom: 1rem;
+  text-indent: 2rem;
+  text-align: justify;
+  @include sm() {
+    text-align: left;
+  }
+}
+.header {
+  font-size: large;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  @include sm() {
+    margin-top: 1.5rem;
+    font-size: x-large;
+  }
+}
+.figure {
+  float: left;
+  width: 100%;
+  margin-bottom: 1rem;
+  @include sm() {
+    width: unset;
+    margin-right: 1rem;
+    margin-bottom: unset;
+  }
+  img {
+    object-fit: contain;
+  }
+}
+.showMore {
+  margin-top: 1rem;
+  color: var(--mantine-color-dark-4);
+  font-weight: 600;
+  z-index: 100;
+}
