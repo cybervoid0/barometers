@@ -1,6 +1,21 @@
-import { Anchor, Box, Center, Container, Flex, Image, Stack, Text } from '@mantine/core'
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Center,
+  Container,
+  Flex,
+  Group,
+  Image,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core'
 import Link from 'next/link'
 import NextImage from 'next/image'
+import { SiInstagram, SiMaildotru } from 'react-icons/si'
+import { instagram, email } from '@/app/constants'
+import sx from './styles.module.scss'
 
 export function Footer() {
   const cvImageSize = 45
@@ -47,6 +62,23 @@ export function Footer() {
             </Text>
           </Box>
         </Center>
+
+        <Group visibleFrom="sm" h="4rem" align="center" justify="space-evenly">
+          <Tooltip label="Instagram">
+            <Anchor aria-label="Instagram" target="_blank" href={instagram} lh={0}>
+              <ActionIcon variant="default" size="sm" bd="none" className={sx.smallButton}>
+                <SiInstagram size="100%" />
+              </ActionIcon>
+            </Anchor>
+          </Tooltip>
+          <Tooltip label="Email">
+            <Anchor aria-label="Email" target="_blank" href={`mailto:${email}`} lh={0}>
+              <ActionIcon variant="default" size="sm" bd="none" className={sx.mailButton}>
+                <SiMaildotru size="100%" />
+              </ActionIcon>
+            </Anchor>
+          </Tooltip>
+        </Group>
       </Flex>
     </Container>
   )
