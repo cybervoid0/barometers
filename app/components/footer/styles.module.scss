@@ -4,16 +4,18 @@
   color: var(--mantine-color-dark-4);
 }
 
-.smallButton {
-  @include bttn();
-  &:hover {
-    color: var(--mantine-color-red-9);
+.container {
+  .smallButton {
+    @include bttn();
+    &:hover {
+      color: var(--mantine-color-red-9);
+    }
   }
-}
 
-.mailButton {
-  @include bttn();
-  &:hover {
-    color: var(--mantine-color-blue-9);
+  .mailButton {
+    @include bttn();
+    &:hover {
+      color: var(--mantine-color-blue-7);
+    }
   }
 }

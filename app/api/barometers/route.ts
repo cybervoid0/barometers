@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
     const typeName = searchParams.get('type')
     // if `type` search param was not passed return all barometers list
     if (!typeName || !typeName.trim()) {
-      const barometers = await Barometer.find().populate(['type', 'condition', 'manufacturer'])
+      const barometers = (
+        await Barometer.find().populate(['type', 'condition', 'manufacturer'])
+      ).toSorted((a, b) => (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? ''))
       return NextResponse.json(barometers, { status: 200 })
     }
     // if some non-empty `type` was passed, perform case-insensitive compare with the stored types
@@ -29,11 +31,13 @@ export async function GET(req: NextRequest) {
     if (!barometerType) return NextResponse.json([], { status: 404 })
 
     // if existing barometer type match the `type` param, return all corresponding barometers
-    const barometers = await Barometer.find({ type: barometerType._id }).populate([
-      'type',
-      'condition',
-      'manufacturer',
-    ])
+    const barometers = (
+      await Barometer.find({ type: barometerType._id }).populate([
+        'type',
+        'condition',
+        'manufacturer',
+      ])
+    ).toSorted((a, b) => (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? ''))
     return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
   } catch (error) {
     return NextResponse.json(

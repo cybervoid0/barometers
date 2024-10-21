@@ -28,7 +28,7 @@ export default async function Collection({ params: { type } }: CollectionProps) 
     return <ShowError message={res.statusText} />
   }
 
-  const barometersOfType: IBarometer[] = await res.json() // Парсим JSON данные из ответа
+  const barometersOfType: IBarometer[] = await res.json()
 
   return (
     <Container pb="xl" size="xl">
