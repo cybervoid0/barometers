@@ -35,6 +35,7 @@ function ShowMore({ children, height = 140 }: PropsWithChildren & { height?: num
 export default function History() {
   return (
     <Container className={sx.page}>
+      <Title className={sx.title}>History of the Barometer</Title>
       <ShowMore>
         <Title className={sx.header}>The Discovery of Torricelli and the First Barometer</Title>
         <Text className={sx.paragraph}>
@@ -135,8 +136,8 @@ export default function History() {
           city of Clermont-Ferrand was several hundred meters above sea level). Périer left one tube
           in the care of the Jesuit Chastel, instructing him to observe it throughout the day, while
           he climbed to the summit of Puy-de-Dôme, where the mercury column showed a reading of
-          231/6 inches (627.12 millimeters of mercury). Upon returning to Clermont-Ferrand, the tube
-          again showed 26 inches and 3.5 lines. Périer immediately reported the results of the
+          23&#x2159; inches (627.12 millimeters of mercury). Upon returning to Clermont-Ferrand, the
+          tube again showed 26 inches and 3.5 lines. Périer immediately reported the results of the
           experiment to Pascal, who described it in his &ldquo;Récit de la grande expérience de
           l&apos;équilibre des liqueurs&rdquo; (Account of the Great Experiment on the Equilibrium
           of Liquids).

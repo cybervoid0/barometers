@@ -38,3 +38,9 @@
   font-weight: 600;
   z-index: 5;
 }
+.title {
+  font-size: 30px;
+  @include sm() {
+    font-size: 35px;
+  }
+}
