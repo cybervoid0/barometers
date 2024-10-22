@@ -17,7 +17,7 @@ function Figure({ src }: { src: string }) {
   )
 }
 
-function ShowMore({ children, height = 140 }: PropsWithChildren & { height?: number }) {
+function ShowMore({ children, height = 0 }: PropsWithChildren & { height?: number }) {
   return (
     <Spoiler
       maxHeight={height}
@@ -36,15 +36,15 @@ export default function History() {
   return (
     <Container className={sx.page}>
       <Title className={sx.title}>History of the Barometer</Title>
+      <Title className={sx.header}>The Discovery of Torricelli and the First Barometer</Title>
+      <Text className={sx.paragraph}>
+        The experiment with mercury, conducted by Evangelista Torricelli in 1644, laid the
+        foundation for the creation of the first barometer. The scientist discovered that the column
+        of mercury in a tube hangs at a certain height, creating a vacuum in the upper part of the
+        tube, which demonstrates atmospheric pressure. This discovery forever changed the
+        understanding of the nature of the atmosphere and vacuum.
+      </Text>
       <ShowMore>
-        <Title className={sx.header}>The Discovery of Torricelli and the First Barometer</Title>
-        <Text className={sx.paragraph}>
-          The experiment with mercury, conducted by Evangelista Torricelli in 1644, laid the
-          foundation for the creation of the first barometer. The scientist discovered that the
-          column of mercury in a tube hangs at a certain height, creating a vacuum in the upper part
-          of the tube, which demonstrates atmospheric pressure. This discovery forever changed the
-          understanding of the nature of the atmosphere and vacuum.
-        </Text>
         <Figure src="figure-1_experiment.png" />
         <Text className={sx.paragraph}>
           The story of the barometer usually begins with the famous experiment with mercury
@@ -84,15 +84,15 @@ export default function History() {
           result of the weight of this air column.
         </Text>
       </ShowMore>
+      <Title className={sx.header}>The Experiment of Pierre Petit and Pascal</Title>
+      <Text className={sx.paragraph}>
+        The first experiment outside of Italy was conducted by the Frenchman Pierre Petit in 1646.
+        Through a friend, he informed Blaise Pascal of Torricelli&apos;s discovery, and Pascal,
+        along with Descartes, continued the research, attaching a paper scale to the tube, making
+        the barometer a measuring instrument. Pascal later initiated an experiment in the mountains
+        to prove the change in atmospheric pressure at altitude.
+      </Text>
       <ShowMore>
-        <Title className={sx.header}>The Experiment of Pierre Petit and Pascal</Title>
-        <Text className={sx.paragraph}>
-          The first experiment outside of Italy was conducted by the Frenchman Pierre Petit in 1646.
-          Through a friend, he informed Blaise Pascal of Torricelli&apos;s discovery, and Pascal,
-          along with Descartes, continued the research, attaching a paper scale to the tube, making
-          the barometer a measuring instrument. Pascal later initiated an experiment in the
-          mountains to prove the change in atmospheric pressure at altitude.
-        </Text>
         <Text className={sx.paragraph}>
           The first Torricellian experiment outside of Italy was conducted in 1646 by the French
           scientist, physician, and poet Pierre Petit. He learned the details of Torricelli&apos;s
@@ -116,16 +116,16 @@ export default function History() {
           not just a scientific experiment, began.
         </Text>
       </ShowMore>
+      <Title className={sx.header}>The Experiment on the Summit of Puy-de-Dôme</Title>
+      <Text className={sx.paragraph}>
+        In 1648, Florin Périer, Pascal&apos;s brother-in-law, conducted the famous experiment on the
+        mountain Puy-de-Dôme. By measuring pressure at different altitudes, he confirmed that air
+        pressure decreases with height, thus proving the hypothesis about the weight of air. Unable
+        to conduct the experiment himself in a higher location, Pascal wrote to his brother-in-law,
+        Florin Périer, a French lawyer living in Clermont-Ferrand, asking him to perform a similar
+        experiment.
+      </Text>
       <ShowMore>
-        <Title className={sx.header}>The Experiment on the Summit of Puy-de-Dôme</Title>
-        <Text className={sx.paragraph}>
-          In 1648, Florin Périer, Pascal&apos;s brother-in-law, conducted the famous experiment on
-          the mountain Puy-de-Dôme. By measuring pressure at different altitudes, he confirmed that
-          air pressure decreases with height, thus proving the hypothesis about the weight of air.
-          Unable to conduct the experiment himself in a higher location, Pascal wrote to his
-          brother-in-law, Florin Périer, a French lawyer living in Clermont-Ferrand, asking him to
-          perform a similar experiment.
-        </Text>
         <Text className={sx.paragraph}>
           On September 19, 1648, Périer carefully took measurements at various heights on the summit
           of Puy-de-Dôme, a mountain near the town. This is known as the Puy-de-Dôme experiment.
@@ -143,31 +143,34 @@ export default function History() {
           of Liquids).
         </Text>
       </ShowMore>
+      <Title className={sx.header}>Robert Boyle&apos;s Contribution</Title>
+      <Text className={sx.paragraph}>
+        Inspired by Torricelli&apos;s work, Robert Boyle brought knowledge of the barometer to
+        England and demonstrated that the changes in the height of the mercury column were caused by
+        atmospheric pressure. He was also the first to use the word &ldquo;barometer&rdquo; in his
+        scientific writings.
+      </Text>
       <ShowMore>
-        <Title className={sx.header}>Robert Boyle&apos;s Contribution</Title>
         <Text className={sx.paragraph}>
-          Inspired by Torricelli&apos;s work, Robert Boyle brought knowledge of the barometer to
-          England and demonstrated that the changes in the height of the mercury column were caused
-          by atmospheric pressure. He was also the first to use the word &ldquo;barometer&rdquo; in
-          his scientific writings. Robert Boyle was a student in Italy at the time when Torricelli
-          was conducting his experiments with mercury. Upon returning to England, Boyle brought with
-          him the details of the experiment and proved that the observed phenomena were caused by
-          air pressure. He demonstrated that sound cannot exist in a vacuum, that air is essential
-          for life and combustion, and that air has constant elasticity. It is not exactly known
-          when the experiment became a device, moving beyond the demonstration of air properties.
-          However, Boyle was the first to use the word &ldquo;barometer&rdquo; in his work
+          Robert Boyle was a student in Italy at the time when Torricelli was conducting his
+          experiments with mercury. Upon returning to England, Boyle brought with him the details of
+          the experiment and proved that the observed phenomena were caused by air pressure. He
+          demonstrated that sound cannot exist in a vacuum, that air is essential for life and
+          combustion, and that air has constant elasticity. It is not exactly known when the
+          experiment became a device, moving beyond the demonstration of air properties. However,
+          Boyle was the first to use the word &ldquo;barometer&rdquo; in his work
           {` `}
           <em>New Experiments and Observations Touching Cold</em>.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Robert Hooke and the Wheel Barometer</Title>
-        <Text className={sx.paragraph}>
-          In 1664, Robert Hooke created the &ldquo;Wheel Barometer,&rdquo; which allowed for precise
-          measurements of the smallest changes in atmospheric pressure. Hooke&apos;s invention,
-          based on a modified siphon tube, was the precursor to the elegant and functional
-          &ldquo;banjo&rdquo; barometers.
-        </Text>
+      <Title className={sx.header}>Robert Hooke and the Wheel Barometer</Title>
+      <Text className={sx.paragraph}>
+        In 1664, Robert Hooke created the &ldquo;Wheel Barometer,&rdquo; which allowed for precise
+        measurements of the smallest changes in atmospheric pressure. Hooke&apos;s invention, based
+        on a modified siphon tube, was the precursor to the elegant and functional
+        &ldquo;banjo&rdquo; barometers.
+      </Text>
+      <ShowMore>
         <Figure src="figure-4_wheel-barometer-mech.png" />
         <Text className={sx.paragraph}>
           On August 17, 1664, Robert Hooke, a prominent English natural philosopher, inventor, and
@@ -194,13 +197,13 @@ export default function History() {
           in the atmosphere.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Hooke&apos;s Two-Liquid and Three-Liquid Barometers</Title>
-        <Text className={sx.paragraph}>
-          Robert Hooke continued his research, creating a two-liquid barometer in 1668, where oil
-          served as a buffer between mercury and atmospheric pressure. Later, he developed a
-          three-liquid barometer, which further improved the accuracy of measurements.
-        </Text>
+      <Title className={sx.header}>Hooke&apos;s Two-Liquid and Three-Liquid Barometers</Title>
+      <Text className={sx.paragraph}>
+        Robert Hooke continued his research, creating a two-liquid barometer in 1668, where oil
+        served as a buffer between mercury and atmospheric pressure. Later, he developed a
+        three-liquid barometer, which further improved the accuracy of measurements.
+      </Text>
+      <ShowMore>
         <Figure src="figure-9_quattro.png" />
         <Text className={sx.paragraph}>
           In 1668, Robert Hooke, continuing his studies on the scaling of barometric readings,
@@ -254,14 +257,14 @@ export default function History() {
           striking culmination of the evolution of two-liquid barometers initiated by Robert Hooke.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Diagonal Barometers and the Development of Trade</Title>
-        <Text className={sx.paragraph}>
-          As barometers advanced, they became commodities in London and Paris. &ldquo;Diagonal
-          barometers,&rdquo; invented in the late 17th century, became popular due to their high
-          accuracy and elegant design. They took up more space, but this was compensated by
-          increased precision.
-        </Text>
+      <Title className={sx.header}>Diagonal Barometers and the Development of Trade</Title>
+      <Text className={sx.paragraph}>
+        As barometers advanced, they became commodities in London and Paris. &ldquo;Diagonal
+        barometers,&rdquo; invented in the late 17th century, became popular due to their high
+        accuracy and elegant design. They took up more space, but this was compensated by increased
+        precision.
+      </Text>
+      <ShowMore>
         <Figure src="figure-11_square-barometer-christie.png" />
         <Text className={sx.paragraph}>
           In 1670, the barometer became a trade commodity in London and Paris, and weather
@@ -319,15 +322,15 @@ export default function History() {
           vertical tube caused a noticeable shift in the horizontal section.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>
-          The Invention of the Conical Barometer and England&apos;s Contribution
-        </Title>
-        <Text className={sx.paragraph}>
-          Guillaume Amontons developed the conical barometer in 1695, which was highly sensitive to
-          atmospheric pressure changes. England became the center of barometer production, where
-          many of these instruments were made.
-        </Text>
+      <Title className={sx.header}>
+        The Invention of the Conical Barometer and England&apos;s Contribution
+      </Title>
+      <Text className={sx.paragraph}>
+        Guillaume Amontons developed the conical barometer in 1695, which was highly sensitive to
+        atmospheric pressure changes. England became the center of barometer production, where many
+        of these instruments were made.
+      </Text>
+      <ShowMore>
         <Text className={sx.paragraph}>
           The work of another scientist, Guillaume Amontons, significantly influenced the
           development of the barometer. A description of one of his ingenious devices, the conical
@@ -355,15 +358,15 @@ export default function History() {
           England.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>
-          The Development of the Barometric Scale and Units of Measurement
-        </Title>
-        <Text className={sx.paragraph}>
-          The history of measuring atmospheric pressure is closely tied to the transition to unified
-          measurement systems, including the use of inches of mercury in England. In the 18th
-          century, the use of vernier scales for precise measurements became standard.
-        </Text>
+      <Title className={sx.header}>
+        The Development of the Barometric Scale and Units of Measurement
+      </Title>
+      <Text className={sx.paragraph}>
+        The history of measuring atmospheric pressure is closely tied to the transition to unified
+        measurement systems, including the use of inches of mercury in England. In the 18th century,
+        the use of vernier scales for precise measurements became standard.
+      </Text>
+      <ShowMore>
         <Figure src="figure-17_register-plates.png " />
         <Text className={sx.paragraph}>
           England&apos;s influence on the development of the barometer is reflected in the units of
@@ -407,15 +410,15 @@ export default function History() {
         <Box>
           31 inches — &ldquo;Very Dry&rdquo; — Very dry
           <br />
-          30 1/2 inches — &ldquo;Settled Fair&rdquo; — Settled fair
+          30&frac12; inches — &ldquo;Settled Fair&rdquo; — Settled fair
           <br />
           30 inches — &ldquo;Fair&rdquo; — Fair
           <br />
-          29 1/2 inches — &ldquo;Change&rdquo; — Changeable
+          29&frac12; inches — &ldquo;Change&rdquo; — Changeable
           <br />
           29 inches — &ldquo;Rain&rdquo; — Rain
           <br />
-          28 1/2 inches — &ldquo;Much Rain&rdquo; — Heavy rain
+          28&frac12; inches — &ldquo;Much Rain&rdquo; — Heavy rain
           <br />
           28 inches — &ldquo;Stormy&rdquo; — Stormy
         </Box>
@@ -436,15 +439,15 @@ export default function History() {
           respect for the history of meteorology.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>
-          The Introduction of the Vernier Scale for Increased Accuracy
-        </Title>
-        <Text className={sx.paragraph}>
-          In the 18th century, barometers began to be fitted with a vernier scale — an auxiliary
-          scale invented by Pierre Vernier, significantly improving the precision of atmospheric
-          pressure measurements.
-        </Text>
+      <Title className={sx.header}>
+        The Introduction of the Vernier Scale for Increased Accuracy
+      </Title>
+      <Text className={sx.paragraph}>
+        In the 18th century, barometers began to be fitted with a vernier scale — an auxiliary scale
+        invented by Pierre Vernier, significantly improving the precision of atmospheric pressure
+        measurements.
+      </Text>
+      <ShowMore>
         <Figure src="figure-17_register-plates.png" />
         <Text className={sx.paragraph}>
           Starting around 1750, it became common practice to equip barometers with a
@@ -464,15 +467,15 @@ export default function History() {
           scale for a similar instrument at the end of the 16th century.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>
-          The Torricelli Tube and the Evolution of Cistern Barometers
-        </Title>
-        <Text className={sx.paragraph}>
-          The Torricelli tube was used in the first cistern barometers, but over time they were made
-          safer by adding covers and using materials like boxwood. This made barometers more
-          reliable and convenient to use.
-        </Text>
+      <Title className={sx.header}>
+        The Torricelli Tube and the Evolution of Cistern Barometers
+      </Title>
+      <Text className={sx.paragraph}>
+        The Torricelli tube was used in the first cistern barometers, but over time they were made
+        safer by adding covers and using materials like boxwood. This made barometers more reliable
+        and convenient to use.
+      </Text>
+      <ShowMore>
         <Figure src="figure-19_boxwood-cistern.png" />
         <Text className={sx.paragraph}>
           In Torricelli&apos;s mercury experiment, the tube had an open cistern — a simple bowl
@@ -497,13 +500,13 @@ export default function History() {
           reliability and convenience of these instruments.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Stick and Bottle Barometers</Title>
-        <Text className={sx.paragraph}>
-          Stick and bottle barometers were further developments of cistern instruments. They had
-          different designs but preserved the principle of a mercury column. Siphon tubes were also
-          used in well-known wheel barometers by Hooke.
-        </Text>
+      <Title className={sx.header}>Stick and Bottle Barometers</Title>
+      <Text className={sx.paragraph}>
+        Stick and bottle barometers were further developments of cistern instruments. They had
+        different designs but preserved the principle of a mercury column. Siphon tubes were also
+        used in well-known wheel barometers by Hooke.
+      </Text>
+      <ShowMore>
         <Figure src="figure-20_cistern-bulb-tube.png" />
         <Text className={sx.paragraph}>
           The next type of barometer, which appeared almost immediately after the cistern ones, was
@@ -524,13 +527,13 @@ export default function History() {
           Hooke. Another name for this type of instrument is &ldquo;Dial Barometers.&rdquo;
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Efforts to Create Accurate Barometers</Title>
-        <Text className={sx.paragraph}>
-          Standard and reference barometers, such as the &ldquo;Kew Standard Barometers,&rdquo; were
-          developed for meteorological laboratories. These devices provided high precision and were
-          used in scientific research.
-        </Text>
+      <Title className={sx.header}>Efforts to Create Accurate Barometers</Title>
+      <Text className={sx.paragraph}>
+        Standard and reference barometers, such as the &ldquo;Kew Standard Barometers,&rdquo; were
+        developed for meteorological laboratories. These devices provided high precision and were
+        used in scientific research.
+      </Text>
+      <ShowMore>
         <Figure src="figure-25_Kew-barometer.png" />
         <Text className={sx.paragraph}>
           A special place belongs to highly accurate barometers used in meteorological laboratories.
@@ -544,13 +547,13 @@ export default function History() {
           construction of any mercury barometer.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Barometer Components</Title>
-        <Text className={sx.paragraph}>
-          Barometer plates and dials were not only functional but also aesthetic elements. They were
-          made from various materials such as ivory and enamel plates, creating beautiful and
-          durable instruments.
-        </Text>
+      <Title className={sx.header}>Barometer Components</Title>
+      <Text className={sx.paragraph}>
+        Barometer plates and dials were not only functional but also aesthetic elements. They were
+        made from various materials such as ivory and enamel plates, creating beautiful and durable
+        instruments.
+      </Text>
+      <ShowMore>
         <Figure src="figure-26_moon-hand.png" />
         <Text className={sx.paragraph}>
           Every barometer consists of several important elements that not only ensure its
@@ -581,14 +584,13 @@ export default function History() {
           manually adjusted to record the current pressure value to determine weather trends.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>The Contribution of Daniel Quare and Edward Nairne</Title>
-        <Text className={sx.paragraph}>
-          Daniel Quare proposed an improvement to the barometer by adding a shock-absorbing chamber
-          to prevent the tube from breaking during transport. Edward Nairne developed a marine
-          barometer for use aboard ships, an important step in the development of navigation
-          instruments.
-        </Text>
+      <Title className={sx.header}>The Contribution of Daniel Quare and Edward Nairne</Title>
+      <Text className={sx.paragraph}>
+        Daniel Quare proposed an improvement to the barometer by adding a shock-absorbing chamber to
+        prevent the tube from breaking during transport. Edward Nairne developed a marine barometer
+        for use aboard ships, an important step in the development of navigation instruments.
+      </Text>
+      <ShowMore>
         <Figure src="figure-27_marine-mercury-barometer.png" />
         <Text className={sx.paragraph}>
           In 1724, Daniel Quare, a prominent English clockmaker and maker of scientific instruments,
@@ -622,12 +624,12 @@ export default function History() {
           renowned French instrument maker specializing in the creation of scientific tools.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Fortin&apos;s Barometer and Mercury Level Adjustment</Title>
-        <Text className={sx.paragraph}>
-          Jean Nicolas Fortin created an improved barometer with an adjustable cistern, providing
-          high measurement accuracy. This barometer became a standard in scientific research.
-        </Text>
+      <Title className={sx.header}>Fortin&apos;s Barometer and Mercury Level Adjustment</Title>
+      <Text className={sx.paragraph}>
+        Jean Nicolas Fortin created an improved barometer with an adjustable cistern, providing high
+        measurement accuracy. This barometer became a standard in scientific research.
+      </Text>
+      <ShowMore>
         <Figure src="figure-28_Fortin-cistern.png" />
         <Text className={sx.paragraph}>
           Fortin combined various early innovations and created an improved version of the barometer
@@ -645,15 +647,13 @@ export default function History() {
           for precision.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>
-          The Marine Barometer of Kew and Gold&apos;s Sliding Scale
-        </Title>
-        <Text className={sx.paragraph}>
-          In 1855, the &ldquo;Kew Marine Barometer&rdquo; was developed for use on ships. Ernest
-          Gold added a thermometer to the barometer&apos;s scale, allowing for temperature
-          compensation and improved reading accuracy.
-        </Text>
+      <Title className={sx.header}>The Marine Barometer of Kew and Gold&apos;s Sliding Scale</Title>
+      <Text className={sx.paragraph}>
+        In 1855, the &ldquo;Kew Marine Barometer&rdquo; was developed for use on ships. Ernest Gold
+        added a thermometer to the barometer&apos;s scale, allowing for temperature compensation and
+        improved reading accuracy.
+      </Text>
+      <ShowMore>
         <Figure src="figure-25_Kew-barometer.png" />
         <Text className={sx.paragraph}>
           In 1853, an international conference was held in Brussels, aimed at developing a
@@ -688,15 +688,15 @@ export default function History() {
           significantly influence the accuracy of barometer readings.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>
-          Robert FitzRoy&apos;s Contribution to the Development of Barometers
-        </Title>
-        <Text className={sx.paragraph}>
-          Robert FitzRoy played a key role in advancing barometers for sailors and fishermen, as
-          well as proposing the &ldquo;Miner&apos;s Barometer,&rdquo; which helped warn against gas
-          explosions in mines.
-        </Text>
+      <Title className={sx.header}>
+        Robert FitzRoy&apos;s Contribution to the Development of Barometers
+      </Title>
+      <Text className={sx.paragraph}>
+        Robert FitzRoy played a key role in advancing barometers for sailors and fishermen, as well
+        as proposing the &ldquo;Miner&apos;s Barometer,&rdquo; which helped warn against gas
+        explosions in mines.
+      </Text>
+      <ShowMore>
         <Figure src="figure-29_Gun-barometer.png" />
         <Text className={sx.paragraph}>
           Thanks to its proven accuracy in practice, Kew barometers were widely used at weather
@@ -724,13 +724,13 @@ export default function History() {
           sudden storms and adverse weather conditions.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Miner&apos;s Barometers</Title>
-        <Text className={sx.paragraph}>
-          In 1864, the company Negretti & Zambra developed a miner&apos;s barometer to warn against
-          sudden pressure changes that could lead to gas explosions in mines. This device became a
-          mandatory safety measure in the mining industry.
-        </Text>
+      <Title className={sx.header}>Miner&apos;s Barometers</Title>
+      <Text className={sx.paragraph}>
+        In 1864, the company Negretti & Zambra developed a miner&apos;s barometer to warn against
+        sudden pressure changes that could lead to gas explosions in mines. This device became a
+        mandatory safety measure in the mining industry.
+      </Text>
+      <ShowMore>
         <Text className={sx.paragraph}>
           In 1864, Negretti & Zambra developed the &ldquo;Miner&apos;s Barometer,&rdquo;
           specifically designed for use in mines. This instrument became an essential safety tool
@@ -742,12 +742,12 @@ export default function History() {
           and hazardous conditions underground.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Aneroid Barometers and Their Spread</Title>
-        <Text className={sx.paragraph}>
-          With the invention of the aneroid barometer by Lucien Vidi in 1844, a new era of measuring
-          instruments began. Aneroid barometers did not require mercury and were convenient to use.
-        </Text>
+      <Title className={sx.header}>Aneroid Barometers and Their Spread</Title>
+      <Text className={sx.paragraph}>
+        With the invention of the aneroid barometer by Lucien Vidi in 1844, a new era of measuring
+        instruments began. Aneroid barometers did not require mercury and were convenient to use.
+      </Text>
+      <ShowMore>
         <Figure src="figure-35_marine-aneroid-barometer.png" />
         <Text className={sx.paragraph}>
           The transition from mercury barometers to aneroid barometers marked a key moment in
@@ -784,12 +784,12 @@ export default function History() {
           Vidi mechanism.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Miniature Aneroid Barometers</Title>
-        <Text className={sx.paragraph}>
-          Negretti & Zambra developed miniature pocket aneroid barometers, revolutionizing the field
-          of measuring instruments. These devices became essential tools in various fields.
-        </Text>
+      <Title className={sx.header}>Miniature Aneroid Barometers</Title>
+      <Text className={sx.paragraph}>
+        Negretti & Zambra developed miniature pocket aneroid barometers, revolutionizing the field
+        of measuring instruments. These devices became essential tools in various fields.
+      </Text>
+      <ShowMore>
         <Figure src="figure-36_2euro-pocket-barometer.png" />
         <Text className={sx.paragraph}>
           At the suggestion of Admiral Robert FitzRoy, Negretti & Zambra began working on the
@@ -802,15 +802,15 @@ export default function History() {
           various fields, allowing people to carry a barometer in their pocket.
         </Text>
       </ShowMore>
-      <ShowMore height={180}>
-        <Title className={sx.header}>
-          Aneroid Mechanisms: The Vidi Mechanism and the Continental Console Mechanism
-        </Title>
-        <Text className={sx.paragraph}>
-          Aneroid barometers, invented by Lucien Vidi, used a metal capsule that deformed under air
-          pressure. Later, the continental console mechanism, based on a rack and pinion system, was
-          developed, improving the accuracy and stability of measurements.
-        </Text>
+      <Title className={sx.header}>
+        Aneroid Mechanisms: The Vidi Mechanism and the Continental Console Mechanism
+      </Title>
+      <Text className={sx.paragraph}>
+        Aneroid barometers, invented by Lucien Vidi, used a metal capsule that deformed under air
+        pressure. Later, the continental console mechanism, based on a rack and pinion system, was
+        developed, improving the accuracy and stability of measurements.
+      </Text>
+      <ShowMore>
         <Figure src="figure-39_mountain-barometer.png" />
         <Text className={sx.paragraph}>
           Friction and slack in the joints of the levers and linkages in the aneroid mechanism,
@@ -832,11 +832,11 @@ export default function History() {
           capsule&apos;s deformation into pointer movement, improving measurement accuracy.
         </Text>
       </ShowMore>
-      <ShowMore height={90}>
-        <Title className={sx.header}>Self-Registering Barometers</Title>
-        <Text className={sx.paragraph}>
-          Self-registering barometers automated the recording of atmospheric pressure readings.{' '}
-        </Text>
+      <Title className={sx.header}>Self-Registering Barometers</Title>
+      <Text className={sx.paragraph}>
+        Self-registering barometers automated the recording of atmospheric pressure readings.{' '}
+      </Text>
+      <ShowMore>
         <Figure src="figure-41_barograf-mercury.png" />
         <Text className={sx.paragraph}>
           Since the invention of the first barometers, scientists dreamed of creating a device that
@@ -859,14 +859,14 @@ export default function History() {
           wound, gradually unrolling as data was recorded.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Photobarograph</Title>
-        <Text className={sx.paragraph}>
-          In 1847, Sir Francis Ronalds developed the photobarograph, which used daguerreotype plates
-          to photographically record changes in atmospheric pressure. This device became a
-          significant step in the automation of meteorological observations and was installed at the
-          Kew Observatory.
-        </Text>
+      <Title className={sx.header}>Photobarograph</Title>
+      <Text className={sx.paragraph}>
+        In 1847, Sir Francis Ronalds developed the photobarograph, which used daguerreotype plates
+        to photographically record changes in atmospheric pressure. This device became a significant
+        step in the automation of meteorological observations and was installed at the Kew
+        Observatory.
+      </Text>
+      <ShowMore>
         <Text className={sx.paragraph}>
           Over time, self-registering mercury barometers allowed continuous recording of barometric
           fluctuations not only on paper moving across a drum but also through photographic
@@ -888,12 +888,12 @@ export default function History() {
           time, combining elements of mechanics, optics, and early photography techniques.
         </Text>
       </ShowMore>
-      <ShowMore height={120}>
-        <Title className={sx.header}>Barographs</Title>
-        <Text className={sx.paragraph}>
-          Barographs, invented in the 19th century, used aneroid capsules and clock mechanisms to
-          precisely record pressure changes.
-        </Text>
+      <Title className={sx.header}>Barographs</Title>
+      <Text className={sx.paragraph}>
+        Barographs, invented in the 19th century, used aneroid capsules and clock mechanisms to
+        precisely record pressure changes.
+      </Text>
+      <ShowMore>
         <Figure src="figure-43_RF-barograph.png" />
         <Text className={sx.paragraph}>
           In 1867, at the Paris International Exhibition, the renowned watchmaking company Breguet
@@ -927,14 +927,14 @@ export default function History() {
           inside the drum was replaced by a battery-powered unit.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Observing Nature as a Way of Predicting the Weather</Title>
-        <Text className={sx.paragraph}>
-          Long before the invention of barometers, people observed natural phenomena to predict the
-          weather. Sailors, whose lives depended on weather conditions, used signs like the behavior
-          of seagulls or sharks to anticipate storms and weather changes. Clouds, sunsets, and other
-          natural phenomena also helped people predict the weather.
-        </Text>
+      <Title className={sx.header}>Observing Nature as a Way of Predicting the Weather</Title>
+      <Text className={sx.paragraph}>
+        Long before the invention of barometers, people observed natural phenomena to predict the
+        weather. Sailors, whose lives depended on weather conditions, used signs like the behavior
+        of seagulls or sharks to anticipate storms and weather changes. Clouds, sunsets, and other
+        natural phenomena also helped people predict the weather.
+      </Text>
+      <ShowMore>
         <Text className={sx.paragraph}>
           Long before the first barometers began showing drops in mercury levels, people already
           sought clues about upcoming weather by closely observing nature. For sailors, whose lives
@@ -967,14 +967,13 @@ export default function History() {
           people survive and thrive despite nature&apos;s whims.
         </Text>
       </ShowMore>
-      <ShowMore height={140}>
-        <Title className={sx.header}>Primitive Tools for Predicting the Weather</Title>
-        <Text className={sx.paragraph}>
-          People created simple yet effective devices for forecasting the weather. One such device
-          was a pinecone used as a hygrometer. Sheep&apos;s wool and hemp ropes also served as
-          humidity indicators, allowing sailors and shepherds to forecast weather changes and
-          prepare for rain.
-        </Text>
+      <Title className={sx.header}>Primitive Tools for Predicting the Weather</Title>
+      <Text className={sx.paragraph}>
+        People created simple yet effective devices for forecasting the weather. One such device was
+        a pinecone used as a hygrometer. Sheep&apos;s wool and hemp ropes also served as humidity
+        indicators, allowing sailors and shepherds to forecast weather changes and prepare for rain.
+      </Text>
+      <ShowMore>
         <Text className={sx.paragraph}>
           In addition to observing nature, people have long created simple but remarkably effective
           tools for predicting the weather, which became reliable assistants in everyday life. These
