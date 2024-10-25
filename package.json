@@ -1,20 +1,26 @@
 {
-  "name": "mantine-next-template",
+  "name": "barometers-realm",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
+  "author": {
+    "name": "CyberVoid",
+    "email": "shenshin@me.com",
+    "url": "https://github.com/shenshin"
+  },
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "lint": "next lint --fix && npm run lint:stylelint -- --fix",
+    "lint": "next lint --fix && yarn run lint:stylelint -- --fix",
     "lint:stylelint": "stylelint '**/*.css' --cache",
     "jest": "jest",
     "jest:watch": "jest --watch",
     "prettier:check": "prettier --check \"**/*.{ts,tsx}\"",
     "prettier:write": "prettier --write \"**/*.{ts,tsx}\"",
-    "test": "npm run prettier:check && npm run lint && npm run typecheck && npm run jest",
+    "test": "yarn run prettier:check && yarn run lint && yarn run typecheck && yarn run jest",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },
@@ -97,5 +103,5 @@
     "ts-jest": "^29.1.5",
     "typescript": "5.5.2"
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
