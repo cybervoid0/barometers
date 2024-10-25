@@ -12,7 +12,7 @@
     "dev": "next dev",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "typecheck": "tsc --noEmit",
     "lint": "next lint --fix && yarn run lint:stylelint -- --fix",
     "lint:stylelint": "stylelint '**/*.css' --cache",
