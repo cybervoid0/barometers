@@ -7,9 +7,10 @@ interface BarometerCardProps {
   image: string
   name: string
   link: string
+  manufacturer?: string
 }
 
-export async function BarometerCard({ name, image, link }: BarometerCardProps) {
+export async function BarometerCard({ name, image, link, manufacturer }: BarometerCardProps) {
   return (
     <Box>
       <Anchor c="dark" component={Link} href={link}>
@@ -27,6 +28,11 @@ export async function BarometerCard({ name, image, link }: BarometerCardProps) {
         <Text size="xs" fw={500} lts={1} tt="uppercase" ta="center">
           {name}
         </Text>
+        {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
+          <Text size="8px" fw={500} lts={1} tt="uppercase" ta="center">
+            {manufacturer}
+          </Text>
+        )}
       </Anchor>
     </Box>
   )

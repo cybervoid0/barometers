@@ -5,7 +5,8 @@ import Barometer, { IBarometer } from '@/models/barometer'
 import BarometerType from '@/models/type'
 import '@/models/condition'
 import Manufacturer from '@/models/manufacturer'
-import { cleanObject, slug as slugify } from '@/utils/misc'
+import { cleanObject, slug as slugify, parseDate } from '@/utils/misc'
+import { SortOptions } from '@/app/collection/types/[type]/types'
 
 /**
  * Get barometer list
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const typeName = searchParams.get('type')
+    const sortBy = searchParams.get('sort') as SortOptions | null
     // if `type` search param was not passed return all barometers list
     if (!typeName || !typeName.trim()) {
       const barometers = (
@@ -37,7 +39,27 @@ export async function GET(req: NextRequest) {
         'condition',
         'manufacturer',
       ])
-    ).toSorted((a, b) => (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? ''))
+    ).toSorted((a, b) => {
+      switch (sortBy) {
+        case SortOptions.manufacturer:
+          return (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? '')
+        case SortOptions.name:
+          return a.name.localeCompare(b.name)
+        case SortOptions.date: {
+          if (!a.dating || !b.dating) return 0
+          const yearA = parseDate(a.dating)?.[0]
+          const yearB = parseDate(b.dating)?.[0]
+          if (!yearA || !yearB) return 0
+          const dateA = new Date(yearA, 0, 1).getTime()
+          const dateB = new Date(yearB, 0, 1).getTime()
+          return dateA - dateB
+        }
+        case SortOptions.catNo:
+          return a.collectionId.localeCompare(b.collectionId)
+        default:
+          return 0
+      }
+    })
     return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
   } catch (error) {
     return NextResponse.json(
