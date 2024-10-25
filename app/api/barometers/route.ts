@@ -8,6 +8,30 @@ import Manufacturer from '@/models/manufacturer'
 import { cleanObject, slug as slugify, parseDate } from '@/utils/misc'
 import { SortOptions } from '@/app/collection/types/[type]/types'
 
+function sortBarometers(barometers: IBarometer[], sortBy: SortOptions | null): IBarometer[] {
+  return barometers.toSorted((a, b) => {
+    switch (sortBy) {
+      case SortOptions.manufacturer:
+        return (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? '')
+      case SortOptions.name:
+        return a.name.localeCompare(b.name)
+      case SortOptions.date: {
+        if (!a.dating || !b.dating) return 0
+        const yearA = parseDate(a.dating)?.[0]
+        const yearB = parseDate(b.dating)?.[0]
+        if (!yearA || !yearB) return 0
+        const dateA = new Date(yearA, 0, 1).getTime()
+        const dateB = new Date(yearB, 0, 1).getTime()
+        return dateA - dateB
+      }
+      case SortOptions.catNo:
+        return a.collectionId.localeCompare(b.collectionId)
+      default:
+        return 0
+    }
+  })
+}
+
 /**
  * Get barometer list
  *
@@ -21,9 +45,10 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get('sort') as SortOptions | null
     // if `type` search param was not passed return all barometers list
     if (!typeName || !typeName.trim()) {
-      const barometers = (
-        await Barometer.find().populate(['type', 'condition', 'manufacturer'])
-      ).toSorted((a, b) => (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? ''))
+      const barometers = sortBarometers(
+        await Barometer.find().populate(['type', 'condition', 'manufacturer']),
+        sortBy,
+      )
       return NextResponse.json(barometers, { status: 200 })
     }
     // if some non-empty `type` was passed, perform case-insensitive compare with the stored types
@@ -33,33 +58,14 @@ export async function GET(req: NextRequest) {
     if (!barometerType) return NextResponse.json([], { status: 404 })
 
     // if existing barometer type match the `type` param, return all corresponding barometers
-    const barometers = (
+    const barometers = sortBarometers(
       await Barometer.find({ type: barometerType._id }).populate([
         'type',
         'condition',
         'manufacturer',
-      ])
-    ).toSorted((a, b) => {
-      switch (sortBy) {
-        case SortOptions.manufacturer:
-          return (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? '')
-        case SortOptions.name:
-          return a.name.localeCompare(b.name)
-        case SortOptions.date: {
-          if (!a.dating || !b.dating) return 0
-          const yearA = parseDate(a.dating)?.[0]
-          const yearB = parseDate(b.dating)?.[0]
-          if (!yearA || !yearB) return 0
-          const dateA = new Date(yearA, 0, 1).getTime()
-          const dateB = new Date(yearB, 0, 1).getTime()
-          return dateA - dateB
-        }
-        case SortOptions.catNo:
-          return a.collectionId.localeCompare(b.collectionId)
-        default:
-          return 0
-      }
-    })
+      ]),
+      sortBy,
+    )
     return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
   } catch (error) {
     return NextResponse.json(

@@ -25,7 +25,7 @@ interface CollectionProps {
   }
 }
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
-  const sortBy = searchParams.sort ?? SortOptions.name
+  const sortBy = searchParams.sort ?? SortOptions.date
   const qs = new URLSearchParams({ type, sort: sortBy })
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute}?${qs}`, {
     next: { revalidate: 600 },
@@ -46,18 +46,16 @@ export default async function Collection({ params: { type }, searchParams }: Col
         <Sort sortBy={sortBy} />
       </Group>
       <Grid justify="center" gutter="xl">
-        {barometersOfType
-          ?.filter(({ images }) => Boolean(images?.[0]))
-          .map(({ name, _id, images, manufacturer }) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
-              <BarometerCard
-                image={googleStorageImagesFolder + images![0]}
-                name={name}
-                link={barometerRoute + slug(name)}
-                manufacturer={manufacturer?.name}
-              />
-            </GridCol>
-          ))}
+        {barometersOfType.map(({ name, _id, images, manufacturer }) => (
+          <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
+            <BarometerCard
+              image={googleStorageImagesFolder + images![0]}
+              name={name}
+              link={barometerRoute + slug(name)}
+              manufacturer={manufacturer?.name}
+            />
+          </GridCol>
+        ))}
       </Grid>
     </Container>
   )
