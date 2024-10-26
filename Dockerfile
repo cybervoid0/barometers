@@ -13,12 +13,6 @@ RUN npm install
 # Copy the entire project into the container
 COPY . .
 
-# Копируем файл с переменными окружения внутрь контейнера
-COPY .env.production.local .env
-
-# Загружаем переменные и собираем приложение
-RUN export $(grep -v '^#' .env | xargs) && npm run build
-
 # Remove devDependencies after the build to reduce image size
 RUN npm prune --production
 
