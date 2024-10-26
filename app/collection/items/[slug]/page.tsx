@@ -74,6 +74,27 @@ export async function generateMetadata({
   }
 }
 
+const Description = ({ description }: { description: string }) => {
+  const [firstParagraph, ...paragraphs] = description.split('\n')
+  return (
+    <>
+      <Text>{firstParagraph}</Text>
+      <Spoiler
+        maxHeight={0}
+        showLabel="Show more"
+        hideLabel="Hide"
+        styles={{ control: { color: '#242424', fontWeight: 600 } }}
+      >
+        {paragraphs.map((paragraph, i) => (
+          <Text mb="md" key={i}>
+            {paragraph}
+          </Text>
+        ))}
+      </Spoiler>
+    </>
+  )
+}
+
 /**
  * This function fetches all barometers from the API and maps their slugs
  * to be used as static parameters for Next.js static generation.
@@ -184,19 +205,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
                   labelPosition: 'right',
                 })}
               />
-
-              <Spoiler
-                maxHeight={120}
-                showLabel="Show more"
-                hideLabel="Hide"
-                styles={{ control: { color: '#242424', fontWeight: 600 } }}
-              >
-                {description.split('\n').map((paragraph, i) => (
-                  <Text mb="md" key={i}>
-                    {paragraph}
-                  </Text>
-                ))}
-              </Spoiler>
+              <Description description={description} />
             </>
           )}
         </Box>
