@@ -78,7 +78,7 @@ const Description = ({ description }: { description: string }) => {
   const [firstParagraph, ...paragraphs] = description.split('\n')
   return (
     <>
-      <Text mb="md">{firstParagraph}</Text>
+      <Text>{firstParagraph}</Text>
       <Spoiler
         maxHeight={0}
         showLabel="Show more"
