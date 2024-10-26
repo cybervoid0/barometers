@@ -13,6 +13,8 @@ RUN npm install
 # Copy the entire project into the container
 COPY . .
 
+RUN npm run build
+
 # Remove devDependencies after the build to reduce image size
 RUN npm prune --production
 
@@ -28,7 +30,7 @@ COPY --from=builder /app ./
 # Set the environment variable for production
 ENV NODE_ENV=production
 
-# Expose port 3000 for the application
+# Expose port for the application
 EXPOSE 3000
 
 # Start the application
