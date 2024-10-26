@@ -31,7 +31,7 @@ COPY --from=builder /app ./
 ENV NODE_ENV=production
 
 # Expose port for the application
-EXPOSE 3000
+EXPOSE 8080
 
 # Start the application
 CMD ["npm", "start"]
