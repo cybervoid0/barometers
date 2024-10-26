@@ -6,16 +6,16 @@ import BarometerType from '@/models/type'
 import '@/models/condition'
 import Manufacturer from '@/models/manufacturer'
 import { cleanObject, slug as slugify, parseDate } from '@/utils/misc'
-import { SortOptions } from '@/app/collection/types/[type]/types'
+import { SortValue } from '@/app/collection/types/[type]/types'
 
-function sortBarometers(barometers: IBarometer[], sortBy: SortOptions | null): IBarometer[] {
+function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBarometer[] {
   return barometers.toSorted((a, b) => {
     switch (sortBy) {
-      case SortOptions.manufacturer:
+      case 'manufacturer':
         return (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? '')
-      case SortOptions.name:
+      case 'name':
         return a.name.localeCompare(b.name)
-      case SortOptions.date: {
+      case 'date': {
         if (!a.dating || !b.dating) return 0
         const yearA = parseDate(a.dating)?.[0]
         const yearB = parseDate(b.dating)?.[0]
@@ -24,7 +24,7 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortOptions | null): I
         const dateB = new Date(yearB, 0, 1).getTime()
         return dateA - dateB
       }
-      case SortOptions.catNo:
+      case 'cat-no':
         return a.collectionId.localeCompare(b.collectionId)
       default:
         return 0
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const typeName = searchParams.get('type')
-    const sortBy = searchParams.get('sort') as SortOptions | null
+    const sortBy = searchParams.get('sort') as SortValue | null
     // if `type` search param was not passed return all barometers list
     if (!typeName || !typeName.trim()) {
       const barometers = sortBarometers(

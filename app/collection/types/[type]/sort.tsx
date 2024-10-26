@@ -2,10 +2,10 @@
 
 import { Select } from '@mantine/core'
 import { useRouter } from 'next/navigation'
-import { SortOptions } from './types'
+import { SortValue, SortOptions } from './types'
 
 interface SortProps {
-  sortBy: SortOptions
+  sortBy: SortValue
   direction?: 'asc' | 'dec'
 }
 
@@ -25,7 +25,7 @@ export default function Sort({ sortBy }: SortProps) {
       placeholder="Sort by"
       value={sortBy}
       onChange={handleSortChange}
-      data={Object.keys(SortOptions)}
+      data={SortOptions}
       styles={{
         option: { textTransform: 'capitalize' },
         input: { textTransform: 'capitalize' },

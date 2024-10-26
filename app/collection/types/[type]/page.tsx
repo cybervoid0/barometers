@@ -13,7 +13,7 @@ import {
 import { BarometerCard } from './components/barometer-card'
 import { ShowError } from '@/app/components/show-error'
 import { slug } from '@/utils/misc'
-import { SortOptions } from './types'
+import { SortValue } from './types'
 import Sort from './sort'
 
 interface CollectionProps {
@@ -21,11 +21,11 @@ interface CollectionProps {
     type: string
   }
   searchParams: {
-    sort?: SortOptions
+    sort?: SortValue
   }
 }
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
-  const sortBy = searchParams.sort ?? SortOptions.date
+  const sortBy = searchParams.sort ?? 'date'
   const qs = new URLSearchParams({ type, sort: sortBy })
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute}?${qs}`, {
     next: { revalidate: 600 },
