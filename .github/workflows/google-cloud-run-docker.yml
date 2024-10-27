@@ -65,15 +65,16 @@ jobs:
         run: gcloud auth configure-docker
 
       - name: Build and tag the docker image
-        run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
-          --build-arg AUTH_SECRET=${{ secrets.AUTH_SECRET }} \
-          --build-arg GCP_BUCKET_NAME=${{ secrets.GCP_BUCKET_NAME }} \
-          --build-arg GCP_CLIENT_EMAIL=${{ secrets.GCP_CLIENT_EMAIL }} \
-          --build-arg GCP_PRIVATE_KEY=${{ secrets.GCP_PRIVATE_KEY }} \
-          --build-arg GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
-          --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
-          --build-arg NODE_ENV=${{ secrets.NODE_ENV }}
+        run: |
+          docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
+            --build-arg AUTH_SECRET=${{ secrets.AUTH_SECRET }} \
+            --build-arg GCP_BUCKET_NAME=${{ secrets.GCP_BUCKET_NAME }} \
+            --build-arg GCP_CLIENT_EMAIL=${{ secrets.GCP_CLIENT_EMAIL }} \
+            --build-arg GCP_PRIVATE_KEY=${{ secrets.GCP_PRIVATE_KEY }} \
+            --build-arg GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
+            --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
+            --build-arg NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
+            --build-arg NODE_ENV=${{ secrets.NODE_ENV }}
 
       - name: Push the image to the Google Container Registry (GCR)
         run: |-
