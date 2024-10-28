@@ -59,10 +59,8 @@ jobs:
             --build-arg "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
             --build-arg "NEXTAUTH_URL=https://barometers.vercel.app" \
             --build-arg "NEXT_PUBLIC_BASE_URL=https://barometers.vercel.app" \
-            --build-arg "NODE_ENV=${{ secrets.NODE_ENV }}"
-
-      - name: Push the image to the Google Container Registry (GCR)
-        run: docker push gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
+            --build-arg "NODE_ENV=${{ secrets.NODE_ENV }}" \
+            --push
 
       - name: Deploy to Cloud Run
         run: |
