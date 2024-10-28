@@ -9,7 +9,7 @@ ARG GCP_PRIVATE_KEY
 ARG GCP_PROJECT_ID
 ARG MONGODB_URI
 ARG NEXTAUTH_SECRET
-ARG NODE_ENV=development  # Принудительно установлено для сборки
+ARG NODE_ENV
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ WORKDIR /app
 # Copy package.json and package-lock.json for installing dependencies
 COPY package*.json ./
 
-# Install all dependencies, включая devDependencies
+# Install all dependencies, including devDependencies, for the build stage
 RUN npm install
 
 # Copy the entire project into the container
@@ -38,3 +38,21 @@ RUN npm run build
 
 # Remove devDependencies after the build to reduce image size
 RUN npm prune --production
+
+# Start a new stage for the production environment
+FROM node:20.18-alpine
+
+# Set the working directory inside the new container
+WORKDIR /app
+
+# Copy only the necessary files from the builder stage
+COPY --from=builder /app ./
+
+# Set the environment variable for production
+ENV NODE_ENV=production
+
+# Expose port for the application
+EXPOSE 8080
+
+# Start the application
+CMD ["npm", "start"]
