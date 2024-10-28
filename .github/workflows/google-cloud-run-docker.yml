@@ -42,23 +42,17 @@ jobs:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           REPO_NAME: barometers
         run: |
-          echo "${{ secrets.AUTH_SECRET }}" > /tmp/auth_secret
-          echo "${{ secrets.GCP_CLIENT_EMAIL }}" > /tmp/gcp_client_email
-          echo "${{ secrets.GCP_PRIVATE_KEY }}" > /tmp/gcp_private_key
-          echo "${{ secrets.MONGODB_URI }}" > /tmp/mongodb_uri
-          echo "${{ secrets.NEXTAUTH_SECRET }}" > /tmp/nextauth_secret
-
-          DOCKER_BUILDKIT=1 docker buildx build \
+          docker buildx build \
             --tag "gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA" . \
-            --secret id=AUTH_SECRET,src=/tmp/auth_secret \
-            --secret id=GCP_CLIENT_EMAIL,src=/tmp/gcp_client_email \
-            --secret id=GCP_PRIVATE_KEY,src=/tmp/gcp_private_key \
-            --secret id=MONGODB_URI,src=/tmp/mongodb_uri \
-            --secret id=NEXTAUTH_SECRET,src=/tmp/nextauth_secret \
+            --build-arg "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" \
             --build-arg "GCP_BUCKET_NAME=${{ secrets.GCP_BUCKET_NAME }}" \
+            --build-arg "GCP_CLIENT_EMAIL=${{ secrets.GCP_CLIENT_EMAIL }}" \
+            --build-arg "GCP_PRIVATE_KEY=${{ secrets.GCP_PRIVATE_KEY }}" \
             --build-arg "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
-            --build-arg "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" \
-            --build-arg "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" \
+            --build-arg "MONGODB_URI=${{ secrets.MONGODB_URI }}" \
+            --build-arg "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
+            --build-arg "NEXTAUTH_URL=https://barometers.vercel.app" \
+            --build-arg "NEXT_PUBLIC_BASE_URL=https://barometers.vercel.app" \
             --build-arg "NODE_ENV=${{ secrets.NODE_ENV }}" \
             --push
 
