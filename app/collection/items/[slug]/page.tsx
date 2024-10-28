@@ -104,9 +104,6 @@ const Description = ({ description }: { description: string }) => {
  * @throws {Error} If the fetch request fails or the response cannot be parsed as JSON.
  */
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  if (process.env.CI) {
-    return []
-  }
   const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute)
   const barometers: IBarometer[] = await res.json()
 

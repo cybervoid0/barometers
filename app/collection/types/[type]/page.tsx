@@ -62,9 +62,6 @@ export default async function Collection({ params: { type }, searchParams }: Col
 }
 
 export async function generateStaticParams() {
-  if (process.env.CI) {
-    return []
-  }
   const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometerTypesApiRoute)
   const barometerTypes: IBarometerType[] = await res.json()
 
