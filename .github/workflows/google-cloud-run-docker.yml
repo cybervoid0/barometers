@@ -57,17 +57,27 @@ jobs:
             --build-arg "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
             --build-arg "MONGODB_URI=${{ secrets.MONGODB_URI }}" \
             --build-arg "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
+            --build-arg "NEXTAUTH_URL=https://temporary-url.com" \
+            --build-arg "NEXT_PUBLIC_BASE_URL=https://temporary-url.com" \
             --build-arg "NODE_ENV=${{ secrets.NODE_ENV }}"
-      
-        
 
       - name: Push the image to the Google Container Registry (GCR)
         run: docker push gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
 
-      - name: Deploy
+      - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $REPO_NAME \
           --region $REGION \
           --image gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
           --platform "managed" \
           --quiet
+
+      - name: Update Cloud Run environment variables with actual URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe $REPO_NAME \
+            --platform managed \
+            --region $REGION \
+            --format 'value(status.url)')
+          gcloud run services update $REPO_NAME \
+            --region $REGION \
+            --update-env-vars NEXTAUTH_URL="$SERVICE_URL",NEXT_PUBLIC_BASE_URL="$SERVICE_URL"
