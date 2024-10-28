@@ -57,8 +57,8 @@ jobs:
             --build-arg "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
             --build-arg "MONGODB_URI=${{ secrets.MONGODB_URI }}" \
             --build-arg "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
-            --build-arg "NEXTAUTH_URL=https://temporary-url.com" \
-            --build-arg "NEXT_PUBLIC_BASE_URL=https://temporary-url.com" \
+            --build-arg "NEXTAUTH_URL=http://localhost:3000" \
+            --build-arg "NEXT_PUBLIC_BASE_URL=http://localhost:3000" \
             --build-arg "NODE_ENV=${{ secrets.NODE_ENV }}"
 
       - name: Push the image to the Google Container Registry (GCR)
