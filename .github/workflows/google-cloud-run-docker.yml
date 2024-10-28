@@ -42,13 +42,19 @@ jobs:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           REPO_NAME: barometers
         run: |
+          echo "${{ secrets.AUTH_SECRET }}" > /tmp/auth_secret
+          echo "${{ secrets.GCP_CLIENT_EMAIL }}" > /tmp/gcp_client_email
+          echo "${{ secrets.GCP_PRIVATE_KEY }}" > /tmp/gcp_private_key
+          echo "${{ secrets.MONGODB_URI }}" > /tmp/mongodb_uri
+          echo "${{ secrets.NEXTAUTH_SECRET }}" > /tmp/nextauth_secret
+
           DOCKER_BUILDKIT=1 docker buildx build \
             --tag "gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA" . \
-            --secret id=AUTH_SECRET,src=<(echo "${{ secrets.AUTH_SECRET }}") \
-            --secret id=GCP_CLIENT_EMAIL,src=<(echo "${{ secrets.GCP_CLIENT_EMAIL }}") \
-            --secret id=GCP_PRIVATE_KEY,src=<(echo "${{ secrets.GCP_PRIVATE_KEY }}") \
-            --secret id=MONGODB_URI,src=<(echo "${{ secrets.MONGODB_URI }}") \
-            --secret id=NEXTAUTH_SECRET,src=<(echo "${{ secrets.NEXTAUTH_SECRET }}") \
+            --secret id=AUTH_SECRET,src=/tmp/auth_secret \
+            --secret id=GCP_CLIENT_EMAIL,src=/tmp/gcp_client_email \
+            --secret id=GCP_PRIVATE_KEY,src=/tmp/gcp_private_key \
+            --secret id=MONGODB_URI,src=/tmp/mongodb_uri \
+            --secret id=NEXTAUTH_SECRET,src=/tmp/nextauth_secret \
             --build-arg "GCP_BUCKET_NAME=${{ secrets.GCP_BUCKET_NAME }}" \
             --build-arg "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
             --build-arg "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" \
