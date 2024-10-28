@@ -1,6 +1,28 @@
 # Use Node.js 20.18 as the base image
 FROM node:20.18-alpine AS builder
 
+# Указываем build-args для переменных окружения
+ARG GCP_BUCKET_NAME
+ARG GCP_PROJECT_ID
+ARG NEXTAUTH_URL
+ARG NEXT_PUBLIC_BASE_URL
+ARG NODE_ENV
+
+# Using secrets
+RUN --mount=type=secret,id=AUTH_SECRET \
+  --mount=type=secret,id=GCP_CLIENT_EMAIL \
+  --mount=type=secret,id=GCP_PRIVATE_KEY \
+  --mount=type=secret,id=MONGODB_URI \
+  --mount=type=secret,id=NEXTAUTH_SECRET \
+  echo "Secrets were successfully received"
+
+# Using arguments
+ENV GCP_BUCKET_NAME=$GCP_BUCKET_NAME
+ENV GCP_PROJECT_ID=$GCP_PROJECT_ID
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NODE_ENV=$NODE_ENV
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -13,18 +35,6 @@ RUN npm install
 
 # Copy the entire project into the container
 COPY . .
-
-# Устанавливаем переменные окружения, чтобы они были доступны на этапе сборки
-ENV AUTH_SECRET=$AUTH_SECRET
-ENV GCP_BUCKET_NAME=$GCP_BUCKET_NAME
-ENV GCP_CLIENT_EMAIL=$GCP_CLIENT_EMAIL
-ENV GCP_PRIVATE_KEY=$GCP_PRIVATE_KEY
-ENV GCP_PROJECT_ID=$GCP_PROJECT_ID
-ENV MONGODB_URI=$MONGODB_URI
-ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-ENV NODE_ENV=$NODE_ENV
-ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
-ENV NEXTAUTH_URL=$NEXTAUTH_URL
 
 # Выполняем сборку проекта
 RUN npm run build
