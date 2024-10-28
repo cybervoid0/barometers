@@ -1,8 +1,12 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
-});
+})
 
 export default withBundleAnalyzer({
   reactStrictMode: false,
@@ -24,5 +28,9 @@ export default withBundleAnalyzer({
         hostname: 'storage.googleapis.com',
       },
     ],
+  },
+  webpack: config => {
+    config.resolve.alias['@'] = path.resolve('./')
+    return config
   },
 })
