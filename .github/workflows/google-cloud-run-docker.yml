@@ -9,6 +9,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: europe-west4
   REPO_NAME: barometers
+  CI: true
 
 jobs:
   deploy:
