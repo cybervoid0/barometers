@@ -16,6 +16,7 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json for installing dependencies
 COPY package*.json ./
+COPY tsconfig.json ./
 
 # Install all dependencies, including devDependencies, for the build stage
 RUN npm install
