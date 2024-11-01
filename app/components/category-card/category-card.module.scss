@@ -8,6 +8,8 @@
     transform: scale(1.2);
     z-index: 3;
   }
+
+  background: linear-gradient(180deg, #e2e2e2, #efefef);
 }
 .bg_image {
   z-index: 0;
@@ -17,13 +19,14 @@
 }
 .title {
   position: absolute;
+  padding-inline: .3rem .15rem;
   bottom: 2rem;
   left: 2rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 3px;
   font-size: larger;
   text-transform: uppercase;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: #5a4f46;
   color: white;
   z-index: 4;
 }

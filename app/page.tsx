@@ -34,7 +34,7 @@ export default async function HomePage() {
         {errorMessage ? (
           <ShowError message={errorMessage} />
         ) : (
-          <Grid justify="center" gutter={{ base: 'xs', sm: 'lg' }}>
+          <Grid justify="center" gutter={{ base: '2rem', sm: '2.5rem' }}>
             {barometerTypes.map(({ image, _id, label, name }) => (
               <GridCol key={String(_id)} span={{ base: 12, xs: 6, lg: 4 }}>
                 <CategoryCard

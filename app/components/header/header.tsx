@@ -35,9 +35,7 @@ export function Header() {
                       style={{ objectFit: 'contain' }}
                     />
                   </Box>
-                  <Title lh="100%" fz={{ base: 'h3', sm: 'h1' }} c="black" fw={500}>
-                    Barometers Realm
-                  </Title>
+                  <Title className={styles.title}>Barometers Realm</Title>
                 </Flex>
               </Anchor>
             </Group>

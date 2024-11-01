@@ -27,10 +27,11 @@ export default function About() {
           component={NextImage}
         />
         I am a collector and restorer of antique barometers, a member of the Society for the History
-        of Technology (SHOT) and European Society for Environmental History (ESEH). I have dedicated
-        myself to assembling a unique collection of weather instruments that represent masterpieces
-        of the industrial era, spanning from the early 19th to the mid-20th century. For the past
-        five years, I have passionately curated a diverse collection of barometers and other weather
+        of Technology (SHOT), European Society for Environmental History (ESEH) and the
+        International Meteorological Artifact Preservation Program (IMAPP). I have dedicated myself
+        to assembling a unique collection of weather instruments that represent masterpieces of the
+        industrial era, spanning from the early 19th to the mid-20th century. For the past five
+        years, I have passionately curated a diverse collection of barometers and other weather
         instruments, driven by a deep fascination with the history of meteorology. This dedication
         has also inspired me to write a book that delves into the evolution of barometers over time.
       </Text>
@@ -38,9 +39,9 @@ export default function About() {
         My collection features around 100 rare and exceptional items, including mercury and aneroid
         barometers, as well as barographs, mainly from the Victorian era. Some of the most esteemed
         manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph Hicks,
-        Gottlieb Lufft, Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), O. Comitti and Son,
-        Massiot & Cie, Maple & Co, T. Wheeler Scientific Instruments Ltd., Russel Scientific
-        Instruments Ltd., Bert Bolle, Linde Loos Rose, and Barigo, to name a few.
+        Dollond, Gottlieb Lufft, Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), O. Comitti
+        and Son, Massiot & Cie, Maple & Co, T. Wheeler Scientific Instruments Ltd., Russel
+        Scientific Instruments Ltd., Bert Bolle, Linde Loos Rose, and Barigo, to name a few.
       </Text>
       <Text className={styles.paragraph}>
         The range of barometers in my collection is vast and varied, comprising wheel barometers in

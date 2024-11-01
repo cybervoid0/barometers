@@ -1,4 +1,4 @@
-import { Overlay, AspectRatio, Title, Anchor, Box } from '@mantine/core'
+import { AspectRatio, Title, Anchor, Box } from '@mantine/core'
 import NextLink from 'next/link'
 import NextImage from 'next/image'
 import { FC } from 'react'
@@ -15,10 +15,6 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
         <Box className={styles.container}>
-          <Overlay
-            zIndex={2}
-            gradient="linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 100%)"
-          />
           <NextImage
             fill
             priority
