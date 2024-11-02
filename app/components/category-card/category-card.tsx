@@ -23,6 +23,9 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
             src={image}
             alt={name}
             className={styles.bg_image}
+            style={{
+              objectFit: name === 'Recorders' ? 'cover' : 'contain',
+            }}
           />
           <Title className={styles.title}>{name}</Title>
         </Box>
