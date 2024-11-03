@@ -33,15 +33,15 @@ export default function About() {
         industrial era, spanning from the early 19th to the mid-20th century. For the past five
         years, I have passionately curated a diverse collection of barometers and other weather
         instruments, driven by a deep fascination with the history of meteorology. This dedication
-        has also inspired me to write a book that delves into the evolution of barometers over time.
+        has also inspired me to write Barometer Odyssey, a book that explores the evolution of
+        barometers over time.
       </Text>
       <Text className={styles.paragraph}>
         My collection features around 100 rare and exceptional items, including mercury and aneroid
         barometers, as well as barographs, mainly from the Victorian era. Some of the most esteemed
-        manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph Hicks,
-        Dollond, Gottlieb Lufft, Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), O. Comitti
-        and Son, Massiot & Cie, Maple & Co, T. Wheeler Scientific Instruments Ltd., Russel
-        Scientific Instruments Ltd., Bert Bolle, Linde Loos Rose, and Barigo, to name a few.
+        manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph Hicks, Peter
+        Dollond, Thomas Mason, Gottlieb Lufft, Richard Frères, Jules Richard, Bourdon, Naudet
+        (PNHB), O. Comitti and Son, Massiot & Cie, Maple & Co, to name a few.
       </Text>
       <Text className={styles.paragraph}>
         The range of barometers in my collection is vast and varied, comprising wheel barometers in
