@@ -1,5 +1,6 @@
 export const appShortName = 'Barometers realm'
-export const appFullName = 'Barometers realm: Antique barometers collection'
+export const appDescription = 'Antique barometers collection'
+export const appFullName = `${appShortName}: ${appDescription}`
 export const email = 'post@barometers.info'
 export const instagram = 'https://www.instagram.com/barometers_realm/'
 export const twitterAccount = '@barometer_realm'

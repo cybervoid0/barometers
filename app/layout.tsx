@@ -7,11 +7,33 @@ import '@mantine/notifications/styles.css'
 import './global.scss'
 import { Footer, Header } from './components'
 import Providers from './providers'
+import { appShortName, appDescription } from './constants'
 
 export const metadata: Metadata = {
-  title: 'Antique Barometers',
-  creator: 'CyberVoid',
-  description: 'History of antique barometers',
+  title: appShortName,
+  description: appDescription,
+  keywords: [
+    'barometer',
+    'antique',
+    'collector',
+    'collection',
+    'history of science',
+    'auction',
+    'aneroid',
+    'mercury',
+  ],
+  openGraph: {
+    title: appShortName,
+    description: appDescription,
+    url: process.env.NEXT_PUBLIC_BASE_URL,
+    images: { url: '/images/logo-arrow.png', alt: appShortName },
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: appShortName,
+    description: appDescription,
+    images: { url: '/images/logo-arrow.png', alt: appShortName },
+  },
 }
 
 export const viewport: Viewport = {
