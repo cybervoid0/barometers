@@ -4,11 +4,12 @@ import { v4 as uuid } from 'uuid'
 import { GetSignedUrlConfig, Storage } from '@google-cloud/storage'
 import { FileDto, UrlDto, UrlProps } from './types'
 
+const decodedPrivateKey = Buffer.from(process.env.GCP_PRIVATE_KEY, 'base64').toString('utf-8')
 const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID,
   credentials: {
     client_email: process.env.GCP_CLIENT_EMAIL,
-    private_key: Buffer.from(process.env.GCP_PRIVATE_KEY, 'base64').toString('utf-8'),
+    private_key: decodedPrivateKey,
   },
 })
 const bucket = storage.bucket(process.env.GCP_BUCKET_NAME)
