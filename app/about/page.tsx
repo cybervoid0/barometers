@@ -33,8 +33,8 @@ export default function About() {
         industrial era, spanning from the early 19th to the mid-20th century. For the past five
         years, I have passionately curated a diverse collection of barometers and other weather
         instruments, driven by a deep fascination with the history of meteorology. This dedication
-        has also inspired me to write <i>Barometer Odyssey</i>, a book that explores the evolution
-        of barometers over time.
+        has also inspired me to write <span className={styles.bookTitle}>Barometer Odyssey</span>, a
+        book that explores the evolution of barometers over time.
       </Text>
       <Text className={styles.paragraph}>
         My collection features around 100 rare and exceptional items, including mercury and aneroid
