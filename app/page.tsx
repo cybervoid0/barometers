@@ -1,6 +1,3 @@
-'use server'
-
-import React from 'react'
 import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'

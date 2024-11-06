@@ -3,12 +3,7 @@ import { getServerSession } from 'next-auth'
 import { Container, Title, Text, Spoiler, Box, Divider, Tooltip } from '@mantine/core'
 import { authConfig, getUserByEmail } from '@/utils/auth'
 import { IBarometer } from '@/models/barometer'
-import {
-  barometersApiRoute,
-  googleStorageImagesFolder,
-  barometerRoute,
-  twitterAccount,
-} from '@/app/constants'
+import { googleStorageImagesFolder, barometerRoute, twitterAccount } from '@/app/constants'
 import { ShowError } from '@/app/components/show-error'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -19,6 +14,7 @@ import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
+import { fetchBarometers } from '@/utils/fetch'
 
 interface BarometerItemProps {
   params: {
@@ -26,19 +22,11 @@ interface BarometerItemProps {
   }
 }
 
-async function fetchBarometer(slug: string): Promise<IBarometer> {
-  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute + slug, {
-    next: { revalidate: 600 },
-  })
-  if (!res.ok) throw new Error(res.statusText)
-  return res.json()
-}
-
 export async function generateMetadata({
   params: { slug },
 }: BarometerItemProps): Promise<Metadata> {
   try {
-    const barometer = await fetchBarometer(slug)
+    const barometer = await fetchBarometers(slug)
 
     const images =
       barometer.images?.map(image => ({
@@ -47,13 +35,14 @@ export async function generateMetadata({
       })) ?? []
 
     return {
+      metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
       title: barometer.name,
       description: barometer.description,
       keywords: ['barometer', ...barometer.name.split(' ')],
       openGraph: {
         title: barometer.name,
         description: barometer.description,
-        url: process.env.NEXT_PUBLIC_BASE_URL + barometerRoute + slug,
+        url: barometerRoute + slug,
         images,
       },
       twitter: {
@@ -104,9 +93,7 @@ const Description = ({ description }: { description: string }) => {
  * @throws {Error} If the fetch request fails or the response cannot be parsed as JSON.
  */
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute)
-  const barometers: IBarometer[] = await res.json()
-
+  const barometers = await fetchBarometers()
   return barometers.map(
     ({ slug }) =>
       ({
@@ -128,7 +115,7 @@ async function isAuthorized(): Promise<boolean> {
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   try {
     const isAdmin = await isAuthorized()
-    const barometer: IBarometer = await fetchBarometer(slug)
+    const barometer: IBarometer = await fetchBarometers(slug)
     const { name, images, description, manufacturer, dating, dimensions, condition, collectionId } =
       barometer
 

@@ -1,20 +1,11 @@
-'use server'
-
-import React from 'react'
 import { Container, Grid, GridCol, Group, Title } from '@mantine/core'
 import { IBarometerType } from '@/models/type'
-import { IBarometer } from '@/models/barometer'
-import {
-  barometerRoute,
-  barometerTypesApiRoute,
-  barometersApiRoute,
-  googleStorageImagesFolder,
-} from '@/app/constants'
+import { barometerRoute, barometerTypesApiRoute, googleStorageImagesFolder } from '@/app/constants'
 import { BarometerCard } from './components/barometer-card'
-import { ShowError } from '@/app/components/show-error'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
 import Sort from './sort'
+import { fetchBarometers } from '@/utils/fetch'
 
 interface CollectionProps {
   params: {
@@ -27,16 +18,7 @@ interface CollectionProps {
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
   const sortBy = searchParams.sort ?? 'date'
   const qs = new URLSearchParams({ type, sort: sortBy })
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL + barometersApiRoute}?${qs}`, {
-    next: { revalidate: 600 },
-  })
-
-  if (!res.ok) {
-    return <ShowError message={res.statusText} />
-  }
-
-  const barometersOfType: IBarometer[] = await res.json()
-
+  const barometersOfType = await fetchBarometers(qs)
   return (
     <Container pb="xl" size="xl">
       <Group h="5rem" align="center" justify="space-between">

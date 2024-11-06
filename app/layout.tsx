@@ -10,6 +10,7 @@ import Providers from './providers'
 import { appShortName, appDescription } from './constants'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
   title: appShortName,
   description: appDescription,
   keywords: [
