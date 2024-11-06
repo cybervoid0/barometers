@@ -15,6 +15,7 @@ import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
 import { fetchBarometers } from '@/utils/fetch'
+import DimensionEdit from './components/edit-fields/dimensions-edit'
 
 interface BarometerItemProps {
   params: {
@@ -173,6 +174,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
                     {index < arr.length - 1 ? ', ' : ''}
                   </Text>
                 ))}
+                {isAdmin && <DimensionEdit barometer={barometer} />}
               </Title>
             </Box>
           )}

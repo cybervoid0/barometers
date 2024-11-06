@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { isEqual } from 'lodash'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
@@ -24,7 +26,7 @@ export function useEditField({ property, barometer, validate }: Props) {
   const update = useCallback(async () => {
     try {
       const newValue = form.values[property]
-      if (newValue === barometer[property]) {
+      if (isEqual(newValue, barometer[property])) {
         close()
         return
       }
@@ -51,13 +53,11 @@ export function useEditField({ property, barometer, validate }: Props) {
       form.setValues({ [property]: value })
       form.resetDirty({ [property]: value })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barometer, property])
 
   // Reset form when modal is reopened
   useEffect(() => {
     if (opened) form.reset()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened])
 
   return useMemo(() => ({ form, opened, open, close, update }), [form, opened, open, close, update])

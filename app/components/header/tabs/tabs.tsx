@@ -2,16 +2,7 @@
 
 import { useState, useEffect, Key } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import {
-  Center,
-  CenterProps,
-  Tabs,
-  Text,
-  useComputedColorScheme,
-  Menu,
-  Anchor,
-  Box,
-} from '@mantine/core'
+import { Center, CenterProps, Tabs, Text, Menu, Anchor, Box } from '@mantine/core'
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -27,7 +18,6 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
   const isLoggedId = status === 'authenticated'
   const router = useRouter()
   const pathname = usePathname()
-  const scheme = useComputedColorScheme()
   const [activeTab, setActiveTab] = useState(-1)
   // opens menu from the tab
   const [opened, setOpened] = useState<Record<number, boolean>>({})
@@ -60,7 +50,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
             .map((menuitem, i) => {
               const renderTab = (key?: Key) => (
                 <Tabs.Tab
-                  className={sx[`tab-${scheme}`]}
+                  className={sx.tab}
                   value={String(i)}
                   key={key}
                   onClick={() => {

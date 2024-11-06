@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import {
   Box,
   Button,
@@ -126,10 +127,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
   }
   const editImages = async (values: FormProps) => {
     // exit if no image was changed
-    if (
-      values.images.every((image, i) => barometer.images?.at(i)?.includes(image)) &&
-      values.images.length === barometer.images?.length
-    ) {
+    if (isEqual(values.images, barometer.images)) {
       close()
       return
     }

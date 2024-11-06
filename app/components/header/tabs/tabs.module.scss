@@ -4,15 +4,11 @@
     content: none;
   }
   /* Change tabs underline width */
-  .tab-dark,
-  .tab-light {
+  .tab {
     border-bottom-width: 1px;
   }
   /* Change tabs underline color */
-  .tab-light[data-active] {
+  .tab[data-active] {
     border-bottom-color: rgb(124, 124, 124);
-  }
-  .tab-dark[data-active] {
-    border-bottom-color: white;
   }
 }
