@@ -23,7 +23,7 @@ export async function fetchBarometers(
     barometersApiRoute +
     (typeof slugOrQs === 'string' ? slugOrQs : slugOrQs ? `?${slugOrQs}` : '')
   const res = await fetch(input, {
-    next: { revalidate: 600 },
+    cache: 'force-cache',
   })
   if (!res.ok) throw new Error(res.statusText)
   return res.json()

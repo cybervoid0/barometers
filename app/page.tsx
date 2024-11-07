@@ -12,7 +12,7 @@ export default async function HomePage() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
     if (!baseUrl) throw new Error('Base URL is not set. Please configure NEXT_PUBLIC_BASE_URL.')
     const res = await fetch(baseUrl + barometerTypesApiRoute, {
-      next: { revalidate: 600 },
+      cache: 'force-cache',
     })
     if (!res.ok) throw new Error(res.statusText)
     barometerTypes = await res.json()
