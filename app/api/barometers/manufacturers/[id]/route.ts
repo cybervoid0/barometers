@@ -9,8 +9,8 @@ interface Parameters {
 }
 
 export async function DELETE(req: NextRequest, { params: { id } }: Parameters) {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const deletedManufacturer = await Manufacturer.findByIdAndDelete(id)
     if (!deletedManufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })

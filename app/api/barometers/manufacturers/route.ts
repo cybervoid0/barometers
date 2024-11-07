@@ -4,8 +4,8 @@ import Manufacturer, { type IManufacturer } from '@/models/manufacturer'
 import { cleanObject } from '@/utils/misc'
 
 export async function GET() {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const conditions = await Manufacturer.find()
     return NextResponse.json(conditions, { status: 201 })
   } catch (error) {
@@ -17,8 +17,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const manufData: IManufacturer = await req.json()
     const cleanData = cleanObject(manufData)
     const newManufacturer = new Manufacturer(cleanData)

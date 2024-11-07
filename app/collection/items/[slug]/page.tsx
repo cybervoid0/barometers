@@ -16,11 +16,13 @@ import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
 import { fetchBarometers } from '@/utils/fetch'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
+import { slug as slugify } from '@/utils/misc'
 
+interface Slug {
+  slug: string
+}
 interface BarometerItemProps {
-  params: {
-    slug: string
-  }
+  params: Slug
 }
 
 export async function generateMetadata({
@@ -88,19 +90,12 @@ const Description = ({ description }: { description: string }) => {
 /**
  * This function fetches all barometers from the API and maps their slugs
  * to be used as static parameters for Next.js static generation.
- *
- * @returns {Promise<Array<{ slug: string }>>} A promise that resolves to an array of objects containing slugs.
- *
- * @throws {Error} If the fetch request fails or the response cannot be parsed as JSON.
  */
-export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+export async function generateStaticParams(): Promise<Slug[]> {
   const barometers = await fetchBarometers()
-  return barometers.map(
-    ({ slug }) =>
-      ({
-        slug,
-      }) as { slug: string },
-  )
+  return barometers.map(({ slug, name }) => ({
+    slug: slug ?? slugify(name),
+  }))
 }
 
 async function isAuthorized(): Promise<boolean> {

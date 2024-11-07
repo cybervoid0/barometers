@@ -12,9 +12,8 @@ interface Params {
 }
 
 export async function GET(_req: NextRequest, { params: { slug } }: Params) {
-  await connectMongoose()
-
   try {
+    await connectMongoose()
     const barometers = await Barometer.findOne({ slug }).populate([
       'type',
       'condition',

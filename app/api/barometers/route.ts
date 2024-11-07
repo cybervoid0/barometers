@@ -38,8 +38,8 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBa
  * GET /api/barometers?type=type
  */
 export async function GET(req: NextRequest) {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const { searchParams } = new URL(req.url)
     const typeName = searchParams.get('type')
     const sortBy = searchParams.get('sort') as SortValue | null
@@ -81,8 +81,8 @@ export async function GET(req: NextRequest) {
  * POST /api/barometers
  */
 export async function POST(req: NextRequest) {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const barometerData: IBarometer = await req.json()
     const cleanData = cleanObject(barometerData)
     const slug = slugify(cleanData.name)
@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
  * PUT /api/barometers
  */
 export async function PUT(req: NextRequest) {
-  await connectMongoose()
   try {
+    await connectMongoose()
     const barometerData: IBarometer = await req.json()
     const slug = slugify(barometerData.name)
     barometerData.slug = slug
