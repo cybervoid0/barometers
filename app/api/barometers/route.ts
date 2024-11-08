@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     cleanData.slug = slug
     const newBarometer = new Barometer(cleanData)
     await newBarometer.save()
-    revalidatePath(`/collection/items/${slug}`)
+    revalidatePath('/')
     return NextResponse.json({ id: newBarometer._id }, { status: 201 })
   } catch (error) {
     return NextResponse.json(
