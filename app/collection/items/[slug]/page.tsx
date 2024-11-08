@@ -147,17 +147,16 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </Box>
           )}
 
-          {dating && (
-            <Box>
-              <Title fw={500} display="inline" order={3}>
-                Dating:&nbsp;
-              </Title>
-              <Title c="dark.3" fw={400} display="inline" order={3}>
-                {dating}
-                {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
-              </Title>
-            </Box>
-          )}
+          <Box>
+            <Title fw={500} display="inline" order={3}>
+              Dating:&nbsp;
+            </Title>
+            <Title c="dark.3" fw={400} display="inline" order={3}>
+              {dating}
+              {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
+            </Title>
+            <Text>{JSON.stringify(barometer?.datingPeriod ?? {})}</Text>
+          </Box>
 
           {dimensions && dimensions.length > 0 && (
             <Box>

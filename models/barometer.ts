@@ -11,6 +11,7 @@ export interface IBarometer {
   type: IBarometerType
   condition: IBarometerCondition
   dating?: string
+  datingPeriod?: any
   manufacturer?: IManufacturer
   dimensions?: { dim: string; value: string }[]
   description?: string
