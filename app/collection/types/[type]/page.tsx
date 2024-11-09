@@ -23,10 +23,10 @@ export default async function Collection({ params: { type }, searchParams }: Col
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
-        <Title mb="lg" fw={500} order={2} tt="capitalize">
+        <Title mb="sm" fw={500} order={2} tt="capitalize">
           {type}
         </Title>
-        {description && <DescriptionText description={description} />}
+        {description && <DescriptionText size="sm" description={description} />}
         <Sort sortBy={sortBy} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometersOfType.map(({ name, _id, images, manufacturer }) => (

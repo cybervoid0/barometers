@@ -20,3 +20,17 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function PUT(req: NextRequest) {
+  try {
+    await connectMongoose()
+
+    return NextResponse.json({}, { status: 200 })
+  } catch (error) {
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Error updating barometer' },
+      { status: 500 },
+    )
+  }
+}
