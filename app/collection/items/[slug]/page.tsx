@@ -155,7 +155,6 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
               {dating}
               {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
             </Title>
-            <Text>{JSON.stringify(barometer?.datingPeriod ?? {})}</Text>
           </Box>
 
           {dimensions && dimensions.length > 0 && (

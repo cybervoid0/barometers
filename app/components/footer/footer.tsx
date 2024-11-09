@@ -1,23 +1,10 @@
-import {
-  Anchor,
-  Box,
-  Center,
-  Container,
-  Flex,
-  Group,
-  Image,
-  Stack,
-  Text,
-  Tooltip,
-} from '@mantine/core'
+import { Anchor, Box, Center, Container, Flex, Group, Text, Tooltip } from '@mantine/core'
 import Link from 'next/link'
-import NextImage from 'next/image'
 import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
 import { instagram, email } from '@/app/constants'
 import sx from './styles.module.scss'
 
 export function Footer() {
-  const cvImageSize = 45
   return (
     <Container size="xl" w="100%">
       <Flex
@@ -27,22 +14,6 @@ export function Footer() {
         component="footer"
         gap={{ base: 'sm', xs: 0 }}
       >
-        <Stack w="10rem" align="center" gap={0}>
-          <Anchor href="https://github.com/shenshin">
-            <Image
-              component={NextImage}
-              src="/images/cybervoid.jpeg"
-              width={cvImageSize}
-              w={cvImageSize}
-              height={cvImageSize}
-              h={cvImageSize}
-              alt="Lamp"
-            />
-          </Anchor>
-          <Text size="0.7rem" fw={600}>
-            Created by CyberVoid
-          </Text>
-        </Stack>
         <Center style={{ flexGrow: 1, flexDirection: 'column' }}>
           <Box fw={500} w="max-content">
             <Text size="xs" display="inline" fw="inherit">
