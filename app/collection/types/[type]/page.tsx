@@ -1,11 +1,11 @@
-import { Container, Grid, GridCol, Group, Title } from '@mantine/core'
-import { IBarometerType } from '@/models/type'
-import { barometerRoute, barometerTypesApiRoute, googleStorageImagesFolder } from '@/app/constants'
+import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
+import { barometerRoute, googleStorageImagesFolder } from '@/app/constants'
 import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
 import Sort from './sort'
-import { fetchBarometers } from '@/utils/fetch'
+import { fetchBarometers, fetchTypes } from '@/utils/fetch'
+import { DescriptionText } from '@/app/components/description-text'
 
 interface CollectionProps {
   params: {
@@ -17,37 +17,37 @@ interface CollectionProps {
 }
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
   const sortBy = searchParams.sort ?? 'date'
-  const qs = new URLSearchParams({ type, sort: sortBy })
-  const barometersOfType = await fetchBarometers(qs)
+  const barometersOfType = await fetchBarometers(new URLSearchParams({ type, sort: sortBy }))
+  // selected barometer type details
+  const { description } = await fetchTypes(new URLSearchParams({ type }))
   return (
-    <Container pb="xl" size="xl">
-      <Group h="5rem" align="center" justify="space-between">
-        <Title fw={500} order={2} tt="capitalize">
+    <Container py="xl" size="xl">
+      <Stack gap="xs">
+        <Title mb="lg" fw={500} order={2} tt="capitalize">
           {type}
         </Title>
-        <Sort sortBy={sortBy} />
-      </Group>
-      <Grid justify="center" gutter="xl">
-        {barometersOfType.map(({ name, _id, images, manufacturer }) => (
-          <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
-            <BarometerCard
-              image={googleStorageImagesFolder + images![0]}
-              name={name}
-              link={barometerRoute + slug(name)}
-              manufacturer={manufacturer?.name}
-            />
-          </GridCol>
-        ))}
-      </Grid>
+        {description && <DescriptionText description={description} />}
+        <Sort sortBy={sortBy} style={{ alignSelf: 'flex-end' }} />
+        <Grid justify="center" gutter="xl">
+          {barometersOfType.map(({ name, _id, images, manufacturer }) => (
+            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
+              <BarometerCard
+                image={googleStorageImagesFolder + images![0]}
+                name={name}
+                link={barometerRoute + slug(name)}
+                manufacturer={manufacturer?.name}
+              />
+            </GridCol>
+          ))}
+        </Grid>
+      </Stack>
     </Container>
   )
 }
 
 export async function generateStaticParams() {
-  const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + barometerTypesApiRoute)
-  const barometerTypes: IBarometerType[] = await res.json()
-
-  return barometerTypes.map((type: { name: string }) => ({
-    type: type.name.toLowerCase(),
+  const barometerTypes = await fetchTypes()
+  return barometerTypes.map(({ name }) => ({
+    type: name.toLowerCase(),
   }))
 }

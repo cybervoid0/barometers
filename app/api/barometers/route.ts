@@ -40,7 +40,7 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBa
 export async function GET(req: NextRequest) {
   try {
     await connectMongoose()
-    const { searchParams } = new URL(req.url)
+    const { searchParams } = req.nextUrl
     const typeName = searchParams.get('type')
     const sortBy = searchParams.get('sort') as SortValue | null
     // if `type` search param was not passed return all barometers list

@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 import { getServerSession } from 'next-auth'
-import { Container, Title, Text, Spoiler, Box, Divider, Tooltip } from '@mantine/core'
+import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
 import { authConfig, getUserByEmail } from '@/utils/auth'
 import { IBarometer } from '@/models/barometer'
 import { googleStorageImagesFolder, barometerRoute, twitterAccount } from '@/app/constants'
@@ -17,6 +17,7 @@ import sx from './styles.module.scss'
 import { fetchBarometers } from '@/utils/fetch'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
 import { slug as slugify } from '@/utils/misc'
+import { DescriptionText } from '@/app/components/description-text'
 
 interface Slug {
   slug: string
@@ -64,27 +65,6 @@ export async function generateMetadata({
       title: 'Barometers Error',
     }
   }
-}
-
-const Description = ({ description }: { description: string }) => {
-  const [firstParagraph, ...paragraphs] = description.split('\n')
-  return (
-    <>
-      <Text>{firstParagraph}</Text>
-      <Spoiler
-        maxHeight={0}
-        showLabel="Show more"
-        hideLabel="Hide"
-        styles={{ control: { color: '#242424', fontWeight: 600 } }}
-      >
-        {paragraphs.map((paragraph, i) => (
-          <Text mb="md" key={i}>
-            {paragraph}
-          </Text>
-        ))}
-      </Spoiler>
-    </>
-  )
 }
 
 /**
@@ -187,7 +167,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
                   labelPosition: 'right',
                 })}
               />
-              <Description description={description} />
+              <DescriptionText description={description} />
             </>
           )}
         </Box>

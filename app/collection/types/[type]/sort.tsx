@@ -1,15 +1,16 @@
 'use client'
 
-import { Select } from '@mantine/core'
+import { CSSProperties, Select } from '@mantine/core'
 import { useRouter } from 'next/navigation'
 import { SortValue, SortOptions } from './types'
 
 interface SortProps {
   sortBy: SortValue
   direction?: 'asc' | 'dec'
+  style?: CSSProperties
 }
 
-export default function Sort({ sortBy }: SortProps) {
+export default function Sort({ sortBy, style }: SortProps) {
   const router = useRouter()
 
   const handleSortChange = (value: string | null) => {
@@ -27,6 +28,7 @@ export default function Sort({ sortBy }: SortProps) {
       onChange={handleSortChange}
       data={SortOptions}
       styles={{
+        root: style,
         option: { textTransform: 'capitalize' },
         input: { textTransform: 'capitalize' },
       }}

@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { connectMongoose } from '@/utils/mongoose'
 import BarometerType from '@/models/type'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectMongoose()
+    const { searchParams } = request.nextUrl
+    const type = searchParams.get('type')
+    if (type) {
+      const typeDetails = await BarometerType.findOne({ name: { $regex: type, $options: 'i' } })
+      return NextResponse.json(typeDetails, { status: 201 })
+    }
     const types = await BarometerType.find().sort({ order: 1 })
     return NextResponse.json(types, { status: 201 })
   } catch (error) {

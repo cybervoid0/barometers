@@ -1,5 +1,6 @@
-import { barometersApiRoute } from '@/app/constants'
+import { barometersApiRoute, barometerTypesApiRoute } from '@/app/constants'
 import { IBarometer } from '@/models/barometer'
+import { IBarometerType } from '@/models/type'
 
 /**
  * Returns a specific barometer details
@@ -28,5 +29,14 @@ export async function fetchBarometers(
     },
   })
   if (!res.ok) throw new Error(res.statusText)
+  return res.json()
+}
+
+export function fetchTypes(): Promise<IBarometerType[]>
+export function fetchTypes(qs: URLSearchParams): Promise<IBarometerType>
+export async function fetchTypes(qs?: URLSearchParams): Promise<IBarometerType[] | IBarometerType> {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + barometerTypesApiRoute + (qs ? `?${qs}` : ''),
+  )
   return res.json()
 }
