@@ -8,6 +8,7 @@ import './global.scss'
 import { Footer, Header } from './components'
 import Providers from './providers'
 import { appShortName, appDescription } from './constants'
+import styles from './styles.module.scss'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
@@ -58,9 +59,7 @@ export default function RootLayout({ children }: { children: any }) {
           <Notifications />
           <Stack h="100vh" gap={0}>
             <Header />
-            <Box bg="#efefef" style={{ flexGrow: 1 }}>
-              {children}
-            </Box>
+            <Box className={styles.main}>{children}</Box>
             <Footer />
           </Stack>
         </Providers>
