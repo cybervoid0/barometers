@@ -18,7 +18,7 @@ export function Header() {
           <Container h="100%" size="xl">
             <Group h="100%" justify="space-between" gap="0.3rem" wrap="nowrap">
               <Box>
-                <Burger size="sm" hiddenFrom="md" opened={opened} onClick={open} />
+                <Burger size="md" hiddenFrom="md" opened={opened} onClick={open} />
                 <Tabs visibleFrom="md" />
               </Box>
               <Anchor underline="never" component={NextLink} href="/">

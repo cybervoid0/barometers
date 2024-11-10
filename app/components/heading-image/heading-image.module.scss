@@ -2,7 +2,7 @@
   position: relative;
   max-width: calc(var(--container-size-xl) - 2rem);
   height: 50vh;
-  @include xs {
+  @include xs() {
     height: 10rem;
   }
   overflow: hidden;
@@ -28,12 +28,12 @@
   z-index: 2;
   display: flex;
   align-items: flex-end;
-  @include xs {
+  @include xs() {
     align-items: center;
     padding-bottom: 0;
   }
-  @include sm {
-    padding-left: 5rem;
+  @include sm() {
+    padding-left: 3rem;
   }
   
   .title {

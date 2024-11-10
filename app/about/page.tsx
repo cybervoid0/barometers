@@ -6,7 +6,7 @@ import styles from './styles.module.scss'
 
 export default function About() {
   return (
-    <Container p="xl">
+    <Container py="xl">
       <Title mb="md" order={3} component="h2">
         Greetings, my name is Leo.
       </Title>

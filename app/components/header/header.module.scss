@@ -4,18 +4,18 @@
   min-height: $hight-mobile;
   height: $hight-mobile;
 
-  @include sm {
+  @include sm() {
     min-height: $hight-desktop;
     height: $hight-desktop;
   }
 }
 
 .indent {
-  @include set-height;
+  @include set-height();
 }
 
 .container {
-  @include set-height;
+  @include set-height();
   position: fixed;
   top: 0;
   width: 100%;
@@ -30,7 +30,7 @@
     font-weight: 600;
     letter-spacing: 0.08rem;
     font-size: 1.5rem;
-    @include sm {
+    @include sm() {
       font-size: 1.8rem;
     }
   }
@@ -39,7 +39,7 @@
     height: 3rem;
     aspect-ratio: 1;
     height: 2rem;
-    @include sm {
+    @include sm() {
       height: 2.5rem;
     }
     position: relative;
