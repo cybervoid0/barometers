@@ -1,5 +1,6 @@
 import React from 'react'
 import { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { ColorSchemeScript, Box, Stack } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import '@mantine/core/styles.css'
@@ -47,6 +48,20 @@ export default function RootLayout({ children }: { children: any }) {
   return (
     <html lang="en">
       <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-Q8ZR89R225"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-Q8ZR89R225');
+          `}
+        </Script>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
         <meta
