@@ -59,6 +59,7 @@ export default function RootLayout({ children }: { children: any }) {
           name="google-site-verification"
           content="UO-Rt1mPCNM6GZFQEFMmvtMfz1Ft4T62yqfN5mDGyjU"
         />
+        <meta name="msvalidate.01" content="09CC87C263AEB12612A9A1C31447E181" />
       </head>
       <body>
         <Providers>
