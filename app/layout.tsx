@@ -55,6 +55,10 @@ export default function RootLayout({ children }: { children: any }) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
+        <meta
+          name="google-site-verification"
+          content="UO-Rt1mPCNM6GZFQEFMmvtMfz1Ft4T62yqfN5mDGyjU"
+        />
       </head>
       <body>
         <Providers>
