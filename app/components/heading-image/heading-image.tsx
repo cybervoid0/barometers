@@ -18,7 +18,7 @@ export const HeadingImage: FC = () => {
       />
       <Box className={styles.textContainer}>
         <Box>
-          <Title order={3} className={styles.title}>
+          <Title component="h2" order={3} className={styles.title}>
             Industrial Era Barometer Collection
           </Title>
         </Box>

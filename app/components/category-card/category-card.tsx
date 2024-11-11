@@ -27,7 +27,9 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
               objectFit: name === 'Recorders' ? 'cover' : 'contain',
             }}
           />
-          <Title className={styles.title}>{name}</Title>
+          <Title component="h3" className={styles.title}>
+            {name}
+          </Title>
         </Box>
       </AspectRatio>
     </Anchor>
