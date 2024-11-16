@@ -4,8 +4,9 @@ import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
 import Sort from './sort'
-import { fetchBarometers, fetchTypes } from '@/utils/fetch'
 import { DescriptionText } from '@/app/components/description-text'
+import { getType, listTypes } from '@/actions/barometer-types'
+import { listBarometers } from '@/actions/barometers'
 
 interface CollectionProps {
   params: {
@@ -16,10 +17,11 @@ interface CollectionProps {
   }
 }
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
-  const sortBy = searchParams.sort ?? 'date'
-  const barometersOfType = await fetchBarometers(new URLSearchParams({ type, sort: sortBy }))
+  const sort = searchParams.sort ?? 'date'
+  //const barometersOfType = await fetchBarometers(new URLSearchParams({ type, sort: sortBy }))
+  const barometersOfType = await listBarometers({ type, sort })
   // selected barometer type details
-  const { description } = await fetchTypes(new URLSearchParams({ type }))
+  const { description } = await getType(type)
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
@@ -27,7 +29,7 @@ export default async function Collection({ params: { type }, searchParams }: Col
           {type}
         </Title>
         {description && <DescriptionText size="sm" description={description} />}
-        <Sort sortBy={sortBy} style={{ alignSelf: 'flex-end' }} />
+        <Sort sortBy={sort} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometersOfType.map(({ name, _id, images, manufacturer }) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
@@ -46,7 +48,7 @@ export default async function Collection({ params: { type }, searchParams }: Col
 }
 
 export async function generateStaticParams() {
-  const barometerTypes = await fetchTypes()
+  const barometerTypes = await listTypes()
   return barometerTypes.map(({ name }) => ({
     type: name.toLowerCase(),
   }))

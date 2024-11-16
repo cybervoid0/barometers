@@ -1,22 +1,22 @@
 'use client'
 
+import { useSWRConfig } from 'swr'
 import { Box, Title, Button, TextInput, Select, Textarea } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { isLength } from 'validator'
 import { showInfo, showError } from '@/utils/notification'
-import { useBarometers } from '@/app/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
 import type { BarometerFormProps } from '../types'
-import { barometersApiRoute } from '@/app/constants'
+import { useBarometers } from '@/app/hooks/useBarometers'
+import { createBarometer } from '@/actions/barometers'
 
 export function AddCard() {
+  const { mutate } = useSWRConfig()
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const { condition, types, manufacturers } = useBarometers()
+  const { types, manufacturers, conditions } = useBarometers()
 
   const form = useForm<BarometerFormProps>({
     initialValues: {
@@ -35,57 +35,46 @@ export function AddCard() {
     },
   })
 
-  const queryClient = useQueryClient()
-  const { mutate } = useMutation({
-    mutationFn: async (values: BarometerFormProps) => {
+  const saveBarometer = async (values: BarometerFormProps) => {
+    try {
       const barometerWithImages = {
         ...values,
-        manufacturer: manufacturers.data.find(({ _id }) => _id === values.manufacturer),
+        manufacturer: manufacturers?.find(({ _id }) => _id === values.manufacturer),
         images: uploadedImages.map(image => image.split('/').at(-1)),
-      }
-      const { data } = await axios.post(barometersApiRoute, barometerWithImages)
-      return data
-    },
-    onSuccess: (_, { name }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['barometers'],
-      })
+      } as any
+      await createBarometer(barometerWithImages)
       form.reset()
       setUploadedImages([])
-      showInfo(`Added ${name} to the database`)
-    },
-    onError: (error: AxiosError) => {
-      showError(
-        (error.response?.data as { message: string })?.message ||
-          error.message ||
-          'Error adding barometer',
-      )
-    },
-  })
+      showInfo(`Added ${values.name} to the database`)
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Error adding barometer')
+    }
+  }
 
   // set default barometer type
   useEffect(() => {
-    if (types.data.length === 0) return
-    form.setFieldValue('type', String(types.data[0]._id))
+    if (types?.length === 0) return
+    form.setFieldValue('type', String(types?.[0]._id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [types.data])
+  }, [types])
 
   // set default barometer condition
   useEffect(() => {
-    if (condition.data.length === 0) return
-    form.setFieldValue('condition', String(condition.data.at(-1)?._id))
+    if (conditions?.length === 0) return
+    form.setFieldValue('condition', String(conditions?.at(-1)?._id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [condition.data])
+  }, [conditions])
 
   // set default manufacturer
   useEffect(() => {
     // if there are no manufacturers or manufacturer is already set, do nothing
-    if (manufacturers.data.length === 0 || form.values.manufacturer) return
-    form.setFieldValue('manufacturer', String(manufacturers.data[0]._id))
+    if (manufacturers?.length === 0 || form.values.manufacturer) return
+    form.setFieldValue('manufacturer', String(manufacturers?.[0]._id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manufacturers.data])
+  }, [manufacturers])
 
   const onAddManufacturer = (id: string) => {
+    mutate('manufacturers')
     form.setFieldValue('manufacturer', id)
   }
 
@@ -94,12 +83,12 @@ export function AddCard() {
       <Title mb="lg" order={3} tt="capitalize">
         Add new barometer
       </Title>
-      <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
+      <Box component="form" onSubmit={form.onSubmit(values => saveBarometer(values))}>
         <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
         <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
         <TextInput label="Dating" key={form.key('dating')} {...form.getInputProps('dating')} />
         <Select
-          data={types.data.map(({ name, _id }) => ({
+          data={types?.map(({ name, _id }) => ({
             label: name,
             value: String(_id),
           }))}
@@ -109,7 +98,7 @@ export function AddCard() {
           {...form.getInputProps('type')}
         />
         <Select
-          data={manufacturers.data.map(({ name, _id }) => ({
+          data={manufacturers?.map(({ name, _id }) => ({
             label: name,
             value: _id!,
           }))}
@@ -125,7 +114,7 @@ export function AddCard() {
         />
         <Select
           label="Condition"
-          data={condition.data.map(({ name, _id }) => ({
+          data={conditions?.map(({ name, _id }) => ({
             label: name,
             value: String(_id),
           }))}

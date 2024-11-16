@@ -15,7 +15,6 @@ import {
   Select,
   Group,
 } from '@mantine/core'
-import axios, { AxiosError } from 'axios'
 import { useDisclosure } from '@mantine/hooks'
 import { isLength } from 'validator'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
@@ -23,8 +22,10 @@ import { useForm } from '@mantine/form'
 import { IBarometer } from '@/models/barometer'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { barometerRoute, barometersApiRoute } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { deleteManufacturer } from '@/actions/manufacturers'
+import { updateBarometer } from '@/actions/barometers'
 
 interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -57,11 +58,11 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
 
   // Reset selected manufacturer index
   const resetManufacturerIndex = useCallback(() => {
-    const manufacturerIndex = manufacturers.data.findIndex(
+    const manufacturerIndex = manufacturers?.findIndex(
       ({ _id }) => _id === barometer.manufacturer?._id,
     )
-    setSelectedManufacturerIndex(manufacturerIndex)
-  }, [barometer.manufacturer?._id, manufacturers.data])
+    setSelectedManufacturerIndex(manufacturerIndex ?? 0)
+  }, [barometer.manufacturer?._id, manufacturers])
 
   // Reset selected manufacturer index when modal is opened
   useEffect(() => {
@@ -71,7 +72,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
 
   // Set form values when selected manufacturer index changes
   useEffect(() => {
-    const selectedManufacturer = manufacturers?.data[selectedManufacturerIndex]
+    const selectedManufacturer = manufacturers?.[selectedManufacturerIndex]
     // pick all manufacturer fields and put empty string if not present
     const manufacturerFormData: IManufacturer = {
       _id: selectedManufacturer?._id ?? '',
@@ -87,7 +88,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
 
   const update = async (manufacturer: IManufacturer) => {
     try {
-      const selectedManufacturer = manufacturers.data[selectedManufacturerIndex]
+      const selectedManufacturer = manufacturers?.[selectedManufacturerIndex]
       const updatedBarometer = {
         ...barometer,
         manufacturer: {
@@ -95,18 +96,12 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           ...manufacturer,
         },
       }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
+      const slug = await updateBarometer(updatedBarometer)
       showInfo(`${manufacturer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + slug
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
-      }
+      showError(error instanceof Error ? error.message : 'Error updating manufacturer')
     }
   }
 
@@ -120,9 +115,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
               <ActionIcon
                 variant="outline"
                 color="dark"
-                onClick={() =>
-                  manufacturers.delete(manufacturers.data[selectedManufacturerIndex]._id!)
-                }
+                onClick={() => deleteManufacturer(manufacturers?.[selectedManufacturerIndex]._id!)}
               >
                 <IconTrash />
               </ActionIcon>
@@ -130,7 +123,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           </Group>
           <Select
             value={String(selectedManufacturerIndex)}
-            data={manufacturers.data.map(({ name }, i) => ({
+            data={manufacturers?.map(({ name }, i) => ({
               value: String(i),
               label: name,
             }))}

@@ -1,6 +1,7 @@
-import { Schema, model, Document, models, type Model } from 'mongoose'
+import { Schema, model, models, type Model } from 'mongoose'
 
-export interface IBarometerCondition extends Document {
+export interface IBarometerCondition {
+  _id: string
   name: string
   value: number
   description: string

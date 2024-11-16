@@ -80,8 +80,8 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       </List.Item>
                       <Collapse transitionDuration={500} in={opened[i]}>
                         <List px="xl" listStyleType="none">
-                          {types.data.map(({ name, label, _id }) => (
-                            <List.Item pb="sm" key={String(_id)}>
+                          {types?.map(({ name, label }, j) => (
+                            <List.Item pb="sm" key={String(j)}>
                               <Anchor
                                 c="inherit"
                                 component={Link}

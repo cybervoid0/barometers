@@ -13,10 +13,8 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
-import axios, { AxiosError } from 'axios'
-import { showError } from '@/utils/notification'
-import { FileDto, UrlDto } from '@/app/api/barometers/upload/images/types'
-import { imageUploadApiRoute } from '@/app/constants'
+import { uploadImages, deleteImage } from '@/actions/images'
+import { showError, showInfo } from '@/utils/notification'
 
 interface FileUploadProps {
   fileNames: string[]
@@ -30,60 +28,43 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
     if (!files || !Array.isArray(files) || files.length === 0) return
     setIsUploading(true)
     try {
-      const {
-        data: { urls },
-      } = await axios.post<UrlDto>(
-        imageUploadApiRoute,
-        {
-          files: files.map(file => ({
-            fileName: file.name,
-            contentType: file.type,
-          })),
-        } as FileDto,
-        { headers: { 'Content-Type': 'application/json' } },
+      const urls = await uploadImages(
+        files.map(({ name, type }) => ({
+          fileName: name,
+          contentType: type,
+        })),
       )
-      // upload all files concurrently
+      // upload all files to Google cloud concurrently
       await Promise.all(
-        urls.map(async ({ signed }, index) => {
-          const file = files[index]
-          await axios.put(signed, file, {
+        urls.map(async ({ signed }, i) => {
+          const file = files[i]
+          await fetch(signed, {
+            method: 'PUT',
+            body: file,
             headers: {
               'Content-Type': file.type,
             },
           })
         }),
       )
+      showInfo(`Uploaded ${urls.length} image${urls.length > 1 ? 's' : ''}`)
       setFileNames(old => [...old, ...urls.map(url => url.public)])
     } catch (error) {
-      const defaultErrMsg = 'Error uploading files'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      showError(error instanceof Error ? error.message : 'Can`t upload images')
     } finally {
       setIsUploading(false)
     }
   }
 
-  const handleDeleteFile = async (index: number) => {
-    const fileName = fileNames.at(index)?.split('/').at(-1)
+  const handleDeleteImage = async (imgUrl: string) => {
     try {
-      await axios.delete(imageUploadApiRoute, {
-        params: {
-          fileName,
-        },
-      })
-      setFileNames(old => [...old].filter((_, i) => i !== index))
+      await deleteImage(imgUrl.split('/').at(-1))
+      setFileNames(old => [...old].filter(file => file !== imgUrl))
     } catch (error) {
-      const defaultErrMsg = 'Error deleting file'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      showError(error instanceof Error ? error.message : `Can't delete image ${imgUrl}`)
     }
   }
+
   return (
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
       <Stack gap="xs" align="flex-start">
@@ -98,7 +79,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
             )}
           </FileButton>
           <Group gap="0.4rem" wrap="wrap">
-            {fileNames.map((fileName, i) => (
+            {fileNames.map(fileName => (
               <Paper key={fileName} withBorder pos="relative">
                 <CloseButton
                   p={0}
@@ -110,7 +91,7 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
                   pos="absolute"
                   icon={<IconXboxX />}
                   bg="white"
-                  onClick={() => handleDeleteFile(i)}
+                  onClick={() => handleDeleteImage(fileName)}
                 />
                 <Image h="3rem" w="3rem" src={fileName} />
               </Paper>

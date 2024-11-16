@@ -21,7 +21,7 @@ interface TextFieldEditProps extends UnstyledButtonProps {
 }
 
 export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
-  const { condition } = useBarometers()
+  const { conditions } = useBarometers()
   const { open, close, opened, form, update } = useEditField({ property: 'condition', barometer })
   return (
     <>
@@ -42,13 +42,13 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
         <Box component="form" onSubmit={update}>
           <Stack>
             <Select
-              data={condition.data.map(({ name, _id }) => ({
+              data={conditions?.map(({ name, _id }) => ({
                 label: name,
                 value: String(_id),
               }))}
               value={String(form.values.condition?._id)}
               onChange={id => {
-                const newCondition = condition.data.find(({ _id }) => _id === id)
+                const newCondition = conditions?.find(({ _id }) => _id === id)
                 form.setValues({ condition: newCondition })
               }}
               allowDeselect={false}

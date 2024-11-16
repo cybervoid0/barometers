@@ -4,7 +4,7 @@ import { IBarometerType } from './type'
 import { IBarometerCondition } from './condition'
 
 export interface IBarometer {
-  _id?: string
+  _id: string
   collectionId: string
   name: string
   slug?: string

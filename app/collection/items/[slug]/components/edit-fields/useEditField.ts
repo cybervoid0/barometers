@@ -3,10 +3,10 @@ import { isEqual } from 'lodash'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
-import axios, { AxiosError } from 'axios'
 import { IBarometer } from '@/models/barometer'
-import { barometersApiRoute, barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
+import { updateBarometer } from '@/actions/barometers'
 
 interface Props {
   barometer: IBarometer
@@ -31,18 +31,12 @@ export function useEditField({ property, barometer, validate }: Props) {
         return
       }
       const updatedBarometer = { ...barometer, [property]: newValue }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
+      const slug = await updateBarometer(updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + slug
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
-      }
+      showError(error instanceof Error ? error.message : `Error updating ${barometer.name}`)
     }
   }, [barometer, close, form.values, property])
 

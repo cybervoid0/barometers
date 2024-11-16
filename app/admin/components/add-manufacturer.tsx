@@ -1,16 +1,14 @@
 'use client'
 
 import React from 'react'
-import axios, { AxiosError } from 'axios'
 import { Box, Button, TextInput, Title, Textarea, Modal, ActionIcon, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconSquareRoundedPlus } from '@tabler/icons-react'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { manufacturersApiRoute } from '@/app/constants'
+import { setManufacturer } from '@/actions/manufacturers'
 
 interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void
@@ -37,27 +35,19 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
         isLength(val ?? '', { max: 100 }) ? null : 'Country should be shorter that 100 symbols',
     },
   })
-  const queryClient = useQueryClient()
-  const { mutate } = useMutation({
-    mutationFn: (values: IManufacturer) =>
-      axios.post(manufacturersApiRoute, values).then(({ data }) => data),
-    onSuccess: ({ id }, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['manufacturers'],
-      })
+
+  const createManufacturer = async (values: IManufacturer) => {
+    try {
+      const { _id, name } = await setManufacturer(values)
       form.reset()
-      onAddManufacturer(id)
+      onAddManufacturer(_id!)
       close()
-      showInfo(`${variables.name} has been recorded as a manufacturer #${id ?? 0}`, 'Success')
-    },
-    onError: (error: AxiosError) => {
-      showError(
-        (error.response?.data as { message: string })?.message ||
-          error.message ||
-          'Error adding manufacturer',
-      )
-    },
-  })
+      showInfo(`${name} has been recorded as a manufacturer`, 'Success')
+    } catch (error) {
+      showError(error instanceof Error ? error.message : `Couldn't create manufacturer`)
+    }
+  }
+
   return (
     <>
       <Modal opened={opened} onClose={close} centered>
@@ -67,7 +57,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           onSubmit={form.onSubmit((values, event) => {
             // prevent bubbling up to parent form
             event?.stopPropagation()
-            mutate(values)
+            createManufacturer(values)
           })}
         >
           <Title mb="lg" order={3}>

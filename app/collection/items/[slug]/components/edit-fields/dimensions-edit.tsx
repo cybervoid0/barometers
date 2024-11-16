@@ -6,7 +6,6 @@ import { isEqual } from 'lodash'
 import { useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
-import axios, { AxiosError } from 'axios'
 import {
   ActionIcon,
   Box,
@@ -20,8 +19,9 @@ import {
 } from '@mantine/core'
 import { IconEdit, IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
 import { IBarometer } from '@/models/barometer'
-import { barometerRoute, barometersApiRoute } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
+import { updateBarometer } from '@/actions/barometers'
 
 interface DimFormProps {
   dimensions: IBarometer['dimensions']
@@ -49,7 +49,7 @@ export default function DimensionEdit({ barometer }: DimensionEditProps) {
     if (opened) form.reset()
   }, [opened])
 
-  const updateBarometer = async ({ dimensions }: DimFormProps) => {
+  const update = async ({ dimensions }: DimFormProps) => {
     try {
       if (isEqual(dimensions, barometer.dimensions)) {
         close()
@@ -60,18 +60,12 @@ export default function DimensionEdit({ barometer }: DimensionEditProps) {
         // keep non-empty entries
         dimensions: dimensions?.filter(({ dim }) => dim),
       }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
+      const slug = await updateBarometer(updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + slug
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
-      }
+      showError(error instanceof Error ? error.message : 'Error updating dimensions')
     }
   }
   const addDimension = () => {
@@ -98,7 +92,7 @@ export default function DimensionEdit({ barometer }: DimensionEditProps) {
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Box component="form" onSubmit={form.onSubmit(updateBarometer)}>
+        <Box component="form" onSubmit={form.onSubmit(update)}>
           <Stack>
             <Stack gap="xs" align="flex-start">
               {form.values.dimensions?.map((_, i) => (

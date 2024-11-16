@@ -1,6 +1,7 @@
-import { Schema, model, Document, models, type Model } from 'mongoose'
+import { Schema, model, models, type Model } from 'mongoose'
 
-export interface IBarometerType extends Document {
+export interface IBarometerType {
+  _id: string
   name: string
   description?: string
   label: string
