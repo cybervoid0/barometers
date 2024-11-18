@@ -7,7 +7,7 @@ import styles from './category-card.module.scss'
 interface CategoryCardProps {
   name: string
   link: string
-  image: string
+  image?: string
 }
 
 export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
@@ -15,18 +15,20 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
         <Box className={styles.container}>
-          <NextImage
-            fill
-            priority
-            quality={50}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            src={image}
-            alt={name}
-            className={styles.bg_image}
-            style={{
-              objectFit: name === 'Recorders' ? 'cover' : 'contain',
-            }}
-          />
+          {image && (
+            <NextImage
+              fill
+              priority
+              quality={50}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              src={image}
+              alt={name}
+              className={styles.bg_image}
+              style={{
+                objectFit: name === 'Recorders' ? 'cover' : 'contain',
+              }}
+            />
+          )}
           <Title component="h3" className={styles.title}>
             {name}
           </Title>

@@ -15,14 +15,15 @@ export function fetchBarometers(): Promise<IBarometer[]>
  * Returns a list of barometers filtered by the query string (type, sort)
  * @param qs - query string parameters
  */
-export function fetchBarometers(qs: URLSearchParams): Promise<IBarometer[]>
+export function fetchBarometers(qs: Record<string, string>): Promise<IBarometer[]>
 export async function fetchBarometers(
-  slugOrQs?: string | URLSearchParams,
+  slugOrQs?: string | Record<string, string>,
 ): Promise<IBarometer | IBarometer[]> {
   const input =
     process.env.NEXT_PUBLIC_BASE_URL +
     barometersApiRoute +
-    (typeof slugOrQs === 'string' ? slugOrQs : slugOrQs ? `?${slugOrQs}` : '')
+    (typeof slugOrQs === 'string' ? slugOrQs : slugOrQs ? `?${new URLSearchParams(slugOrQs)}` : '')
+
   const res = await fetch(input, {
     next: {
       revalidate: 600,
@@ -33,10 +34,14 @@ export async function fetchBarometers(
 }
 
 export function fetchTypes(): Promise<IBarometerType[]>
-export function fetchTypes(qs: URLSearchParams): Promise<IBarometerType>
-export async function fetchTypes(qs?: URLSearchParams): Promise<IBarometerType[] | IBarometerType> {
+export function fetchTypes(qs: Record<string, string>): Promise<IBarometerType>
+export async function fetchTypes(
+  qs?: Record<string, string>,
+): Promise<IBarometerType[] | IBarometerType> {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + barometerTypesApiRoute + (qs ? `?${qs}` : ''),
+    process.env.NEXT_PUBLIC_BASE_URL +
+      barometerTypesApiRoute +
+      (qs ? `?${new URLSearchParams(qs)}` : ''),
   )
   return res.json()
 }

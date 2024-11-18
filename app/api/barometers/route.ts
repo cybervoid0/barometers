@@ -43,10 +43,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
     const typeName = searchParams.get('type')
     const sortBy = searchParams.get('sort') as SortValue | null
+    const limit = Number(searchParams.get('limit')) ?? 0
     // if `type` search param was not passed return all barometers list
     if (!typeName || !typeName.trim()) {
       const barometers = sortBarometers(
-        await Barometer.find().populate(['type', 'condition', 'manufacturer']),
+        await Barometer.find().limit(limit).populate(['type', 'condition', 'manufacturer']),
         sortBy,
       )
       return NextResponse.json(barometers, { status: 200 })
@@ -59,11 +60,9 @@ export async function GET(req: NextRequest) {
 
     // if existing barometer type match the `type` param, return all corresponding barometers
     const barometers = sortBarometers(
-      await Barometer.find({ type: barometerType._id }).populate([
-        'type',
-        'condition',
-        'manufacturer',
-      ]),
+      await Barometer.find({ type: barometerType._id })
+        .limit(limit)
+        .populate(['type', 'condition', 'manufacturer']),
       sortBy,
     )
     return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })

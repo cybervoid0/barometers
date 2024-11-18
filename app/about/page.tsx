@@ -30,7 +30,7 @@ export default function About() {
         of Technology (SHOT), European Society for Environmental History (ESEH) and the
         International Meteorological Artifact Preservation Program (IMAPP). I have dedicated myself
         to assembling a unique collection of weather instruments that represent masterpieces of the
-        industrial era, spanning from the early 19th to the mid-20th century. For the past five
+        industrial era, spanning from the late 18th to the mid 20th century. For the past five
         years, I have passionately curated a diverse collection of barometers and other weather
         instruments, driven by a deep fascination with the history of meteorology. This dedication
         has also inspired me to write <span className={styles.bookTitle}>Barometer Odyssey</span>, a
