@@ -1,9 +1,10 @@
 import { type Metadata } from 'next'
 import { getServerSession } from 'next-auth'
+import capitalize from 'lodash/capitalize'
 import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
 import { authConfig, getUserByEmail } from '@/utils/auth'
 import { IBarometer } from '@/models/barometer'
-import { googleStorageImagesFolder, barometerRoute, twitterAccount } from '@/app/constants'
+import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ShowError } from '@/app/components/show-error'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -18,6 +19,7 @@ import { getBarometer, listBarometers } from '@/actions/barometers'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
 import { slug as slugify } from '@/utils/misc'
 import { DescriptionText } from '@/app/components/description-text'
+import { title, openGraph, twitter } from '@/app/metadata'
 
 interface Slug {
   slug: string
@@ -29,41 +31,34 @@ interface BarometerItemProps {
 export async function generateMetadata({
   params: { slug },
 }: BarometerItemProps): Promise<Metadata> {
-  try {
-    const barometer = await getBarometer(slug)
-
-    const images =
-      barometer.images?.map(image => ({
-        url: googleStorageImagesFolder + image,
-        alt: barometer.name,
-      })) ?? []
-
-    return {
-      metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
-      title: barometer.name,
-      description: barometer.description,
-      keywords: ['barometer', ...barometer.name.split(' ')],
-      openGraph: {
-        title: barometer.name,
-        description: barometer.description,
-        url: barometerRoute + slug,
-        images,
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: barometer.name,
-        description: barometer.description,
-        images: images.map(image => ({
-          url: image.url,
-          alt: image.alt,
-        })),
-        site: twitterAccount,
-      },
-    }
-  } catch (error) {
-    return {
-      title: 'Barometers Error',
-    }
+  const { description, name, images } = await getBarometer(slug)
+  const barometerTitle = `${title}: ${capitalize(name)}`
+  const barometerImages =
+    images &&
+    images.map(image => ({
+      url: googleStorageImagesFolder + image,
+      alt: name,
+    }))
+  const url = barometerRoute + slug
+  return {
+    title: barometerTitle,
+    description,
+    openGraph: {
+      ...openGraph,
+      title: barometerTitle,
+      description,
+      url,
+      images: barometerImages,
+    },
+    twitter: {
+      ...twitter,
+      title: name,
+      description,
+      images: barometerImages?.map(image => ({
+        url: image.url,
+        alt: image.alt,
+      })),
+    },
   }
 }
 

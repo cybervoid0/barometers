@@ -1,5 +1,7 @@
+import { Metadata } from 'next'
+import capitalize from 'lodash/capitalize'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
-import { barometerRoute, googleStorageImagesFolder } from '@/app/constants'
+import { barometerRoute, googleStorageImagesFolder, barometerTypesRoute } from '@/app/constants'
 import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
@@ -7,6 +9,7 @@ import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { getType, listTypes } from '@/actions/barometer-types'
 import { listBarometers } from '@/actions/barometers'
+import { title, openGraph, twitter } from '@/app/metadata'
 
 interface CollectionProps {
   params: {
@@ -16,9 +19,39 @@ interface CollectionProps {
     sort?: SortValue
   }
 }
+
+export async function generateMetadata({ params: { type } }: CollectionProps): Promise<Metadata> {
+  const { description } = await getType(type)
+  const barometersOfType = await listBarometers({ type, limit: 5 })
+  const collectionTitle = `${title}: ${capitalize(type)} Barometers Collection`
+  const barometerImages = barometersOfType
+    .filter(({ images }) => images && images.length > 0)
+    .map(({ images, name }) => ({
+      url: googleStorageImagesFolder + images!.at(0),
+      alt: name,
+    }))
+  const url = barometerTypesRoute + type
+  return {
+    title: collectionTitle,
+    description,
+    openGraph: {
+      ...openGraph,
+      url,
+      title: collectionTitle,
+      description,
+      images: barometerImages,
+    },
+    twitter: {
+      ...twitter,
+      title: collectionTitle,
+      description,
+      images: barometerImages,
+    },
+  }
+}
+
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
   const sort = searchParams.sort ?? 'date'
-  //const barometersOfType = await fetchBarometers(new URLSearchParams({ type, sort: sortBy }))
   const barometersOfType = await listBarometers({ type, sort })
   // selected barometer type details
   const { description } = await getType(type)

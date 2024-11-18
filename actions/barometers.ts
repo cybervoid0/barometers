@@ -54,18 +54,27 @@ export async function updateBarometer(barometerData: IBarometer): Promise<string
 export async function listBarometers(options?: {
   type?: string
   sort?: SortValue
+  limit?: number
 }): Promise<IBarometer[]> {
   await connectMongoose()
   const sortBy = options?.sort ?? 'date'
-  if (!options?.type) return sortBarometers(await Barometer.find().populate(dependencies), sortBy)
+  if (!options?.type)
+    return sortBarometers(
+      await Barometer.find()
+        .limit(options?.limit ?? 0)
+        .populate(dependencies),
+      sortBy,
+    )
   const barometerType = await BarometerType.findOne({
     name: { $regex: new RegExp(`^${options.type}$`, 'i') },
   })
   if (!barometerType) throw new Error('Unknown barometer type')
   return sortBarometers(
-    (await Barometer.find({ type: barometerType._id }).populate(dependencies)).map(res =>
-      res.toObject({ flattenObjectIds: true }),
-    ),
+    (
+      await Barometer.find({ type: barometerType._id })
+        .limit(options.limit ?? 0)
+        .populate(dependencies)
+    ).map(res => res.toObject({ flattenObjectIds: true })),
     sortBy,
   )
 }

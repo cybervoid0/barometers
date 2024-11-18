@@ -22,6 +22,11 @@ export default withBundleAnalyzer({
   },
   images: {
     formats: ['image/avif'],
+    localPatterns: [
+      {
+        pathname: '/images/**',
+      },
+    ],
     remotePatterns: [
       {
         protocol: 'https',

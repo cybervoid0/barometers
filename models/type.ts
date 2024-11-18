@@ -1,7 +1,7 @@
 import { Schema, model, models, type Model } from 'mongoose'
 
 export interface IBarometerType {
-  _id: string
+  _id?: string
   name: string
   description?: string
   label: string
