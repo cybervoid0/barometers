@@ -152,18 +152,18 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             editButton={isAdmin && <ConditionEdit barometer={barometer} />}
           />
 
-          {description && (
-            <>
-              <Divider
-                mx="lg"
-                my="lg"
-                {...(isAdmin && {
-                  label: <DescriptionEdit barometer={barometer} />,
-                  labelPosition: 'right',
-                })}
-              />
-              <DescriptionText description={description} />
-            </>
+          <Divider
+            mx="lg"
+            my="lg"
+            {...(isAdmin && {
+              label: <DescriptionEdit barometer={barometer} />,
+              labelPosition: 'right',
+            })}
+          />
+          {description ? (
+            <DescriptionText description={description} />
+          ) : (
+            isAdmin && <Text>Add description</Text>
           )}
         </Box>
       </Container>
