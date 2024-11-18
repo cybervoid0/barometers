@@ -35,11 +35,12 @@ export function ImageCarousel({ images, barometer, isAdmin }: ImageCarouselProps
           },
         }}
       >
-        {images.map(image => (
+        {images.map((image, i) => (
           <SwiperSlide key={image}>
             <Box className="swiper-zoom-container">
               <Image
-                priority
+                priority={i === 0}
+                loading={i === 0 ? 'eager' : 'lazy'}
                 quality={60}
                 width={200}
                 height={200}

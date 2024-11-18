@@ -32,9 +32,10 @@ export default async function HomePage() {
           <ShowError message={errorMessage} />
         ) : (
           <Grid justify="center" gutter={{ base: '2rem', sm: '2.5rem' }}>
-            {barometerTypes.map(({ _id, label, name, image }) => (
+            {barometerTypes.map(({ _id, label, name, image }, i) => (
               <GridCol key={String(_id)} span={{ base: 12, xs: 6, lg: 4 }}>
                 <CategoryCard
+                  priority={i < 3}
                   image={image}
                   name={label}
                   link={barometerTypesRoute + name.toLowerCase()}

@@ -8,9 +8,10 @@ interface CategoryCardProps {
   name: string
   link: string
   image?: string
+  priority: boolean
 }
 
-export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
+export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priority }) => {
   return (
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
@@ -18,7 +19,8 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image }) => {
           {image && (
             <NextImage
               fill
-              priority
+              priority={priority}
+              loading={priority ? 'eager' : 'lazy'}
               quality={50}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               src={image}
