@@ -1,7 +1,7 @@
 import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
-import { barometerTypesRoute, googleStorageImagesFolder } from './constants'
+import { barometerTypesRoute } from './constants'
 import { IBarometerType } from '@/models/type'
 import { listTypes } from '@/actions/barometer-types'
 
@@ -15,7 +15,7 @@ export default async function HomePage() {
           {barometerTypes.map(({ image, label, name }, i) => (
             <GridCol key={String(i)} span={{ base: 12, xs: 6, lg: 4 }}>
               <CategoryCard
-                image={googleStorageImagesFolder + image}
+                image={image}
                 name={label}
                 link={barometerTypesRoute + name.toLowerCase()}
               />
