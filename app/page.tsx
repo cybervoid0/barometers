@@ -15,6 +15,7 @@ export default async function HomePage() {
           {barometerTypes.map(({ image, label, name }, i) => (
             <GridCol key={String(i)} span={{ base: 12, xs: 6, lg: 4 }}>
               <CategoryCard
+                priority={i < 3}
                 image={image}
                 name={label}
                 link={barometerTypesRoute + name.toLowerCase()}

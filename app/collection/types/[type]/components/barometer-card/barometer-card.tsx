@@ -8,15 +8,23 @@ interface BarometerCardProps {
   name: string
   link: string
   manufacturer?: string
+  priority: boolean
 }
 
-export async function BarometerCard({ name, image, link, manufacturer }: BarometerCardProps) {
+export async function BarometerCard({
+  name,
+  image,
+  link,
+  manufacturer,
+  priority,
+}: BarometerCardProps) {
   return (
     <Box>
       <Anchor c="dark" component={Link} href={link}>
         <Box className={styles.bg_gradient}>
           <NextImage
-            priority
+            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
             quality={50}
             src={image}
             alt={name}

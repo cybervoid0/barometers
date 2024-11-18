@@ -64,9 +64,10 @@ export default async function Collection({ params: { type }, searchParams }: Col
         {description && <DescriptionText size="sm" description={description} />}
         <Sort sortBy={sort} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
-          {barometersOfType.map(({ name, _id, images, manufacturer }) => (
+          {barometersOfType.map(({ name, _id, images, manufacturer }, i) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
               <BarometerCard
+                priority={i < 8}
                 image={googleStorageImagesFolder + images![0]}
                 name={name}
                 link={barometerRoute + slug(name)}
