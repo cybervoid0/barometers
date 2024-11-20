@@ -776,7 +776,7 @@ export default function History() {
         Aneroid Barometers and Their Spread
       </Title>
       <Text className={sx.paragraph}>
-        With the invention of the aneroid barometer by Lucien Vidi in 1844, a new era of measuring
+        With the invention of the aneroid barometer by Lucien Vidie in 1844, a new era of measuring
         instruments began. Aneroid barometers did not require mercury and were convenient to use.
       </Text>
       <ShowMore>
@@ -792,10 +792,10 @@ export default function History() {
         </Text>
         <Text className={sx.paragraph}>
           Two centuries had passed since Torricelli&apos;s famous experiment, which began the study
-          of atmospheric pressure. In 1844, Lucien Vidi, a French physicist, invented the first
+          of atmospheric pressure. In 1844, Lucien Vidie, a French physicist, invented the first
           mercury-free barometer, based on his groundbreaking creation — the aneroid sensitive
-          element, later named after him: the Vidi capsule. The Vidi capsule is a small metallic
-          chamber with corrugated walls, from which air is partially evacuated. Lucien Vidi&apos;s
+          element, later named after him: the Vidie capsule. The Vidie capsule is a small metallic
+          chamber with corrugated walls, from which air is partially evacuated. Lucien Vidie&apos;s
           patented aneroid chamber was a hermetically sealed metal box that deformed under the
           influence of atmospheric pressure. Inside this capsule were springs that transferred the
           deformations to the barometer&apos;s pointer via a system of levers, providing
@@ -809,11 +809,11 @@ export default function History() {
           which increased sensitivity and measurement accuracy, as the coil spring was prone to
           twisting during compression. Later, the external spring was replaced with a flat leaf
           spring, resulting in a more stable and reliable mechanism. In 1859, the patent on Lucien
-          Vidi&apos;s invention expired, opening the door for mass production of aneroid barometers
-          based on his mechanism. Despite Vidi&apos;s attempts to extend his patent, he was
+          Vidie&apos;s invention expired, opening the door for mass production of aneroid barometers
+          based on his mechanism. Despite Vidie&apos;s attempts to extend his patent, he was
           unsuccessful. As a result, a number of British and French manufacturers, including the
           leading companies of the time, began producing and selling barometers widely using the
-          Vidi mechanism.
+          Vidie mechanism.
         </Text>
       </ShowMore>
       <Title component="h3" className={sx.header}>
@@ -837,10 +837,10 @@ export default function History() {
         </Text>
       </ShowMore>
       <Title component="h3" className={sx.header}>
-        Aneroid Mechanisms: The Vidi Mechanism and the Continental Console Mechanism
+        Aneroid Mechanisms: The Vidie Mechanism and the Continental Console Mechanism
       </Title>
       <Text className={sx.paragraph}>
-        Aneroid barometers, invented by Lucien Vidi, used a metal capsule that deformed under air
+        Aneroid barometers, invented by Lucien Vidie, used a metal capsule that deformed under air
         pressure. Later, the continental console mechanism, based on a rack and pinion system, was
         developed, improving the accuracy and stability of measurements.
       </Text>

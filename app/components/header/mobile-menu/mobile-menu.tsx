@@ -32,11 +32,12 @@ export const MobileMenu: FC<DrawerProps> = props => {
 
   return (
     <Drawer
-      size="sm"
+      size="80%"
       transitionProps={{
         duration: 500,
       }}
       styles={{
+        content: {},
         body: {
           padding: 0,
           height: 'calc(100% - 4rem)',
@@ -65,7 +66,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       <List.Item py="md">
                         <UnstyledButton onClick={() => toggle(i)}>
                           <Group gap="sm">
-                            <Text size="sm" tt="uppercase" lts="0.15rem" fw={500}>
+                            <Text size="md" tt="uppercase" lts="0.15rem" fw={500}>
                               {outer.label}
                             </Text>
                             <Center
@@ -88,7 +89,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                                 href={barometerTypesRoute + name.toLowerCase()}
                                 onClick={props.onClose}
                               >
-                                <Text size="xs" tt="capitalize" lts="0.1rem" fw={400}>
+                                <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>
                                   {label}
                                 </Text>
                               </Anchor>
@@ -105,7 +106,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                         href={`/${outer.link}`}
                         onClick={props.onClose}
                       >
-                        <Text size="sm" tt="uppercase" lts="0.15rem" fw={500}>
+                        <Text size="md" tt="uppercase" lts="0.15rem" fw={500}>
                           {outer.label}
                         </Text>
                       </Anchor>
