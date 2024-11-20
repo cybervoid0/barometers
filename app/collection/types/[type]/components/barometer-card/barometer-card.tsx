@@ -33,11 +33,11 @@ export async function BarometerCard({
             style={{ objectFit: 'contain' }}
           />
         </Box>
-        <Text size="xs" fw={500} lts={1} tt="uppercase" ta="center">
+        <Text mb="0.2rem" size="xs" fw={500} lts={1} tt="uppercase" ta="center">
           {name}
         </Text>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <Text size="8px" fw={500} lts={1} tt="uppercase" ta="center">
+          <Text size="8px" fw={500} lts={1} tt="uppercase" ta="center" lh="xs">
             {manufacturer}
           </Text>
         )}

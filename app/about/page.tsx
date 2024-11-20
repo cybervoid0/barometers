@@ -40,8 +40,9 @@ export default function About() {
         My collection features more than 100 rare and exceptional items, including mercury and
         aneroid barometers, as well as barographs, mainly from the Victorian era. Some of the most
         esteemed manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph
-        Hicks, Peter Dollond, Thomas Mason, Gottlieb Lufft, Richard Frères, Jules Richard, Bourdon,
-        Naudet (PNHB), O. Comitti and Son, Massiot & Cie, Maple & Co, to name a few.
+        Hicks, Peter Dollond, Thomas Mason, Dominicus Sala, Breguet, J.C. Vickery, Gottlieb Lufft,
+        Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), Onorato Comitti and Son, Massiot &
+        Cie, Maple & Co, to name a few.
       </Text>
       <Text className={styles.paragraph}>
         The range of barometers in my collection is vast and varied, comprising wheel barometers in
