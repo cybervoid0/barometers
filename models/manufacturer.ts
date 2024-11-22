@@ -44,7 +44,7 @@ const manufacturerSchema = new Schema<IManufacturer>(
 )
 manufacturerSchema.index({
   name: 'text',
-  country: 'text',
+  description: 'text',
 })
 
 const Manufacturer: Model<IManufacturer> =

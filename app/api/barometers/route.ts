@@ -8,6 +8,12 @@ import Manufacturer from '@/models/manufacturer'
 import { cleanObject, slug as slugify, parseDate } from '@/utils/misc'
 import { SortValue } from '@/app/collection/types/[type]/types'
 
+// dependencies to include in resulting barometers array
+const deps = ['type', 'condition', 'manufacturer']
+
+/**
+ * Sort barometer list by one of the parameters: manufacturer, name, date or catalogue no.
+ */
 function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBarometer[] {
   return barometers.toSorted((a, b) => {
     switch (sortBy) {
@@ -33,6 +39,43 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBa
 }
 
 /**
+ * Search barometers matching a query
+ */
+async function searchBarometers(query: string) {
+  const quotedQuery = `"${query}"`
+  const barometers = await Barometer.find({ $text: { $search: quotedQuery } }).populate(deps)
+  return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
+}
+
+/**
+ * Find a list of barometers of a certain type
+ */
+async function getBarometersByType(typeName: string, limit: number, sortBy: SortValue | null) {
+  // perform case-insensitive compare with the stored types
+  const barometerType = await BarometerType.findOne({
+    name: { $regex: new RegExp(`^${typeName}$`, 'i') },
+  })
+  if (!barometerType) return NextResponse.json([], { status: 404 })
+
+  // if existing barometer type match the `type` param, return all corresponding barometers
+  const barometers = sortBarometers(
+    await Barometer.find({ type: barometerType._id })
+      .limit(limit)
+      .populate(['type', 'condition', 'manufacturer']),
+    sortBy,
+  )
+  return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
+}
+
+/**
+ * Find all barometers
+ */
+async function getAllBarometers(limit: number, sortBy: SortValue | null) {
+  const barometers = sortBarometers(await Barometer.find().limit(limit).populate(deps), sortBy)
+  return NextResponse.json(barometers, { status: 200 })
+}
+
+/**
  * Get barometer list
  *
  * GET /api/barometers?type=type
@@ -44,28 +87,13 @@ export async function GET(req: NextRequest) {
     const typeName = searchParams.get('type')
     const sortBy = searchParams.get('sort') as SortValue | null
     const limit = Number(searchParams.get('limit')) ?? 0
+    const query = searchParams.get('q')
+    // query param was received: ?q=aneroid%20barometer
+    if (query) return await searchBarometers(query)
     // if `type` search param was not passed return all barometers list
-    if (!typeName || !typeName.trim()) {
-      const barometers = sortBarometers(
-        await Barometer.find().limit(limit).populate(['type', 'condition', 'manufacturer']),
-        sortBy,
-      )
-      return NextResponse.json(barometers, { status: 200 })
-    }
-    // if some non-empty `type` was passed, perform case-insensitive compare with the stored types
-    const barometerType = await BarometerType.findOne({
-      name: { $regex: new RegExp(`^${typeName}$`, 'i') },
-    })
-    if (!barometerType) return NextResponse.json([], { status: 404 })
-
-    // if existing barometer type match the `type` param, return all corresponding barometers
-    const barometers = sortBarometers(
-      await Barometer.find({ type: barometerType._id })
-        .limit(limit)
-        .populate(['type', 'condition', 'manufacturer']),
-      sortBy,
-    )
-    return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
+    if (!typeName || !typeName.trim()) return await getAllBarometers(limit, sortBy)
+    // type was passed
+    return await getBarometersByType(typeName, limit, sortBy)
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Could not retrieve barometer list' },

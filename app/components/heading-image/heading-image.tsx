@@ -6,7 +6,7 @@ import { googleStorageImagesFolder } from '@/app/constants'
 
 export const HeadingImage: FC = () => {
   return (
-    <Container mb="3rem" className={styles.componentContainer}>
+    <Container className={styles.componentContainer}>
       <NextImage
         priority
         quality={50}
