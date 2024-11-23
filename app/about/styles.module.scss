@@ -6,10 +6,4 @@
 .bookTitle {
   font-style: italic;
   font-weight: 500;
-  &::before {
-    content: '«';
-  }
-  &::after {
-    content: '»';
-  }
 }
