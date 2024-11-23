@@ -41,8 +41,8 @@ export default function About() {
         aneroid barometers, as well as barographs, mainly from the Victorian era. Some of the most
         esteemed manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph
         Hicks, Peter Dollond, Thomas Mason, Dominicus Sala, Breguet, J.C. Vickery, Gottlieb Lufft,
-        Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), Onorato Comitti and Son, Massiot &
-        Cie, Maple & Co, to name a few.
+        Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), Onorato Comitti, Massiot & Cie, Maple
+        & Co, to name a few.
       </Text>
       <Text className={styles.paragraph}>
         The range of barometers in my collection is vast and varied, comprising wheel barometers in

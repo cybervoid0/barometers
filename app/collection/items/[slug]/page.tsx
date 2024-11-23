@@ -99,7 +99,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             barometer={barometer}
             images={images?.map(image => googleStorageImagesFolder + image) ?? []}
           />
-          <Box>
+          <Box mb="md">
             <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
             <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
               {name.split(' ').at(-1)}
