@@ -4,7 +4,7 @@ import { Box, Center, Container, TextInput, UnstyledButton, Group } from '@manti
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useRouter } from 'next/navigation'
-import { IconSend2 } from '@tabler/icons-react'
+import { IconSearch } from '@tabler/icons-react'
 
 interface QueryForm extends Record<string, string> {
   q: string
@@ -17,12 +17,14 @@ export function Search() {
       q: '',
     },
     validate: {
-      q: value => (isLength(value, { min: 1, max: 100 }) ? null : 'Allowed length 1-100 symbols'),
+      q: value =>
+        isLength(value.trim(), { min: 1, max: 100 }) ? null : 'Allowed length 1-100 symbols',
     },
   })
 
-  const handleSearch = async (values: QueryForm) => {
-    const query = new URLSearchParams(values)
+  const handleSearch = async ({ q }: QueryForm) => {
+    const qs = q.trim()
+    const query = new URLSearchParams({ q: qs })
     router.push(`/search?${query}`)
   }
   return (
@@ -36,12 +38,13 @@ export function Search() {
         >
           <TextInput
             placeholder="Find barometer"
+            title="Fill in any barometer related word"
             required
             {...form.getInputProps('q')}
             rightSection={
               <UnstyledButton type="submit">
                 <Center>
-                  <IconSend2 />
+                  <IconSearch />
                 </Center>
               </UnstyledButton>
             }
