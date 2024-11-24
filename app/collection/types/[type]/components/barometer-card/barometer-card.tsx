@@ -20,7 +20,7 @@ export async function BarometerCard({
 }: BarometerCardProps) {
   return (
     <Box>
-      <Anchor c="dark" component={Link} href={link}>
+      <Anchor display="block" c="dark" component={Link} href={link}>
         <Box className={styles.bg_gradient}>
           <NextImage
             priority={priority}

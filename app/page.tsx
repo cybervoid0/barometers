@@ -18,8 +18,11 @@ export default async function HomePage() {
   return (
     <>
       <HeadingImage />
-      <Search />
       <Container size="xl" pb="2.3rem">
+        <Search
+          ml="auto"
+          w={{ base: '100%', xs: 'calc(50% - 1.25rem)', lg: 'calc(33% - 1.25rem)' }}
+        />
         <Grid justify="center" gutter={{ base: '2rem', sm: '2.5rem' }}>
           {barometerTypes.map(({ _id, label, name, image }, i) => (
             <GridCol key={String(_id)} span={{ base: 12, xs: 6, lg: 4 }}>

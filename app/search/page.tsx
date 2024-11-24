@@ -1,7 +1,8 @@
-import { Box, Container } from '@mantine/core'
+import { Container, Stack, Text, Title } from '@mantine/core'
 import { IBarometer } from '@/models/barometer'
 import { barometersApiRoute, googleStorageImagesFolder, barometerRoute } from '../constants'
-import { Item } from './item'
+import { SearchItem } from './search-item'
+import { Search as SearchForm } from '../components/search'
 
 interface SearchParams extends Record<string, string> {
   q: string
@@ -19,18 +20,27 @@ export default async function Search({ searchParams }: SearchProps) {
   if (!barometers || !Array.isArray(barometers)) throw new Error('Bad barometers data')
 
   return (
-    <Container>
-      <Box>
-        {barometers.map(({ _id, name, manufacturer, images, slug }) => (
-          <Item
-            image={images ? googleStorageImagesFolder + images.at(0) : undefined}
-            name={name}
-            manufacturer={manufacturer?.name}
-            link={barometerRoute + slug}
-            key={_id}
-          />
-        ))}
-      </Box>
+    <Container my="xl">
+      <SearchForm maw="30rem" queryString={searchParams.q} />
+      <Title mb="lg" fw={500} component="h2" order={2}>
+        Search results
+      </Title>
+      {barometers.length > 0 ? (
+        <Stack gap="md" p={0}>
+          {barometers.map(({ _id, name, manufacturer, images, slug, dating }) => (
+            <SearchItem
+              image={images ? googleStorageImagesFolder + images.at(0) : undefined}
+              name={name}
+              manufacturer={manufacturer?.name}
+              link={barometerRoute + slug}
+              key={_id}
+              dating={dating}
+            />
+          ))}
+        </Stack>
+      ) : (
+        <Text size="lg">No barometer matches your request: {searchParams.q}</Text>
+      )}
     </Container>
   )
 }

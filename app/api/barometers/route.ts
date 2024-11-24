@@ -44,7 +44,7 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBa
 async function searchBarometers(query: string) {
   const quotedQuery = `"${query}"`
   const barometers = await Barometer.find({ $text: { $search: quotedQuery } }).populate(deps)
-  return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
+  return NextResponse.json(barometers, { status: 200 })
 }
 
 /**
