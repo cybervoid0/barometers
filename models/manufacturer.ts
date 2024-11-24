@@ -42,6 +42,10 @@ const manufacturerSchema = new Schema<IManufacturer>(
     timestamps: true,
   },
 )
+manufacturerSchema.index({
+  name: 'text',
+  description: 'text',
+})
 
 const Manufacturer: Model<IManufacturer> =
   models?.Manufacturer || model<IManufacturer>('Manufacturer', manufacturerSchema)

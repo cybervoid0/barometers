@@ -1,0 +1,48 @@
+import { Text, Group, Image, Anchor, Box, Stack, Paper } from '@mantine/core'
+import NextImage from 'next/image'
+import Link from 'next/link'
+
+interface ItemProps {
+  image?: string
+  name: string
+  link: string
+  manufacturer?: string
+  dating?: string
+}
+
+export function SearchItem({ image, link, name, manufacturer, dating }: ItemProps) {
+  const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
+  return (
+    <Paper
+      px="0.5rem"
+      py="0.2rem"
+      shadow="sm"
+      maw="30rem"
+      style={{ borderRight: '3px solid black' }}
+    >
+      <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
+        <Group gap="0.5rem" wrap="nowrap">
+          <Box pos="relative" w="80px" h="80px">
+            <Image
+              component={NextImage}
+              fill
+              alt={name}
+              src={image}
+              style={{ objectFit: 'contain' }}
+              sizes="100px"
+            />
+          </Box>
+          <Stack gap="xs" justify="center" mih="70px">
+            <Text fw={400} lh="100%">
+              {name}
+            </Text>
+            <Text size="xs">
+              {!noManufacturer && manufacturer} {!noManufacturer && dating && <>&mdash;</>}{' '}
+              {dating && dating}
+            </Text>
+          </Stack>
+        </Group>
+      </Anchor>
+    </Paper>
+  )
+}

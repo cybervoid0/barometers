@@ -35,6 +35,10 @@ const barometerTypeSchema = new Schema<IBarometerType>({
     required: true,
   },
 })
+barometerTypeSchema.index({
+  name: 'text',
+  description: 'text',
+})
 
 const BarometerType: Model<IBarometerType> =
   models?.BarometerType || model<IBarometerType>('BarometerType', barometerTypeSchema)

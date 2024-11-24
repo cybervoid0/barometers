@@ -73,6 +73,10 @@ const barometerSchema = new Schema<IBarometer>(
     timestamps: true,
   },
 )
+barometerSchema.index({
+  name: 'text',
+  description: 'text',
+})
 
 const Barometer: Model<IBarometer> =
   models?.Barometer || model<IBarometer>('Barometer', barometerSchema)
