@@ -1,4 +1,5 @@
 import { Viewport } from 'next'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { ColorSchemeScript, Box, Stack } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: any }) {
             <Footer />
           </Stack>
         </Providers>
+        <VercelAnalytics />
       </body>
     </html>
   )
