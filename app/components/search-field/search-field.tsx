@@ -2,12 +2,13 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { Box, Center, TextInput, UnstyledButton, BoxProps } from '@mantine/core'
+import { useEffect } from 'react'
+import { Box, TextInput, BoxProps, CloseButton, ActionIcon, ButtonGroup } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useRouter } from 'next/navigation'
 import { IconSearch } from '@tabler/icons-react'
-import { useEffect } from 'react'
+import sx from './search-field.module.scss'
 
 interface SearchProps extends BoxProps {
   queryString?: string
@@ -33,13 +34,12 @@ export function SearchField({ queryString, ...props }: SearchProps) {
   useEffect(() => {
     if (!queryString) return
     form.setValues({ q: queryString })
-    form.resetDirty({ q: queryString })
   }, [queryString])
 
   const handleSearch = async ({ q }: QueryForm) => {
     const qs = q.trim()
     const query = new URLSearchParams({ q: qs })
-    router.push(`/search?${query}`)
+    router.push(`/search?${query}#top`, { scroll: true })
   }
   return (
     <Box
@@ -49,25 +49,26 @@ export function SearchField({ queryString, ...props }: SearchProps) {
       component="form"
       onSubmit={form.onSubmit(handleSearch)}
     >
-      <TextInput
-        style={{ overflow: 'hidden' }}
-        styles={{
-          input: {
-            fontSize: '1rem',
-          },
-        }}
-        placeholder="Find barometer"
-        title="Fill in any barometer related word"
-        required
-        {...form.getInputProps('q')}
-        rightSection={
-          <UnstyledButton type="submit">
-            <Center>
-              <IconSearch />
-            </Center>
-          </UnstyledButton>
-        }
-      />
+      <ButtonGroup>
+        <TextInput
+          autoComplete="off"
+          classNames={{ input: sx.input, root: sx.inputRoot }}
+          placeholder="Find barometer"
+          title="Fill in any barometer related word"
+          required
+          {...form.getInputProps('q')}
+          rightSection={
+            <CloseButton
+              aria-label="Clear input"
+              onClick={form.reset}
+              style={{ display: form.values.q ? undefined : 'none' }}
+            />
+          }
+        />
+        <ActionIcon variant="filled" size="input-sm" type="submit" className={sx.searchButton}>
+          <IconSearch />
+        </ActionIcon>
+      </ButtonGroup>
     </Box>
   )
 }
