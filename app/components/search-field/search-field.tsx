@@ -17,7 +17,7 @@ interface QueryForm extends Record<string, string> {
   q: string
 }
 
-export function Search({ queryString, ...props }: SearchProps) {
+export function SearchField({ queryString, ...props }: SearchProps) {
   const router = useRouter()
   const form = useForm<QueryForm>({
     initialValues: {
@@ -50,6 +50,7 @@ export function Search({ queryString, ...props }: SearchProps) {
       onSubmit={form.onSubmit(handleSearch)}
     >
       <TextInput
+        style={{ overflow: 'hidden' }}
         placeholder="Find barometer"
         title="Fill in any barometer related word"
         required

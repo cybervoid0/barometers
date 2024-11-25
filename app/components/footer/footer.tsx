@@ -1,4 +1,4 @@
-import { Anchor, Box, Center, Container, Flex, Group, Text, Tooltip } from '@mantine/core'
+import { Anchor, Box, Container, Group, Text, Tooltip } from '@mantine/core'
 import Link from 'next/link'
 import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
 import { instagram, email } from '@/app/constants'
@@ -6,32 +6,21 @@ import sx from './styles.module.scss'
 
 export function Footer() {
   return (
-    <Container size="xl" w="100%">
-      <Flex
-        py={{ base: 'sm', sm: 'md' }}
-        align="center"
-        direction={{ base: 'column', xs: 'row' }}
-        component="footer"
-        gap={{ base: 'sm', xs: 0 }}
-      >
-        <Center style={{ flexGrow: 1, flexDirection: 'column' }}>
-          <Box fw={500} w="max-content">
-            <Text size="xs" display="inline" fw="inherit">
-              By using this website, you agree to our{' '}
-              <Anchor fw="600" c="dark" component={Link} href="/terms-and-conditions">
-                <Text size="sm" component="span" fw="inherit">
-                  Terms&Conditions
-                </Text>
-              </Anchor>
-            </Text>
-          </Box>
-          <Box fw={500} w="max-content">
-            <Text size="sm" display="inline" fw="inherit">
-              &copy; {new Date().getFullYear()}
-              {` `} Leo Shirokov. All right reserved.
-            </Text>
-          </Box>
-        </Center>
+    <Container w="100%">
+      <Group py={{ base: 'sm', sm: 'md' }}>
+        <Box className={sx.textBlock}>
+          <Text mb="0.5rem" size="xs">
+            By using this website, you agree to our{' '}
+            <Anchor fw="600" c="dark" component={Link} href="/terms-and-conditions">
+              Terms&Conditions
+            </Anchor>
+          </Text>
+
+          <Text size="sm">
+            &copy; {new Date().getFullYear()}
+            {` `} Leo Shirokov. All right reserved.
+          </Text>
+        </Box>
         {/* Social media links */}
         <Group gap="xs" visibleFrom="sm" className={sx.container}>
           <Tooltip label="Instagram">
@@ -57,7 +46,7 @@ export function Footer() {
             </Anchor>
           </Tooltip>
         </Group>
-      </Flex>
+      </Group>
     </Container>
   )
 }

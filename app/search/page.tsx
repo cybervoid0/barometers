@@ -2,7 +2,7 @@ import { Container, Stack, Text, Title } from '@mantine/core'
 import { IBarometer } from '@/models/barometer'
 import { barometersApiRoute, googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
-import { Search as SearchForm } from '../components/search'
+import { SearchField } from '../components/search-field'
 
 interface SearchParams extends Record<string, string> {
   q: string
@@ -20,9 +20,10 @@ export default async function Search({ searchParams }: SearchProps) {
   if (!barometers || !Array.isArray(barometers)) throw new Error('Bad barometers data')
 
   return (
-    <Container my="xl">
-      <SearchForm maw="30rem" queryString={searchParams.q} />
-      <Title mb="lg" fw={500} component="h2" order={2}>
+    <Container size="xs" my="xl">
+      <SearchField queryString={searchParams.q} />
+
+      <Title fz={{ base: 'h3', xs: 'h2' }} mb="lg" fw={500} component="h2" order={2}>
         Search results
       </Title>
       {barometers.length > 0 ? (

@@ -1,6 +1,7 @@
 import { Text, Group, Image, Anchor, Box, Stack, Paper } from '@mantine/core'
 import NextImage from 'next/image'
 import Link from 'next/link'
+import styles from './style.module.css'
 
 interface ItemProps {
   image?: string
@@ -13,16 +14,10 @@ interface ItemProps {
 export function SearchItem({ image, link, name, manufacturer, dating }: ItemProps) {
   const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
   return (
-    <Paper
-      px="0.5rem"
-      py="0.2rem"
-      shadow="sm"
-      maw="30rem"
-      style={{ borderRight: '3px solid black' }}
-    >
+    <Paper shadow="sm" className={styles.paper}>
       <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
         <Group gap="0.5rem" wrap="nowrap">
-          <Box pos="relative" w="80px" h="80px">
+          <Box className={styles.image}>
             <Image
               component={NextImage}
               fill

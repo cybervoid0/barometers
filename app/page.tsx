@@ -3,7 +3,7 @@ import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { barometerTypesApiRoute, barometerTypesRoute } from './constants'
 import { IBarometerType } from '@/models/type'
-import { Search } from './components/search'
+import { SearchField } from './components/search-field'
 
 export default async function HomePage() {
   let barometerTypes: IBarometerType[] = []
@@ -19,7 +19,7 @@ export default async function HomePage() {
     <>
       <HeadingImage />
       <Container size="xl" pb="2.3rem">
-        <Search
+        <SearchField
           ml="auto"
           w={{ base: '100%', xs: 'calc(50% - 1.25rem)', lg: 'calc(33% - 1.25rem)' }}
         />

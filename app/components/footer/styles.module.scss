@@ -1,3 +1,8 @@
+.textBlock {
+  text-align: center;
+  flex-grow: 1;
+}
+
 @mixin bttn() {
   width: 1.5rem;
   transition: color 0.3s ease-in-out;
