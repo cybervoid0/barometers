@@ -12,7 +12,6 @@ interface SearchProps {
 }
 
 export default async function Search({ searchParams }: SearchProps) {
-  if (!searchParams.q) throw new Error('Search string was not provided')
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const res = await fetch(`${baseUrl + barometersApiRoute}?${new URLSearchParams(searchParams)}`)
   if (!res.ok) throw new Error(res.statusText)
