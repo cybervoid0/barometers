@@ -51,6 +51,11 @@ export function SearchField({ queryString, ...props }: SearchProps) {
     >
       <TextInput
         style={{ overflow: 'hidden' }}
+        styles={{
+          input: {
+            fontSize: '1rem',
+          },
+        }}
         placeholder="Find barometer"
         title="Fill in any barometer related word"
         required
