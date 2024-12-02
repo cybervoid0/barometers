@@ -1,5 +1,6 @@
 import { Viewport } from 'next'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { ColorSchemeScript, Box, Stack } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: any }) {
           </Stack>
         </Providers>
         <VercelAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   )
