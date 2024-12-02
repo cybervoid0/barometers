@@ -39,7 +39,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
   const handleSearch = async ({ q }: QueryForm) => {
     const qs = q.trim()
     const query = new URLSearchParams({ q: qs })
-    router.push(`/search?${query}#top`, { scroll: true })
+    router.push(`/search?${query}`, { scroll: true })
   }
   return (
     <Box

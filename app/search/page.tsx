@@ -1,11 +1,13 @@
-import { Container, Stack, Text, Title } from '@mantine/core'
-import { IBarometer } from '@/models/barometer'
+import { Container, Stack, Text, Title, Pagination } from '@mantine/core'
 import { barometersApiRoute, googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
 import { SearchField } from '../components/search-field'
+import { type PaginationDTO } from '../api/barometers/route'
 
 interface SearchParams extends Record<string, string> {
   q: string
+  limit: string
+  page: string
 }
 interface SearchProps {
   searchParams: SearchParams
@@ -15,9 +17,8 @@ export default async function Search({ searchParams }: SearchProps) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const res = await fetch(`${baseUrl + barometersApiRoute}?${new URLSearchParams(searchParams)}`)
   if (!res.ok) throw new Error(res.statusText)
-  const barometers: IBarometer[] = await res.json()
+  const { barometers, page, total }: PaginationDTO = await res.json()
   if (!barometers || !Array.isArray(barometers)) throw new Error('Bad barometers data')
-
   return (
     <Container size="xs" my="xl">
       <SearchField queryString={searchParams.q} />

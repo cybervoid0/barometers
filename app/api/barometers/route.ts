@@ -8,6 +8,15 @@ import Manufacturer from '@/models/manufacturer'
 import { cleanObject, slug as slugify, parseDate } from '@/utils/misc'
 import { SortValue } from '@/app/collection/types/[type]/types'
 
+export interface PaginationDTO {
+  barometers: IBarometer[]
+  /**
+   * Total number of barometers in response before applying pagination
+   */
+  total: number
+  page: number
+}
+
 // dependencies to include in resulting barometers array
 const deps = ['type', 'condition', 'manufacturer']
 
@@ -41,16 +50,42 @@ function sortBarometers(barometers: IBarometer[], sortBy: SortValue | null): IBa
 /**
  * Search barometers matching a query
  */
-async function searchBarometers(query: string) {
+async function searchBarometers(
+  query: string,
+  page: number,
+  limit: number,
+  sortBy: SortValue | null,
+) {
   const quotedQuery = `"${query}"`
-  const barometers = await Barometer.find({ $text: { $search: quotedQuery } }).populate(deps)
-  return NextResponse.json(barometers, { status: 200 })
+  const skip = (page - 1) * limit
+  const barometers = sortBarometers(
+    await Barometer.find({ $text: { $search: quotedQuery } })
+      .populate(deps)
+      .skip(skip)
+      .limit(limit),
+    sortBy,
+  )
+  const total = await Barometer.countDocuments({ $text: { $search: quotedQuery } })
+
+  return NextResponse.json<PaginationDTO>(
+    {
+      barometers,
+      total,
+      page,
+    },
+    { status: 200 },
+  )
 }
 
 /**
  * Find a list of barometers of a certain type
  */
-async function getBarometersByType(typeName: string, limit: number, sortBy: SortValue | null) {
+async function getBarometersByType(
+  typeName: string,
+  page: number,
+  limit: number,
+  sortBy: SortValue | null,
+) {
   // perform case-insensitive compare with the stored types
   const barometerType = await BarometerType.findOne({
     name: { $regex: new RegExp(`^${typeName}$`, 'i') },
@@ -58,21 +93,43 @@ async function getBarometersByType(typeName: string, limit: number, sortBy: Sort
   if (!barometerType) return NextResponse.json([], { status: 404 })
 
   // if existing barometer type match the `type` param, return all corresponding barometers
+  const skip = (page - 1) * limit
   const barometers = sortBarometers(
     await Barometer.find({ type: barometerType._id })
+      .skip(skip)
       .limit(limit)
       .populate(['type', 'condition', 'manufacturer']),
     sortBy,
   )
-  return NextResponse.json(barometers, { status: barometers.length > 0 ? 200 : 404 })
+  const total = await Barometer.countDocuments({ type: barometerType._id })
+  return NextResponse.json<PaginationDTO>(
+    {
+      barometers,
+      page,
+      total,
+    },
+    { status: barometers.length > 0 ? 200 : 404 },
+  )
 }
 
 /**
  * Find all barometers
  */
-async function getAllBarometers(limit: number, sortBy: SortValue | null) {
-  const barometers = sortBarometers(await Barometer.find().limit(limit).populate(deps), sortBy)
-  return NextResponse.json(barometers, { status: 200 })
+async function getAllBarometers(page: number, limit: number, sortBy: SortValue | null) {
+  const skip = (page - 1) * limit
+  const barometers = sortBarometers(
+    await Barometer.find().skip(skip).limit(limit).populate(deps),
+    sortBy,
+  )
+  const total = await Barometer.countDocuments()
+  return NextResponse.json<PaginationDTO>(
+    {
+      barometers,
+      total,
+      page,
+    },
+    { status: 200 },
+  )
 }
 
 /**
@@ -86,14 +143,18 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
     const typeName = searchParams.get('type')
     const sortBy = searchParams.get('sort') as SortValue | null
-    const limit = Number(searchParams.get('limit')) ?? 0
     const query = searchParams.get('q')
+    const limit = Math.max(Number(searchParams.get('limit')) || 0, 0)
+    console.log('🚀 ~ GET ~ limit:', limit)
+    const page = Math.max(Number(searchParams.get('page')) || 1, 1)
+    console.log('🚀 ~ GET ~ page:', page)
+
     // query param was received: ?q=aneroid%20barometer
-    if (query) return await searchBarometers(query)
+    if (query) return await searchBarometers(query, page, limit, sortBy)
     // if `type` search param was not passed return all barometers list
-    if (!typeName || !typeName.trim()) return await getAllBarometers(limit, sortBy)
+    if (!typeName || !typeName.trim()) return await getAllBarometers(limit, page, sortBy)
     // type was passed
-    return await getBarometersByType(typeName, limit, sortBy)
+    return await getBarometersByType(typeName, page, limit, sortBy)
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Could not retrieve barometer list' },

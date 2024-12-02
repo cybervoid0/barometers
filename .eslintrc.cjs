@@ -3,9 +3,9 @@ module.exports = {
     'mantine',
     'plugin:@next/next/recommended',
     'plugin:jest/recommended',
-    'plugin:prettier/recommended',
     'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:react-hooks/recommended',
+    'plugin:prettier/recommended',
   ],
   plugins: ['testing-library', 'jest'],
   overrides: [
