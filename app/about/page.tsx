@@ -73,7 +73,6 @@ export default function About() {
         </Text>
         <Image
           w={{ base: '70%', xs: 'fit-content' }}
-          /*  h={{ base: '300px', sm: '400px' }} */
           alt="Book"
           width={160}
           height={160}
