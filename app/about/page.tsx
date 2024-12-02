@@ -61,7 +61,7 @@ export default function About() {
         always happy to answer any questions you may have about the barometers or their history.
       </Text>
       <Divider mx="xl" />
-      <Flex pt="lg" gap="lg" direction={{ base: 'column', sm: 'row' }} wrap="nowrap" align="center">
+      <Flex pt="lg" gap="lg" direction={{ base: 'column', xs: 'row' }} wrap="nowrap" align="center">
         <Text className={styles.paragraph}>
           <span className={styles.bookTitle}>Barometer Odyssey</span> immerses the reader in the
           world of one of the most fascinating scientific instruments. This book explores centuries
@@ -72,7 +72,7 @@ export default function About() {
           incredible world of weather forecasters. Currently available in Russian.
         </Text>
         <Image
-          w={{ base: '70%', xs: 'fit-content' }}
+          w={{ base: '70%', xs: 'unset' }}
           alt="Book"
           width={160}
           height={160}
