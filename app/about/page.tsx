@@ -20,10 +20,7 @@ export default function About() {
           height={125}
           sizes="(max-width: 768px) 100vw, 50vw"
           src={`${googleStorageImagesFolder}a98daba6-1f4e-4614-aecd-ab5cb189fcaf.png`}
-          style={{
-            float: 'left',
-            objectFit: 'contain',
-          }}
+          className={styles.leoImage}
           component={NextImage}
         />
         I am a collector and restorer of antique barometers, a member of the Society for the History
@@ -76,6 +73,7 @@ export default function About() {
           alt="Book"
           width={160}
           height={160}
+          sizes="(max-width: 576px) 70vw, 160px"
           src="/images/about-circle.png"
           component={NextImage}
         />
