@@ -6,7 +6,7 @@ import sx from './styles.module.scss'
 
 export function Footer() {
   return (
-    <Container w="100%">
+    <Container size="xl" w="100%">
       <Group py={{ base: 'sm', sm: 'md' }}>
         <Box className={sx.textBlock}>
           <Text mb="0.5rem" size="xs">

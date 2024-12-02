@@ -23,6 +23,7 @@ export function Header() {
               </Box>
               <Anchor underline="never" component={NextLink} href="/">
                 <Flex align="center" gap="xs">
+                  <Title className={styles.title}>Barometers Realm</Title>
                   {/* Logo image */}
                   <Box className={styles.logo}>
                     <NextImage
@@ -34,7 +35,6 @@ export function Header() {
                       style={{ objectFit: 'contain' }}
                     />
                   </Box>
-                  <Title className={styles.title}>Barometers Realm</Title>
                 </Flex>
               </Anchor>
             </Group>

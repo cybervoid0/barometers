@@ -1,6 +1,6 @@
 import React from 'react'
 import NextImage from 'next/image'
-import { Container, Image, Text, Title } from '@mantine/core'
+import { Container, Image, Text, Title, Divider, Flex } from '@mantine/core'
 import { googleStorageImagesFolder } from '../constants'
 import styles from './styles.module.scss'
 
@@ -54,12 +54,33 @@ export default function About() {
         documents from historical manufacturers and period advertisements, further enriching the
         collection’s historical value.
       </Text>
-      <Text className={styles.paragraph}>
+      <Text pb="xl" className={styles.paragraph}>
         I am very excited to be able to share my collection online with enthusiasts around the
         world. Each barometer is accompanied by high-quality photographs and a detailed description,
         ensuring that the beauty and craftsmanship of these instruments are fully appreciated. I am
         always happy to answer any questions you may have about the barometers or their history.
       </Text>
+      <Divider mx="xl" />
+      <Flex pt="lg" gap="lg" direction={{ base: 'column', sm: 'row' }} wrap="nowrap" align="center">
+        <Text className={styles.paragraph}>
+          Barometer Odyssey immerses the reader in the world of one of the most fascinating
+          scientific instruments. This book explores centuries of experiments, discoveries, and
+          inventions connected to the barometer, as well as its aesthetic and functional
+          significance. From ancient studies of the vacuum to modern aneroid mechanisms, each
+          chapter unveils the captivating story of the barometer. Featuring vivid examples from the
+          author’s collection, this book will inspire you to discover the incredible world of
+          weather forecasters. Currently available in Russian.
+        </Text>
+        <Image
+          w={{ base: '70%', xs: 'fit-content' }}
+          /*  h={{ base: '300px', sm: '400px' }} */
+          alt="Book"
+          width={160}
+          height={160}
+          src="/images/about-circle.png"
+          component={NextImage}
+        />
+      </Flex>
     </Container>
   )
 }

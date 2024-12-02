@@ -1,6 +1,6 @@
 export const SortOptions = [
   { value: 'name', label: 'Name' },
-  { value: 'date', label: 'Date' },
+  { value: 'date', label: 'Dating' },
   { value: 'manufacturer', label: 'Manufacturer' },
   { value: 'cat-no', label: 'Catalogue No.' },
 ] as const satisfies { value: string; label: string }[]
