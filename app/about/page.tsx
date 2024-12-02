@@ -63,13 +63,13 @@ export default function About() {
       <Divider mx="xl" />
       <Flex pt="lg" gap="lg" direction={{ base: 'column', sm: 'row' }} wrap="nowrap" align="center">
         <Text className={styles.paragraph}>
-          Barometer Odyssey immerses the reader in the world of one of the most fascinating
-          scientific instruments. This book explores centuries of experiments, discoveries, and
-          inventions connected to the barometer, as well as its aesthetic and functional
-          significance. From ancient studies of the vacuum to modern aneroid mechanisms, each
-          chapter unveils the captivating story of the barometer. Featuring vivid examples from the
-          author’s collection, this book will inspire you to discover the incredible world of
-          weather forecasters. Currently available in Russian.
+          <span className={styles.bookTitle}>Barometer Odyssey</span> immerses the reader in the
+          world of one of the most fascinating scientific instruments. This book explores centuries
+          of experiments, discoveries, and inventions connected to the barometer, as well as its
+          aesthetic and functional significance. From ancient studies of the vacuum to modern
+          aneroid mechanisms, each chapter unveils the captivating story of the barometer. Featuring
+          vivid examples from the author’s collection, this book will inspire you to discover the
+          incredible world of weather forecasters. Currently available in Russian.
         </Text>
         <Image
           w={{ base: '70%', xs: 'fit-content' }}
