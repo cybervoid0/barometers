@@ -6,17 +6,23 @@ import sx from './styles.module.scss'
 
 export function Footer() {
   return (
-    <Container size="xl" w="100%">
+    <Container size="xl" py="sm" w="100%">
       <Group py={{ base: 'sm', sm: 'md' }}>
         <Box className={sx.textBlock}>
           <Text mb="0.5rem" size="xs">
             By using this website, you agree to our{' '}
-            <Anchor fw="600" c="dark" component={Link} href="/terms-and-conditions">
-              Terms&Conditions
+            <Anchor
+              underline="hover"
+              fw="600"
+              c="dark"
+              component={Link}
+              href="/terms-and-conditions"
+            >
+              Terms & Conditions
             </Anchor>
           </Text>
 
-          <Text size="sm">
+          <Text size="xs">
             &copy; {new Date().getFullYear()}
             {` `} Leo Shirokov. All right reserved.
           </Text>

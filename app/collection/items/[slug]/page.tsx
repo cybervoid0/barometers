@@ -113,7 +113,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           {manufacturer && (
             <Box>
               <Title fw={500} display="inline" order={3}>
-                Manufacturer:&nbsp;
+                Manufacturer/Retailer:&nbsp;
               </Title>
               <Title c="dark.3" fw={400} display="inline" order={3}>
                 {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
