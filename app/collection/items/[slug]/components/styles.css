@@ -42,6 +42,15 @@
   background: var(--mantine-color-dark-4);
 }
 
+/* Remove left and right spacing at swiper buttons */
+.swiper-button-prev {
+  left: 0;
+}
+
+.swiper-button-next {
+  right: 0;
+}
+
 .swiper-button-next,
 .swiper-button-prev {
   color: var(--mantine-color-dark-4);

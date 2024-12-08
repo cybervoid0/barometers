@@ -20,7 +20,7 @@ export async function BarometerCard({
 }: BarometerCardProps) {
   return (
     <Box>
-      <Anchor display="block" c="dark" component={Link} href={link}>
+      <Anchor underline="never" c="dark" className={styles.anchor} component={Link} href={link}>
         <Box className={styles.bg_gradient}>
           <NextImage
             priority={priority}
@@ -37,7 +37,7 @@ export async function BarometerCard({
           {name}
         </Text>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <Text size="8px" fw={500} lts={1} tt="uppercase" ta="center" lh="xs">
+          <Text c="inherit" size="8px" fw={500} lts={1} tt="uppercase" ta="center" lh="xs">
             {manufacturer}
           </Text>
         )}

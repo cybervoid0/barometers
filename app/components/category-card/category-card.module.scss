@@ -3,6 +3,7 @@
   height: 100%;
   position: relative;
   overflow: hidden;
+  border-radius: 4px;
 
   &:hover .bg_image {
     transform: scale(1.5);

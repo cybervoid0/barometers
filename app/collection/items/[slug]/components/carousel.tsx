@@ -5,6 +5,7 @@ import { Box, Image } from '@mantine/core'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Zoom, Navigation, Pagination } from 'swiper/modules'
 import NextImage from 'next/image'
+import clsx from 'clsx'
 import { ImagesEdit } from './edit-fields/images-edit'
 import 'swiper/css'
 import 'swiper/css/zoom'
@@ -31,7 +32,7 @@ export function ImageCarousel({ images, barometer, isAdmin }: ImageCarouselProps
         pagination={{
           clickable: true,
           renderBullet(index, className) {
-            return `<span class="${className}">${index + 1}</span>`
+            return `<span class="${clsx(className)}">${index + 1}</span>`
           },
         }}
       >
