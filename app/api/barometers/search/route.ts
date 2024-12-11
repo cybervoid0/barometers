@@ -4,7 +4,7 @@ import { DEFAULT_PAGE_SIZE, type PaginationDTO } from '../../types'
 import { connectMongoose } from '@/utils/mongoose'
 
 // dependencies to include in resulting barometers array
-export const deps = ['type', 'condition', 'manufacturer']
+const deps = ['type', 'condition', 'manufacturer']
 
 /**
  * Search barometers matching a query
