@@ -9,6 +9,7 @@ import Sort from './sort'
 import { fetchBarometers, fetchTypes } from '@/utils/fetch'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
+import { Pagination } from '@/app/components/pagination'
 
 interface CollectionProps {
   params: {
@@ -16,14 +17,17 @@ interface CollectionProps {
   }
   searchParams: {
     sort?: SortValue
+    page: string
   }
 }
 
+const PAGE_SIZE = '12'
+
 export async function generateMetadata({ params: { type } }: CollectionProps): Promise<Metadata> {
   const { description } = await fetchTypes({ type })
-  const barometersOfType = await fetchBarometers({ type, limit: '5' })
+  const barometersOfType = await fetchBarometers({ type, size: '5', page: '1' })
   const collectionTitle = `${title}: ${capitalize(type)} Barometers Collection`
-  const barometerImages = barometersOfType
+  const barometerImages = barometersOfType.barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
       url: googleStorageImagesFolder + images!.at(0),
@@ -50,8 +54,14 @@ export async function generateMetadata({ params: { type } }: CollectionProps): P
 }
 
 export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
-  const sortBy = searchParams.sort ?? 'date'
-  const barometersOfType = await fetchBarometers({ type, sort: sortBy })
+  const sort = searchParams.sort ?? 'date'
+  const page = searchParams.page ?? 1
+  const { barometers, totalPages } = await fetchBarometers({
+    type,
+    sort,
+    pageSize: PAGE_SIZE,
+    page,
+  })
   // selected barometer type details
   const { description } = await fetchTypes({ type })
   return (
@@ -61,9 +71,9 @@ export default async function Collection({ params: { type }, searchParams }: Col
           {type}
         </Title>
         {description && <DescriptionText size="sm" description={description} />}
-        <Sort sortBy={sortBy} style={{ alignSelf: 'flex-end' }} />
+        <Sort sortBy={sort} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
-          {barometersOfType.map(({ name, _id, images, manufacturer }, i) => (
+          {barometers.map(({ name, _id, images, manufacturer }, i) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(_id)}>
               <BarometerCard
                 priority={i < 8}
@@ -75,6 +85,7 @@ export default async function Collection({ params: { type }, searchParams }: Col
             </GridCol>
           ))}
         </Grid>
+        {totalPages > 1 && <Pagination total={totalPages} value={+page} />}
       </Stack>
     </Container>
   )

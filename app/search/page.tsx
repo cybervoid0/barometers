@@ -1,47 +1,43 @@
-import { Container, Stack, Text, Title, Pagination } from '@mantine/core'
-import { barometersApiRoute, googleStorageImagesFolder, barometerRoute } from '../constants'
+import { Box, Container, Stack, Title } from '@mantine/core'
+import { barometersSearchRoute, googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
 import { SearchField } from '../components/search-field'
-import { type PaginationDTO } from '../api/barometers/route'
+import { PaginationDTO } from '../api/types'
+import { Pagination } from '../components/pagination'
 
-interface SearchParams extends Record<string, string> {
-  q: string
-  limit: string
-  page: string
-}
 interface SearchProps {
-  searchParams: SearchParams
+  searchParams: Record<string, string>
 }
 
 export default async function Search({ searchParams }: SearchProps) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-  const res = await fetch(`${baseUrl + barometersApiRoute}?${new URLSearchParams(searchParams)}`)
-  if (!res.ok) throw new Error(res.statusText)
-  const { barometers, page, total }: PaginationDTO = await res.json()
-  if (!barometers || !Array.isArray(barometers)) throw new Error('Bad barometers data')
-  return (
-    <Container size="xs" my="xl">
-      <SearchField queryString={searchParams.q} />
+  const url = `${baseUrl + barometersSearchRoute}?${new URLSearchParams(searchParams)}`
+  const res = await fetch(url, { cache: 'no-cache' })
+  const { barometers = [], page = 1, totalPages = 0 }: PaginationDTO = await res.json()
 
-      <Title fz={{ base: 'h3', xs: 'h2' }} mb="lg" fw={500} component="h2" order={2}>
-        Search results
-      </Title>
-      {barometers.length > 0 ? (
-        <Stack gap="md" p={0}>
-          {barometers.map(({ _id, name, manufacturer, images, slug, dating }) => (
-            <SearchItem
-              image={images ? googleStorageImagesFolder + images.at(0) : undefined}
-              name={name}
-              manufacturer={manufacturer?.name}
-              link={barometerRoute + slug}
-              key={_id}
-              dating={dating}
-            />
-          ))}
-        </Stack>
-      ) : (
-        <Text size="lg">No barometer matches your request: {searchParams.q}</Text>
-      )}
+  return (
+    <Container p={0} size="xs" px={{ base: 'xs' }} my="xl">
+      <Stack>
+        <Box style={{ flexGrow: 1 }}>
+          <Title fz={{ base: 'h3', xs: 'h2' }} mb="lg" fw={500} component="h2" order={2}>
+            Search results
+          </Title>
+          <SearchField />
+          <Stack gap="md" p={0}>
+            {barometers.map(({ _id, name, manufacturer, images, slug, dating }) => (
+              <SearchItem
+                image={images ? googleStorageImagesFolder + images.at(0) : undefined}
+                name={name}
+                manufacturer={manufacturer?.name}
+                link={barometerRoute + slug}
+                key={_id}
+                dating={dating}
+              />
+            ))}
+          </Stack>
+        </Box>
+        {totalPages > 1 && <Pagination total={totalPages} value={page} />}
+      </Stack>
     </Container>
   )
 }

@@ -6,19 +6,18 @@ import { useEffect } from 'react'
 import { Box, TextInput, BoxProps, CloseButton, ActionIcon, ButtonGroup } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { IconSearch } from '@tabler/icons-react'
 import sx from './search-field.module.scss'
-
-interface SearchProps extends BoxProps {
-  queryString?: string
-}
 
 interface QueryForm extends Record<string, string> {
   q: string
 }
 
-export function SearchField({ queryString, ...props }: SearchProps) {
+const PAGE_SIZE = '6'
+
+export function SearchField(props: BoxProps) {
+  const searchParams = useSearchParams()
   const router = useRouter()
   const form = useForm<QueryForm>({
     initialValues: {
@@ -32,13 +31,13 @@ export function SearchField({ queryString, ...props }: SearchProps) {
 
   // fill querystring from the page to the form
   useEffect(() => {
-    if (!queryString) return
-    form.setValues({ q: queryString })
-  }, [queryString])
+    if (!searchParams.has('q')) return
+    form.setValues({ q: searchParams.get('q') ?? '' })
+  }, [searchParams])
 
   const handleSearch = async ({ q }: QueryForm) => {
     const qs = q.trim()
-    const query = new URLSearchParams({ q: qs })
+    const query = new URLSearchParams({ q: qs, pageSize: PAGE_SIZE })
     router.push(`/search?${query}`, { scroll: true })
   }
   return (

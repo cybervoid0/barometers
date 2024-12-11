@@ -67,7 +67,7 @@ export async function generateMetadata({
  * to be used as static parameters for Next.js static generation.
  */
 export async function generateStaticParams(): Promise<Slug[]> {
-  const barometers = await fetchBarometers()
+  const { barometers } = await fetchBarometers()
   return barometers.map(({ slug, name }) => ({
     slug: slug ?? slugify(name),
   }))

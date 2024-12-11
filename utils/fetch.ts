@@ -1,3 +1,4 @@
+import { PaginationDTO } from '@/app/api/types'
 import { barometersApiRoute, barometerTypesApiRoute } from '@/app/constants'
 import { IBarometer } from '@/models/barometer'
 import { IBarometerType } from '@/models/type'
@@ -10,15 +11,15 @@ export function fetchBarometers(slug: string): Promise<IBarometer>
 /**
  * Returns a full list of barometers in the collection
  */
-export function fetchBarometers(): Promise<IBarometer[]>
+export function fetchBarometers(): Promise<PaginationDTO>
 /**
  * Returns a list of barometers filtered by the query string (type, sort)
  * @param qs - query string parameters
  */
-export function fetchBarometers(qs: Record<string, string>): Promise<IBarometer[]>
+export function fetchBarometers(qs: Record<string, string>): Promise<PaginationDTO>
 export async function fetchBarometers(
   slugOrQs?: string | Record<string, string>,
-): Promise<IBarometer | IBarometer[]> {
+): Promise<IBarometer | PaginationDTO> {
   const input =
     process.env.NEXT_PUBLIC_BASE_URL +
     barometersApiRoute +
@@ -29,7 +30,6 @@ export async function fetchBarometers(
       revalidate: 600,
     },
   })
-  if (!res.ok) throw new Error(res.statusText)
   return res.json()
 }
 

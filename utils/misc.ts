@@ -76,3 +76,16 @@ export function parseDate(dated: string): number[] | null {
 
   return null // if parsing failed
 }
+/* 
+Sorting by date
+
+      case 'date': {
+        if (!a.dating || !b.dating) return 0
+        const yearA = parseDate(a.dating)?.[0]
+        const yearB = parseDate(b.dating)?.[0]
+        if (!yearA || !yearB) return 0
+        const dateA = new Date(yearA, 0, 1).getTime()
+        const dateB = new Date(yearB, 0, 1).getTime()
+        return dateA - dateB
+      }
+*/

@@ -5,6 +5,7 @@ export const twitterAccount = '@barometer_realm'
 // API Routes
 export const barometersApiRoute = '/api/barometers/'
 export const barometerTypesApiRoute = '/api/barometers/types/'
+export const barometersSearchRoute = '/api/barometers/search/'
 export const manufacturersApiRoute = '/api/barometers/manufacturers/'
 export const conditionsApiRoute = '/api/barometers/conditions/'
 export const imageUploadApiRoute = '/api/barometers/upload/images/'
