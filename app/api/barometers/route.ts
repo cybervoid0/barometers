@@ -16,7 +16,7 @@ function getSortCriteria(sortBy: SortValue | null): Record<string, 1 | -1> {
     case 'name':
       return { name: 1 }
     case 'date':
-      return { dating: 1 }
+      return { 'dating.year': 1 }
     case 'cat-no':
       return { collectionId: 1 }
     default:
@@ -96,6 +96,14 @@ async function getBarometersByType(
 }
 
 /**
+ * List all barometers
+ */
+async function getAllBarometers() {
+  const barometers = await Barometer.find().populate(['type', 'condition', 'manufacturer'])
+  return NextResponse.json(barometers, { status: 200 })
+}
+
+/**
  * Get barometer list
  *
  * GET /api/barometers?type=type
@@ -105,10 +113,12 @@ export async function GET(req: NextRequest) {
     await connectMongoose()
     const { searchParams } = req.nextUrl
     const typeName = searchParams.get('type')
-    if (!typeName) throw new Error('Unknown barometer type')
     const sortBy = searchParams.get('sort') as SortValue | null
-    const size = Math.max(Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE, 1)
+    const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
+    // if `type` search param was not passed return all barometers list
+    if (!typeName || !typeName.trim()) return await getAllBarometers()
+    // type was passed
     return await getBarometersByType(typeName, page, size, sortBy)
   } catch (error) {
     return NextResponse.json(
