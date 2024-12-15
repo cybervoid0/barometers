@@ -1,0 +1,91 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id          String      @id @default(uuid())
+  url         String
+  description String?
+  name        String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  categories  Category?   @relation("CategoryImage")
+  barometers  Barometer[] @relation("BarometerImages")
+}
+
+model Category {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String
+  label       String
+  order       Int
+  imageId     String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  barometers  Barometer[]
+  image       Image       @relation("CategoryImage", fields: [imageId], references: [id])
+}
+
+model Barometer {
+  id              String       @id @default(uuid())
+  collectionId    String       @unique
+  name            String       @unique
+  slug            String       @unique
+  description     String
+  conditionId     String
+  date            DateTime
+  dateDescription String
+  manufacturerId  String
+  dimensions      Json?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  categoryId      String
+  category        Category     @relation(fields: [categoryId], references: [id])
+  condition       Condition    @relation(fields: [conditionId], references: [id])
+  manufacturer    Manufacturer @relation(fields: [manufacturerId], references: [id])
+  images          Image[]      @relation("BarometerImages")
+}
+
+model Manufacturer {
+  id          String      @id @default(uuid())
+  name        String
+  country     String?
+  city        String?
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  barometers  Barometer[]
+}
+
+model Condition {
+  id          String      @id @default(uuid())
+  name        String
+  value       Int
+  description String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  barometers  Barometer[]
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String?
+  name      String
+  role      AccessRole
+  avatarURL String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum AccessRole {
+  USER
+  OWNER
+  ADMIN
+}
