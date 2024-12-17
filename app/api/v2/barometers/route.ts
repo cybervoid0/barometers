@@ -24,26 +24,9 @@ function getSortCriteria(
   }
 }
 
-// which barometer fields to include in barometer group responses
-const select: Prisma.BarometerSelect = {
-  name: true,
-  date: true,
-  slug: true,
-  collectionId: true,
-  manufacturer: {
-    select: {
-      name: true,
-    },
-  },
-  category: {
-    select: {
-      name: true,
-    },
-  },
-}
-
 /**
- * Find a list of barometers of a certain type using pagination
+ * Find a list of barometers of a certain category (and other params)
+ * Respond with pagination
  */
 async function getBarometersByParams(
   prisma: PrismaClient,
@@ -64,7 +47,28 @@ async function getBarometersByParams(
   const [barometers, totalItems] = await Promise.all([
     prisma.barometer.findMany({
       where: { categoryId: category.id },
-      select,
+      select: {
+        id: true,
+        name: true,
+        date: true,
+        slug: true,
+        collectionId: true,
+        manufacturer: {
+          select: {
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+          },
+        },
+      },
       skip,
       take: pageSize,
       orderBy,
@@ -72,27 +76,43 @@ async function getBarometersByParams(
     prisma.barometer.count({ where: { categoryId: category.id } }),
   ])
 
-  return NextResponse.json(
-    {
-      barometers,
-      page,
-      totalItems,
-      pageSize,
-      totalPages: Math.ceil(totalItems / pageSize),
-    },
-    { status: barometers.length > 0 ? 200 : 404 },
-  )
+  return {
+    barometers,
+    page,
+    totalItems,
+    pageSize,
+    totalPages: Math.ceil(totalItems / pageSize),
+  }
 }
 
+export type ParameterizedBarometerListDTO = Awaited<ReturnType<typeof getBarometersByParams>>
+
 /**
- * List all barometers without pagination
+ * List all barometers WITHOUT pagination. This is used in static pages generation
  */
 async function getAllBarometers(prisma: PrismaClient) {
-  const barometers = await prisma.barometer.findMany({
-    select,
+  return prisma.barometer.findMany({
+    select: {
+      id: true,
+      name: true,
+      date: true,
+      slug: true,
+      collectionId: true,
+      manufacturer: {
+        select: {
+          name: true,
+        },
+      },
+      category: {
+        select: {
+          name: true,
+        },
+      },
+    },
   })
-  return NextResponse.json(barometers, { status: 200 })
 }
+
+export type BarometerListDTO = Awaited<ReturnType<typeof getAllBarometers>>
 
 /**
  * Get barometer list
@@ -108,9 +128,13 @@ export async function GET(req: NextRequest) {
     const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
     // if `type` search param was not passed return all barometers list
-    if (!category || !category.trim()) return await getAllBarometers(prisma)
+    if (!category || !category.trim()) {
+      const barometers = await getAllBarometers(prisma)
+      return NextResponse.json(barometers, { status: 200 })
+    }
     // type was passed
-    return await getBarometersByParams(prisma, category, page, size, sortBy)
+    const dbResponse = await getBarometersByParams(prisma, category, page, size, sortBy)
+    return NextResponse.json(dbResponse, { status: dbResponse.barometers.length > 0 ? 200 : 404 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Could not retrieve barometer list' },
