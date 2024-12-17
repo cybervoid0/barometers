@@ -2,24 +2,23 @@ import { type Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import capitalize from 'lodash/capitalize'
 import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
+import { AccessRole } from '@prisma/client'
 import { authConfig, getUserByEmail } from '@/utils/auth'
-import { IBarometer } from '@/models/barometer'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ShowError } from '@/app/components/show-error'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
-import { AccessRole } from '@/models/user'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
 import { DescriptionEdit } from './components/edit-fields/description-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
-import { fetchBarometers } from '@/utils/fetch'
+import { fetchBarometer, fetchAllBarometers } from '@/utils/fetch'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
-import { slug as slugify } from '@/utils/misc'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
+import { Dimensions } from '@/app/types'
 
 interface Slug {
   slug: string
@@ -31,7 +30,7 @@ interface BarometerItemProps {
 export async function generateMetadata({
   params: { slug },
 }: BarometerItemProps): Promise<Metadata> {
-  const { description, name, images } = await fetchBarometers(slug)
+  const { description, name, images } = await fetchBarometer(slug)
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
     images &&
@@ -67,9 +66,9 @@ export async function generateMetadata({
  * to be used as static parameters for Next.js static generation.
  */
 export async function generateStaticParams(): Promise<Slug[]> {
-  const barometers = await fetchBarometers()
-  return barometers.map(({ slug, name }) => ({
-    slug: slug ?? slugify(name),
+  const barometers = await fetchAllBarometers()
+  return barometers.map(({ slug }) => ({
+    slug,
   }))
 }
 
@@ -86,18 +85,18 @@ async function isAuthorized(): Promise<boolean> {
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   try {
     const isAdmin = await isAuthorized()
-    const barometer: IBarometer = await fetchBarometers(slug)
-    const { name, images, description, manufacturer, dating, dimensions, condition, collectionId } =
+    const barometer = await fetchBarometer(slug)
+    const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
       barometer
-
+    const dimensions = barometer.dimensions as Dimensions
     return (
       <Container size="xl">
         <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
-          <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.type.name} />
+          <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
           <ImageCarousel
             isAdmin={isAdmin}
             barometer={barometer}
-            images={images?.map(image => googleStorageImagesFolder + image) ?? []}
+            images={images.map(image => googleStorageImagesFolder + image.url)}
           />
           <Box mb="md">
             <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
@@ -127,7 +126,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
               Dating:&nbsp;
             </Title>
             <Title c="dark.3" fw={400} display="inline" order={3}>
-              {dating}
+              {dateDescription}
               {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
             </Title>
           </Box>

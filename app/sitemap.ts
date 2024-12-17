@@ -1,9 +1,7 @@
 import { MetadataRoute } from 'next'
-import { connectMongoose } from '@/utils/mongoose'
-import BarometerType, { type IBarometerType } from '@/models/type'
-import Barometer, { type IBarometer } from '@/models/barometer'
 import { slug as slugify } from '@/utils/misc'
 import { barometerRoute, barometerTypesRoute } from './constants'
+import { getPrismaClient } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -35,8 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 }
 
 async function getItemPages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
-  await connectMongoose()
-  const barometers: IBarometer[] = await Barometer.find()
+  const prisma = getPrismaClient()
+  const barometers = await prisma.barometer.findMany({ select: { slug: true, name: true } })
   return barometers.map(({ slug, name }) => ({
     url: baseUrl + barometerRoute + (slug ?? slugify(name)),
     priority: 0.8,
@@ -44,8 +42,8 @@ async function getItemPages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
   }))
 }
 async function getCategoryPages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
-  await connectMongoose()
-  const categories: IBarometerType[] = await BarometerType.find()
+  const prisma = getPrismaClient()
+  const categories = await prisma.category.findMany({ select: { name: true } })
   return categories.map(({ name }) => ({
     url: baseUrl + barometerTypesRoute + name.toLowerCase(),
     priority: 0.9,

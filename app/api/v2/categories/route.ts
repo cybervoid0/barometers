@@ -1,5 +1,27 @@
 import { NextResponse } from 'next/server'
+import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
+
+async function getCategories(prisma: PrismaClient) {
+  return prisma.category.findMany({
+    orderBy: {
+      order: 'asc',
+    },
+    select: {
+      id: true,
+      name: true,
+      label: true,
+      order: true,
+      image: {
+        select: {
+          url: true,
+        },
+      },
+    },
+  })
+}
+
+export type CategoryListDTO = Awaited<ReturnType<typeof getCategories>>
 
 /**
  * Get Categories list
@@ -7,17 +29,7 @@ import { getPrismaClient } from '@/prisma/prismaClient'
 export async function GET() {
   const prisma = getPrismaClient()
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: {
-        order: 'asc',
-      },
-      select: {
-        id: true,
-        name: true,
-        label: true,
-        order: true,
-      },
-    })
+    const categories = await getCategories(prisma)
     return NextResponse.json(categories, { status: 200 })
   } catch (error) {
     return NextResponse.json(

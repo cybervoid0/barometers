@@ -5,7 +5,7 @@ import { IBarometerCondition } from '@/models/condition'
 import { IBarometerType } from '@/models/type'
 import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { conditionsApiRoute, barometerTypesApiRoute, manufacturersApiRoute } from '@/app/constants'
+import { conditionsApiRoute, categoriesApiRoute, manufacturersApiRoute } from '@/app/constants'
 
 export const useBarometers = () => {
   const queryClient = useQueryClient()
@@ -23,7 +23,7 @@ export const useBarometers = () => {
     isLoading: typesIsLoading,
   } = useQuery<IBarometerType[]>({
     queryKey: ['types'],
-    queryFn: () => axios.get(barometerTypesApiRoute).then(({ data }) => data),
+    queryFn: () => axios.get(categoriesApiRoute).then(({ data }) => data),
   })
   const {
     data: manufacturers,

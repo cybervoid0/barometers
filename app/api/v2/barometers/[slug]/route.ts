@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
 
 interface Params {
@@ -7,26 +8,32 @@ interface Params {
   }
 }
 
+async function getBarometer(prisma: PrismaClient, slug: string) {
+  return prisma.barometer.findFirstOrThrow({
+    where: {
+      slug: {
+        equals: slug,
+        mode: 'insensitive',
+      },
+    },
+    include: {
+      category: true,
+      condition: true,
+      manufacturer: true,
+      images: true,
+    },
+  })
+}
+
+export type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>
+
 /**
  * Get Barometer details by slug
  */
 export async function GET(_req: NextRequest, { params: { slug } }: Params) {
   const prisma = getPrismaClient()
   try {
-    const barometer = await prisma.barometer.findFirst({
-      where: {
-        slug: {
-          equals: slug,
-          mode: 'insensitive',
-        },
-      },
-      include: {
-        category: true,
-        condition: true,
-        manufacturer: true,
-      },
-    })
-    if (barometer === null) return NextResponse.json({}, { status: 404 })
+    const barometer = await getBarometer(prisma, slug)
     return NextResponse.json(barometer, { status: 200 })
   } catch (error) {
     return NextResponse.json(

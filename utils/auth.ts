@@ -1,14 +1,11 @@
 import type { AuthOptions, User } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
-import { connectMongoose } from './mongoose'
-import UserModel, { IUser } from '@/models/user'
+import { getPrismaClient } from '@/prisma/prismaClient'
 
-export async function getUserByEmail(email?: string | null | undefined): Promise<IUser> {
-  await connectMongoose()
-  const user = await UserModel.findOne({
-    email,
-  }).select('+password')
+export async function getUserByEmail(email?: string | null | undefined) {
+  const prisma = getPrismaClient()
+  const user = await prisma.user.findUnique({ where: { email: email ?? undefined } })
   if (!user) throw new Error('User not found')
   return user
 }
@@ -29,7 +26,7 @@ export const authConfig: AuthOptions = {
         const passwordMatch = await bcrypt.compare(credentials.password, user.password)
         if (!passwordMatch) throw new Error('Wrong Password')
         return {
-          id: user._id,
+          id: user.id,
           email: user.email,
           name: user.name,
           image: user.avatarURL,
