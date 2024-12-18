@@ -45,17 +45,15 @@ async function searchBarometers(
     }
   })
 
-  return NextResponse.json(
-    {
-      barometers: barometersWithFirstImage,
-      totalItems,
-      page,
-      totalPages: Math.ceil(totalItems / pageSize),
-      pageSize,
-    },
-    { status: 200 },
-  )
+  return {
+    barometers: barometersWithFirstImage,
+    totalItems,
+    page,
+    totalPages: Math.ceil(totalItems / pageSize),
+    pageSize,
+  }
 }
+export type SearchResultsDTO = Awaited<ReturnType<typeof searchBarometers>>
 
 export async function GET(req: NextRequest) {
   const prisma = getPrismaClient()
@@ -69,7 +67,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json([], { status: 200 })
     }
 
-    return await searchBarometers(prisma, query, page, pageSize)
+    const barometers = await searchBarometers(prisma, query, page, pageSize)
+    return NextResponse.json(barometers, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error searching barometers' },

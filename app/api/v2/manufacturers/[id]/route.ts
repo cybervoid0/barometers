@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
 
 interface Parameters {
@@ -7,17 +8,22 @@ interface Parameters {
   }
 }
 
+async function getManufacturer(prisma: PrismaClient, id: string) {
+  return prisma.manufacturer.findUnique({
+    where: {
+      id,
+    },
+  })
+}
+export type ManufacturerDTO = Awaited<ReturnType<typeof getManufacturer>>
+
 /**
  * Query a specific manufacturer by ID
  */
 export async function GET(req: NextRequest, { params: { id } }: Parameters) {
   const prisma = getPrismaClient()
   try {
-    const manufacturer = await prisma.manufacturer.findUnique({
-      where: {
-        id,
-      },
-    })
+    const manufacturer = await getManufacturer(prisma, id)
     return NextResponse.json(manufacturer, { status: 200 })
   } catch (error) {
     return NextResponse.json(
