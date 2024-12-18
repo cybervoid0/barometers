@@ -9,27 +9,33 @@ import Sort from './sort'
 import { fetchBarometersByCategory, fetchCategory, fetchCategoryList } from '@/utils/fetch'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
+import { Pagination } from '@/app/components/pagination'
 
 interface CollectionProps {
   params: {
-    type: string
+    category: string
   }
   searchParams: {
     sort?: SortValue
+    page?: string
   }
 }
 
-export async function generateMetadata({ params: { type } }: CollectionProps): Promise<Metadata> {
-  const { description } = await fetchCategory(type)
-  const { barometers } = await fetchBarometersByCategory({ category: type, size: 5 })
-  const collectionTitle = `${title}: ${capitalize(type)} Barometers Collection`
+const PAGE_SIZE = 12
+
+export async function generateMetadata({
+  params: { category },
+}: CollectionProps): Promise<Metadata> {
+  const { description } = await fetchCategory(category)
+  const { barometers } = await fetchBarometersByCategory({ category, size: 5 })
+  const collectionTitle = `${title}: ${capitalize(category)} Barometers Collection`
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
       url: googleStorageImagesFolder + images!.at(0),
       alt: name,
     }))
-  const url = barometerTypesRoute + type
+  const url = barometerTypesRoute + category
   return {
     title: collectionTitle,
     description,
@@ -49,22 +55,27 @@ export async function generateMetadata({ params: { type } }: CollectionProps): P
   }
 }
 
-export default async function Collection({ params: { type }, searchParams }: CollectionProps) {
-  const sortBy = searchParams.sort ?? 'date'
-  const { barometers } = await fetchBarometersByCategory({ category: type, sort: sortBy })
-  // selected barometer type details
-  const { description } = await fetchCategory(type)
+export default async function Collection({ params: { category }, searchParams }: CollectionProps) {
+  const sort = searchParams.sort ?? 'date'
+  const page = searchParams.page ?? '1'
+  const { barometers, totalPages } = await fetchBarometersByCategory({
+    category,
+    sort,
+    size: PAGE_SIZE,
+    page,
+  })
+  const { description } = await fetchCategory(category)
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
         <Title mb="sm" fw={500} order={2} tt="capitalize">
-          {type}
+          {category}
         </Title>
         {description && <DescriptionText size="sm" description={description} />}
-        <Sort sortBy={sortBy} style={{ alignSelf: 'flex-end' }} />
+        <Sort sortBy={sort} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer }, i) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={String(id)}>
+            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 8}
                 image={googleStorageImagesFolder + images[0].url}
@@ -75,14 +86,15 @@ export default async function Collection({ params: { type }, searchParams }: Col
             </GridCol>
           ))}
         </Grid>
+        {totalPages > 1 && <Pagination total={totalPages} value={+page} />}
       </Stack>
     </Container>
   )
 }
 
 export async function generateStaticParams() {
-  const barometerTypes = await fetchCategoryList()
-  return barometerTypes.map(({ name }) => ({
-    type: name.toLowerCase(),
+  const categories = await fetchCategoryList()
+  return categories.map(({ name }) => ({
+    category: name.toLowerCase(),
   }))
 }

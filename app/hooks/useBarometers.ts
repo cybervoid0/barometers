@@ -1,11 +1,12 @@
 import { useMemo, useEffect } from 'react'
-import axios, { AxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { IBarometerCondition } from '@/models/condition'
-import { IBarometerType } from '@/models/type'
-import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { conditionsApiRoute, categoriesApiRoute, manufacturersApiRoute } from '@/app/constants'
+import {
+  fetchCategoryList,
+  fetchConditions,
+  fetchManufacturerList,
+  deleteManufacturer,
+} from '@/utils/fetch'
 
 export const useBarometers = () => {
   const queryClient = useQueryClient()
@@ -13,42 +14,37 @@ export const useBarometers = () => {
     data: condition,
     error: conditionError,
     isLoading: conditionIsLoading,
-  } = useQuery<IBarometerCondition[]>({
+  } = useQuery({
     queryKey: ['conditions'],
-    queryFn: () => axios.get(conditionsApiRoute).then(({ data }) => data),
+    queryFn: fetchConditions,
   })
   const {
     data: types,
     error: typesError,
     isLoading: typesIsLoading,
-  } = useQuery<IBarometerType[]>({
+  } = useQuery({
     queryKey: ['types'],
-    queryFn: () => axios.get(categoriesApiRoute).then(({ data }) => data),
+    queryFn: fetchCategoryList,
   })
   const {
     data: manufacturers,
     error: manufacturersError,
     isLoading: manufacturersIsLoading,
-  } = useQuery<IManufacturer[]>({
+  } = useQuery({
     queryKey: ['manufacturers'],
-    queryFn: () => axios.get(manufacturersApiRoute).then(({ data }) => data),
+    queryFn: fetchManufacturerList,
   })
 
-  const { mutate: deleteManufacturer } = useMutation({
-    mutationFn: (id: string) =>
-      axios.delete(`${manufacturersApiRoute}/${id}`).then(({ data }) => data),
+  const { mutate: deleteMnf } = useMutation({
+    mutationFn: deleteManufacturer,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['manufacturers'],
       })
       showInfo('Manufacturer deleted', 'Success')
     },
-    onError: (error: AxiosError) => {
-      showError(
-        (error.response?.data as { message: string })?.message ||
-          error.message ||
-          'Error deleting manufacturer',
-      )
+    onError: error => {
+      showError(error.message || 'Error deleting manufacturer')
     },
   })
 
@@ -71,7 +67,7 @@ export const useBarometers = () => {
       manufacturers: {
         data: manufacturers ?? [],
         isLoading: manufacturersIsLoading,
-        delete: deleteManufacturer,
+        delete: deleteMnf,
       },
     }),
     [
@@ -81,7 +77,7 @@ export const useBarometers = () => {
       typesIsLoading,
       manufacturers,
       manufacturersIsLoading,
-      deleteManufacturer,
+      deleteMnf,
     ],
   )
 }

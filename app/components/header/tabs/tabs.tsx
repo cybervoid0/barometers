@@ -76,9 +76,9 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                 >
                   <Menu.Target>{renderTab()}</Menu.Target>
                   <Menu.Dropdown>
-                    {types.data.map(({ label, _id, name }) => (
+                    {types.data.map(({ label, id, name }) => (
                       <Anchor
-                        key={String(_id)}
+                        key={id}
                         href={barometerTypesRoute + name.toLocaleLowerCase()}
                         component={Link}
                         c="inherit"

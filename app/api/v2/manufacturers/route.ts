@@ -1,5 +1,19 @@
 import { NextResponse, NextRequest } from 'next/server'
+import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
+
+async function getManufacturers(prisma: PrismaClient) {
+  return prisma.manufacturer.findMany({
+    select: {
+      name: true,
+      id: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  })
+}
+export type ManufacturerListDTO = Awaited<ReturnType<typeof getManufacturers>>
 
 /**
  * Retrieve a list of all Manufacturers
@@ -7,15 +21,7 @@ import { getPrismaClient } from '@/prisma/prismaClient'
 export async function GET() {
   const prisma = getPrismaClient()
   try {
-    const manufacturers = await prisma.manufacturer.findMany({
-      select: {
-        name: true,
-        id: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    })
+    const manufacturers = await getManufacturers(prisma)
     return NextResponse.json(manufacturers, { status: 200 })
   } catch (error) {
     return NextResponse.json(

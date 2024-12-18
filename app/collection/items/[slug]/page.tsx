@@ -75,7 +75,9 @@ export async function generateStaticParams(): Promise<Slug[]> {
 async function isAuthorized(): Promise<boolean> {
   try {
     const session = await getServerSession(authConfig)
-    const { role } = await getUserByEmail(session?.user?.email)
+    const email = session?.user?.email
+    if (!email) return false
+    const { role } = await getUserByEmail(email)
     return role === AccessRole.ADMIN
   } catch (error) {
     return false

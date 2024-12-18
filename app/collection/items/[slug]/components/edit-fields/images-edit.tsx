@@ -34,7 +34,7 @@ import {
   googleStorageImagesFolder,
   imageUploadApiRoute,
 } from '@/app/constants'
-import { FileDto, UrlDto } from '@/app/api/barometers/upload/images/types'
+import { FileDto, UrlDto } from '@/app/api/v2/upload/images/types'
 import { showError, showInfo } from '@/utils/notification'
 
 interface ImagesEditProps extends UnstyledButtonProps {
