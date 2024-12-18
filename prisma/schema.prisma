@@ -10,6 +10,7 @@ datasource db {
 
 model Image {
   id          String      @id @default(uuid())
+  order       Int?         @unique
   url         String
   description String?
   name        String?
