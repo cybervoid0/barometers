@@ -28,7 +28,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
   const isLoggedId = status === 'authenticated'
   const [opened, setOpened] = useState<Record<number, boolean>>({})
   const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
-  const { types } = useBarometers()
+  const { categories: types } = useBarometers()
 
   return (
     <Drawer

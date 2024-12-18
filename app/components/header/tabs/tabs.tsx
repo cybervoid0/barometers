@@ -13,7 +13,7 @@ import { useBarometers } from '@/app/hooks/useBarometers'
 import { barometerTypesRoute } from '@/app/constants'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
-  const { types } = useBarometers()
+  const { categories: types } = useBarometers()
   const { status } = useSession()
   const isLoggedId = status === 'authenticated'
   const router = useRouter()

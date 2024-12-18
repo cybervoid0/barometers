@@ -19,7 +19,7 @@ export const useBarometers = () => {
     queryFn: fetchConditions,
   })
   const {
-    data: types,
+    data: categories,
     error: typesError,
     isLoading: typesIsLoading,
   } = useQuery({
@@ -60,8 +60,8 @@ export const useBarometers = () => {
         data: condition ?? [],
         isLoading: conditionIsLoading,
       },
-      types: {
-        data: types ?? [],
+      categories: {
+        data: categories ?? [],
         isLoading: typesIsLoading,
       },
       manufacturers: {
@@ -73,7 +73,7 @@ export const useBarometers = () => {
     [
       condition,
       conditionIsLoading,
-      types,
+      categories,
       typesIsLoading,
       manufacturers,
       manufacturersIsLoading,

@@ -32,7 +32,7 @@ export async function generateMetadata({
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: googleStorageImagesFolder + images!.at(0),
+      url: googleStorageImagesFolder + images.at(0),
       alt: name,
     }))
   const url = barometerTypesRoute + category

@@ -48,6 +48,7 @@ export async function fetchBarometersByCategory({
 export async function searchBarometers(
   searchParams: Record<string, string>,
 ): Promise<SearchResultsDTO> {
+  //! 6 items
   const url = `${baseUrl + barometersSearchRoute}?${new URLSearchParams(searchParams)}`
   const res = await fetch(url, { cache: 'no-cache' })
   return res.json()

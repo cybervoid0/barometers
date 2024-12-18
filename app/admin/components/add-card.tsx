@@ -16,7 +16,7 @@ import { barometersApiRoute } from '@/app/constants'
 
 export function AddCard() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const { condition, types, manufacturers } = useBarometers()
+  const { condition, categories, manufacturers } = useBarometers()
 
   const form = useForm<BarometerFormProps>({
     initialValues: {
@@ -40,7 +40,7 @@ export function AddCard() {
     mutationFn: async (values: BarometerFormProps) => {
       const barometerWithImages = {
         ...values,
-        manufacturer: manufacturers.data.find(({ _id }) => _id === values.manufacturer),
+        manufacturer: manufacturers.data.find(({ id }) => id === values.manufacturer),
         images: uploadedImages.map(image => image.split('/').at(-1)),
       }
       const { data } = await axios.post(barometersApiRoute, barometerWithImages)
@@ -65,15 +65,15 @@ export function AddCard() {
 
   // set default barometer type
   useEffect(() => {
-    if (types.data.length === 0) return
-    form.setFieldValue('type', String(types.data[0]._id))
+    if (categories.data.length === 0) return
+    form.setFieldValue('type', String(categories.data[0].id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [types.data])
+  }, [categories.data])
 
   // set default barometer condition
   useEffect(() => {
     if (condition.data.length === 0) return
-    form.setFieldValue('condition', String(condition.data.at(-1)?._id))
+    form.setFieldValue('condition', String(condition.data.at(-1)?.id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [condition.data])
 
@@ -81,7 +81,7 @@ export function AddCard() {
   useEffect(() => {
     // if there are no manufacturers or manufacturer is already set, do nothing
     if (manufacturers.data.length === 0 || form.values.manufacturer) return
-    form.setFieldValue('manufacturer', String(manufacturers.data[0]._id))
+    form.setFieldValue('manufacturer', String(manufacturers.data[0].id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manufacturers.data])
 
@@ -98,10 +98,11 @@ export function AddCard() {
         <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
         <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
         <TextInput label="Dating" key={form.key('dating')} {...form.getInputProps('dating')} />
+        {/* ! добавить дату */}
         <Select
-          data={types.data.map(({ name, _id }) => ({
+          data={categories.data.map(({ name, id }) => ({
             label: name,
-            value: String(_id),
+            value: id,
           }))}
           label="Type"
           required
@@ -109,9 +110,9 @@ export function AddCard() {
           {...form.getInputProps('type')}
         />
         <Select
-          data={manufacturers.data.map(({ name, _id }) => ({
+          data={manufacturers.data.map(({ name, id }) => ({
             label: name,
-            value: _id!,
+            value: id,
           }))}
           label="Manufacturer"
           allowDeselect={false}
@@ -125,9 +126,9 @@ export function AddCard() {
         />
         <Select
           label="Condition"
-          data={condition.data.map(({ name, _id }) => ({
+          data={condition.data.map(({ name, id }) => ({
             label: name,
-            value: String(_id),
+            value: id,
           }))}
           allowDeselect={false}
           {...form.getInputProps('condition')}
