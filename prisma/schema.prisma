@@ -10,7 +10,6 @@ datasource db {
 
 model Image {
   id          String      @id @default(uuid())
-  order       Int?         @unique
   url         String
   description String?
   name        String?
@@ -18,6 +17,7 @@ model Image {
   updatedAt   DateTime    @updatedAt
   categories  Category?   @relation("CategoryImage")
   barometers  Barometer[] @relation("BarometerImages")
+  order       Int?        
 }
 
 model Category {
