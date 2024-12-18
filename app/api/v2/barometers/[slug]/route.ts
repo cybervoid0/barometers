@@ -20,7 +20,11 @@ async function getBarometer(prisma: PrismaClient, slug: string) {
       category: true,
       condition: true,
       manufacturer: true,
-      images: true,
+      images: {
+        orderBy: {
+          order: 'asc',
+        },
+      },
     },
   })
 }

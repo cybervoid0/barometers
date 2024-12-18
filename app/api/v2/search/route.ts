@@ -23,10 +23,10 @@ async function searchBarometers(
         ],
       },
       select: {
+        id: true,
         name: true,
-        date: true,
+        dateDescription: true,
         slug: true,
-        collectionId: true,
         manufacturer: {
           select: {
             name: true,
@@ -37,7 +37,15 @@ async function searchBarometers(
             name: true,
           },
         },
-        images: true,
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+          take: 1,
+          select: {
+            url: true,
+          },
+        },
       },
       skip,
       take: pageSize,
@@ -76,7 +84,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
     const query = searchParams.get('q')
-    const pageSize = Math.max(Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE, 1)
+    const pageSize = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
 
     if (!query) {

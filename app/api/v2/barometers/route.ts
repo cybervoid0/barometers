@@ -66,6 +66,10 @@ async function getBarometersByParams(
         images: {
           select: {
             url: true,
+            order: true,
+          },
+          orderBy: {
+            order: 'asc',
           },
         },
       },
