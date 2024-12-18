@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
-import { DEFAULT_PAGE_SIZE, select } from '../parameters'
+import { DEFAULT_PAGE_SIZE } from '../parameters'
 
 /**
  * Search barometers matching a query
@@ -22,7 +22,23 @@ async function searchBarometers(
           { description: { contains: query, mode: 'insensitive' } },
         ],
       },
-      select: { ...select, images: true },
+      select: {
+        name: true,
+        date: true,
+        slug: true,
+        collectionId: true,
+        manufacturer: {
+          select: {
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        images: true,
+      },
       skip,
       take: pageSize,
     }),
