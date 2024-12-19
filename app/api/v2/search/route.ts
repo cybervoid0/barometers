@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
-import { DEFAULT_PAGE_SIZE, select } from '../parameters'
+import { DEFAULT_PAGE_SIZE } from '../parameters'
 
 /**
  * Search barometers matching a query
@@ -22,7 +22,31 @@ async function searchBarometers(
           { description: { contains: query, mode: 'insensitive' } },
         ],
       },
-      select: { ...select, images: true },
+      select: {
+        id: true,
+        name: true,
+        dateDescription: true,
+        slug: true,
+        manufacturer: {
+          select: {
+            name: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+          take: 1,
+          select: {
+            url: true,
+          },
+        },
+      },
       skip,
       take: pageSize,
     }),
@@ -60,7 +84,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
     const query = searchParams.get('q')
-    const pageSize = Math.max(Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE, 1)
+    const pageSize = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
 
     if (!query) {
