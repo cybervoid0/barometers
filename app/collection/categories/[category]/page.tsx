@@ -6,10 +6,11 @@ import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
 import Sort from './sort'
-import { fetchBarometersByCategory, fetchCategory, fetchCategoryList } from '@/utils/fetch'
+import { fetchBarometersByCategory, fetchCategory } from '@/utils/fetch'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Pagination } from '@/app/components/pagination'
+import { getPrismaClient } from '@/prisma/prismaClient'
 
 interface CollectionProps {
   params: {
@@ -93,7 +94,8 @@ export default async function Collection({ params: { category }, searchParams }:
 }
 
 export async function generateStaticParams() {
-  const categories = await fetchCategoryList()
+  const prisma = getPrismaClient()
+  const categories = await prisma.category.findMany({ select: { name: true } })
   return categories.map(({ name }) => ({
     category: name.toLowerCase(),
   }))

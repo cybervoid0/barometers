@@ -14,11 +14,12 @@ import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
-import { fetchBarometer, fetchAllBarometers } from '@/utils/fetch'
+import { fetchBarometer } from '@/utils/fetch'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Dimensions } from '@/app/types'
+import { getPrismaClient } from '@/prisma/prismaClient'
 
 interface Slug {
   slug: string
@@ -66,10 +67,7 @@ export async function generateMetadata({
  * to be used as static parameters for Next.js static generation.
  */
 export async function generateStaticParams(): Promise<Slug[]> {
-  const barometers = await fetchAllBarometers()
-  return barometers.map(({ slug }) => ({
-    slug,
-  }))
+  return getPrismaClient().barometer.findMany({ select: { slug: true } })
 }
 
 async function isAuthorized(): Promise<boolean> {
