@@ -1,16 +1,14 @@
 'use client'
 
 import React from 'react'
-import axios, { AxiosError } from 'axios'
 import { Box, Button, TextInput, Title, Textarea, Modal, ActionIcon, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconSquareRoundedPlus } from '@tabler/icons-react'
-import { IManufacturer } from '@/models/manufacturer'
 import { showError, showInfo } from '@/utils/notification'
-import { manufacturersApiRoute } from '@/app/constants'
+import { addManufacturer } from '@/utils/fetch'
 
 interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void
@@ -19,7 +17,7 @@ interface AddManufacturerProps {
 export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   const [opened, { open, close }] = useDisclosure(false)
 
-  const form = useForm<IManufacturer>({
+  const form = useForm({
     initialValues: {
       name: '',
       city: '',
@@ -39,8 +37,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   })
   const queryClient = useQueryClient()
   const { mutate } = useMutation({
-    mutationFn: (values: IManufacturer) =>
-      axios.post(manufacturersApiRoute, values).then(({ data }) => data),
+    mutationFn: addManufacturer,
     onSuccess: ({ id }, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['manufacturers'],
@@ -50,12 +47,8 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
       close()
       showInfo(`${variables.name} has been recorded as a manufacturer #${id ?? 0}`, 'Success')
     },
-    onError: (error: AxiosError) => {
-      showError(
-        (error.response?.data as { message: string })?.message ||
-          error.message ||
-          'Error adding manufacturer',
-      )
+    onError: error => {
+      showError(error.message || 'Error adding manufacturer')
     },
   })
   return (

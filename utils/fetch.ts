@@ -1,3 +1,4 @@
+import { Manufacturer } from '@prisma/client'
 import { SortValue } from '@/app/collection/categories/[category]/types'
 import {
   barometersApiRoute,
@@ -82,4 +83,16 @@ export async function deleteManufacturer(id: string) {
   await fetch(baseUrl + manufacturersApiRoute + id, {
     method: 'DELETE',
   })
+}
+export async function addManufacturer(
+  manufacturer: Partial<Manufacturer>,
+): Promise<{ id: string }> {
+  const res = await fetch(baseUrl + manufacturersApiRoute, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(manufacturer),
+  })
+  return res.json()
 }
