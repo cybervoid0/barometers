@@ -7,6 +7,9 @@ async function getManufacturers(prisma: PrismaClient) {
     select: {
       name: true,
       id: true,
+      city: true,
+      country: true,
+      description: true,
     },
     orderBy: {
       name: 'asc',

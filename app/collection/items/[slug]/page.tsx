@@ -98,7 +98,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           <ImageCarousel
             isAdmin={isAdmin}
             barometer={barometer}
-            images={images.map(image => googleStorageImagesFolder + image.url)}
+            images={images.map(image => googleStorageImagesFolder + image)}
           />
           <Box mb="md">
             <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
@@ -129,7 +129,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </Title>
             <Title c="dark.3" fw={400} display="inline" order={3}>
               {dateDescription}
-              {isAdmin && <TextFieldEdit barometer={barometer} property="dating" />}
+              {isAdmin && <TextFieldEdit barometer={barometer} property="dateDescription" />}
             </Title>
           </Box>
 

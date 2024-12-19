@@ -28,7 +28,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
   const isLoggedId = status === 'authenticated'
   const [opened, setOpened] = useState<Record<number, boolean>>({})
   const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
-  const { categories: types } = useBarometers()
+  const { categories } = useBarometers()
 
   return (
     <Drawer
@@ -81,8 +81,8 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       </List.Item>
                       <Collapse transitionDuration={500} in={opened[i]}>
                         <List px="xl" listStyleType="none">
-                          {types.data.map(({ name, label, _id }) => (
-                            <List.Item pb="sm" key={String(_id)}>
+                          {categories.data.map(({ name, label, id }) => (
+                            <List.Item pb="sm" key={id}>
                               <Anchor
                                 c="inherit"
                                 component={Link}

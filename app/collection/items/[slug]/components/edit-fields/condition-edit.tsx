@@ -11,13 +11,13 @@ import {
   Box,
 } from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
-import { IBarometer } from '@/models/barometer'
+import { BarometerDTO } from '@/app/types'
 import { useEditField } from './useEditField'
 import { useBarometers } from '@/app/hooks/useBarometers'
 
 interface TextFieldEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
-  barometer: IBarometer
+  barometer: BarometerDTO
 }
 
 export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
@@ -42,13 +42,13 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
         <Box component="form" onSubmit={update}>
           <Stack>
             <Select
-              data={condition.data.map(({ name, _id }) => ({
+              data={condition.data.map(({ name, id }) => ({
                 label: name,
-                value: String(_id),
+                value: id,
               }))}
-              value={String(form.values.condition?._id)}
+              value={form.values.condition?.id}
               onChange={id => {
-                const newCondition = condition.data.find(({ _id }) => _id === id)
+                const newCondition = condition.data.find(c => c.id === id)
                 form.setValues({ condition: newCondition })
               }}
               allowDeselect={false}

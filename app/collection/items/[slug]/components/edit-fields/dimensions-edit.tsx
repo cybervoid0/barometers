@@ -19,15 +19,15 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 import { IconEdit, IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
-import { IBarometer } from '@/models/barometer'
+import { BarometerDTO, Dimensions } from '@/app/types'
 import { barometerRoute, barometersApiRoute } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
 
 interface DimFormProps {
-  dimensions: IBarometer['dimensions']
+  dimensions: Dimensions
 }
 interface DimensionEditProps {
-  barometer: IBarometer
+  barometer: BarometerDTO
 }
 
 export default function DimensionEdit({ barometer }: DimensionEditProps) {
@@ -39,7 +39,7 @@ export default function DimensionEdit({ barometer }: DimensionEditProps) {
   })
   // set initial form values on modal open
   useEffect(() => {
-    const { dimensions } = barometer
+    const dimensions = barometer.dimensions as Dimensions | undefined
     if (!dimensions) return
     form.setValues({ dimensions })
     form.resetDirty({ dimensions })
@@ -55,7 +55,7 @@ export default function DimensionEdit({ barometer }: DimensionEditProps) {
         close()
         return
       }
-      const updatedBarometer: IBarometer = {
+      const updatedBarometer: BarometerDTO = {
         ...barometer,
         // keep non-empty entries
         dimensions: dimensions?.filter(({ dim }) => dim),

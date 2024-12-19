@@ -9,7 +9,7 @@ interface Params {
 }
 
 async function getBarometer(prisma: PrismaClient, slug: string) {
-  return prisma.barometer.findFirstOrThrow({
+  const barometer = await prisma.barometer.findFirstOrThrow({
     where: {
       slug: {
         equals: slug,
@@ -18,8 +18,23 @@ async function getBarometer(prisma: PrismaClient, slug: string) {
     },
     include: {
       category: true,
-      condition: true,
-      manufacturer: true,
+      condition: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          value: true,
+        },
+      },
+      manufacturer: {
+        select: {
+          id: true,
+          city: true,
+          name: true,
+          country: true,
+          description: true,
+        },
+      },
       images: {
         orderBy: {
           order: 'asc',
@@ -27,6 +42,11 @@ async function getBarometer(prisma: PrismaClient, slug: string) {
       },
     },
   })
+  return {
+    ...barometer,
+    // temporarily
+    images: barometer.images.map(img => img.url),
+  }
 }
 
 export type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>

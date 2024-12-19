@@ -26,7 +26,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import axios, { AxiosError } from 'axios'
-import { IBarometer } from '@/models/barometer'
+import { BarometerDTO } from '@/app/types'
 import sx from './styles.module.scss'
 import {
   barometerRoute,
@@ -39,7 +39,7 @@ import { showError, showInfo } from '@/utils/notification'
 
 interface ImagesEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
-  barometer: IBarometer
+  barometer: BarometerDTO
 }
 interface FormProps {
   images: string[]
@@ -136,7 +136,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       // erase deleted images
       const extraFiles = barometer.images?.filter(img => !form.values.images.includes(img))
       if (extraFiles) await Promise.all(extraFiles?.map(deleteFromStorage))
-      const updatedBarometer: IBarometer = {
+      const updatedBarometer: BarometerDTO = {
         ...barometer,
         images: form.getValues().images,
       }

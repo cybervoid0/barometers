@@ -4,18 +4,18 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import axios, { AxiosError } from 'axios'
-import { IBarometer } from '@/models/barometer'
+import { BarometerDTO } from '@/app/types'
 import { barometersApiRoute, barometerRoute } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
 
 interface Props {
-  barometer: IBarometer
-  property: keyof IBarometer
-  validate?: (value: IBarometer[keyof IBarometer]) => string | null
+  barometer: BarometerDTO
+  property: keyof BarometerDTO
+  validate?: (value: BarometerDTO[keyof BarometerDTO]) => string | null
 }
 
 export function useEditField({ property, barometer, validate }: Props) {
-  const form = useForm<Partial<IBarometer>>({
+  const form = useForm<Partial<BarometerDTO>>({
     initialValues: { [property]: '' },
     validate: {
       [property]: validate,
