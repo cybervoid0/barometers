@@ -2,11 +2,13 @@ import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { barometerTypesRoute } from './constants'
-import { fetchCategoryList } from '@/utils/fetch'
 import { SearchField } from './components/search-field'
+import { getPrismaClient } from '@/prisma/prismaClient'
+import { getCategories } from './api/v2/categories/getters'
 
 export default async function HomePage() {
-  const categories = await fetchCategoryList()
+  const prisma = getPrismaClient()
+  const categories = await getCategories(prisma)
   return (
     <>
       <HeadingImage />

@@ -5,7 +5,6 @@ import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
 import { AccessRole } from '@prisma/client'
 import { authConfig, getUserByEmail } from '@/utils/auth'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
-import { ShowError } from '@/app/components/show-error'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
@@ -88,95 +87,89 @@ async function isAuthorized(): Promise<boolean> {
 }
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
-  try {
-    const prisma = getPrismaClient()
-    const isAdmin = await isAuthorized()
-    const barometer = await getBarometer(prisma, slug)
-    await prisma.$disconnect()
-    const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
-      barometer
-    const dimensions = barometer.dimensions as Dimensions
-    return (
-      <Container size="xl">
-        <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
-          <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
-          <ImageCarousel
-            isAdmin={isAdmin}
-            barometer={barometer}
-            images={images.map(image => googleStorageImagesFolder + image)}
-          />
-          <Box mb="md">
-            <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
-            <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
-              {name.split(' ').at(-1)}
-              {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
-            </Title>
-            <Tooltip label="Collection ID">
-              <Text className={sx.collectionId}>{collectionId}</Text>
-            </Tooltip>
-          </Box>
+  const prisma = getPrismaClient()
+  const isAdmin = await isAuthorized()
+  const barometer = await getBarometer(prisma, slug)
+  await prisma.$disconnect()
+  const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
+    barometer
+  const dimensions = barometer.dimensions as Dimensions
+  return (
+    <Container size="xl">
+      <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
+        <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
+        <ImageCarousel
+          isAdmin={isAdmin}
+          barometer={barometer}
+          images={images.map(image => googleStorageImagesFolder + image)}
+        />
+        <Box mb="md">
+          <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
+          <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
+            {name.split(' ').at(-1)}
+            {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
+          </Title>
+          <Tooltip label="Collection ID">
+            <Text className={sx.collectionId}>{collectionId}</Text>
+          </Tooltip>
+        </Box>
 
-          {manufacturer && (
-            <Box>
-              <Title fw={500} display="inline" order={3}>
-                Manufacturer/Retailer:&nbsp;
-              </Title>
-              <Title c="dark.3" fw={400} display="inline" order={3}>
-                {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
-                {isAdmin && <ManufacturerEdit barometer={barometer} />}
-              </Title>
-            </Box>
-          )}
-
+        {manufacturer && (
           <Box>
             <Title fw={500} display="inline" order={3}>
-              Dating:&nbsp;
+              Manufacturer/Retailer:&nbsp;
             </Title>
             <Title c="dark.3" fw={400} display="inline" order={3}>
-              {dateDescription}
-              {isAdmin && <TextFieldEdit barometer={barometer} property="dateDescription" />}
+              {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
+              {isAdmin && <ManufacturerEdit barometer={barometer} />}
             </Title>
           </Box>
+        )}
 
-          {dimensions && dimensions.length > 0 && (
-            <Box>
-              <Title fw={500} order={3}>
-                Dimensions:{' '}
-                {dimensions.map((dimension, index, arr) => (
-                  <Text c="dark.3" display="inline" key={index}>
-                    {dimension.dim} {dimension.value}
-                    {index < arr.length - 1 ? ', ' : ''}
-                  </Text>
-                ))}
-                {isAdmin && <DimensionEdit barometer={barometer} />}
-              </Title>
-            </Box>
-          )}
-
-          <Condition
-            condition={condition}
-            editButton={isAdmin && <ConditionEdit barometer={barometer} />}
-          />
-
-          <Divider
-            mx="lg"
-            my="lg"
-            {...(isAdmin && {
-              label: <DescriptionEdit barometer={barometer} />,
-              labelPosition: 'right',
-            })}
-          />
-          {description ? (
-            <DescriptionText description={description} />
-          ) : (
-            isAdmin && <Text>Add description</Text>
-          )}
+        <Box>
+          <Title fw={500} display="inline" order={3}>
+            Dating:&nbsp;
+          </Title>
+          <Title c="dark.3" fw={400} display="inline" order={3}>
+            {dateDescription}
+            {isAdmin && <TextFieldEdit barometer={barometer} property="dateDescription" />}
+          </Title>
         </Box>
-      </Container>
-    )
-  } catch (error) {
-    return (
-      <ShowError message={error instanceof Error ? error.message : 'Error fetching barometer'} />
-    )
-  }
+
+        {dimensions && dimensions.length > 0 && (
+          <Box>
+            <Title fw={500} order={3}>
+              Dimensions:{' '}
+              {dimensions.map((dimension, index, arr) => (
+                <Text c="dark.3" display="inline" key={index}>
+                  {dimension.dim} {dimension.value}
+                  {index < arr.length - 1 ? ', ' : ''}
+                </Text>
+              ))}
+              {isAdmin && <DimensionEdit barometer={barometer} />}
+            </Title>
+          </Box>
+        )}
+
+        <Condition
+          condition={condition}
+          editButton={isAdmin && <ConditionEdit barometer={barometer} />}
+        />
+
+        <Divider
+          mx="lg"
+          my="lg"
+          {...(isAdmin && {
+            label: <DescriptionEdit barometer={barometer} />,
+            labelPosition: 'right',
+          })}
+        />
+        {description ? (
+          <DescriptionText description={description} />
+        ) : (
+          isAdmin && <Text>Add description</Text>
+        )}
+      </Box>
+    </Container>
+  )
 }
