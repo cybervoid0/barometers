@@ -1,21 +1,12 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
+import { getManufacturer } from './getters'
 
 interface Parameters {
   params: {
     id: string
   }
 }
-
-async function getManufacturer(prisma: PrismaClient, id: string) {
-  return prisma.manufacturer.findUnique({
-    where: {
-      id,
-    },
-  })
-}
-export type ManufacturerDTO = Awaited<ReturnType<typeof getManufacturer>>
 
 /**
  * Query a specific manufacturer by ID

@@ -14,12 +14,12 @@ import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 import sx from './styles.module.scss'
-import { fetchBarometer } from '@/utils/fetch'
 import DimensionEdit from './components/edit-fields/dimensions-edit'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Dimensions } from '@/app/types'
 import { getPrismaClient } from '@/prisma/prismaClient'
+import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 
 interface Slug {
   slug: string
@@ -31,7 +31,9 @@ interface BarometerItemProps {
 export async function generateMetadata({
   params: { slug },
 }: BarometerItemProps): Promise<Metadata> {
-  const { description, name, images } = await fetchBarometer(slug)
+  const prisma = getPrismaClient()
+  const { description, name, images } = await getBarometer(prisma, slug)
+  await prisma.$disconnect()
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
     images &&
@@ -67,7 +69,10 @@ export async function generateMetadata({
  * to be used as static parameters for Next.js static generation.
  */
 export async function generateStaticParams(): Promise<Slug[]> {
-  return getPrismaClient().barometer.findMany({ select: { slug: true } })
+  const prisma = getPrismaClient()
+  const barometers = await prisma.barometer.findMany({ select: { slug: true } })
+  await prisma.$disconnect()
+  return barometers
 }
 
 async function isAuthorized(): Promise<boolean> {
@@ -84,8 +89,10 @@ async function isAuthorized(): Promise<boolean> {
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   try {
+    const prisma = getPrismaClient()
     const isAdmin = await isAuthorized()
-    const barometer = await fetchBarometer(slug)
+    const barometer = await getBarometer(prisma, slug)
+    await prisma.$disconnect()
     const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
       barometer
     const dimensions = barometer.dimensions as Dimensions

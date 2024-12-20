@@ -1,22 +1,7 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
+import { getConditions } from './getters'
 
-async function getConditions(prisma: PrismaClient) {
-  return prisma.condition.findMany({
-    orderBy: {
-      value: 'asc',
-    },
-    select: {
-      id: true,
-      name: true,
-      value: true,
-      description: true,
-    },
-  })
-}
-
-export type ConditionListDTO = Awaited<ReturnType<typeof getConditions>>
 /**
  * Get list of possible barometer Conditions
  */

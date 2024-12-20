@@ -1,37 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
+import { getCategory } from './getters'
 
 interface Params {
   params: {
     name: string
   }
 }
-
-async function getCategory(prisma: PrismaClient, name: string) {
-  return prisma.category.findFirstOrThrow({
-    where: {
-      name: {
-        equals: name,
-        mode: 'insensitive',
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      order: true,
-      label: true,
-      image: {
-        select: {
-          url: true,
-        },
-      },
-    },
-  })
-}
-
-export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
 
 /**
  * Get Category details

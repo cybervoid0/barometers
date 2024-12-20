@@ -6,11 +6,12 @@ import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue } from './types'
 import Sort from './sort'
-import { fetchBarometersByCategory, fetchCategory } from '@/utils/fetch'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Pagination } from '@/app/components/pagination'
 import { getPrismaClient } from '@/prisma/prismaClient'
+import { getCategory } from '@/app/api/v2/categories/[name]/getters'
+import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
 
 interface CollectionProps {
   params: {
@@ -27,8 +28,10 @@ const PAGE_SIZE = 12
 export async function generateMetadata({
   params: { category },
 }: CollectionProps): Promise<Metadata> {
-  const { description } = await fetchCategory(category)
-  const { barometers } = await fetchBarometersByCategory({ category, size: 5 })
+  const prisma = getPrismaClient()
+  const { description } = await getCategory(prisma, category)
+  const { barometers } = await getBarometersByParams(prisma, category, 1, 5, 'date')
+  await prisma.$disconnect()
   const collectionTitle = `${title}: ${capitalize(category)} Barometers Collection`
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
@@ -57,15 +60,18 @@ export async function generateMetadata({
 }
 
 export default async function Collection({ params: { category }, searchParams }: CollectionProps) {
+  const prisma = getPrismaClient()
   const sort = searchParams.sort ?? 'date'
   const page = searchParams.page ?? '1'
-  const { barometers, totalPages } = await fetchBarometersByCategory({
+  const { barometers, totalPages } = await getBarometersByParams(
+    prisma,
     category,
+    +page,
+    PAGE_SIZE,
     sort,
-    size: PAGE_SIZE,
-    page,
-  })
-  const { description } = await fetchCategory(category)
+  )
+  const { description } = await getCategory(prisma, category)
+  await prisma.$disconnect()
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
@@ -96,6 +102,7 @@ export default async function Collection({ params: { category }, searchParams }:
 export async function generateStaticParams() {
   const prisma = getPrismaClient()
   const categories = await prisma.category.findMany({ select: { name: true } })
+  await prisma.$disconnect()
   return categories.map(({ name }) => ({
     category: name.toLowerCase(),
   }))

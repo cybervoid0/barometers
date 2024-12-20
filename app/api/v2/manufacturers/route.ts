@@ -1,22 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { type PrismaClient } from '@prisma/client'
 import { getPrismaClient } from '@/prisma/prismaClient'
-
-async function getManufacturers(prisma: PrismaClient) {
-  return prisma.manufacturer.findMany({
-    select: {
-      name: true,
-      id: true,
-      city: true,
-      country: true,
-      description: true,
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
-}
-export type ManufacturerListDTO = Awaited<ReturnType<typeof getManufacturers>>
+import { getManufacturers } from './getters'
 
 /**
  * Retrieve a list of all Manufacturers
