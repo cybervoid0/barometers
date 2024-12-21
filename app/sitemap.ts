@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 import { slug as slugify } from '@/utils/misc'
 import { barometerRoute, barometerTypesRoute } from './constants'
-import { getPrismaClient } from '@/prisma/prismaClient'
+import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -31,22 +31,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 }
-
-async function getItemPages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
-  const prisma = getPrismaClient()
-  const barometers = await prisma.barometer.findMany({ select: { slug: true, name: true } })
-  return barometers.map(({ slug, name }) => ({
-    url: baseUrl + barometerRoute + (slug ?? slugify(name)),
-    priority: 0.8,
-    lastModified: new Date(),
-  }))
-}
-async function getCategoryPages(baseUrl: string): Promise<MetadataRoute.Sitemap> {
-  const prisma = getPrismaClient()
-  const categories = await prisma.category.findMany({ select: { name: true } })
-  return categories.map(({ name }) => ({
-    url: baseUrl + barometerTypesRoute + name.toLowerCase(),
-    priority: 0.9,
-    lastModified: new Date(),
-  }))
-}
+/* eslint-disable prettier/prettier */
+export const getItemPages = withPrisma(
+  async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
+    const barometers = await prisma.barometer.findMany({ select: { slug: true, name: true } })
+    return barometers.map(({ slug, name }) => ({
+      url: baseUrl + barometerRoute + (slug ?? slugify(name)),
+      priority: 0.8,
+      lastModified: new Date(),
+    }))
+  },
+)
+export const getCategoryPages = withPrisma(
+  async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
+    const categories = await prisma.category.findMany({ select: { name: true } })
+    return categories.map(({ name }) => ({
+      url: baseUrl + barometerTypesRoute + name.toLowerCase(),
+      priority: 0.9,
+      lastModified: new Date(),
+    }))
+  },
+)

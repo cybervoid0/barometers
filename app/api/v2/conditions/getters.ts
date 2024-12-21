@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getConditions(prisma: PrismaClient) {
-  return prisma.condition.findMany({
+export const getConditions = withPrisma(prisma =>
+  prisma.condition.findMany({
     orderBy: {
       value: 'asc',
     },
@@ -11,7 +11,7 @@ export async function getConditions(prisma: PrismaClient) {
       value: true,
       description: true,
     },
-  })
-}
+  }),
+)
 
 export type ConditionListDTO = Awaited<ReturnType<typeof getConditions>>

@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getCategories(prisma: PrismaClient) {
-  return prisma.category.findMany({
+export const getCategories = withPrisma(prisma =>
+  prisma.category.findMany({
     orderBy: {
       order: 'asc',
     },
@@ -16,7 +16,7 @@ export async function getCategories(prisma: PrismaClient) {
         },
       },
     },
-  })
-}
+  }),
+)
 
 export type CategoryListDTO = Awaited<ReturnType<typeof getCategories>>

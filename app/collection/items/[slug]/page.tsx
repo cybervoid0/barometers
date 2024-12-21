@@ -17,7 +17,7 @@ import DimensionEdit from './components/edit-fields/dimensions-edit'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Dimensions } from '@/app/types'
-import { getPrismaClient } from '@/prisma/prismaClient'
+import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 
 interface Slug {
@@ -30,9 +30,7 @@ interface BarometerItemProps {
 export async function generateMetadata({
   params: { slug },
 }: BarometerItemProps): Promise<Metadata> {
-  const prisma = getPrismaClient()
-  const { description, name, images } = await getBarometer(prisma, slug)
-  await prisma.$disconnect()
+  const { description, name, images } = await getBarometer(slug)
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
     images &&
@@ -67,12 +65,9 @@ export async function generateMetadata({
  * This function fetches all barometers from the API and maps their slugs
  * to be used as static parameters for Next.js static generation.
  */
-export async function generateStaticParams(): Promise<Slug[]> {
-  const prisma = getPrismaClient()
-  const barometers = await prisma.barometer.findMany({ select: { slug: true } })
-  await prisma.$disconnect()
-  return barometers
-}
+export const generateStaticParams = withPrisma(prisma =>
+  prisma.barometer.findMany({ select: { slug: true } }),
+)
 
 async function isAuthorized(): Promise<boolean> {
   try {
@@ -87,10 +82,8 @@ async function isAuthorized(): Promise<boolean> {
 }
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
-  const prisma = getPrismaClient()
   const isAdmin = await isAuthorized()
-  const barometer = await getBarometer(prisma, slug)
-  await prisma.$disconnect()
+  const barometer = await getBarometer(slug)
   const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
     barometer
   const dimensions = barometer.dimensions as Dimensions

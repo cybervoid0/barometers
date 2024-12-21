@@ -9,7 +9,7 @@ import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Pagination } from '@/app/components/pagination'
-import { getPrismaClient } from '@/prisma/prismaClient'
+import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
 
@@ -28,10 +28,8 @@ const PAGE_SIZE = 12
 export async function generateMetadata({
   params: { category },
 }: CollectionProps): Promise<Metadata> {
-  const prisma = getPrismaClient()
-  const { description } = await getCategory(prisma, category)
-  const { barometers } = await getBarometersByParams(prisma, category, 1, 5, 'date')
-  await prisma.$disconnect()
+  const { description } = await getCategory(category)
+  const { barometers } = await getBarometersByParams(category, 1, 5, 'date')
   const collectionTitle = `${title}: ${capitalize(category)} Barometers Collection`
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
@@ -60,18 +58,10 @@ export async function generateMetadata({
 }
 
 export default async function Collection({ params: { category }, searchParams }: CollectionProps) {
-  const prisma = getPrismaClient()
   const sort = searchParams.sort ?? 'date'
   const page = searchParams.page ?? '1'
-  const { barometers, totalPages } = await getBarometersByParams(
-    prisma,
-    category,
-    +page,
-    PAGE_SIZE,
-    sort,
-  )
-  const { description } = await getCategory(prisma, category)
-  await prisma.$disconnect()
+  const { barometers, totalPages } = await getBarometersByParams(category, +page, PAGE_SIZE, sort)
+  const { description } = await getCategory(category)
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
@@ -99,11 +89,9 @@ export default async function Collection({ params: { category }, searchParams }:
   )
 }
 
-export async function generateStaticParams() {
-  const prisma = getPrismaClient()
+export const generateStaticParams = withPrisma(async prisma => {
   const categories = await prisma.category.findMany({ select: { name: true } })
-  await prisma.$disconnect()
   return categories.map(({ name }) => ({
     category: name.toLowerCase(),
   }))
-}
+})

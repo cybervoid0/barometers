@@ -1,5 +1,6 @@
-import { type Prisma, type PrismaClient } from '@prisma/client'
+import { type Prisma } from '@prisma/client'
 import { SortValue } from '@/app/collection/categories/[category]/types'
+import { withPrisma } from '@/prisma/prismaClient'
 
 function getSortCriteria(
   sortBy: SortValue | null,
@@ -23,74 +24,76 @@ function getSortCriteria(
  * Find a list of barometers of a certain category (and other params)
  * Respond with pagination
  */
-export async function getBarometersByParams(
-  prisma: PrismaClient,
-  categoryName: string,
-  page: number,
-  pageSize: number,
-  sortBy: SortValue | null,
-) {
-  // perform case-insensitive compare with the stored categories
-  const category = await prisma.category.findFirst({
-    where: { name: { equals: categoryName, mode: 'insensitive' } },
-  })
-  if (!category) throw new Error('Unknown barometer category')
+export const getBarometersByParams = withPrisma(
+  async (
+    prisma,
+    categoryName: string,
+    page: number,
+    pageSize: number,
+    sortBy: SortValue | null,
+  ) => {
+    // perform case-insensitive compare with the stored categories
+    const category = await prisma.category.findFirst({
+      where: { name: { equals: categoryName, mode: 'insensitive' } },
+    })
+    if (!category) throw new Error('Unknown barometer category')
 
-  const skip = (page - 1) * pageSize
-  const orderBy = getSortCriteria(sortBy)
+    const skip = (page - 1) * pageSize
+    const orderBy = getSortCriteria(sortBy)
 
-  const [barometers, totalItems] = await Promise.all([
-    prisma.barometer.findMany({
-      where: { categoryId: category.id },
-      select: {
-        id: true,
-        name: true,
-        date: true,
-        slug: true,
-        collectionId: true,
-        manufacturer: {
-          select: {
-            name: true,
+    const [barometers, totalItems] = await Promise.all([
+      prisma.barometer.findMany({
+        where: { categoryId: category.id },
+        select: {
+          id: true,
+          name: true,
+          date: true,
+          slug: true,
+          collectionId: true,
+          manufacturer: {
+            select: {
+              name: true,
+            },
+          },
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          images: {
+            select: {
+              url: true,
+              order: true,
+            },
+            orderBy: {
+              order: 'asc',
+            },
           },
         },
-        category: {
-          select: {
-            name: true,
-          },
-        },
-        images: {
-          select: {
-            url: true,
-            order: true,
-          },
-          orderBy: {
-            order: 'asc',
-          },
-        },
-      },
-      skip,
-      take: pageSize,
-      orderBy,
-    }),
-    prisma.barometer.count({ where: { categoryId: category.id } }),
-  ])
+        skip,
+        take: pageSize,
+        orderBy,
+      }),
+      prisma.barometer.count({ where: { categoryId: category.id } }),
+    ])
 
-  return {
-    barometers,
-    page,
-    totalItems,
-    pageSize,
-    totalPages: Math.ceil(totalItems / pageSize),
-  }
-}
+    return {
+      barometers,
+      page,
+      totalItems,
+      pageSize,
+      totalPages: Math.ceil(totalItems / pageSize),
+    }
+  },
+)
 
 export type ParameterizedBarometerListDTO = Awaited<ReturnType<typeof getBarometersByParams>>
 
 /**
  * List all barometers WITHOUT pagination. This is used in static pages generation
  */
-export async function getAllBarometers(prisma: PrismaClient) {
-  return prisma.barometer.findMany({
+export const getAllBarometers = withPrisma(prisma =>
+  prisma.barometer.findMany({
     select: {
       id: true,
       name: true,
@@ -108,7 +111,7 @@ export async function getAllBarometers(prisma: PrismaClient) {
         },
       },
     },
-  })
-}
+  }),
+)
 
 export type BarometerListDTO = Awaited<ReturnType<typeof getAllBarometers>>

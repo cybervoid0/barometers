@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getCategory(prisma: PrismaClient, name: string) {
-  return prisma.category.findFirstOrThrow({
+export const getCategory = withPrisma((prisma, name: string) =>
+  prisma.category.findFirstOrThrow({
     where: {
       name: {
         equals: name,
@@ -20,7 +20,7 @@ export async function getCategory(prisma: PrismaClient, name: string) {
         },
       },
     },
-  })
-}
+  }),
+)
 
 export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>

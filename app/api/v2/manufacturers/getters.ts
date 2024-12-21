@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getManufacturers(prisma: PrismaClient) {
-  return prisma.manufacturer.findMany({
+export const getManufacturers = withPrisma(prisma =>
+  prisma.manufacturer.findMany({
     select: {
       name: true,
       id: true,
@@ -12,6 +12,7 @@ export async function getManufacturers(prisma: PrismaClient) {
     orderBy: {
       name: 'asc',
     },
-  })
-}
+  }),
+)
+
 export type ManufacturerListDTO = Awaited<ReturnType<typeof getManufacturers>>

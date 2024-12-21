@@ -3,12 +3,10 @@ import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { barometerTypesRoute } from './constants'
 import { SearchField } from './components/search-field'
-import { getPrismaClient } from '@/prisma/prismaClient'
 import { getCategories } from './api/v2/categories/getters'
 
 export default async function HomePage() {
-  const prisma = getPrismaClient()
-  const categories = await getCategories(prisma)
+  const categories = await getCategories()
   return (
     <>
       <HeadingImage />

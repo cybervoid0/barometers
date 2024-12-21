@@ -1,14 +1,11 @@
 import type { AuthOptions, User } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
-import { getPrismaClient } from '@/prisma/prismaClient'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getUserByEmail(email?: string | null | undefined) {
-  const prisma = getPrismaClient()
-  const user = await prisma.user.findUnique({ where: { email: email ?? undefined } })
-  if (!user) throw new Error('User not found')
-  return user
-}
+export const getUserByEmail = withPrisma((prisma, email?: string | null | undefined) =>
+  prisma.user.findUniqueOrThrow({ where: { email: email ?? undefined } }),
+)
 
 export const authConfig: AuthOptions = {
   providers: [

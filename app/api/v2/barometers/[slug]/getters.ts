@@ -1,6 +1,6 @@
-import { type PrismaClient } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export async function getBarometer(prisma: PrismaClient, slug: string) {
+export const getBarometer = withPrisma(async (prisma, slug: string) => {
   const barometer = await prisma.barometer.findFirstOrThrow({
     where: {
       slug: {
@@ -39,6 +39,6 @@ export async function getBarometer(prisma: PrismaClient, slug: string) {
     // temporarily
     images: barometer.images.map(img => img.url),
   }
-}
+})
 
 export type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>
