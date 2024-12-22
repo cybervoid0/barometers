@@ -6,6 +6,7 @@ import {
   categoriesApiRoute,
   conditionsApiRoute,
   manufacturersApiRoute,
+  imageUploadApiRoute,
 } from '@/app/constants'
 import type {
   BarometerListDTO,
@@ -18,6 +19,8 @@ import type {
   ManufacturerDTO,
   SearchResultsDTO,
 } from '@/app/types'
+import { handleApiError } from './misc'
+import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
@@ -52,6 +55,17 @@ export async function searchBarometers(
   const pageSize = '6'
   const url = `${baseUrl + barometersSearchRoute}?${new URLSearchParams({ ...searchParams, size: pageSize })}`
   const res = await fetch(url, { cache: 'no-cache' })
+  return res.json()
+}
+export async function createBarometer<T>(barometer: T): Promise<{ id: string }> {
+  const res = await fetch(baseUrl + barometersApiRoute, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(barometer),
+  })
+  if (!res.ok) await handleApiError(res)
   return res.json()
 }
 /******* Categories ********/
@@ -94,5 +108,34 @@ export async function addManufacturer(
     },
     body: JSON.stringify(manufacturer),
   })
+  if (!res.ok) await handleApiError(res)
   return res.json()
+}
+/******* Images ********/
+export async function createImageUrls(files: FileProps[]): Promise<UrlDto> {
+  const res = await fetch(imageUploadApiRoute, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ files }),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
+export async function uploadFileToCloud(url: string, file: File) {
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type,
+    },
+    body: file,
+  })
+  if (!res.ok) await handleApiError(res)
+}
+export async function deleteImage(fileName: string) {
+  const res = await fetch(`${imageUploadApiRoute}?fileName=${fileName}`, {
+    method: 'DELETE',
+  })
+  if (!res.ok) await handleApiError(res)
 }

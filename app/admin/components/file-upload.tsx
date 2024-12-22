@@ -1,6 +1,6 @@
 'use client'
 
-import { Dispatch, SetStateAction, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import {
   CloseButton,
   Fieldset,
@@ -11,56 +11,43 @@ import {
   Group,
   Paper,
   Tooltip,
+  Text,
 } from '@mantine/core'
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
-import axios, { AxiosError } from 'axios'
 import { showError } from '@/utils/notification'
-import { FileDto, UrlDto } from '@/app/api/v2/upload/images/types'
-import { imageUploadApiRoute } from '@/app/constants'
+import { deleteImage, uploadFileToCloud, createImageUrls } from '@/utils/fetch'
 
 interface FileUploadProps {
   fileNames: string[]
-  setFileNames: Dispatch<SetStateAction<string[]>>
+  setFileNames: (names: string[]) => void
+  validateError?: ReactNode
+  clearValidateError?: () => void
 }
-export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
+export function FileUpload({
+  setFileNames,
+  fileNames,
+  validateError,
+  clearValidateError,
+}: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
 
-  // upload images to Google cloud
   const googleUploadImages = async (files: File[] | null) => {
+    if (clearValidateError) clearValidateError()
     if (!files || !Array.isArray(files) || files.length === 0) return
     setIsUploading(true)
     try {
-      const {
-        data: { urls },
-      } = await axios.post<UrlDto>(
-        imageUploadApiRoute,
-        {
-          files: files.map(file => ({
-            fileName: file.name,
-            contentType: file.type,
-          })),
-        } as FileDto,
-        { headers: { 'Content-Type': 'application/json' } },
+      const urlsDto = await createImageUrls(
+        files.map(file => ({
+          fileName: file.name,
+          contentType: file.type,
+        })),
       )
-      // upload all files concurrently
       await Promise.all(
-        urls.map(async ({ signed }, index) => {
-          const file = files[index]
-          await axios.put(signed, file, {
-            headers: {
-              'Content-Type': file.type,
-            },
-          })
-        }),
+        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
       )
-      setFileNames(old => [...old, ...urls.map(url => url.public)])
+      setFileNames([...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)])
     } catch (error) {
-      const defaultErrMsg = 'Error uploading files'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      showError(error instanceof Error ? error.message : 'Error uploading files')
     } finally {
       setIsUploading(false)
     }
@@ -68,22 +55,15 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
 
   const handleDeleteFile = async (index: number) => {
     const fileName = fileNames.at(index)?.split('/').at(-1)
+    if (!fileName) return
     try {
-      await axios.delete(imageUploadApiRoute, {
-        params: {
-          fileName,
-        },
-      })
-      setFileNames(old => [...old].filter((_, i) => i !== index))
+      await deleteImage(fileName)
+      setFileNames(fileNames.filter((_, i) => i !== index))
     } catch (error) {
-      const defaultErrMsg = 'Error deleting file'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      showError(error instanceof Error ? error.message : 'Error deleting file')
     }
   }
+
   return (
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
       <Stack gap="xs" align="flex-start">
@@ -118,6 +98,11 @@ export function FileUpload({ setFileNames, fileNames }: FileUploadProps) {
           </Group>
         </Group>
       </Stack>
+      {validateError && (
+        <Text mt="xs" size="xs" c="red">
+          {validateError}
+        </Text>
+      )}
     </Fieldset>
   )
 }

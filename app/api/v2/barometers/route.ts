@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import type { Barometer } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
-import { cleanObject, slug as slugify } from '@/utils/misc'
+import { cleanObject } from '@/utils/misc'
 import { type SortValue } from '@/app/collection/categories/[category]/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getAllBarometers, getBarometersByParams } from './getters'
@@ -43,19 +43,22 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const barometerData: Barometer = await req.json()
-    const cleanData = cleanObject(barometerData)
-    const slug = slugify(cleanData.name)
-    const newBarometer = await prisma.barometer.create({
+    const barometerData = await req.json()
+    const { images, ...barometer } = cleanObject(barometerData)
+    const { id } = await prisma.barometer.create({
       data: {
-        ...cleanData,
-        slug,
-        dimensions: cleanData.dimensions?.toString(),
+        ...barometer,
+        images: {
+          create: images,
+        },
       },
     })
     revalidatePath('/')
-    return NextResponse.json({ id: newBarometer.id }, { status: 201 })
+    return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json({ message: error.message }, { status: 400 })
+    }
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error adding new barometer' },
       { status: 500 },
@@ -71,18 +74,23 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const barometerData: Barometer = await req.json()
-    const slug = slugify(barometerData.name)
-    await prisma.barometer.update({
-      where: { id: barometerData.id },
-      data: {
-        ...barometerData,
-        slug,
-        dimensions: barometerData.dimensions?.toString(),
-      },
+    const barometerData = await req.json()
+    const { images, id, ...barometer } = cleanObject(barometerData)
+    // transaction will prevent deleting images in case barometer update fails
+    await prisma.$transaction(async tx => {
+      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+      await tx.barometer.update({
+        where: { id },
+        data: {
+          ...barometer,
+          images: {
+            create: images,
+          },
+        },
+      })
     })
-    revalidatePath(`/collection/items/${slug}`)
-    return NextResponse.json({ slug }, { status: 200 })
+    revalidatePath(`/collection/items/${barometerData.slug}`)
+    return NextResponse.json({ slug: barometerData.slug }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error updating barometer' },

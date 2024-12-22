@@ -9,4 +9,4 @@ export type { SearchResultsDTO } from './api/v2/search/search'
 /**
  * Barometer dimensions database JSON structure
  */
-export type Dimensions = Record<string, string>[]
+export type Dimensions = { dim: string; value: string }[]
