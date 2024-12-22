@@ -73,11 +73,11 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     const selectedManufacturer = manufacturers?.data[selectedManufacturerIndex]
     // pick all manufacturer fields and put empty string if not present
     const manufacturerFormData = {
-      id: selectedManufacturer.id,
-      name: selectedManufacturer.name,
-      city: selectedManufacturer.city,
-      country: selectedManufacturer.country,
-      description: selectedManufacturer.description,
+      id: selectedManufacturer?.id ?? '',
+      name: selectedManufacturer?.name ?? '',
+      city: selectedManufacturer?.city ?? '',
+      country: selectedManufacturer?.country ?? '',
+      description: selectedManufacturer?.description ?? '',
     } as ManufacturerForm
     form.setValues(manufacturerFormData)
     form.resetDirty(manufacturerFormData)

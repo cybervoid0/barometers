@@ -76,21 +76,32 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
     const barometerData = await req.json()
     const { images, id, ...barometer } = cleanObject(barometerData)
+    const { slug } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
-      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
-      await tx.barometer.update({
-        where: { id },
-        data: {
-          ...barometer,
-          images: {
-            create: images,
+      if (images && images.length > 0) {
+        // delete old images
+        await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+        await tx.barometer.update({
+          where: { id },
+          data: {
+            ...barometer,
+            // attach new images
+            images: {
+              create: images,
+            },
           },
-        },
-      })
+        })
+      } else {
+        // images are not updated
+        await tx.barometer.update({
+          where: { id },
+          data: barometer,
+        })
+      }
     })
-    revalidatePath(`/collection/items/${barometerData.slug}`)
-    return NextResponse.json({ slug: barometerData.slug }, { status: 200 })
+    revalidatePath(`/collection/items/${slug}`)
+    return NextResponse.json({ slug }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error updating barometer' },

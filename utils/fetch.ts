@@ -68,6 +68,17 @@ export async function createBarometer<T>(barometer: T): Promise<{ id: string }> 
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
+export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }> {
+  const res = await fetch(barometersApiRoute, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(barometer),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
 /******* Categories ********/
 export async function fetchCategoryList(): Promise<CategoryListDTO> {
   const res = await fetch(baseUrl + categoriesApiRoute)
