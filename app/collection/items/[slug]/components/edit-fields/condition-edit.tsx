@@ -22,7 +22,7 @@ interface TextFieldEditProps extends UnstyledButtonProps {
 
 export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
   const { condition } = useBarometers()
-  const { open, close, opened, form, update } = useEditField({ property: 'condition', barometer })
+  const { open, close, opened, form, update } = useEditField({ property: 'conditionId', barometer })
   return (
     <>
       <Tooltip label="Edit condition">
@@ -46,10 +46,10 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
                 label: name,
                 value: id,
               }))}
-              value={form.values.condition?.id}
+              value={form.values.conditionId}
               onChange={id => {
                 const newCondition = condition.data.find(c => c.id === id)
-                form.setValues({ condition: newCondition })
+                form.setValues({ conditionId: newCondition?.id })
               }}
               allowDeselect={false}
             />
