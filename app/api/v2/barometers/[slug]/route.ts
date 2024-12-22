@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
+import { NotFoundError } from '@/app/errors'
 
 interface Params {
   params: {
@@ -16,6 +17,9 @@ export async function GET(_req: NextRequest, { params: { slug } }: Params) {
     const barometer = await getBarometer(slug)
     return NextResponse.json(barometer, { status: 200 })
   } catch (error) {
+    if (error instanceof NotFoundError) {
+      return NextResponse.json({ message: error.message }, { status: 404 })
+    }
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error retrieving barometer' },
       { status: 500 },

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
-import { cleanObject } from '@/utils/misc'
+import { cleanObject, slug as slugify } from '@/utils/misc'
 import { type SortValue } from '@/app/collection/categories/[category]/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getAllBarometers, getBarometersByParams } from './getters'
@@ -77,6 +77,8 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const barometerData = await req.json()
     const { images, id, ...barometer } = cleanObject(barometerData)
     const { slug } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
+    // modify slug if name has changed
+    const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
       if (images && images.length > 0) {
@@ -85,7 +87,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         await tx.barometer.update({
           where: { id },
           data: {
-            ...barometer,
+            ...newData,
             // attach new images
             images: {
               create: images,
@@ -96,12 +98,12 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         // images are not updated
         await tx.barometer.update({
           where: { id },
-          data: barometer,
+          data: newData,
         })
       }
     })
-    revalidatePath(`/collection/items/${slug}`)
-    return NextResponse.json({ slug }, { status: 200 })
+    revalidatePath(`/collection/items/${newData.slug}`)
+    return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error updating barometer' },
