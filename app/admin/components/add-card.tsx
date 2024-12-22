@@ -11,22 +11,9 @@ import { useBarometers } from '@/app/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
-import { type Dimensions as DimType } from '../../types'
+import { type BarometerFormProps } from '../../types'
 import { createBarometer } from '@/utils/fetch'
 import { slug } from '@/utils/misc'
-
-export interface BarometerFormProps {
-  collectionId: string
-  name: string
-  categoryId: string
-  date: string
-  dateDescription: string
-  manufacturerId: string
-  conditionId: string
-  description: string
-  dimensions: DimType
-  images: string[]
-}
 
 export function AddCard() {
   const { condition, categories, manufacturers } = useBarometers()

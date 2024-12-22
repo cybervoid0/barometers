@@ -10,3 +10,16 @@ export type { SearchResultsDTO } from './api/v2/search/search'
  * Barometer dimensions database JSON structure
  */
 export type Dimensions = { dim: string; value: string }[]
+
+export interface BarometerFormProps {
+  collectionId: string
+  name: string
+  categoryId: string
+  date: string
+  dateDescription: string
+  manufacturerId: string
+  conditionId: string
+  description: string
+  dimensions: Dimensions
+  images: string[]
+}

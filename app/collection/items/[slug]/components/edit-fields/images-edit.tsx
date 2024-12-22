@@ -25,17 +25,11 @@ import {
 } from '@dnd-kit/sortable'
 import { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import axios, { AxiosError } from 'axios'
 import { BarometerDTO } from '@/app/types'
 import sx from './styles.module.scss'
-import {
-  barometerRoute,
-  barometersApiRoute,
-  googleStorageImagesFolder,
-  imageUploadApiRoute,
-} from '@/app/constants'
-import { FileDto, UrlDto } from '@/app/api/v2/upload/images/types'
+import { barometerRoute, googleStorageImagesFolder } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
+import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
 
 interface ImagesEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -43,15 +37,6 @@ interface ImagesEditProps extends UnstyledButtonProps {
 }
 interface FormProps {
   images: string[]
-}
-
-async function deleteFromStorage(img: string) {
-  // delete image file from google storage
-  await axios.delete(imageUploadApiRoute, {
-    params: {
-      fileName: img,
-    },
-  })
 }
 
 function SortableImage({
@@ -135,22 +120,21 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     try {
       // erase deleted images
       const extraFiles = barometer.images?.filter(img => !form.values.images.includes(img))
-      if (extraFiles) await Promise.all(extraFiles?.map(deleteFromStorage))
-      const updatedBarometer: BarometerDTO = {
-        ...barometer,
-        images: form.getValues().images,
+      if (extraFiles) await Promise.all(extraFiles?.map(deleteImage))
+      const updatedBarometer = {
+        id: barometer.id,
+        images: form.getValues().images.map((img, i) => ({
+          url: img,
+          order: i,
+        })),
       }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
+      const { slug } = await updateBarometer(updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + (slug ?? '')
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
+      if (error instanceof Error) {
+        showError(error.message || 'Error updating barometer')
       }
     } finally {
       setIsUploading(false)
@@ -163,38 +147,25 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     if (!files || !Array.isArray(files) || files.length === 0) return
     setIsUploading(true)
     try {
-      const {
-        data: { urls },
-      } = await axios.post<UrlDto>(
-        imageUploadApiRoute,
-        {
-          files: files.map(file => ({
-            fileName: file.name,
-            contentType: file.type,
-          })),
-        } as FileDto,
-        { headers: { 'Content-Type': 'application/json' } },
+      const urlsDto = await createImageUrls(
+        files.map(file => ({
+          fileName: file.name,
+          contentType: file.type,
+        })),
       )
-      // upload all files concurrently
       await Promise.all(
-        urls.map(async ({ signed }, index) => {
-          const file = files[index]
-          await axios.put(signed, file, {
-            headers: {
-              'Content-Type': file.type,
-            },
-          })
-        }),
+        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
       )
+
       // extracting file names from URLs
-      const newImages = urls
+      const newImages = urlsDto.urls
         .map(url => new URL(url.public).pathname.split('/').at(-1) ?? '')
         .filter(url => Boolean(url))
       form.setFieldValue('images', prev => [...prev, ...newImages])
     } catch (error) {
       const defaultErrMsg = 'Error uploading files'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
+      if (error instanceof Error) {
+        showError(error.message || defaultErrMsg)
         return
       }
       showError(error instanceof Error ? error.message : defaultErrMsg)
@@ -207,15 +178,10 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     setIsUploading(true)
     try {
       // if the image file was uploaded but not yet added to the barometer
-      if (!barometer.images?.includes(img)) await deleteFromStorage(img)
+      if (!barometer.images?.includes(img)) await deleteImage(img)
       form.setFieldValue('images', old => old.filter(file => !file.includes(img)))
     } catch (error) {
-      const defaultErrMsg = 'Error deleting file'
-      if (error instanceof AxiosError) {
-        showError((error.response?.data as { message?: string })?.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      showError(error instanceof Error ? error.message : 'Error deleting file')
     } finally {
       setIsUploading(false)
     }
@@ -226,7 +192,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     try {
       setIsUploading(true)
       const extraImages = form.values.images.filter(img => !barometer.images?.includes(img))
-      await Promise.all(extraImages.map(deleteFromStorage))
+      await Promise.all(extraImages.map(deleteImage))
     } catch (error) {
       // do nothing
     } finally {
