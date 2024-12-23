@@ -7,6 +7,7 @@ import NextImage from 'next/image'
 import clsx from 'clsx'
 import { ImagesEdit } from './edit-fields/images-edit'
 import { type BarometerDTO } from '@/app/types'
+import { IsAdmin } from '@/app/components/is-admin'
 import 'swiper/css'
 import 'swiper/css/zoom'
 import 'swiper/css/navigation'
@@ -16,13 +17,14 @@ import './styles.css'
 interface ImageCarouselProps {
   images: string[]
   barometer: BarometerDTO
-  isAdmin: boolean
 }
 
-export function ImageCarousel({ images, barometer, isAdmin }: ImageCarouselProps) {
+export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
   return (
     <Box style={{ overflow: 'hidden', position: 'relative' }}>
-      {isAdmin && <ImagesEdit barometer={barometer} />}
+      <IsAdmin>
+        <ImagesEdit barometer={barometer} />
+      </IsAdmin>
       <Swiper
         zoom
         loop={images.length > 1}

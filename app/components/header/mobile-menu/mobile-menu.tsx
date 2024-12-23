@@ -19,13 +19,14 @@ import * as motion from 'framer-motion/client'
 import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
 import { useSession } from 'next-auth/react'
+import { AccessRole } from '@prisma/client'
 import { instagram, email, barometerTypesRoute } from '@/app/constants'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { isAdmin } from '../../is-admin'
 
 export const MobileMenu: FC<DrawerProps> = props => {
-  const { status } = useSession()
-  const isLoggedId = status === 'authenticated'
+  const { data: session } = useSession()
   const [opened, setOpened] = useState<Record<number, boolean>>({})
   const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
   const { categories } = useBarometers()
@@ -57,7 +58,8 @@ export const MobileMenu: FC<DrawerProps> = props => {
             {menuData
               .filter(
                 ({ visibleFor }) =>
-                  typeof visibleFor === 'undefined' || (isLoggedId && visibleFor === 'Admin'),
+                  typeof visibleFor === 'undefined' ||
+                  (isAdmin(session) && visibleFor === AccessRole.ADMIN),
               )
               .map((outer, i, arr) => (
                 <Fragment key={outer.id}>

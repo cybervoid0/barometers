@@ -7,15 +7,16 @@ import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import { AccessRole } from '@prisma/client'
 import sx from './tabs.module.scss'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { barometerTypesRoute } from '@/app/constants'
+import { isAdmin } from '../../is-admin'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
   const { categories: types } = useBarometers()
-  const { status } = useSession()
-  const isLoggedId = status === 'authenticated'
+  const { data: session } = useSession()
   const router = useRouter()
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState(-1)
@@ -45,7 +46,8 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
           {menuData
             .filter(
               ({ visibleFor }) =>
-                typeof visibleFor === 'undefined' || (isLoggedId && visibleFor === 'Admin'),
+                typeof visibleFor === 'undefined' ||
+                (isAdmin(session) && visibleFor === AccessRole.ADMIN),
             )
             .map((menuitem, i) => {
               const renderTab = (key?: Key) => (

@@ -27,6 +27,7 @@ export const authConfig: AuthOptions = {
           email: user.email,
           name: user.name,
           image: user.avatarURL,
+          role: user.role,
         } as User
       },
     }),
@@ -37,5 +38,21 @@ export const authConfig: AuthOptions = {
   },
   session: {
     strategy: 'jwt',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      // Adding Role to token if it exists in User
+      if (user?.role) {
+        token.role = user.role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      // Passing role from token to session
+      if (token.role) {
+        session.user.role = token.role
+      }
+      return session
+    },
   },
 }

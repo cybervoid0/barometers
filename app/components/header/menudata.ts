@@ -1,9 +1,10 @@
-type UserType = 'Simple' | 'Admin'
+import { AccessRole } from '@prisma/client'
+
 interface MenuItem {
   id: number
   label: string
   link: string
-  visibleFor?: UserType
+  visibleFor?: AccessRole
 }
 
 export const menuData: MenuItem[] = [
@@ -36,6 +37,6 @@ export const menuData: MenuItem[] = [
     id: 10,
     label: 'Admin',
     link: 'admin',
-    visibleFor: 'Admin',
+    visibleFor: AccessRole.ADMIN,
   },
 ]
