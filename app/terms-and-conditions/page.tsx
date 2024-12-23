@@ -1,6 +1,8 @@
 import { Container, List, ListItem, Text, Title } from '@mantine/core'
 import styles from './styles.module.scss'
 
+export const dynamic = 'force-static'
+
 export default function TermsAndConditions() {
   return (
     <Container p="xl">

@@ -5,6 +5,8 @@ import { barometerTypesRoute } from './constants'
 import { SearchField } from './components/search-field'
 import { getCategories } from './api/v2/categories/getters'
 
+export const dynamic = 'force-static'
+
 export default async function HomePage() {
   const categories = await getCategories()
   return (

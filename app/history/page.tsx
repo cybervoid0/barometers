@@ -4,6 +4,8 @@ import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '../constants'
 import { ShowMore } from '../components/showmore'
 
+export const dynamic = 'force-static'
+
 function Figure({ src }: { src: string }) {
   return (
     <Center className={sx.figure}>

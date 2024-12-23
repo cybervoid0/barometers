@@ -5,6 +5,8 @@ import { googleStorageImagesFolder } from '../constants'
 import styles from './styles.module.scss'
 import { ShowMore } from '../components/showmore'
 
+export const dynamic = 'force-static'
+
 export default function About() {
   return (
     <Container py="xl">

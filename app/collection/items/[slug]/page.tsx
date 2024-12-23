@@ -20,6 +20,8 @@ import { Dimensions } from '@/app/types'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 
+export const dynamic = 'force-static'
+
 interface Slug {
   slug: string
 }
