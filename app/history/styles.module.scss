@@ -30,11 +30,6 @@
     object-fit: contain;
   }
 }
-.showMore {
-  color: var(--mantine-color-dark-4);
-  font-weight: 600;
-  z-index: 5;
-}
 .title {
   font-size: 30px;
   @include sm() {

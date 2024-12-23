@@ -10,6 +10,7 @@ import {
 } from '@mantine/core'
 import { IconInfoSquareRounded } from '@tabler/icons-react'
 import { ConditionListDTO } from '@/app/types'
+import sx from '../styles.module.scss'
 
 interface ConditionProps {
   condition: ConditionListDTO[number]
@@ -19,7 +20,7 @@ interface ConditionProps {
 export function Condition({ condition, editButton }: ConditionProps) {
   return (
     <Box w="fit-content" pos="relative">
-      <Title fw={500} display="inline" order={3}>
+      <Title className={sx.heading} order={3}>
         Condition:&nbsp;
       </Title>
       <Title c="dark.3" fw={400} display="inline" order={4}>

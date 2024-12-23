@@ -1,8 +1,8 @@
-import { Container, Title, Text, Box, Center, Spoiler } from '@mantine/core'
+import { Container, Title, Text, Box, Center } from '@mantine/core'
 import Image from 'next/image'
-import { PropsWithChildren } from 'react'
 import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '../constants'
+import { ShowMore } from '../components/showmore'
 
 function Figure({ src }: { src: string }) {
   return (
@@ -14,21 +14,6 @@ function Figure({ src }: { src: string }) {
         alt="Figure"
       />
     </Center>
-  )
-}
-
-function ShowMore({ children, height = 0 }: PropsWithChildren & { height?: number }) {
-  return (
-    <Spoiler
-      maxHeight={height}
-      showLabel="Show more"
-      hideLabel="Show less"
-      classNames={{
-        control: sx.showMore,
-      }}
-    >
-      {children}
-    </Spoiler>
   )
 }
 

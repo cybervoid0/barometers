@@ -109,29 +109,29 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
 
         {manufacturer && (
           <Box>
-            <Title fw={500} display="inline" order={3}>
+            <Title className={sx.heading} order={3}>
               Manufacturer/Retailer:&nbsp;
             </Title>
-            <Title c="dark.3" fw={400} display="inline" order={3}>
+            <Text c="dark.3" fw={400} display="inline">
               {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
               {isAdmin && <ManufacturerEdit barometer={barometer} />}
-            </Title>
+            </Text>
           </Box>
         )}
 
         <Box>
-          <Title fw={500} display="inline" order={3}>
+          <Title className={sx.heading} order={3}>
             Dating:&nbsp;
           </Title>
-          <Title c="dark.3" fw={400} display="inline" order={3}>
+          <Text c="dark.3" fw={400} display="inline">
             {dateDescription}
             {isAdmin && <TextFieldEdit barometer={barometer} property="dateDescription" />}
-          </Title>
+          </Text>
         </Box>
 
         {dimensions && dimensions.length > 0 && (
           <Box>
-            <Title fw={500} order={3}>
+            <Title className={sx.heading} fw={500} order={3}>
               Dimensions:{' '}
               {dimensions.map((dimension, index, arr) => (
                 <Text c="dark.3" display="inline" key={index}>
