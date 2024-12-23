@@ -1,9 +1,6 @@
 import { type Metadata } from 'next'
-import { getServerSession } from 'next-auth'
 import capitalize from 'lodash/capitalize'
 import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
-import { AccessRole } from '@prisma/client'
-import { authConfig, getUserByEmail } from '@/utils/auth'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -19,6 +16,7 @@ import { title, openGraph, twitter } from '@/app/metadata'
 import { Dimensions } from '@/app/types'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
+import { IsAdmin } from '@/app/components/is-admin'
 
 export const dynamic = 'force-static'
 
@@ -71,20 +69,7 @@ export const generateStaticParams = withPrisma(prisma =>
   prisma.barometer.findMany({ select: { slug: true } }),
 )
 
-async function isAuthorized(): Promise<boolean> {
-  try {
-    const session = await getServerSession(authConfig)
-    const email = session?.user?.email
-    if (!email) return false
-    const { role } = await getUserByEmail(email)
-    return role === AccessRole.ADMIN
-  } catch (error) {
-    return false
-  }
-}
-
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
-  const isAdmin = await isAuthorized()
   const barometer = await getBarometer(slug)
   const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
     barometer
@@ -94,7 +79,6 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
       <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
         <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
         <ImageCarousel
-          isAdmin={isAdmin}
           barometer={barometer}
           images={images.map(image => googleStorageImagesFolder + image)}
         />
@@ -102,7 +86,9 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
           <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
             {name.split(' ').at(-1)}
-            {isAdmin && <TextFieldEdit barometer={barometer} property="name" size={22} />}
+            <IsAdmin>
+              <TextFieldEdit barometer={barometer} property="name" size={22} />
+            </IsAdmin>
           </Title>
           <Tooltip label="Collection ID">
             <Text className={sx.collectionId}>{collectionId}</Text>
@@ -116,7 +102,9 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </Title>
             <Text c="dark.3" fw={400} display="inline">
               {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
-              {isAdmin && <ManufacturerEdit barometer={barometer} />}
+              <IsAdmin>
+                <ManufacturerEdit barometer={barometer} />
+              </IsAdmin>
             </Text>
           </Box>
         )}
@@ -127,7 +115,9 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           </Title>
           <Text c="dark.3" fw={400} display="inline">
             {dateDescription}
-            {isAdmin && <TextFieldEdit barometer={barometer} property="dateDescription" />}
+            <IsAdmin>
+              <TextFieldEdit barometer={barometer} property="dateDescription" />
+            </IsAdmin>
           </Text>
         </Box>
 
@@ -141,28 +131,38 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
                   {index < arr.length - 1 ? ', ' : ''}
                 </Text>
               ))}
-              {isAdmin && <DimensionEdit barometer={barometer} />}
+              <IsAdmin>
+                <DimensionEdit barometer={barometer} />
+              </IsAdmin>
             </Title>
           </Box>
         )}
 
         <Condition
           condition={condition}
-          editButton={isAdmin && <ConditionEdit barometer={barometer} />}
+          editButton={
+            <IsAdmin>
+              <ConditionEdit barometer={barometer} />
+            </IsAdmin>
+          }
         />
 
         <Divider
           mx="lg"
           my="lg"
-          {...(isAdmin && {
-            label: <DescriptionEdit barometer={barometer} />,
-            labelPosition: 'right',
-          })}
+          labelPosition="right"
+          label={
+            <IsAdmin>
+              <DescriptionEdit barometer={barometer} />
+            </IsAdmin>
+          }
         />
         {description ? (
           <DescriptionText description={description} />
         ) : (
-          isAdmin && <Text>Add description</Text>
+          <IsAdmin>
+            <Text>Add description</Text>
+          </IsAdmin>
         )}
       </Box>
     </Container>
