@@ -4,7 +4,7 @@ import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
 import { barometerRoute, googleStorageImagesFolder, barometerTypesRoute } from '@/app/constants'
 import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
-import { SortValue } from './types'
+import { SortValue, SortOptions } from './types'
 import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
@@ -13,14 +13,15 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
 
+interface SearchParams {
+  sort?: SortValue
+  page?: string
+}
 interface CollectionProps {
   params: {
     category: string
   }
-  searchParams: {
-    sort?: SortValue
-    page?: string
-  }
+  searchParams: SearchParams
 }
 
 const PAGE_SIZE = 12
@@ -89,9 +90,31 @@ export default async function Collection({ params: { category }, searchParams }:
   )
 }
 
+export const dynamicParams = true
 export const generateStaticParams = withPrisma(async prisma => {
-  const categories = await prisma.category.findMany({ select: { name: true } })
-  return categories.map(({ name }) => ({
-    category: name.toLowerCase(),
-  }))
+  const categories = await prisma.category.findMany({ select: { name: true, id: true } })
+  const categoriesWithCount = await prisma.barometer.groupBy({
+    by: ['categoryId'],
+    _count: {
+      _all: true,
+    },
+  })
+  const params: { category: string; searchParams: SearchParams }[] = []
+
+  for (const { name, id } of categories) {
+    const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
+    const barometersPerCategory = categoryData?._count._all ?? 0
+    console.log('🚀 ~ generateStaticParams ~ barometersPerCategory:', name, barometersPerCategory)
+    const pagesPerCategory = Math.ceil(barometersPerCategory / PAGE_SIZE)
+    for (const { value: sort } of SortOptions) {
+      for (let page = 1; page <= pagesPerCategory; page += 1) {
+        params.push({
+          category: name.toLowerCase(),
+          searchParams: { sort, page: String(page) },
+        })
+      }
+    }
+  }
+  console.log('🚀 ~ generateStaticParams ~ params:', params.length)
+  return params
 })
