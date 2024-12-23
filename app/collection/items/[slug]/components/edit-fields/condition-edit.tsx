@@ -52,7 +52,6 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
               onChange={id => {
                 const newCondition = condition.data.find(c => c.id === id)
                 form.setValues({ conditionId: newCondition?.id })
-                console.log('new condition ID', newCondition, form.values.collectionId)
               }}
               allowDeselect={false}
             />
