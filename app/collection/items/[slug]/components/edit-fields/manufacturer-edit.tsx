@@ -15,15 +15,15 @@ import {
   Select,
   Group,
 } from '@mantine/core'
-import axios, { AxiosError } from 'axios'
 import { useDisclosure } from '@mantine/hooks'
 import { isLength } from 'validator'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import type { BarometerDTO, ManufacturerDTO } from '@/app/types'
 import { showError, showInfo } from '@/utils/notification'
-import { barometerRoute, barometersApiRoute } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { updateBarometer, updateManufacturer } from '@/utils/fetch'
 
 interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -86,26 +86,20 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
 
   const update = async (manufacturer: ManufacturerForm) => {
     try {
-      const selectedManufacturer = manufacturers.data[selectedManufacturerIndex]
+      const manufacturerId = manufacturers.data[selectedManufacturerIndex].id
       const updatedBarometer = {
-        ...barometer,
-        manufacturer: {
-          ...selectedManufacturer,
-          ...manufacturer,
-        },
+        id: barometer.id,
+        manufacturerId,
       }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
-      showInfo(`${manufacturer.name} updated`, 'Success')
+      const [{ slug }, { name }] = await Promise.all([
+        updateBarometer(updatedBarometer),
+        updateManufacturer(manufacturerId, manufacturer),
+      ])
+      showInfo(`${name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + (slug ?? '')
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
-      }
+      showError(error instanceof Error ? error.message : 'Error updating barometer')
     }
   }
 

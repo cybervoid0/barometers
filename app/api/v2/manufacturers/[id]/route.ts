@@ -23,6 +23,31 @@ export async function GET(req: NextRequest, { params: { id } }: Parameters) {
   }
 }
 
+export const PUT = withPrisma(async (prisma, req: NextRequest, { params: { id } }: Parameters) => {
+  try {
+    const manufData = await req.json()
+    const manufacturer = await prisma.manufacturer.findUnique({ where: { id } })
+    if (!manufacturer) {
+      return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
+    }
+
+    const updatedManufacturer = await prisma.manufacturer.update({
+      where: { id },
+      data: manufData,
+    })
+
+    return NextResponse.json(updatedManufacturer, { status: 200 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      {
+        message: error instanceof Error ? error.message : 'Cannot update manufacturer',
+      },
+      { status: 500 },
+    )
+  }
+})
+
 // !нужно как-то защитить от общего доступа к этой функции
 
 /**

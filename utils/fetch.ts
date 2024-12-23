@@ -122,6 +122,20 @@ export async function addManufacturer(
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
+export async function updateManufacturer(
+  id: string,
+  updatedData: Partial<Manufacturer>,
+): Promise<Manufacturer> {
+  const res = await fetch(`${baseUrl + manufacturersApiRoute}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedData),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
 /******* Images ********/
 export async function createImageUrls(files: FileProps[]): Promise<UrlDto> {
   const res = await fetch(imageUploadApiRoute, {
