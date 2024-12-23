@@ -5,7 +5,7 @@ import { email, github, instagram } from './constants'
 export const title = 'Barometers Realm'
 export const description =
   'A collection of unique weather instruments spanning the late 18th century to the mid-20th century, with a focus on mercury and aneroid barometers, showcasing the craftsmanship traditions of past masters.'
-export const url = process.env.NEXT_PUBLIC_BASE_URL
+export const url = process.env.NEXT_PUBLIC_BASE_URL!
 export const keywords = [
   'barometer',
   'barometers',
