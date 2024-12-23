@@ -12,13 +12,13 @@ import {
 } from '@mantine/core'
 import { isLength } from 'validator'
 import { IconEdit } from '@tabler/icons-react'
-import { IBarometer } from '@/models/barometer'
+import { BarometerDTO } from '@/app/types'
 import { useEditField } from './useEditField'
 
 interface TextFieldEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
-  barometer: IBarometer
-  property: keyof IBarometer
+  barometer: BarometerDTO
+  property: keyof BarometerDTO
 }
 
 export function TextFieldEdit({ size = 18, barometer, property, ...props }: TextFieldEditProps) {

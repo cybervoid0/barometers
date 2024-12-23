@@ -13,7 +13,7 @@ import { useBarometers } from '@/app/hooks/useBarometers'
 import { barometerTypesRoute } from '@/app/constants'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
-  const { types } = useBarometers()
+  const { categories: types } = useBarometers()
   const { status } = useSession()
   const isLoggedId = status === 'authenticated'
   const router = useRouter()
@@ -76,9 +76,9 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                 >
                   <Menu.Target>{renderTab()}</Menu.Target>
                   <Menu.Dropdown>
-                    {types.data.map(({ label, _id, name }) => (
+                    {types.data.map(({ label, id, name }) => (
                       <Anchor
-                        key={String(_id)}
+                        key={id}
                         href={barometerTypesRoute + name.toLocaleLowerCase()}
                         component={Link}
                         c="inherit"

@@ -1,38 +1,19 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { type PrismaClient } from '@prisma/client'
-import { getPrismaClient } from '@/prisma/prismaClient'
-
-async function getManufacturers(prisma: PrismaClient) {
-  return prisma.manufacturer.findMany({
-    select: {
-      name: true,
-      id: true,
-      city: true,
-      country: true,
-      description: true,
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
-}
-export type ManufacturerListDTO = Awaited<ReturnType<typeof getManufacturers>>
+import { withPrisma } from '@/prisma/prismaClient'
+import { getManufacturers } from './getters'
 
 /**
  * Retrieve a list of all Manufacturers
  */
 export async function GET() {
-  const prisma = getPrismaClient()
   try {
-    const manufacturers = await getManufacturers(prisma)
+    const manufacturers = await getManufacturers()
     return NextResponse.json(manufacturers, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : 'Error getting manufacturers' },
       { status: 500 },
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
 
@@ -40,8 +21,7 @@ export async function GET() {
 /**
  * Create a new Manufacturer
  */
-export async function POST(req: NextRequest) {
-  const prisma = getPrismaClient()
+export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
     const manufData = await req.json()
 
@@ -55,7 +35,5 @@ export async function POST(req: NextRequest) {
       { message: error instanceof Error ? error.message : 'Cannot add new manufacturer' },
       { status: 500 },
     )
-  } finally {
-    await prisma.$disconnect()
   }
-}
+})

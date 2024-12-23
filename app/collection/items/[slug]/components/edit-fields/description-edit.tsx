@@ -11,12 +11,12 @@ import {
   Box,
 } from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
-import { IBarometer } from '@/models/barometer'
 import { useEditField } from './useEditField'
+import { BarometerDTO } from '@/app/types'
 
 interface DescriptionEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
-  barometer: IBarometer
+  barometer: BarometerDTO
 }
 
 const property = 'description'

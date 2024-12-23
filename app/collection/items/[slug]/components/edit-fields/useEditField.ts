@@ -3,24 +3,25 @@ import { isEqual } from 'lodash'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
-import axios, { AxiosError } from 'axios'
-import { IBarometer } from '@/models/barometer'
-import { barometersApiRoute, barometerRoute } from '@/app/constants'
+import { BarometerDTO } from '@/app/types'
+import { barometerRoute } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
+import { updateBarometer } from '@/utils/fetch'
 
 interface Props {
-  barometer: IBarometer
-  property: keyof IBarometer
-  validate?: (value: IBarometer[keyof IBarometer]) => string | null
+  barometer: BarometerDTO
+  property: keyof BarometerDTO
+  validate?: (value: BarometerDTO[keyof BarometerDTO]) => string | null
 }
 
 export function useEditField({ property, barometer, validate }: Props) {
-  const form = useForm<Partial<IBarometer>>({
+  const form = useForm<Partial<BarometerDTO>>({
     initialValues: { [property]: '' },
     validate: {
       [property]: validate,
     },
   })
+
   const [opened, { open, close }] = useDisclosure(false)
 
   const update = useCallback(async () => {
@@ -30,19 +31,17 @@ export function useEditField({ property, barometer, validate }: Props) {
         close()
         return
       }
-      const updatedBarometer = { ...barometer, [property]: newValue }
-      const { data } = await axios.put(barometersApiRoute, updatedBarometer)
+
+      const { slug } = await updateBarometer({
+        id: barometer.id,
+        [property]: newValue,
+      })
+
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (data.slug ?? '')
+      window.location.href = barometerRoute + (slug ?? '')
     } catch (error) {
-      if (error instanceof AxiosError) {
-        showError(
-          (error.response?.data as { message: string })?.message ||
-            error.message ||
-            'Error updating barometer',
-        )
-      }
+      showError(error instanceof Error ? error.message : 'Error updating barometer')
     }
   }, [barometer, close, form.values, property])
 

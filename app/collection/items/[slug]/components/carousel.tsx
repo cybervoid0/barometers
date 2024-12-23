@@ -1,22 +1,21 @@
 'use client'
 
-import React from 'react'
 import { Box, Image } from '@mantine/core'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Zoom, Navigation, Pagination } from 'swiper/modules'
 import NextImage from 'next/image'
 import clsx from 'clsx'
 import { ImagesEdit } from './edit-fields/images-edit'
+import { type BarometerDTO } from '@/app/types'
 import 'swiper/css'
 import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import './styles.css'
-import { IBarometer } from '@/models/barometer'
 
 interface ImageCarouselProps {
   images: string[]
-  barometer: IBarometer
+  barometer: BarometerDTO
   isAdmin: boolean
 }
 

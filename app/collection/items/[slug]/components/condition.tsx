@@ -9,10 +9,10 @@ import {
   Text,
 } from '@mantine/core'
 import { IconInfoSquareRounded } from '@tabler/icons-react'
-import { IBarometerCondition } from '@/models/condition'
+import { ConditionListDTO } from '@/app/types'
 
 interface ConditionProps {
-  condition: IBarometerCondition
+  condition: ConditionListDTO[number]
   editButton: ReactNode
 }
 

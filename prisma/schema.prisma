@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Image {
@@ -17,6 +18,7 @@ model Image {
   updatedAt   DateTime    @updatedAt
   categories  Category?   @relation("CategoryImage")
   barometers  Barometer[] @relation("BarometerImages")
+  order       Int?        
 }
 
 model Category {

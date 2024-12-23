@@ -1,22 +1,23 @@
 'use server'
 
 import { hash } from 'bcrypt'
-import { connectMongoose } from '@/utils/mongoose'
-import User, { IUser } from '@/models/user'
+import type { User } from '@prisma/client'
+import { withPrisma } from '@/prisma/prismaClient'
 
-export const register = async (values: Partial<IUser>): Promise<void> => {
+export const register = withPrisma(async (prisma, values: Partial<User>) => {
   const { email, password, name } = values
   if (!password) throw new Error('Password is not defined')
   if (!email) throw new Error('Email is not defined')
   if (!name) throw new Error('Name is not defined')
-  await connectMongoose()
-  const userFound = await User.findOne({ email })
+  const userFound = await prisma.user.findUnique({ where: { email } })
   if (userFound) throw new Error('Email already exists!')
   const hashedPassword = await hash(password, 10)
-  const user = new User({
-    name,
-    email,
-    password: hashedPassword,
+  await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      role: 'USER',
+    },
   })
-  await user.save()
-}
+})
