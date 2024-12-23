@@ -90,7 +90,7 @@ export default function About() {
       </Flex>
       <Divider mx="xl" />
       <Title mb="md" mt="lg" order={3} component="h2">
-        Why the Barometer?
+        Why Barometers?
       </Title>
       <Text className={styles.paragraph}>
         A barometer is more than just an instrument for measuring atmospheric pressure. It is an
