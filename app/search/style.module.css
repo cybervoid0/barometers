@@ -11,3 +11,17 @@
   min-width: 80px;
   min-height: 80px;
 }
+
+.welcome {
+  display: block;
+  color: var(--mantine-color-blue-9);
+}
+
+.notFound {
+  display: block;
+  color: var(--mantine-color-red-9);
+}
+
+.hidden {
+  display: none;
+}

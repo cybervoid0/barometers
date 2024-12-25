@@ -52,7 +52,7 @@ export async function fetchBarometersByCategory({
 export async function searchBarometers(
   searchParams: Record<string, string>,
 ): Promise<SearchResultsDTO> {
-  const pageSize = '6'
+  const pageSize = '10'
   const url = `${baseUrl + barometersSearchRoute}?${new URLSearchParams({ ...searchParams, size: pageSize })}`
   const res = await fetch(url, { cache: 'no-cache' })
   return res.json()

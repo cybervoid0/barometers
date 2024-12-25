@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 
 /**
@@ -7,14 +8,17 @@ export const searchBarometers = withPrisma(
   async (prisma, query: string, page: number, pageSize: number) => {
     const skip = (page - 1) * pageSize
 
+    const where: Prisma.BarometerWhereInput = {
+      OR: [
+        { name: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { manufacturer: { name: { contains: query, mode: 'insensitive' } } },
+      ],
+    }
+
     const [barometers, totalItems] = await Promise.all([
       prisma.barometer.findMany({
-        where: {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
-        },
+        where,
         select: {
           id: true,
           name: true,
@@ -44,12 +48,7 @@ export const searchBarometers = withPrisma(
         take: pageSize,
       }),
       prisma.barometer.count({
-        where: {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
-        },
+        where,
       }),
     ])
 
