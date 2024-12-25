@@ -1,6 +1,6 @@
 'use client'
 
-import { createTheme, virtualColor } from '@mantine/core'
+import { createTheme, virtualColor, colorsTuple } from '@mantine/core'
 import { Raleway } from 'next/font/google'
 
 const raleway = Raleway({
@@ -10,6 +10,7 @@ const raleway = Raleway({
 export const theme = createTheme({
   fontFamily: raleway.style.fontFamily,
   colors: {
+    primary: colorsTuple('#473e36'),
     tabsUnderline: virtualColor({
       name: 'tabsUnderline',
       dark: 'green',

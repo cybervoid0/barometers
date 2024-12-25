@@ -3,8 +3,9 @@
 import React from 'react'
 import NextLink from 'next/link'
 import NextImage from 'next/image'
-import { Group, Burger, Anchor, Title, Container, Box, Flex } from '@mantine/core'
+import { Group, Burger, Anchor, Title, Container, Box, Flex, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { IconSearch } from '@tabler/icons-react'
 import { Tabs } from './tabs'
 import { MobileMenu } from './mobile-menu'
 import styles from './header.module.scss'
@@ -17,10 +18,17 @@ export function Header() {
         <Box className={styles.container}>
           <Container h="100%" size="xl">
             <Group h="100%" justify="space-between" gap="0.3rem" wrap="nowrap">
-              <Box>
-                <Burger size="md" hiddenFrom="md" opened={opened} onClick={open} />
-                <Tabs visibleFrom="md" />
-              </Box>
+              <Group>
+                <Box>
+                  <Burger size="md" hiddenFrom="md" opened={opened} onClick={open} />
+                  <Tabs visibleFrom="md" />
+                </Box>
+                <Tooltip color="primary" label="Search Barometers">
+                  <Anchor c="dark" component={NextLink} href="/search">
+                    <IconSearch size="1.2rem" />
+                  </Anchor>
+                </Tooltip>
+              </Group>
               <Anchor underline="never" component={NextLink} href="/">
                 <Flex align="center" gap="xs">
                   <Title className={styles.title}>Barometers Realm</Title>

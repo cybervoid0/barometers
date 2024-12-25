@@ -19,11 +19,6 @@ export const menuData: MenuItem[] = [
     link: 'collection',
   },
   {
-    id: 2,
-    label: 'Search',
-    link: 'search',
-  },
-  {
     id: 3,
     label: 'History',
     link: 'history',
