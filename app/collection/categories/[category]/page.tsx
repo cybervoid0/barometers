@@ -13,15 +13,17 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
 
-interface SearchParams {
+/* interface SearchParams {
   sort?: SortValue
   page?: string
-}
+} */
 interface CollectionProps {
   params: {
     category: string
+    sort: SortValue
+    page: number
   }
-  searchParams: SearchParams
+  //searchParams: SearchParams
 }
 
 const PAGE_SIZE = 12
@@ -58,10 +60,14 @@ export async function generateMetadata({
   }
 }
 
-export default async function Collection({ params: { category }, searchParams }: CollectionProps) {
-  const sort = searchParams.sort ?? 'date'
-  const page = searchParams.page ?? '1'
-  const { barometers, totalPages } = await getBarometersByParams(category, +page, PAGE_SIZE, sort)
+export default async function Collection({
+  params: { category, page, sort } /* , searchParams */,
+}: CollectionProps) {
+  console.log('🚀 ~ category, page, sort:', category, page, sort)
+
+  /*  const sort = searchParams.sort ?? 'date'
+  const page = searchParams.page ?? '1' */
+  const { barometers, totalPages } = await getBarometersByParams(category, page, PAGE_SIZE, sort)
   const { description } = await getCategory(category)
   return (
     <Container py="xl" size="xl">
@@ -99,7 +105,7 @@ export const generateStaticParams = withPrisma(async prisma => {
       _all: true,
     },
   })
-  const params: { category: string; searchParams: SearchParams }[] = []
+  const params: CollectionProps['params'][] = []
 
   for (const { name, id } of categories) {
     const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
@@ -110,11 +116,12 @@ export const generateStaticParams = withPrisma(async prisma => {
       for (let page = 1; page <= pagesPerCategory; page += 1) {
         params.push({
           category: name.toLowerCase(),
-          searchParams: { sort, page: String(page) },
+          sort,
+          page,
         })
       }
     }
   }
-  console.log('🚀 ~ generateStaticParams ~ params:', params.length)
-  return params
+  console.log('🚀 ~ generateStaticParams ~ params:', params)
+  return params.slice(0, 1)
 })
