@@ -24,7 +24,7 @@ export function Header() {
                   <Tabs visibleFrom="md" />
                 </Box>
                 <Tooltip color="primary" label="Search Barometers">
-                  <Anchor c="dark" component={NextLink} href="/search">
+                  <Anchor visibleFrom="md" c="dark" component={NextLink} href="/search">
                     <IconSearch size="1.2rem" />
                   </Anchor>
                 </Tooltip>
