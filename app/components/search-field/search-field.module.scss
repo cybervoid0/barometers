@@ -9,7 +9,7 @@
 }
 .searchButton {
   border-radius: 0 4px 4px 0;
-  background-color: #5a4f46;
+  background-color: var(--mantine-color-primary);
   &:hover {
     background-color: #695c51;
   }

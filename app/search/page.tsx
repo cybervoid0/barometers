@@ -1,9 +1,9 @@
 import { Box, Container, Stack, Title } from '@mantine/core'
 import { googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
-import { SearchField } from '../components/search-field'
 import { Pagination } from '../components/pagination'
 import { searchBarometers } from '@/utils/fetch'
+import { SearchInfo } from './search-info'
 
 interface SearchProps {
   searchParams: Record<string, string>
@@ -17,9 +17,9 @@ export default async function Search({ searchParams }: SearchProps) {
       <Stack>
         <Box style={{ flexGrow: 1 }}>
           <Title fz={{ base: 'h3', xs: 'h2' }} mb="lg" fw={500} component="h2" order={2}>
-            Search results
+            Search the entire collection
           </Title>
-          <SearchField />
+          <SearchInfo queryString={searchParams.q} isEmptyResult={barometers.length === 0} />
           <Stack gap="md" p={0}>
             {barometers.map(({ id, name, manufacturer, image, slug, dateDescription }) => (
               <SearchItem

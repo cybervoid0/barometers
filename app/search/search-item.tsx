@@ -28,7 +28,7 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
             />
           </Box>
           <Stack gap="xs" justify="center" mih="70px">
-            <Text fw={400} lh="100%">
+            <Text tt="capitalize" fw={500} lh="100%">
               {name}
             </Text>
             <Text size="xs">

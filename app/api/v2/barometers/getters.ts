@@ -39,7 +39,6 @@ export const getBarometersByParams = withPrisma(
     if (!category) throw new Error('Unknown barometer category')
 
     const skip = (page - 1) * pageSize
-    const orderBy = getSortCriteria(sortBy)
 
     const [barometers, totalItems] = await Promise.all([
       prisma.barometer.findMany({
@@ -72,7 +71,7 @@ export const getBarometersByParams = withPrisma(
         },
         skip,
         take: pageSize,
-        orderBy,
+        orderBy: [getSortCriteria(sortBy), { name: 'asc' }],
       }),
       prisma.barometer.count({ where: { categoryId: category.id } }),
     ])

@@ -20,9 +20,11 @@ interface TextFieldEditProps extends UnstyledButtonProps {
   barometer: BarometerDTO
 }
 
+const property = 'conditionId'
+
 export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
   const { condition } = useBarometers()
-  const { open, close, opened, form, update } = useEditField({ property: 'conditionId', barometer })
+  const { open, close, opened, form, update } = useEditField({ property, barometer })
   return (
     <>
       <Tooltip label="Edit condition">
@@ -39,7 +41,7 @@ export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditP
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Box component="form" onSubmit={update}>
+        <Box component="form" onSubmit={form.onSubmit(update)}>
           <Stack>
             <Select
               data={condition.data.map(({ name, id }) => ({

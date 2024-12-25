@@ -19,7 +19,7 @@ export default function About() {
           w={{ base: '100%', xs: 'fit-content' }}
           h={{ base: '300px', sm: '400px' }}
           alt="Leo"
-          width={116}
+          width={79}
           height={125}
           sizes="(max-width: 768px) 100vw, 50vw"
           src={`${googleStorageImagesFolder}a98daba6-1f4e-4614-aecd-ab5cb189fcaf.png`}
@@ -90,7 +90,7 @@ export default function About() {
       </Flex>
       <Divider mx="xl" />
       <Title mb="md" mt="lg" order={3} component="h2">
-        Why the Barometer?
+        Why Barometers?
       </Title>
       <Text className={styles.paragraph}>
         A barometer is more than just an instrument for measuring atmospheric pressure. It is an

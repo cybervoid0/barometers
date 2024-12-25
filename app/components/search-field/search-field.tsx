@@ -39,7 +39,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
   const handleSearch = async ({ q }: QueryForm) => {
     const qs = q.trim()
     const query = new URLSearchParams({ q: qs })
-    router.push(`/search?${query}#top`, { scroll: true })
+    router.push(`/search?${query}`, { scroll: true })
   }
   return (
     <Box
@@ -53,7 +53,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
         <TextInput
           autoComplete="off"
           classNames={{ input: sx.input, root: sx.inputRoot }}
-          placeholder="Find barometer"
+          placeholder="Enter your query"
           title="Fill in any barometer related word"
           required
           {...form.getInputProps('q')}

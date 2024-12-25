@@ -4,7 +4,7 @@ import { barometerRoute, barometerTypesRoute } from './constants'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!
   return [
     {
       url: `${baseUrl}/`,
