@@ -8,22 +8,16 @@ import { SortValue, SortOptions } from './types'
 import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
-import { Pagination } from '@/app/components/pagination'
+import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
 
-/* interface SearchParams {
-  sort?: SortValue
-  page?: string
-} */
 interface CollectionProps {
   params: {
-    category: string
-    sort: SortValue
-    page: number
+    // category should include [categoryName, sortCriteria, pageNo]
+    category: string[]
   }
-  //searchParams: SearchParams
 }
 
 const PAGE_SIZE = 12
@@ -31,16 +25,17 @@ const PAGE_SIZE = 12
 export async function generateMetadata({
   params: { category },
 }: CollectionProps): Promise<Metadata> {
-  const { description } = await getCategory(category)
-  const { barometers } = await getBarometersByParams(category, 1, 5, 'date')
-  const collectionTitle = `${title}: ${capitalize(category)} Barometers Collection`
+  const [categoryName] = category
+  const { description } = await getCategory(categoryName)
+  const { barometers } = await getBarometersByParams(categoryName, 1, 5, 'date')
+  const collectionTitle = `${title}: ${capitalize(categoryName)} Barometers Collection`
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
       url: googleStorageImagesFolder + images.at(0),
       alt: name,
     }))
-  const url = barometerTypesRoute + category
+  const url = `${barometerTypesRoute}${category.join('/')}`
   return {
     title: collectionTitle,
     description,
@@ -60,23 +55,23 @@ export async function generateMetadata({
   }
 }
 
-export default async function Collection({
-  params: { category, page, sort } /* , searchParams */,
-}: CollectionProps) {
-  console.log('🚀 ~ category, page, sort:', category, page, sort)
-
-  /*  const sort = searchParams.sort ?? 'date'
-  const page = searchParams.page ?? '1' */
-  const { barometers, totalPages } = await getBarometersByParams(category, page, PAGE_SIZE, sort)
-  const { description } = await getCategory(category)
+export default async function Collection({ params: { category } }: CollectionProps) {
+  const [categoryName, sort, page] = category
+  const { barometers, totalPages } = await getBarometersByParams(
+    categoryName,
+    Number(page),
+    PAGE_SIZE,
+    sort as SortValue,
+  )
+  const { description } = await getCategory(categoryName)
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
         <Title mb="sm" fw={500} order={2} tt="capitalize">
-          {category}
+          {categoryName}
         </Title>
         {description && <DescriptionText size="sm" description={description} />}
-        <Sort sortBy={sort} style={{ alignSelf: 'flex-end' }} />
+        <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer }, i) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
@@ -96,7 +91,9 @@ export default async function Collection({
   )
 }
 
-export const dynamicParams = true
+// all non-generated posts will give 404
+export const dynamicParams = false
+
 export const generateStaticParams = withPrisma(async prisma => {
   const categories = await prisma.category.findMany({ select: { name: true, id: true } })
   const categoriesWithCount = await prisma.barometer.groupBy({
@@ -105,23 +102,21 @@ export const generateStaticParams = withPrisma(async prisma => {
       _all: true,
     },
   })
-  const params: CollectionProps['params'][] = []
+  // page rout is /collection/categories/{categoryName}/{sortCriteria}/{pageNumber}
+  const params: { category: string[] }[] = []
 
   for (const { name, id } of categories) {
     const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
     const barometersPerCategory = categoryData?._count._all ?? 0
-    console.log('🚀 ~ generateStaticParams ~ barometersPerCategory:', name, barometersPerCategory)
     const pagesPerCategory = Math.ceil(barometersPerCategory / PAGE_SIZE)
+    // generate all combinations of of category/sort/page for static page generation
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {
         params.push({
-          category: name.toLowerCase(),
-          sort,
-          page,
+          category: [name.toLowerCase(), sort, String(page)],
         })
       }
     }
   }
-  console.log('🚀 ~ generateStaticParams ~ params:', params)
-  return params.slice(0, 1)
+  return params
 })

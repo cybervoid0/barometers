@@ -1,9 +1,9 @@
 import { Box, Container, Stack, Title } from '@mantine/core'
 import { googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
-import { Pagination } from '../components/pagination'
 import { searchBarometers } from '@/utils/fetch'
 import { SearchInfo } from './search-info'
+import { Pagination } from './pagination'
 
 interface SearchProps {
   searchParams: Record<string, string>

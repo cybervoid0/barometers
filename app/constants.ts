@@ -15,3 +15,5 @@ export const barometerRoute = '/collection/items/'
 // External links
 export const googleStorageImagesFolder = 'https://storage.googleapis.com/barometers/'
 export const github = 'https://github.com/shenshin'
+
+export const postfix = '/date/1'

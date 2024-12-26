@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache'
 import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject, slug as slugify } from '@/utils/misc'
-import { type SortValue } from '@/app/collection/categories/[category]/types'
+import { type SortValue } from '@/app/collection/categories/[...category]/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getAllBarometers, getBarometersByParams } from './getters'
 

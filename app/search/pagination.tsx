@@ -7,14 +7,11 @@ export function Pagination(props: PaginationProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
-  const updateQueryParams = (key: string, value: string | number) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
-    params.set(key, String(value))
-    return params.toString()
-  }
+
   const handlePageChange = (newPage: number) => {
-    const updatedQuery = updateQueryParams('page', newPage)
-    router.push(`${pathname}?${updatedQuery}`)
+    const params = new URLSearchParams(searchParams)
+    params.set('page', String(newPage))
+    router.push(`${pathname}?${params}`)
   }
   return (
     <MantinePagination

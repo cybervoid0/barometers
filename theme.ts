@@ -17,4 +17,16 @@ export const theme = createTheme({
       light: 'red',
     }),
   },
+  components: {
+    Pagination: {
+      defaultProps: {
+        mt: 'lg',
+        c: 'dark',
+        color: 'dark',
+      },
+      styles: {
+        alignSelf: 'center',
+      },
+    },
+  },
 })

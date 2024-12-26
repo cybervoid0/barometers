@@ -1,7 +1,7 @@
 'use client'
 
 import { CSSProperties, Select } from '@mantine/core'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { SortValue, SortOptions } from './types'
 
 interface SortProps {
@@ -12,10 +12,12 @@ interface SortProps {
 
 export default function Sort({ sortBy, style }: SortProps) {
   const router = useRouter()
+  const pathName = usePathname()
 
   const handleSortChange = (value: string | null) => {
     if (value) {
-      router.push(`?${new URLSearchParams({ sort: value })}`)
+      const path = pathName.split('/')
+      router.push(path.slice(0, -2).concat(value).concat('1').join('/'))
     }
   }
 
