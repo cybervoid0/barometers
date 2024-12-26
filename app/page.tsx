@@ -1,7 +1,7 @@
 import { Container, Grid, GridCol } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
-import { categoriesRoute, defaultCategorySortPage } from './constants'
+import { categoriesRoute } from './constants'
 import { SearchField } from './components/search-field'
 import { getCategories } from './api/v2/categories/getters'
 
@@ -24,7 +24,7 @@ export default async function HomePage() {
                 priority={i < 3}
                 image={image.url}
                 name={label}
-                link={`${categoriesRoute}${name.toLowerCase()}${defaultCategorySortPage}`}
+                link={categoriesRoute + name.toLowerCase()}
               />
             </GridCol>
           ))}
