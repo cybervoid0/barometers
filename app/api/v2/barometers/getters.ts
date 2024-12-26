@@ -1,5 +1,5 @@
 import { type Prisma } from '@prisma/client'
-import { SortValue } from '@/app/collection/categories/[category]/types'
+import { SortValue } from '@/app/collection/categories/[...category]/types'
 import { withPrisma } from '@/prisma/prismaClient'
 
 function getSortCriteria(
