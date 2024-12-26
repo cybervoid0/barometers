@@ -42,7 +42,7 @@ export default withBundleAnalyzer({
   redirects: async () => {
     const categories = ['miscellaneous', 'RECORDERS', 'POCKET', 'MERCURY', 'BOURDON', 'ANEROID']
     return categories.map(name => {
-      const source = '/collection/categories/' + name
+      const source = '/collection/categories/' + name.toLowerCase()
       return {
         source, // old route
         destination: source + '/date/1', // new route
