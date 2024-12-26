@@ -1,5 +1,5 @@
 import { Manufacturer } from '@prisma/client'
-import { SortValue } from '@/app/collection/categories/[...category]/types'
+import { SortValue } from '@/app/types'
 import {
   barometersApiRoute,
   barometersSearchRoute,

@@ -12,9 +12,9 @@ export const barometersSearchRoute = '/api/v2/search/'
 // Frontend routes
 export const categoriesRoute = '/collection/categories/'
 export const barometerRoute = '/collection/items/'
+export const defaultCategorySortPage = '/date/1'
 // External links
 export const googleStorageImagesFolder = 'https://storage.googleapis.com/barometers/'
 export const github = 'https://github.com/shenshin'
 
-// ! give more adequate name
-export const defaultCategorySortPage = '/date/1'
+export const BAROMETERS_PER_CATEGORY_PAGE = 12

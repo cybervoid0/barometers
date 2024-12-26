@@ -2,7 +2,7 @@
 
 import { CSSProperties, Select } from '@mantine/core'
 import { usePathname, useRouter } from 'next/navigation'
-import { SortValue, SortOptions } from './types'
+import { SortValue, SortOptions } from '@/app/types'
 
 interface SortProps {
   sortBy: SortValue

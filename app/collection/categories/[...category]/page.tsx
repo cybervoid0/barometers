@@ -1,10 +1,15 @@
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
-import { barometerRoute, googleStorageImagesFolder, categoriesRoute } from '@/app/constants'
+import {
+  barometerRoute,
+  googleStorageImagesFolder,
+  categoriesRoute,
+  BAROMETERS_PER_CATEGORY_PAGE,
+} from '@/app/constants'
 import { BarometerCard } from './components/barometer-card'
 import { slug } from '@/utils/misc'
-import { SortValue, SortOptions } from './types'
+import { SortValue, SortOptions } from '@/app/types'
 import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
@@ -19,8 +24,6 @@ interface CollectionProps {
     category: string[]
   }
 }
-
-const PAGE_SIZE = 12
 
 export async function generateMetadata({
   params: { category },
@@ -60,7 +63,7 @@ export default async function Collection({ params: { category } }: CollectionPro
   const { barometers, totalPages } = await getBarometersByParams(
     categoryName,
     Number(page),
-    PAGE_SIZE,
+    BAROMETERS_PER_CATEGORY_PAGE,
     sort as SortValue,
   )
   const { description } = await getCategory(categoryName)
@@ -108,7 +111,7 @@ export const generateStaticParams = withPrisma(async prisma => {
   for (const { name, id } of categories) {
     const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
     const barometersPerCategory = categoryData?._count._all ?? 0
-    const pagesPerCategory = Math.ceil(barometersPerCategory / PAGE_SIZE)
+    const pagesPerCategory = Math.ceil(barometersPerCategory / BAROMETERS_PER_CATEGORY_PAGE)
     // generate all combinations of of category/sort/page for static page generation
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {

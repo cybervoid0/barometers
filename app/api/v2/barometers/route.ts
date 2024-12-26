@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { Prisma } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject, slug as slugify } from '@/utils/misc'
-import { type SortValue } from '@/app/collection/categories/[...category]/types'
+import { SortValue, SortOptions } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getAllBarometers, getBarometersByParams } from './getters'
+import { barometerRoute, categoriesRoute, BAROMETERS_PER_CATEGORY_PAGE } from '@/app/constants'
 
 /**
  * Get barometer list
@@ -35,6 +36,30 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ * Revalidates the cache for a specific category by recalculating the paths that need to be revalidated.
+ * Call this function after adding/updating a barometer to update the category pages that include the
+ * barometer.
+ *
+ * @param prisma - The PrismaClient instance used to interact with the database.
+ * @param categoryId - The ID of the category to revalidate.
+ */
+async function revalidateCategory(prisma: PrismaClient, categoryId: string) {
+  const { name: categoryName } = await prisma.category.findUniqueOrThrow({
+    where: { id: categoryId },
+    select: { name: true },
+  })
+  const barometersInCategory = await prisma.barometer.count({ where: { categoryId } })
+  const pagesPerCategory = Math.ceil(barometersInCategory / BAROMETERS_PER_CATEGORY_PAGE)
+  const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
+    Array.from(
+      { length: pagesPerCategory },
+      (_, i) => `${categoriesRoute}${[categoryName, sort, String(i + 1)].join('/')}`,
+    ),
+  )
+  await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
+}
+
 //! Protect this function
 /**
  * Add new barometer
@@ -45,7 +70,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
     const barometerData = await req.json()
     const { images, ...barometer } = cleanObject(barometerData)
-    const { id } = await prisma.barometer.create({
+    const { id, categoryId } = await prisma.barometer.create({
       data: {
         ...barometer,
         images: {
@@ -53,7 +78,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
         },
       },
     })
-    revalidatePath('/')
+    await revalidateCategory(prisma, categoryId)
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -102,7 +127,8 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         })
       }
     })
-    revalidatePath(`/collection/items/${newData.slug}`)
+    revalidatePath(barometerRoute + newData.slug)
+    await revalidateCategory(prisma, newData.categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
