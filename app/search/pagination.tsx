@@ -13,16 +13,5 @@ export function Pagination(props: PaginationProps) {
     params.set('page', String(newPage))
     router.push(`${pathname}?${params}`)
   }
-  return (
-    <MantinePagination
-      mt="lg"
-      style={{
-        alignSelf: 'center',
-      }}
-      c="dark"
-      color="dark"
-      onChange={handlePageChange}
-      {...props}
-    />
-  )
+  return <MantinePagination onChange={handlePageChange} {...props} />
 }

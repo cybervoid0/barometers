@@ -9,16 +9,5 @@ export function Pagination(props: PaginationProps) {
   const handlePageChange = (newPage: number) => {
     router.push(pathname.split('/').slice(0, -1).concat(`${newPage}`).join('/'))
   }
-  return (
-    <MantinePagination
-      mt="lg"
-      style={{
-        alignSelf: 'center',
-      }}
-      c="dark"
-      color="dark"
-      onChange={handlePageChange}
-      {...props}
-    />
-  )
+  return <MantinePagination onChange={handlePageChange} {...props} />
 }

@@ -23,9 +23,9 @@ export const theme = createTheme({
         mt: 'lg',
         c: 'dark',
         color: 'dark',
-      },
-      styles: {
-        alignSelf: 'center',
+        style: {
+          alignSelf: 'center',
+        },
       },
     },
   },
