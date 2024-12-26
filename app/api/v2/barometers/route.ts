@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject, slug as slugify } from '@/utils/misc'
-import { SortValue, SortOptions } from '@/app/types'
+import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getAllBarometers, getBarometersByParams } from './getters'
-import { barometerRoute, categoriesRoute, BAROMETERS_PER_CATEGORY_PAGE } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
+import { revalidateCategory } from './revalidate'
 
 /**
  * Get barometer list
@@ -34,30 +35,6 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     )
   }
-}
-
-/**
- * Revalidates the cache for a specific category by recalculating the paths that need to be revalidated.
- * Call this function after adding/updating a barometer to update the category pages that include the
- * barometer.
- *
- * @param prisma - The PrismaClient instance used to interact with the database.
- * @param categoryId - The ID of the category to revalidate.
- */
-async function revalidateCategory(prisma: PrismaClient, categoryId: string) {
-  const { name: categoryName } = await prisma.category.findUniqueOrThrow({
-    where: { id: categoryId },
-    select: { name: true },
-  })
-  const barometersInCategory = await prisma.barometer.count({ where: { categoryId } })
-  const pagesPerCategory = Math.ceil(barometersInCategory / BAROMETERS_PER_CATEGORY_PAGE)
-  const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
-    Array.from(
-      { length: pagesPerCategory },
-      (_, i) => `${categoriesRoute}${[categoryName, sort, String(i + 1)].join('/')}`,
-    ),
-  )
-  await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
 }
 
 //! Protect this function

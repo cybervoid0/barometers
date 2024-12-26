@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
+import { revalidateCategory } from '../revalidate'
+import { barometerRoute } from '@/app/constants'
 
 interface Params {
   params: {
@@ -52,6 +55,9 @@ export const DELETE = withPrisma(
           id: barometer.id,
         },
       })
+
+      revalidatePath(barometerRoute + barometer.slug)
+      await revalidateCategory(prisma, barometer.categoryId)
 
       return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })
     } catch (error) {
