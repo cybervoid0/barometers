@@ -78,7 +78,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
     const barometerData = await req.json()
     const { images, id, ...barometer } = cleanObject(barometerData)
-    const { slug } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
+    const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // modify slug if name has changed
     const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
     // transaction will prevent deleting images in case barometer update fails
@@ -105,7 +105,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       }
     })
     revalidatePath(barometerRoute + newData.slug)
-    await revalidateCategory(prisma, newData.categoryId)
+    await revalidateCategory(prisma, newData.categoryId ?? categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {
     return NextResponse.json(

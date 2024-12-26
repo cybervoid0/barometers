@@ -1,6 +1,7 @@
 import { type Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
+import dayjs from 'dayjs'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -17,6 +18,7 @@ import { Dimensions } from '@/app/types'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
+import { DateEdit } from './components/edit-fields/date-edit'
 
 export const dynamic = 'force-static'
 
@@ -71,8 +73,7 @@ export const generateStaticParams = withPrisma(prisma =>
 
 export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
   const barometer = await getBarometer(slug)
-  const { name, images, description, manufacturer, dateDescription, condition, collectionId } =
-    barometer
+
   const dimensions = barometer.dimensions as Dimensions
   return (
     <Container size="xl">
@@ -80,28 +81,30 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
         <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
         <ImageCarousel
           barometer={barometer}
-          images={images.map(image => googleStorageImagesFolder + image)}
+          images={barometer.images.map(image => googleStorageImagesFolder + image)}
         />
         <Box mb="md">
-          <Title className={sx.title}>{`${name.split(' ').slice(0, -1).join(' ')} `}</Title>
+          <Title
+            className={sx.title}
+          >{`${barometer.name.split(' ').slice(0, -1).join(' ')} `}</Title>
           <Title className={sx.title} style={{ whiteSpace: 'nowrap' }}>
-            {name.split(' ').at(-1)}
+            {barometer.name.split(' ').at(-1)}
             <IsAdmin>
               <TextFieldEdit barometer={barometer} property="name" size={22} />
             </IsAdmin>
           </Title>
           <Tooltip label="Collection ID">
-            <Text className={sx.collectionId}>{collectionId}</Text>
+            <Text className={sx.collectionId}>{barometer.collectionId}</Text>
           </Tooltip>
         </Box>
 
-        {manufacturer && (
+        {barometer.manufacturer && (
           <Box>
             <Title className={sx.heading} order={3}>
               Manufacturer/Retailer:&nbsp;
             </Title>
             <Text c="dark.3" fw={400} display="inline">
-              {`${manufacturer.name}${manufacturer.city ? `, ${manufacturer.city}` : ''}`}
+              {`${barometer.manufacturer.name}${barometer.manufacturer.city ? `, ${barometer.manufacturer.city}` : ''}`}
               <IsAdmin>
                 <ManufacturerEdit barometer={barometer} />
               </IsAdmin>
@@ -109,12 +112,22 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           </Box>
         )}
 
-        <Box>
+        <IsAdmin>
           <Title className={sx.heading} order={3}>
-            Dating:&nbsp;
+            Year:&nbsp;
           </Title>
           <Text c="dark.3" fw={400} display="inline">
-            {dateDescription}
+            {dayjs(barometer.date).format('YYYY')}
+            <DateEdit barometer={barometer} />
+          </Text>
+        </IsAdmin>
+
+        <Box>
+          <Title className={sx.heading} order={3}>
+            Date description:&nbsp;
+          </Title>
+          <Text c="dark.3" fw={400} display="inline">
+            {barometer.dateDescription}
             <IsAdmin>
               <TextFieldEdit barometer={barometer} property="dateDescription" />
             </IsAdmin>
@@ -139,7 +152,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
         )}
 
         <Condition
-          condition={condition}
+          condition={barometer.condition}
           editButton={
             <IsAdmin>
               <ConditionEdit barometer={barometer} />
@@ -157,8 +170,8 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </IsAdmin>
           }
         />
-        {description ? (
-          <DescriptionText description={description} />
+        {barometer.description ? (
+          <DescriptionText description={barometer.description} />
         ) : (
           <IsAdmin>
             <Text>Add description</Text>
