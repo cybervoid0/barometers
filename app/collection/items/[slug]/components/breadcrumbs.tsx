@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Breadcrumbs, Anchor, Text } from '@mantine/core'
-import { barometerTypesRoute, postfix } from '@/app/constants'
+import { categoriesRoute, defaultCategorySortPage } from '@/app/constants'
 
 interface BreadcrumbsComponentProps {
   type: string
@@ -10,7 +10,10 @@ interface BreadcrumbsComponentProps {
 export function BreadcrumbsComponent({ type, catId, ...props }: BreadcrumbsComponentProps) {
   const breadcrumbs = [
     { title: 'Home', href: '/' },
-    { title: type.toLowerCase(), href: barometerTypesRoute + type.toLowerCase() + postfix },
+    {
+      title: type.toLowerCase(),
+      href: categoriesRoute + type.toLowerCase() + defaultCategorySortPage,
+    },
     { title: catId },
   ]
 

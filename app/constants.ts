@@ -10,10 +10,11 @@ export const conditionsApiRoute = '/api/v2/conditions/'
 export const imageUploadApiRoute = '/api/v2/upload/images/'
 export const barometersSearchRoute = '/api/v2/search/'
 // Frontend routes
-export const barometerTypesRoute = '/collection/categories/'
+export const categoriesRoute = '/collection/categories/'
 export const barometerRoute = '/collection/items/'
 // External links
 export const googleStorageImagesFolder = 'https://storage.googleapis.com/barometers/'
 export const github = 'https://github.com/shenshin'
 
-export const postfix = '/date/1'
+// ! give more adequate name
+export const defaultCategorySortPage = '/date/1'

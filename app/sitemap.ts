@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { slug as slugify } from '@/utils/misc'
-import { barometerRoute, barometerTypesRoute } from './constants'
+import { barometerRoute, categoriesRoute } from './constants'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -46,7 +46,7 @@ export const getCategoryPages = withPrisma(
   async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
     const categories = await prisma.category.findMany({ select: { name: true } })
     return categories.map(({ name }) => ({
-      url: baseUrl + barometerTypesRoute + name.toLowerCase(),
+      url: baseUrl + categoriesRoute + name.toLowerCase(),
       priority: 0.9,
       lastModified: new Date(),
     }))

@@ -20,7 +20,7 @@ import { SiMaildotru, SiInstagram } from 'react-icons/si'
 import { IoIosArrowForward as Arrow } from 'react-icons/io'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
-import { instagram, email, barometerTypesRoute } from '@/app/constants'
+import { instagram, email, categoriesRoute, defaultCategorySortPage } from '@/app/constants'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { isAdmin } from '../../is-admin'
@@ -88,7 +88,9 @@ export const MobileMenu: FC<DrawerProps> = props => {
                               <Anchor
                                 c="inherit"
                                 component={Link}
-                                href={barometerTypesRoute + name.toLowerCase()}
+                                href={
+                                  categoriesRoute + name.toLowerCase() + defaultCategorySortPage
+                                }
                                 onClick={props.onClose}
                               >
                                 <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>

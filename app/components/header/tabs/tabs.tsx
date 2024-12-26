@@ -11,7 +11,7 @@ import { AccessRole } from '@prisma/client'
 import sx from './tabs.module.scss'
 import { menuData } from '../menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
-import { barometerTypesRoute, postfix } from '@/app/constants'
+import { categoriesRoute, defaultCategorySortPage } from '@/app/constants'
 import { isAdmin } from '../../is-admin'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {
@@ -81,7 +81,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                     {categories.data.map(({ label, id, name }) => (
                       <Anchor
                         key={id}
-                        href={barometerTypesRoute + name.toLocaleLowerCase() + postfix}
+                        href={categoriesRoute + name.toLocaleLowerCase() + defaultCategorySortPage}
                         component={Link}
                         c="inherit"
                         underline="never"
