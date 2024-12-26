@@ -1,6 +1,8 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { withPrisma } from './prisma/prismaClient'
+import { categoriesRoute, defaultCategorySortPage } from './app/constants'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -39,4 +41,15 @@ export default withBundleAnalyzer({
     config.resolve.alias['@'] = path.resolve('./')
     return config
   },
+  redirects: withPrisma(async prisma => {
+    const categories = await prisma.category.findMany({ select: { name: true } })
+    return categories.map(({ name }) => {
+      const source = categoriesRoute + name
+      return {
+        source, // old route
+        destination: source + defaultCategorySortPage, // new route
+        permanent: true,
+      }
+    })
+  }),
 })
