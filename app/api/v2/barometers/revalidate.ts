@@ -21,7 +21,7 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
   const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
     Array.from(
       { length: pagesPerCategory },
-      (_, i) => `${categoriesRoute}${[categoryName, sort, String(i + 1)].join('/')}`,
+      (_, i) => `${categoriesRoute}${[categoryName.toLowerCase(), sort, String(i + 1)].join('/')}`,
     ),
   )
   try {
