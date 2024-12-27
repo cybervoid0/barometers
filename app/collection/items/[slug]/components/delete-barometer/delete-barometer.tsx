@@ -17,7 +17,7 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
 
   const handleDelete = async () => {
     try {
-      const { message } = await deleteBarometer(barometer.id)
+      const { message } = await deleteBarometer(barometer.slug)
       showInfo(message, 'Success')
       close()
     } catch (error) {
