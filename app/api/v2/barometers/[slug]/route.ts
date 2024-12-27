@@ -50,10 +50,13 @@ export const DELETE = withPrisma(
         return NextResponse.json({ message: 'Barometer not found' }, { status: 404 })
       }
 
-      await prisma.barometer.delete({
-        where: {
-          id: barometer.id,
-        },
+      await prisma.$transaction(async tx => {
+        await tx.image.deleteMany({ where: { barometers: { some: { id: barometer.id } } } })
+        await tx.barometer.delete({
+          where: {
+            id: barometer.id,
+          },
+        })
       })
 
       revalidatePath(barometerRoute + barometer.slug)
