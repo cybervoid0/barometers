@@ -3,10 +3,12 @@
 import React from 'react'
 import { Button, ButtonProps, Group, Modal, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { useRouter } from 'next/navigation'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
 import sx from './styles.module.scss'
+import { categoriesRoute } from '@/app/constants'
 
 interface Props extends ButtonProps {
   barometer: BarometerDTO
@@ -14,12 +16,14 @@ interface Props extends ButtonProps {
 
 export function DeleteBarometer({ barometer, ...props }: Props) {
   const [opened, { open, close }] = useDisclosure(false)
+  const router = useRouter()
 
   const handleDelete = async () => {
     try {
       const { message } = await deleteBarometer(barometer.slug)
       showInfo(message, 'Success')
       close()
+      router.replace(categoriesRoute + barometer.category.name)
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error deleting barometer')
     }
