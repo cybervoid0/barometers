@@ -124,7 +124,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
 
         <Box>
           <Title className={sx.heading} order={3}>
-            Date description:&nbsp;
+            Dating:&nbsp;
           </Title>
           <Text c="dark.3" fw={400} display="inline">
             {barometer.dateDescription}
