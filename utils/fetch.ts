@@ -79,6 +79,13 @@ export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
+export async function deleteBarometer(barometerId: string): Promise<{ message: string }> {
+  const res = await fetch(`${barometersApiRoute}/${barometerId}`, {
+    method: 'DELETE',
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
 /******* Categories ********/
 export async function fetchCategoryList(): Promise<CategoryListDTO> {
   const res = await fetch(baseUrl + categoriesApiRoute)

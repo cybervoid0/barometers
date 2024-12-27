@@ -28,5 +28,10 @@ export const theme = createTheme({
         },
       },
     },
+    Button: {
+      defaultProps: {
+        color: 'dark',
+      },
+    },
   },
 })

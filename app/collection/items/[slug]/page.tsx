@@ -19,6 +19,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
 import { DateEdit } from './components/edit-fields/date-edit'
+import { DeleteBarometer } from './components/delete-barometer'
 
 export const dynamic = 'force-static'
 
@@ -97,6 +98,10 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             <Text className={sx.collectionId}>{barometer.collectionId}</Text>
           </Tooltip>
         </Box>
+
+        <IsAdmin>
+          <DeleteBarometer size="compact-md" mb="sm" barometer={barometer} />
+        </IsAdmin>
 
         {barometer.manufacturer && (
           <Box>
