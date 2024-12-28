@@ -5,8 +5,6 @@ import { BarometerCard } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
 import { googleStorageImagesFolder } from '@/app/constants'
 
-//export const dynamic = 'force-dynamic'
-
 const itemsOnPage = 12
 
 interface newArrivalsProps {
