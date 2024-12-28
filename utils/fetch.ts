@@ -1,5 +1,4 @@
 import { Manufacturer } from '@prisma/client'
-import { SortValue } from '@/app/types'
 import {
   barometersApiRoute,
   barometersSearchRoute,
@@ -9,11 +8,10 @@ import {
   imageUploadApiRoute,
 } from '@/app/constants'
 import type {
-  BarometerListDTO,
   CategoryDTO,
   CategoryListDTO,
   BarometerDTO,
-  ParameterizedBarometerListDTO,
+  BarometerListDTO,
   ConditionListDTO,
   ManufacturerListDTO,
   ManufacturerDTO,
@@ -29,24 +27,11 @@ export async function fetchBarometer(slug: string): Promise<BarometerDTO> {
   const res = await fetch(baseUrl + barometersApiRoute + slug)
   return res.json()
 }
-export async function fetchAllBarometers(): Promise<BarometerListDTO> {
-  const res = await fetch(baseUrl + barometersApiRoute)
-  return res.json()
-}
-export async function fetchBarometersByCategory({
-  category,
-  sort = 'date',
-  size = 6,
-  page = 1,
-}: {
-  category: string
-  sort?: SortValue
-  size?: number | string
-  page?: number | string
-}): Promise<ParameterizedBarometerListDTO> {
+export async function fetchBarometerList(
+  searchParams: Record<string, string>,
+): Promise<BarometerListDTO> {
   const url = baseUrl + barometersApiRoute
-  const qsParams = new URLSearchParams({ category, sort, size: String(size), page: String(page) })
-  const res = await fetch(`${url}?${qsParams}`)
+  const res = await fetch(`${url}?${new URLSearchParams(searchParams)}`)
   return res.json()
 }
 export async function searchBarometers(

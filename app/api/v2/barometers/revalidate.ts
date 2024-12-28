@@ -24,10 +24,5 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
       (_, i) => `${categoriesRoute}${[categoryName.toLowerCase(), sort, String(i + 1)].join('/')}`,
     ),
   )
-  try {
-    await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
-    console.warn(`✅ Successfully revalidated path: ${pathsToRevalidate}`)
-  } catch (error) {
-    console.error(`❌ Failed to revalidate path: ${pathsToRevalidate}`, error)
-  }
+  await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
 }

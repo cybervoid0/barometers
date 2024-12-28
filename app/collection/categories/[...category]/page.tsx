@@ -7,7 +7,7 @@ import {
   categoriesRoute,
   BAROMETERS_PER_CATEGORY_PAGE,
 } from '@/app/constants'
-import { BarometerCard } from './components/barometer-card'
+import { BarometerCard } from '@/app/components/barometer-card'
 import { slug } from '@/utils/misc'
 import { SortValue, SortOptions } from '@/app/types'
 import Sort from './sort'

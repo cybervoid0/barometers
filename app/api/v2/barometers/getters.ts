@@ -13,8 +13,8 @@ function getSortCriteria(
       return { name: direction }
     case 'date':
       return { date: direction }
-    case 'cat-no':
-      return { collectionId: direction }
+    case 'last-added':
+      return { createdAt: 'desc' }
     default:
       return { date: direction }
   }
@@ -27,22 +27,26 @@ function getSortCriteria(
 export const getBarometersByParams = withPrisma(
   async (
     prisma,
-    categoryName: string,
+    categoryName: string | null,
     page: number,
     pageSize: number,
     sortBy: SortValue | null,
   ) => {
     // perform case-insensitive compare with the stored categories
-    const category = await prisma.category.findFirst({
-      where: { name: { equals: categoryName, mode: 'insensitive' } },
-    })
-    if (!category) throw new Error('Unknown barometer category')
+    const category = categoryName
+      ? await prisma.category.findFirst({
+          where: { name: { equals: categoryName, mode: 'insensitive' } },
+        })
+      : null
 
     const skip = (page - 1) * pageSize
+    const where: Prisma.BarometerWhereInput | undefined = category
+      ? { categoryId: category.id }
+      : undefined
 
     const [barometers, totalItems] = await Promise.all([
       prisma.barometer.findMany({
-        where: { categoryId: category.id },
+        where,
         select: {
           id: true,
           name: true,
@@ -73,7 +77,7 @@ export const getBarometersByParams = withPrisma(
         take: pageSize,
         orderBy: [getSortCriteria(sortBy), { name: 'asc' }],
       }),
-      prisma.barometer.count({ where: { categoryId: category.id } }),
+      prisma.barometer.count({ where }),
     ])
 
     return {
@@ -86,31 +90,4 @@ export const getBarometersByParams = withPrisma(
   },
 )
 
-export type ParameterizedBarometerListDTO = Awaited<ReturnType<typeof getBarometersByParams>>
-
-/**
- * List all barometers WITHOUT pagination. This is used in static pages generation
- */
-export const getAllBarometers = withPrisma(prisma =>
-  prisma.barometer.findMany({
-    select: {
-      id: true,
-      name: true,
-      date: true,
-      slug: true,
-      collectionId: true,
-      manufacturer: {
-        select: {
-          name: true,
-        },
-      },
-      category: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  }),
-)
-
-export type BarometerListDTO = Awaited<ReturnType<typeof getAllBarometers>>
+export type BarometerListDTO = Awaited<ReturnType<typeof getBarometersByParams>>

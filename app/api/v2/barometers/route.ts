@@ -5,7 +5,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject, slug as slugify } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { getAllBarometers, getBarometersByParams } from './getters'
+import { getBarometersByParams } from './getters'
 import { barometerRoute } from '@/app/constants'
 import { revalidateCategory } from './revalidate'
 
@@ -21,12 +21,6 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get('sort') as SortValue | null
     const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
-    // if `type` search param was not passed return all barometers list
-    if (!category || !category.trim()) {
-      const barometers = await getAllBarometers()
-      return NextResponse.json(barometers, { status: 200 })
-    }
-    // type was passed
     const dbResponse = await getBarometersByParams(category, page, size, sortBy)
     return NextResponse.json(dbResponse, { status: dbResponse.barometers.length > 0 ? 200 : 404 })
   } catch (error) {
@@ -53,6 +47,8 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
         images: {
           create: images,
         },
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     })
     await revalidateCategory(prisma, categoryId)
@@ -94,6 +90,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
             images: {
               create: images,
             },
+            updatedAt: new Date(),
           },
         })
       } else {
