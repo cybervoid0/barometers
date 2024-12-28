@@ -8,7 +8,6 @@ import {
   BAROMETERS_PER_CATEGORY_PAGE,
 } from '@/app/constants'
 import { BarometerCard } from '@/app/components/barometer-card'
-import { slug } from '@/utils/misc'
 import { SortValue, SortOptions } from '@/app/types'
 import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
@@ -76,13 +75,13 @@ export default async function Collection({ params: { category } }: CollectionPro
         {description && <DescriptionText size="sm" description={description} />}
         <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
-          {barometers.map(({ name, id, images, manufacturer }, i) => (
+          {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 8}
                 image={googleStorageImagesFolder + images[0].url}
                 name={name}
-                link={barometerRoute + slug(name)}
+                link={barometerRoute + slug}
                 manufacturer={manufacturer?.name}
               />
             </GridCol>
