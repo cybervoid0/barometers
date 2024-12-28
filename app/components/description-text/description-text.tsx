@@ -1,14 +1,17 @@
-import { Spoiler, Text, TextProps } from '@mantine/core'
+'use client'
+
+import { Spoiler, TextProps } from '@mantine/core'
+import { MD } from '../md'
 
 interface DescriptionTextProps extends TextProps {
   description: string
 }
 
-export const DescriptionText = ({ description, ...props }: DescriptionTextProps) => {
+export const DescriptionText = ({ description }: DescriptionTextProps) => {
   const [firstParagraph, ...paragraphs] = description.split('\n')
   return (
     <>
-      <Text {...props}>{firstParagraph}</Text>
+      <MD>{firstParagraph}</MD>
       <Spoiler
         maxHeight={0}
         showLabel="Show more"
@@ -16,9 +19,7 @@ export const DescriptionText = ({ description, ...props }: DescriptionTextProps)
         styles={{ control: { color: '#242424', fontWeight: 600 } }}
       >
         {paragraphs.map((paragraph, i) => (
-          <Text {...props} mb="md" key={i}>
-            {paragraph}
-          </Text>
+          <MD key={i}>{paragraph}</MD>
         ))}
       </Spoiler>
     </>
