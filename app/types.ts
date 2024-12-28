@@ -1,4 +1,4 @@
-export type { BarometerListDTO, ParameterizedBarometerListDTO } from './api/v2/barometers/getters'
+export type { BarometerListDTO } from './api/v2/barometers/getters'
 export type { CategoryListDTO } from './api/v2/categories/getters'
 export type { CategoryDTO } from './api/v2/categories/[name]/getters'
 export type { BarometerDTO } from './api/v2/barometers/[slug]/getters'
@@ -28,7 +28,7 @@ export const SortOptions = [
   { value: 'name', label: 'Name' },
   { value: 'date', label: 'Dating' },
   { value: 'manufacturer', label: 'Manufacturer' },
-  { value: 'cat-no', label: 'Catalogue No.' },
+  { value: 'last-added', label: 'Last added' },
 ] as const satisfies { value: string; label: string }[]
 
 export type SortValue = (typeof SortOptions)[number]['value']

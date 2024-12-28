@@ -3,7 +3,7 @@ import { googleStorageImagesFolder, barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
 import { searchBarometers } from '@/utils/fetch'
 import { SearchInfo } from './search-info'
-import { Pagination } from './pagination'
+import { Pagination } from '@/app/components/pagination'
 
 interface SearchProps {
   searchParams: Record<string, string>

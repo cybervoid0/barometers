@@ -25,7 +25,7 @@ export function SearchInfo({ isEmptyResult, queryString }: SearchInfoProps) {
 
   return (
     <Stack>
-      <SearchField queryString={queryString} />
+      <SearchField px={{ base: 'lg', xs: 0 }} queryString={queryString} />
       <Title className={sx[msg]} fw={400} fz={{ base: '0.8rem', sm: '1rem' }} component="p">
         {message[msg]}
       </Title>

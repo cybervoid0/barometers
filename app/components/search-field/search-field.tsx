@@ -42,13 +42,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
     router.push(`/search?${query}`, { scroll: true })
   }
   return (
-    <Box
-      {...props}
-      my="md"
-      px={{ base: 'lg', xs: 0 }}
-      component="form"
-      onSubmit={form.onSubmit(handleSearch)}
-    >
+    <Box {...props} my="md" component="form" onSubmit={form.onSubmit(handleSearch)}>
       <ButtonGroup>
         <TextInput
           autoComplete="off"
