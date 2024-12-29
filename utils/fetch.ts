@@ -31,7 +31,9 @@ export async function fetchBarometerList(
   searchParams: Record<string, string>,
 ): Promise<BarometerListDTO> {
   const url = baseUrl + barometersApiRoute
-  const res = await fetch(`${url}?${new URLSearchParams(searchParams)}`)
+  const res = await fetch(`${url}?${new URLSearchParams(searchParams)}`, {
+    next: { revalidate: 600 },
+  })
   return res.json()
 }
 export async function searchBarometers(
