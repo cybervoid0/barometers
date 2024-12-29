@@ -6,7 +6,7 @@ import { cleanObject, slug as slugify } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/app/constants'
 import { revalidateCategory } from './revalidate'
 
 /**
@@ -52,6 +52,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
     await revalidateCategory(prisma, categoryId)
+    revalidatePath(newArrivals) // regenerate new arrivals page
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
