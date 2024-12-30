@@ -67,6 +67,7 @@ export const getBarometersByParams = withPrisma(
             select: {
               url: true,
               order: true,
+              blurData: true,
             },
             orderBy: {
               order: 'asc',

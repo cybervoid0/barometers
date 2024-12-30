@@ -2,9 +2,11 @@ import { Text, Group, Image, Anchor, Box, Stack, Paper } from '@mantine/core'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import styles from './style.module.css'
+import { SearchResultsDTO } from '../types'
+import { googleStorageImagesFolder } from '../constants'
 
 interface ItemProps {
-  image?: string
+  image: SearchResultsDTO['barometers'][number]['image']
   name: string
   link: string
   manufacturer?: string
@@ -22,9 +24,11 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
               component={NextImage}
               fill
               alt={name}
-              src={image}
+              src={image?.url && googleStorageImagesFolder + image.url}
               style={{ objectFit: 'contain' }}
               sizes="100px"
+              placeholder="blur"
+              blurDataURL={image?.blurData}
             />
           </Box>
           <Stack gap="xs" justify="center" mih="70px">

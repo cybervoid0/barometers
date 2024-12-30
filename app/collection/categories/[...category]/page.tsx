@@ -79,7 +79,7 @@ export default async function Collection({ params: { category } }: CollectionPro
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 8}
-                image={googleStorageImagesFolder + images[0].url}
+                image={images[0]}
                 name={name}
                 link={barometerRoute + slug}
                 manufacturer={manufacturer?.name}

@@ -13,13 +13,13 @@ import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import './styles.css'
+import { googleStorageImagesFolder } from '@/app/constants'
 
 interface ImageCarouselProps {
-  images: string[]
   barometer: BarometerDTO
 }
 
-export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
+export function ImageCarousel({ barometer }: ImageCarouselProps) {
   return (
     <Box style={{ overflow: 'hidden', position: 'relative' }}>
       <IsAdmin>
@@ -27,7 +27,7 @@ export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
       </IsAdmin>
       <Swiper
         zoom
-        loop={images.length > 1}
+        loop={barometer.images.length > 1}
         navigation
         modules={[Zoom, Navigation, Pagination]}
         pagination={{
@@ -37,8 +37,8 @@ export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
           },
         }}
       >
-        {images.map((image, i) => (
-          <SwiperSlide key={image}>
+        {barometer.images.map((image, i) => (
+          <SwiperSlide key={image.id}>
             <Box className="swiper-zoom-container">
               <Image
                 priority={i === 0}
@@ -46,10 +46,12 @@ export function ImageCarousel({ images, barometer }: ImageCarouselProps) {
                 quality={60}
                 width={200}
                 height={200}
-                src={image}
+                src={googleStorageImagesFolder + image.url}
                 alt={barometer.name}
                 component={NextImage}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                placeholder="blur"
+                blurDataURL={image.blurData}
               />
             </Box>
           </SwiperSlide>

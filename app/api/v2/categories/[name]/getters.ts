@@ -17,6 +17,7 @@ export const getCategory = withPrisma((prisma, name: string) =>
       image: {
         select: {
           url: true,
+          blurData: true,
         },
       },
     },

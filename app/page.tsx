@@ -27,7 +27,7 @@ export default async function HomePage() {
             <GridCol key={id} span={{ base: 12, xs: 6, lg: 4 }}>
               <CategoryCard
                 priority={i < 3}
-                image={image.url}
+                image={image}
                 name={label}
                 link={categoriesRoute + name.toLowerCase()}
               />

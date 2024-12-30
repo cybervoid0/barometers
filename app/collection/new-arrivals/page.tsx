@@ -3,7 +3,7 @@ import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
-import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/app/constants'
 
 const itemsOnPage = 12
 
@@ -30,7 +30,7 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 8}
-                image={googleStorageImagesFolder + images[0].url}
+                image={images[0]}
                 name={name}
                 link={barometerRoute + slug}
                 manufacturer={manufacturer?.name}

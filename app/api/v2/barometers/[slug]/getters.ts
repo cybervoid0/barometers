@@ -36,11 +36,7 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
     },
   })
   if (barometer === null) throw new NotFoundError()
-  return {
-    ...barometer,
-    // temporarily
-    images: barometer.images.map(img => img.url),
-  }
+  return barometer
 })
 
 export type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>
