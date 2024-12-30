@@ -30,6 +30,7 @@ import sx from './styles.module.scss'
 import { barometerRoute, googleStorageImagesFolder } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
+import { getFullImage } from '@/utils/misc'
 
 interface ImagesEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -77,7 +78,7 @@ function SortableImage({
           className={sx.thumbnail}
           alt="Barometer"
           key={image}
-          src={googleStorageImagesFolder + image}
+          src={googleStorageImagesFolder + getFullImage(image)}
           width={100}
           height={200}
           quality={50}

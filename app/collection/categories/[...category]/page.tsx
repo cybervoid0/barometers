@@ -16,6 +16,7 @@ import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
+import { getFullImage } from '@/utils/misc'
 
 interface CollectionProps {
   params: {
@@ -34,7 +35,7 @@ export async function generateMetadata({
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: googleStorageImagesFolder + images.at(0),
+      url: googleStorageImagesFolder + getFullImage(images.at(0)!.url),
       alt: name,
     }))
   const url = `${categoriesRoute}${category.join('/')}`
