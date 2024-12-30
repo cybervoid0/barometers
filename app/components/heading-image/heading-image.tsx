@@ -2,6 +2,7 @@ import { Box, Title, Container } from '@mantine/core'
 import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './heading-image.module.scss'
+import headingImage from '@/public/images/landing-header.png'
 
 export const HeadingImage: FC = () => {
   return (
@@ -11,9 +12,10 @@ export const HeadingImage: FC = () => {
         quality={50}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         alt="Barograph"
-        src="/images/landing-header.png"
+        src={headingImage}
         fill
         className={styles.image}
+        placeholder="blur"
       />
       <Box className={styles.textContainer}>
         <Box>
