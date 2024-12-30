@@ -4,7 +4,7 @@ import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/app/constants'
 
 interface Params {
   params: {
@@ -60,7 +60,10 @@ export const DELETE = withPrisma(
       })
 
       revalidatePath(barometerRoute + barometer.slug)
+      revalidatePath(newArrivals)
       await revalidateCategory(prisma, barometer.categoryId)
+
+      // TODO: Delete image from google storage
 
       return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })
     } catch (error) {

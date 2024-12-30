@@ -1,5 +1,5 @@
 import { Box, Container, Stack, Title } from '@mantine/core'
-import { googleStorageImagesFolder, barometerRoute } from '../constants'
+import { barometerRoute } from '../constants'
 import { SearchItem } from './search-item'
 import { searchBarometers } from '@/utils/fetch'
 import { SearchInfo } from './search-info'
@@ -23,7 +23,7 @@ export default async function Search({ searchParams }: SearchProps) {
           <Stack gap="md" p={0}>
             {barometers.map(({ id, name, manufacturer, image, slug, dateDescription }) => (
               <SearchItem
-                image={image ? googleStorageImagesFolder + image.url : undefined}
+                image={image}
                 name={name}
                 manufacturer={manufacturer?.name}
                 link={barometerRoute + slug}

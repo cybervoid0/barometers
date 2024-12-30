@@ -80,10 +80,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
     <Container size="xl">
       <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
         <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
-        <ImageCarousel
-          barometer={barometer}
-          images={barometer.images.map(image => googleStorageImagesFolder + image)}
-        />
+        <ImageCarousel barometer={barometer} />
         <Box mb="md">
           <Title
             className={sx.title}

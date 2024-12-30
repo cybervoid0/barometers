@@ -12,13 +12,14 @@ datasource db {
 model Image {
   id          String      @id @default(uuid())
   url         String
+  blurData    String
   description String?
   name        String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   categories  Category?   @relation("CategoryImage")
   barometers  Barometer[] @relation("BarometerImages")
-  order       Int?        
+  order       Int?
 }
 
 model Category {

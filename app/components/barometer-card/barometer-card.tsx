@@ -2,9 +2,11 @@ import { Box, Text, Anchor } from '@mantine/core'
 import Link from 'next/link'
 import NextImage from 'next/image'
 import styles from './styles.module.scss'
+import { BarometerListDTO } from '@/app/types'
+import { googleStorageImagesFolder } from '@/app/constants'
 
 interface BarometerCardProps {
-  image: string
+  image: BarometerListDTO['barometers'][number]['images'][number]
   name: string
   link: string
   manufacturer?: string
@@ -26,11 +28,13 @@ export async function BarometerCard({
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
             quality={50}
-            src={image}
+            src={googleStorageImagesFolder + image.url}
             alt={name}
             fill
             sizes="(max-width: 575px) 50vw, (max-width: 1350px) 25vw, 20vw"
             style={{ objectFit: 'contain' }}
+            placeholder="blur"
+            blurDataURL={image.blurData ?? undefined}
           />
         </Box>
         <Text mb="0.2rem" size="xs" fw={500} lts={1} tt="uppercase" ta="center">

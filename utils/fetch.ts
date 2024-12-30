@@ -32,7 +32,7 @@ export async function fetchBarometerList(
 ): Promise<BarometerListDTO> {
   const url = baseUrl + barometersApiRoute
   const res = await fetch(`${url}?${new URLSearchParams(searchParams)}`, {
-    next: { revalidate: 600 },
+    cache: 'no-cache',
   })
   return res.json()
 }

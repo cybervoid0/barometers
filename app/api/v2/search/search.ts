@@ -41,6 +41,7 @@ export const searchBarometers = withPrisma(
             take: 1,
             select: {
               url: true,
+              blurData: true,
             },
           },
         },

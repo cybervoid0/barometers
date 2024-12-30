@@ -8,6 +8,7 @@ import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
 import { barometerRoute, newArrivals } from '@/app/constants'
 import { revalidateCategory } from './revalidate'
+import { getImagesMeta } from './imageBlur'
 
 /**
  * Get barometer list
@@ -45,7 +46,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       data: {
         ...barometer,
         images: {
-          create: images,
+          create: await getImagesMeta(images),
         },
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -89,7 +90,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
             ...newData,
             // attach new images
             images: {
-              create: images,
+              create: await getImagesMeta(images),
             },
             updatedAt: new Date(),
           },

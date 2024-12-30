@@ -13,6 +13,7 @@ export const getCategories = withPrisma(prisma =>
       image: {
         select: {
           url: true,
+          blurData: true,
         },
       },
     },

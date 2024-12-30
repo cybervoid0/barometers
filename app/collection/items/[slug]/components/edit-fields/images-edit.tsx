@@ -23,7 +23,7 @@ import {
   arrayMove,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { BarometerDTO } from '@/app/types'
 import sx from './styles.module.scss'
@@ -87,6 +87,7 @@ function SortableImage({
   )
 }
 export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
+  const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer])
   const [isUploading, setIsUploading] = useState(false)
   const [opened, { open, close }] = useDisclosure()
   const form = useForm<FormProps>({
@@ -95,10 +96,10 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     },
   })
   useEffect(() => {
-    if (!barometer.images || !opened) return
-    form.setFieldValue('images', barometer.images)
+    if (!barometerImages || !opened) return
+    form.setFieldValue('images', barometerImages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [barometer.images, opened])
+  }, [barometerImages, opened])
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
@@ -119,7 +120,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     setIsUploading(true)
     try {
       // erase deleted images
-      const extraFiles = barometer.images?.filter(img => !form.values.images.includes(img))
+      const extraFiles = barometerImages?.filter(img => !form.values.images.includes(img))
       if (extraFiles) await Promise.all(extraFiles?.map(deleteImage))
       const updatedBarometer = {
         id: barometer.id,
@@ -178,7 +179,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     setIsUploading(true)
     try {
       // if the image file was uploaded but not yet added to the barometer
-      if (!barometer.images?.includes(img)) await deleteImage(img)
+      if (!barometerImages?.includes(img)) await deleteImage(img)
       form.setFieldValue('images', old => old.filter(file => !file.includes(img)))
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error deleting file')
@@ -191,7 +192,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     // delete unused files from storage
     try {
       setIsUploading(true)
-      const extraImages = form.values.images.filter(img => !barometer.images?.includes(img))
+      const extraImages = form.values.images.filter(img => !barometerImages?.includes(img))
       await Promise.all(extraImages.map(deleteImage))
     } catch (error) {
       // do nothing
