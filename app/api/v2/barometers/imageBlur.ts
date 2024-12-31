@@ -1,10 +1,10 @@
 import sharp from 'sharp'
-import { googleStorageImagesFolder } from '@/app/constants'
+import bucket from '@/utils/googleStorage'
 
 async function getGoogleStorageImage(imgUrl: string) {
-  const url = googleStorageImagesFolder + imgUrl
-  const res = await fetch(url)
-  return res.arrayBuffer()
+  const file = bucket.file(imgUrl)
+  const [buffer] = await file.download()
+  return buffer
 }
 
 async function getBlurDateBase64(imgUrl: string) {

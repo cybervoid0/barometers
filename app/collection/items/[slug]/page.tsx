@@ -20,7 +20,6 @@ import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { DeleteBarometer } from './components/delete-barometer'
-import { getFullImage } from '@/utils/misc'
 
 export const dynamic = 'force-static'
 
@@ -39,7 +38,7 @@ export async function generateMetadata({
   const barometerImages =
     images &&
     images.map(image => ({
-      url: googleStorageImagesFolder + getFullImage(image.url),
+      url: googleStorageImagesFolder + image.url,
       alt: name,
     }))
   const url = barometerRoute + slug

@@ -1,17 +1,6 @@
-import { Storage } from '@google-cloud/storage'
 import sharp from 'sharp'
 import { withPrisma } from '../prisma/prismaClient'
-
-const decodedPrivateKey = Buffer.from(process.env.GCP_PRIVATE_KEY!, 'base64').toString('utf-8')
-const storage = new Storage({
-  projectId: process.env.GCP_PROJECT_ID,
-  credentials: {
-    client_email: process.env.GCP_CLIENT_EMAIL,
-    private_key: decodedPrivateKey,
-  },
-})
-const bucket = storage.bucket(process.env.GCP_BUCKET_NAME!)
-
+import bucket from './googleStorage'
 /**
  * This function processes images stored either locally or in Google Cloud Storage,
  * generates a small blurred placeholder for each image in AVIF format, and updates

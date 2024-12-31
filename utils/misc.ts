@@ -36,13 +36,3 @@ export async function handleApiError(res: Response): Promise<void> {
   const errorMessage = errorData.message || res.statusText
   throw new Error(errorMessage)
 }
-
-function parseUrl(url: string) {
-  const ext = url.split('.').at(-1)
-  const name = url.slice(0, -(ext ? ext.length + 1 : 0))
-  return { ext, name }
-}
-export function getFullImage(url: string): string {
-  const { ext, name } = parseUrl(url)
-  return `${name}/image.${ext}`
-}

@@ -30,8 +30,6 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               style={{
                 objectFit: name === 'Recorders' ? 'cover' : 'contain',
               }}
-              placeholder="blur"
-              blurDataURL={image.blurData}
             />
           )}
           <Title component="h3" className={styles.title}>
