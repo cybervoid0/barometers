@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         const [signedUrl] = await cloudFile.getSignedUrl(options)
         return {
           signed: signedUrl,
-          public: cloudFile.publicUrl(),
+          public: cloudFile.name,
         }
       }),
     )

@@ -45,7 +45,7 @@ export function AddCard() {
         ...values,
         date: dayjs(`${values.date}-01-01`).toISOString(),
         images: values.images.map((image, i) => ({
-          url: image.split('/').at(-1),
+          url: image,
           order: i,
           name: values.name,
         })),
