@@ -35,48 +35,45 @@ export async function GET(_req: NextRequest, { params: { slug } }: Params) {
  * Delete Barometer by slug
  */
 /* eslint-disable prettier/prettier */
-export const DELETE = withPrisma(
-  async (prisma, _req: NextRequest, { params: { slug } }: Params) => {
-    console.log('🚀 ~ slug:', slug, decodeURIComponent(slug))
-    try {
-      const barometer = await prisma.barometer.findFirst({
-        where: {
-          slug: {
-            equals: slug,
-            mode: 'insensitive',
-          },
+export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Params) => {
+  try {
+    const barometer = await prisma.barometer.findFirst({
+      where: {
+        slug: {
+          equals: slug,
+          mode: 'insensitive',
         },
-      })
+      },
+    })
 
-      if (!barometer) {
-        return NextResponse.json({ message: 'Barometer not found' }, { status: 404 })
-      }
-      const args = {
-        where: { barometers: { some: { id: barometer.id } } },
-      }
-      // save deleting images info
-      const imagesBeforeDbUpdate = await prisma.image.findMany(args)
-      await prisma.$transaction(async tx => {
-        await tx.image.deleteMany(args)
-        await tx.barometer.delete({
-          where: {
-            id: barometer.id,
-          },
-        })
-      })
-      await deleteImagesFromGoogleStorage(imagesBeforeDbUpdate)
-      revalidatePath(barometerRoute + barometer.slug)
-      revalidatePath(newArrivals)
-      await revalidateCategory(prisma, barometer.categoryId)
-
-      return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })
-    } catch (error) {
-      return NextResponse.json(
-        {
-          message: error instanceof Error ? error.message : 'Error deleting barometer',
-        },
-        { status: 500 },
-      )
+    if (!barometer) {
+      return NextResponse.json({ message: 'Barometer not found' }, { status: 404 })
     }
-  },
-)
+    const args = {
+      where: { barometers: { some: { id: barometer.id } } },
+    }
+    // save deleting images info
+    const imagesBeforeDbUpdate = await prisma.image.findMany(args)
+    await prisma.$transaction(async tx => {
+      await tx.image.deleteMany(args)
+      await tx.barometer.delete({
+        where: {
+          id: barometer.id,
+        },
+      })
+    })
+    await deleteImagesFromGoogleStorage(imagesBeforeDbUpdate)
+    revalidatePath(barometerRoute + barometer.slug)
+    revalidatePath(newArrivals)
+    await revalidateCategory(prisma, barometer.categoryId)
+
+    return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: error instanceof Error ? error.message : 'Error deleting barometer',
+      },
+      { status: 500 },
+    )
+  }
+})
