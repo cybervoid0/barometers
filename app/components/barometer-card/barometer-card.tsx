@@ -6,7 +6,7 @@ import { BarometerListDTO } from '@/app/types'
 import { googleStorageImagesFolder } from '@/app/constants'
 
 interface BarometerCardProps {
-  image: BarometerListDTO['barometers'][number]['images'][number]
+  image?: BarometerListDTO['barometers'][number]['images'][number]
   name: string
   link: string
   manufacturer?: string
@@ -24,18 +24,22 @@ export async function BarometerCard({
     <Box>
       <Anchor underline="never" c="dark" className={styles.anchor} component={Link} href={link}>
         <Box className={styles.bg_gradient}>
-          <NextImage
-            priority={priority}
-            loading={priority ? 'eager' : 'lazy'}
-            quality={50}
-            src={googleStorageImagesFolder + image.url}
-            alt={name}
-            fill
-            sizes="(max-width: 575px) 50vw, (max-width: 1350px) 25vw, 20vw"
-            style={{ objectFit: 'contain' }}
-            placeholder="blur"
-            blurDataURL={image.blurData ?? undefined}
-          />
+          {image ? (
+            <NextImage
+              priority={priority}
+              loading={priority ? 'eager' : 'lazy'}
+              quality={50}
+              src={googleStorageImagesFolder + image.url}
+              alt={name}
+              fill
+              sizes="(max-width: 575px) 50vw, (max-width: 1350px) 25vw, 20vw"
+              style={{ objectFit: 'contain' }}
+              placeholder="blur"
+              blurDataURL={image.blurData ?? undefined}
+            />
+          ) : (
+            <Text>No image</Text>
+          )}
         </Box>
         <Text mb="0.2rem" size="xs" fw={500} lts={1} tt="uppercase" ta="center">
           {name}
