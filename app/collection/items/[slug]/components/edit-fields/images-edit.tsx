@@ -158,10 +158,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
       )
 
-      // extracting file names from URLs
-      const newImages = urlsDto.urls
-        .map(url => new URL(url.public).pathname.split('/').at(-1) ?? '')
-        .filter(url => Boolean(url))
+      const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
       form.setFieldValue('images', prev => [...prev, ...newImages])
     } catch (error) {
       const defaultErrMsg = 'Error uploading files'
