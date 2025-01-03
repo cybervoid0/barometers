@@ -43,20 +43,18 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const fileName = searchParams.get('fileName')
   try {
-    const { searchParams } = new URL(req.url)
-    const fileName = searchParams.get('fileName')
     if (!fileName) return NextResponse.json({ message: 'File name is required' }, { status: 400 })
-
     // delete file from google cloud storage
     const file = bucket.file(fileName)
     await file.delete()
-
     return NextResponse.json({ message: `${fileName} was deleted` }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error deleting file' },
-      { status: 500 },
+      { message: `${fileName ?? 'Your file'} is already deleted` },
+      { status: 200 },
     )
   }
 }

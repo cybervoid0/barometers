@@ -1,19 +1,16 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Image } from '@prisma/client'
 import bucket from '@/utils/googleStorage'
 
 /**
- * Deletes all Google Storage images of the selected barometer
+ * Deletes selected Google Storage images
  */
-export async function deleteImagesFromGoogleStorage(prisma: PrismaClient, barometerId: string) {
-  const imageArgs: Prisma.ImageFindManyArgs = {
-    where: { barometers: { some: { id: barometerId } } },
-  }
-  const images = await prisma.image.findMany(imageArgs)
+export async function deleteImagesFromGoogleStorage(images: Image[]) {
   await Promise.all(
     images.map(async image => {
       try {
         await bucket.file(image.url).delete()
       } catch (error) {
+        // don't throw error if image was not deleted
         console.error(`Could not delete ${image.url} from Google Storage`)
         console.error(error)
       }

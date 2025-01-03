@@ -25,7 +25,7 @@ export async function getImagesMeta(
     name: string
   }[],
 ) {
-  return Promise.all(
+  const results = await Promise.allSettled(
     images.map(async image => {
       const blurData = await getBlurDateBase64(image.url)
       return {
@@ -34,4 +34,6 @@ export async function getImagesMeta(
       }
     }),
   )
+  // take only successfully created thumbnails
+  return results.filter(res => res.status === 'fulfilled').map(res => res.value)
 }

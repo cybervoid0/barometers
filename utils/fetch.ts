@@ -153,7 +153,8 @@ export async function uploadFileToCloud(url: string, file: File) {
   if (!res.ok) await handleApiError(res)
 }
 export async function deleteImage(fileName: string) {
-  const res = await fetch(`${imageUploadApiRoute}?fileName=${fileName}`, {
+  const url = `${imageUploadApiRoute}?${new URLSearchParams({ fileName })}`
+  const res = await fetch(url, {
     method: 'DELETE',
   })
   if (!res.ok) await handleApiError(res)

@@ -79,30 +79,24 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // modify slug if name has changed
     const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
-    const imagesWithThumbnails = images ? await getImagesMeta(images) : undefined
+    // take only existing images
+    const imagesWithThumbnails =
+      images && images.length > 0 ? await getImagesMeta(images) : undefined
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
-      if (images && images.length > 0) {
-        // delete old images
-        await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
-        await tx.barometer.update({
-          where: { id },
-          data: {
-            ...newData,
-            // attach new images
-            images: {
-              create: imagesWithThumbnails,
-            },
-            updatedAt: new Date(),
+      // delete old images
+      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+      await tx.barometer.update({
+        where: { id },
+        data: {
+          ...newData,
+          // attach new images
+          images: {
+            create: imagesWithThumbnails,
           },
-        })
-      } else {
-        // images are not updated
-        await tx.barometer.update({
-          where: { id },
-          data: newData,
-        })
-      }
+          updatedAt: new Date(),
+        },
+      })
     })
     revalidatePath(barometerRoute + newData.slug)
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
