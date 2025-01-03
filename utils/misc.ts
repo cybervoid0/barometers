@@ -32,7 +32,11 @@ export function slug(text: string): string {
  * @throws {Error} Throws an error with the extracted or default error message.
  */
 export async function handleApiError(res: Response): Promise<void> {
-  const errorData = await res.json()
-  const errorMessage = errorData.message || res.statusText
-  throw new Error(errorMessage)
+  try {
+    const errorData = await res.json()
+    const errorMessage = errorData.message || res.statusText
+    throw new Error(errorMessage)
+  } catch (error) {
+    throw new Error(res.statusText ?? res.text ?? 'handleApiError: unknown error')
+  }
 }

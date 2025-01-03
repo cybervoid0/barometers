@@ -83,21 +83,24 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const imagesWithThumbnails =
       images && images.length > 0 ? await getImagesMeta(images) : undefined
     // transaction will prevent deleting images in case barometer update fails
-    await prisma.$transaction(async tx => {
-      // delete old images
-      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
-      await tx.barometer.update({
-        where: { id },
-        data: {
-          ...newData,
-          // attach new images
-          images: {
-            create: imagesWithThumbnails,
+    await prisma.$transaction(
+      async tx => {
+        // delete old images
+        await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+        await tx.barometer.update({
+          where: { id },
+          data: {
+            ...newData,
+            // attach new images
+            images: {
+              create: imagesWithThumbnails,
+            },
+            updatedAt: new Date(),
           },
-          updatedAt: new Date(),
-        },
-      })
-    })
+        })
+      },
+      { timeout: 100000 }, // 1 minute
+    )
     revalidatePath(barometerRoute + newData.slug)
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
