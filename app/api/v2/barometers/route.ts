@@ -105,8 +105,14 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {
+    console.error(error)
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error updating barometer' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : '/api/v2/barometer PUT: Error updating barometer',
+      },
       { status: 500 },
     )
   }

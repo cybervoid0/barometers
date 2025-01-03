@@ -144,8 +144,9 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       close()
       window.location.href = barometerRoute + (slug ?? '')
     } catch (error) {
+      console.error(error)
       if (error instanceof Error) {
-        showError(error.message || 'Error updating barometer')
+        showError(error.message || 'editImages: Error updating barometer')
       }
     } finally {
       setIsUploading(false)
