@@ -79,6 +79,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // modify slug if name has changed
     const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
+    const imagesWithThumbnails = images ? await getImagesMeta(images) : undefined
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
       if (images && images.length > 0) {
@@ -90,7 +91,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
             ...newData,
             // attach new images
             images: {
-              create: await getImagesMeta(images),
+              create: imagesWithThumbnails,
             },
             updatedAt: new Date(),
           },
