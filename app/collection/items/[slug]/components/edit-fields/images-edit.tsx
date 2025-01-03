@@ -121,7 +121,17 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     try {
       // erase deleted images
       const extraFiles = barometerImages?.filter(img => !form.values.images.includes(img))
-      if (extraFiles) await Promise.all(extraFiles?.map(deleteImage))
+      if (extraFiles)
+        await Promise.all(
+          extraFiles?.map(async file => {
+            try {
+              await deleteImage(file)
+            } catch (error) {
+              // don't mind if it was not possible to delete the file
+            }
+          }),
+        )
+
       const updatedBarometer = {
         id: barometer.id,
         images: form.getValues().images.map((img, i) => ({
