@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       files.map<Promise<UrlProps>>(async ({ fileName, contentType }) => {
         // give unique names to files
         const extension = path.extname(fileName).toLowerCase()
-        const newFileName = `gallery/${uuid()}/image${extension}`
+        const newFileName = `gallery/${uuid()}${extension}`
         const options: GetSignedUrlConfig = {
           version: 'v4',
           action: 'write',
