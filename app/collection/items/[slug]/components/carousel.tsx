@@ -39,13 +39,12 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
       >
         {barometer.images.map((image, i) => (
           <SwiperSlide key={image.id}>
-            <Box className="swiper-zoom-container">
+            <Box pos="relative" className="swiper-zoom-container">
               <Image
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                quality={90}
-                width={200}
-                height={200}
+                quality={100}
+                fill
                 src={googleStorageImagesFolder + image.url}
                 alt={barometer.name}
                 component={NextImage}
