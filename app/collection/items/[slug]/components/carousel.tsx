@@ -43,7 +43,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
               <Image
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                quality={60}
+                quality={90}
                 width={200}
                 height={200}
                 src={googleStorageImagesFolder + image.url}
