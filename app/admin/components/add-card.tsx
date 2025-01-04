@@ -13,7 +13,8 @@ import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
 import { type BarometerFormProps } from '../../types'
 import { createBarometer } from '@/utils/fetch'
-import { slug } from '@/utils/misc'
+import { slug, getThumbnailBase64 } from '@/utils/misc'
+import { googleStorageImagesFolder } from '@/app/constants'
 
 export function AddCard() {
   const { condition, categories, manufacturers } = useBarometers()
@@ -44,11 +45,14 @@ export function AddCard() {
       const barometerWithImages = {
         ...values,
         date: dayjs(`${values.date}-01-01`).toISOString(),
-        images: values.images.map((image, i) => ({
-          url: image,
-          order: i,
-          name: values.name,
-        })),
+        images: await Promise.all(
+          values.images.map(async (url, i) => ({
+            url,
+            order: i,
+            name: values.name,
+            blurData: await getThumbnailBase64(googleStorageImagesFolder + url),
+          })),
+        ),
         slug: slug(values.name),
       }
       return createBarometer(barometerWithImages)

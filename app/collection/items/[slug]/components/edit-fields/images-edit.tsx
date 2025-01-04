@@ -30,6 +30,7 @@ import sx from './styles.module.scss'
 import { barometerRoute, googleStorageImagesFolder } from '@/app/constants'
 import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
+import { getThumbnailBase64 } from '@/utils/misc'
 
 interface ImagesEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -111,7 +112,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       form.setFieldValue('images', newOrder)
     }
   }
-  const editImages = async (values: FormProps) => {
+  const updateBarometerWithImages = async (values: FormProps) => {
     // exit if no image was changed
     if (isEqual(values.images, barometer.images)) {
       close()
@@ -134,11 +135,19 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
 
       const updatedBarometer = {
         id: barometer.id,
-        images: form.getValues().images.map((img, i) => ({
-          url: img,
-          order: i,
-        })),
+        images: await Promise.all(
+          values.images.map(async (url, i) => {
+            const blurData = await getThumbnailBase64(googleStorageImagesFolder + url)
+            return {
+              url,
+              order: i,
+              name: barometer.name,
+              blurData,
+            }
+          }),
+        ),
       }
+
       const { slug } = await updateBarometer(updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
@@ -219,7 +228,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         onClose={onClose}
         classNames={{ title: sx.imageEditModalTitle }}
       >
-        <Box pos="relative" component="form" onSubmit={form.onSubmit(editImages)}>
+        <Box pos="relative" component="form" onSubmit={form.onSubmit(updateBarometerWithImages)}>
           <LoadingOverlay visible={isUploading} zIndex={100} />
           <Stack>
             <FileButton multiple onChange={uploadImages} accept="image/**">

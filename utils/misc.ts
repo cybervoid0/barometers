@@ -1,5 +1,6 @@
 import slugify from 'slugify'
 import traverse from 'traverse'
+import { Jimp, rgbaToInt } from 'jimp'
 
 /**
  * Returns a deep object copy where string values are trimmed,
@@ -39,4 +40,13 @@ export async function handleApiError(res: Response): Promise<void> {
   } catch (error) {
     throw new Error(res.statusText ?? res.text ?? 'handleApiError: unknown error')
   }
+}
+
+/**
+ * Downloads image to the browser memory and creates a blurred thumbnail for displaying as Next Image placeholder
+ */
+export async function getThumbnailBase64(imgUrl: string) {
+  const image = await Jimp.read(imgUrl)
+  image.background = rgbaToInt(239, 239, 239, 255)
+  return image.resize({ h: 32 }).blur(1).getBase64('image/jpeg', { quality: 30 })
 }

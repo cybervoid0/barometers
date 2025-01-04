@@ -8,7 +8,6 @@ import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
 import { barometerRoute, newArrivals } from '@/app/constants'
 import { revalidateCategory } from './revalidate'
-import { getImagesMeta } from './imageBlur'
 
 /**
  * Get barometer list
@@ -46,7 +45,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       data: {
         ...barometer,
         images: {
-          create: await getImagesMeta(images),
+          create: images,
         },
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -79,28 +78,22 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // modify slug if name has changed
     const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
-    // take only existing images
-    const imagesWithThumbnails =
-      images && images.length > 0 ? await getImagesMeta(images) : undefined
     // transaction will prevent deleting images in case barometer update fails
-    await prisma.$transaction(
-      async tx => {
-        // delete old images
-        await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
-        await tx.barometer.update({
-          where: { id },
-          data: {
-            ...newData,
-            // attach new images
-            images: {
-              create: imagesWithThumbnails,
-            },
-            updatedAt: new Date(),
+    await prisma.$transaction(async tx => {
+      // delete old images
+      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+      await tx.barometer.update({
+        where: { id },
+        data: {
+          ...newData,
+          // attach new images
+          images: {
+            create: images,
           },
-        })
-      },
-      { timeout: 100000 }, // 1 minute
-    )
+          updatedAt: new Date(),
+        },
+      })
+    })
     revalidatePath(barometerRoute + newData.slug)
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
