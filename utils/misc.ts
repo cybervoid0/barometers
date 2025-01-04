@@ -1,6 +1,6 @@
 import slugify from 'slugify'
 import traverse from 'traverse'
-import { Jimp, rgbaToInt } from 'jimp'
+import imageCompression from 'browser-image-compression'
 
 /**
  * Returns a deep object copy where string values are trimmed,
@@ -45,8 +45,30 @@ export async function handleApiError(res: Response): Promise<void> {
 /**
  * Downloads image to the browser memory and creates a blurred thumbnail for displaying as Next Image placeholder
  */
-export async function getThumbnailBase64(imgUrl: string) {
-  const image = await Jimp.read(imgUrl)
-  image.background = rgbaToInt(239, 239, 239, 255)
-  return image.resize({ h: 32 }).blur(1).getBase64('image/jpeg', { quality: 30 })
+export async function getThumbnailBase64(imgUrl: string): Promise<string> {
+  // Загружаем изображение как Blob
+  const response = await fetch(imgUrl)
+  if (!response.ok) throw new Error(`Failed to fetch image: ${imgUrl}`)
+  const blob = await response.blob()
+
+  // Преобразуем Blob в File
+  const file = new File([blob], 'image.jpg', { type: blob.type })
+
+  // Настройки сжатия
+  const options = {
+    maxWidthOrHeight: 32, // Высота 32 пикселя, ширина рассчитывается автоматически
+    initialQuality: 0.3, // Качество 30%
+    useWebWorker: true, // Использовать WebWorker для производительности
+  }
+
+  // Сжимаем изображение
+  const compressedBlob = await imageCompression(file, options)
+
+  // Преобразуем Blob в Base64
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(compressedBlob)
+  })
 }
