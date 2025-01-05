@@ -42,7 +42,6 @@
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "bcrypt": "^5.1.1",
-    "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.5.4",
