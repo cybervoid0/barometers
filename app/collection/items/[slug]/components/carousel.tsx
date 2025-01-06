@@ -48,7 +48,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 src={googleStorageImagesFolder + image.url}
                 alt={barometer.name}
                 component={NextImage}
-                sizes="(max-width: 768px) 100vw, 75vw"
+                sizes="100vw"
                 placeholder="blur"
                 blurDataURL={image.blurData}
                 style={{ objectFit: 'contain' }}
