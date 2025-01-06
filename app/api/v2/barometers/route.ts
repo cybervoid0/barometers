@@ -80,16 +80,22 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
-      // delete old images
-      await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+      // delete old images if the new ones are provided
+      if (images) {
+        await tx.image.deleteMany({ where: { barometers: { some: { id } } } })
+      }
       await tx.barometer.update({
         where: { id },
         data: {
           ...newData,
-          // attach new images
-          images: {
-            create: images,
-          },
+          // attach new images if provided
+          ...(images
+            ? {
+                images: {
+                  create: images,
+                },
+              }
+            : {}),
           updatedAt: new Date(),
         },
       })

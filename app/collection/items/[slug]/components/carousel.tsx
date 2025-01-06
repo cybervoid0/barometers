@@ -43,12 +43,12 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
               <Image
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                quality={100}
+                quality={85}
                 fill
                 src={googleStorageImagesFolder + image.url}
                 alt={barometer.name}
                 component={NextImage}
-                sizes="100vw"
+                sizes="(max-width: 768px) 1024px, 100vw"
                 placeholder="blur"
                 blurDataURL={image.blurData}
                 style={{ objectFit: 'contain' }}
