@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
-import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
+import { Container, Title, Text, Box, Divider, Tooltip, Group } from '@mantine/core'
 import dayjs from 'dayjs'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ImageCarousel } from './components/carousel'
@@ -20,6 +20,7 @@ import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { DeleteBarometer } from './components/delete-barometer'
+import InaccuracyReport from './components/inaccuracy-report'
 
 export const dynamic = 'force-static'
 
@@ -96,9 +97,12 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           </Tooltip>
         </Box>
 
-        <IsAdmin>
-          <DeleteBarometer size="compact-md" mb="sm" barometer={barometer} />
-        </IsAdmin>
+        <Group mb="sm">
+          <IsAdmin>
+            <DeleteBarometer size="compact-md" barometer={barometer} />
+          </IsAdmin>
+          <InaccuracyReport size="compact-md" barometer={barometer} />
+        </Group>
 
         {barometer.manufacturer && (
           <Box>

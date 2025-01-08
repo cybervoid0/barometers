@@ -1,4 +1,4 @@
-import { Manufacturer } from '@prisma/client'
+import { InaccuracyReport, Manufacturer } from '@prisma/client'
 import {
   barometersApiRoute,
   barometersSearchRoute,
@@ -6,6 +6,7 @@ import {
   conditionsApiRoute,
   manufacturersApiRoute,
   imageUploadApiRoute,
+  reportRoute,
 } from '@/app/constants'
 import type {
   CategoryDTO,
@@ -158,4 +159,22 @@ export async function deleteImage(fileName: string) {
     method: 'DELETE',
   })
   if (!res.ok) await handleApiError(res)
+}
+/******* Inaccuracy Report ********/
+export async function createReport(report: Partial<InaccuracyReport>): Promise<{ id: string }> {
+  const res = await fetch(baseUrl + reportRoute, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(report),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
+export async function fetchReportList(searchParams: Record<string, string>) {
+  const url = baseUrl + reportRoute
+  const qs = new URLSearchParams(searchParams)
+  const res = await fetch(`${url}?${qs.toString()}`, {
+    cache: 'no-cache',
+  })
+  return res.json()
 }
