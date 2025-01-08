@@ -39,6 +39,7 @@
     "@prisma/client": "^6.0.1",
     "@tabler/icons-react": "^3.6.0",
     "@tanstack/react-query": "^5.56.2",
+    "@upstash/redis": "^1.34.3",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "bcrypt": "^5.1.1",

@@ -36,23 +36,41 @@ model Category {
 }
 
 model Barometer {
-  id              String       @id @default(uuid())
-  collectionId    String       @unique
-  name            String       @unique
-  slug            String       @unique
+  id              String             @id @default(uuid())
+  collectionId    String             @unique
+  name            String             @unique
+  slug            String             @unique
   description     String
   conditionId     String
   date            DateTime
   dateDescription String
   manufacturerId  String
   dimensions      Json?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
   categoryId      String
-  category        Category     @relation(fields: [categoryId], references: [id])
-  condition       Condition    @relation(fields: [conditionId], references: [id])
-  manufacturer    Manufacturer @relation(fields: [manufacturerId], references: [id])
-  images          Image[]      @relation("BarometerImages")
+  category        Category           @relation(fields: [categoryId], references: [id])
+  condition       Condition          @relation(fields: [conditionId], references: [id])
+  manufacturer    Manufacturer       @relation(fields: [manufacturerId], references: [id])
+  images          Image[]            @relation("BarometerImages")
+  reports         InaccuracyReport[]
+}
+
+model InaccuracyReport {
+  id            String                 @id @default(uuid())
+  issueType     String
+  barometerId   String
+  barometer     Barometer              @relation(fields: [barometerId], references: [id])
+  reporterEmail String
+  description   String
+  status        InaccuracyReportStatus @default(PENDING)
+  createdAt     DateTime               @default(now())
+}
+
+enum InaccuracyReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
 }
 
 model Manufacturer {
