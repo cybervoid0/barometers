@@ -6,7 +6,7 @@ export const getInaccuracyReportList = withPrisma(
       prisma.inaccuracyReport.findMany({
         skip: (page - 1) * pageSize,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { reporterName: 'desc' }],
         include: {
           barometer: {
             select: {

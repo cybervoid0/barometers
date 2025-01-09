@@ -11,6 +11,7 @@ import {
   TextInput,
   Text,
   LoadingOverlay,
+  Tooltip,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
@@ -63,11 +64,22 @@ export default function InaccuracyReport({ barometer, ...props }: Props) {
   })
   return (
     <>
-      <Button color="primary" {...props} onClick={open}>
-        <Text fw={400} fz="sm" size="md" lts="0.05rem" tt="uppercase">
-          Report inaccuracy
-        </Text>
-      </Button>
+      <Tooltip
+        multiline
+        w={210}
+        label={
+          <Text size="xs">
+            Report issues in the description of &laquo;
+            <span style={{ textTransform: 'capitalize' }}>{barometer.name}</span>&raquo;
+          </Text>
+        }
+      >
+        <Button color="primary" {...props} onClick={open}>
+          <Text fw={400} fz="sm" size="md" lts="0.05rem" tt="uppercase">
+            Report inaccuracy
+          </Text>
+        </Button>
+      </Tooltip>
       <Modal
         size="xl"
         opened={isOpened}
