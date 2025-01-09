@@ -11,6 +11,8 @@ export const imageUploadApiRoute = '/api/v2/upload/images/'
 export const barometersSearchRoute = '/api/v2/search/'
 export const reportRoute = '/api/v2/report/'
 // Frontend routes
+export const addBarometerRoute = '/admin/add-barometer/'
+export const viewReportsRoute = '/admin/reports/'
 export const categoriesRoute = '/collection/categories/'
 export const barometerRoute = '/collection/items/'
 export const newArrivals = '/collection/new-arrivals/'

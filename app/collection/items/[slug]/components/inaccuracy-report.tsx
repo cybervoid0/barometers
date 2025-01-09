@@ -1,10 +1,20 @@
 'use client'
 
 import React from 'react'
-import { Box, Button, ButtonProps, Group, Modal, Textarea, TextInput } from '@mantine/core'
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Group,
+  Modal,
+  Textarea,
+  TextInput,
+  Text,
+  LoadingOverlay,
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isEmail, isLength } from 'validator'
 import { showError, showInfo } from '@/utils/notification'
 import { createReport } from '@/utils/fetch'
@@ -13,24 +23,24 @@ import { BarometerDTO } from '@/app/types'
 interface Props extends ButtonProps {
   barometer: BarometerDTO
 }
+const maxFeedbackLen = 1000
 
 export default function InaccuracyReport({ barometer, ...props }: Props) {
+  const queryClient = useQueryClient()
   const [isOpened, { open, close }] = useDisclosure(false)
   const form = useForm({
     initialValues: {
-      issueType: '',
+      reporterName: '',
       reporterEmail: '',
       description: '',
     },
     validate: {
       reporterEmail: value => (!isEmail(value) ? 'Invalid email' : null),
-      issueType: value =>
-        !isLength(value, { min: 5, max: 100 })
-          ? 'Value must be between 5 and 100 characters'
-          : null,
+      reporterName: value =>
+        !isLength(value, { min: 2, max: 50 }) ? 'Value must be between 2 and 50 characters' : null,
       description: value =>
-        !isLength(value, { min: 10, max: 1000 })
-          ? 'Value must be between 10 and 1000 characters'
+        !isLength(value, { min: 5, max: maxFeedbackLen })
+          ? `Value must be between 5 and ${maxFeedbackLen} characters`
           : null,
     },
     transformValues: values => ({
@@ -39,9 +49,10 @@ export default function InaccuracyReport({ barometer, ...props }: Props) {
     }),
   })
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createReport,
     onSuccess: ({ id }) => {
+      queryClient.invalidateQueries({ queryKey: ['inaccuracyReport'] })
       close()
       form.reset()
       showInfo(
@@ -52,22 +63,39 @@ export default function InaccuracyReport({ barometer, ...props }: Props) {
   })
   return (
     <>
-      <Button {...props} onClick={open}>
-        Report inaccuracy
+      <Button color="primary" {...props} onClick={open}>
+        <Text fw={400} fz="sm" size="md" lts="0.05rem" tt="uppercase">
+          Report inaccuracy
+        </Text>
       </Button>
       <Modal
-        size="auto"
+        size="xl"
         opened={isOpened}
         onClose={close}
         title={`Report Inaccuracy in ${barometer.name}`}
         centered
         styles={{ title: { fontWeight: 500, fontSize: '1.2rem', textTransform: 'capitalize' } }}
       >
+        <LoadingOverlay
+          visible={isPending}
+          zIndex={1000}
+          loaderProps={{ color: 'dark', type: 'oval' }}
+          overlayProps={{ blur: 2 }}
+        />
         <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
-          <TextInput label="Your email" required {...form.getInputProps('reporterEmail')} />
-          <TextInput label="Subject" required {...form.getInputProps('issueType')} />
+          <TextInput label="Name" required {...form.getInputProps('reporterName')} />
+          <TextInput label="Email" required {...form.getInputProps('reporterEmail')} />
           <Textarea
-            label="Issue description"
+            label="Feedback"
+            description={(() => {
+              const feedbackLen = form.values.description.length
+              const symbolsLeft = maxFeedbackLen - feedbackLen
+              return feedbackLen > 0 && feedbackLen <= maxFeedbackLen
+                ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`
+                : feedbackLen > maxFeedbackLen
+                  ? `Feedback is ${-symbolsLeft} character${-symbolsLeft === 1 ? '' : 's'} longer than allowed`
+                  : undefined
+            })()}
             placeholder="Describe the inaccuracy"
             {...form.getInputProps('description')}
             required

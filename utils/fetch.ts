@@ -17,6 +17,7 @@ import type {
   ManufacturerListDTO,
   ManufacturerDTO,
   SearchResultsDTO,
+  InaccuracyReportListDTO,
 } from '@/app/types'
 import { handleApiError } from './misc'
 import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
@@ -170,7 +171,9 @@ export async function createReport(report: Partial<InaccuracyReport>): Promise<{
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
-export async function fetchReportList(searchParams: Record<string, string>) {
+export async function fetchReportList(
+  searchParams: Record<string, string>,
+): Promise<InaccuracyReportListDTO> {
   const url = baseUrl + reportRoute
   const qs = new URLSearchParams(searchParams)
   const res = await fetch(`${url}?${qs.toString()}`, {

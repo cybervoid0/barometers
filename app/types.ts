@@ -6,6 +6,7 @@ export type { ConditionListDTO } from './api/v2/conditions/getters'
 export type { ManufacturerListDTO } from './api/v2/manufacturers/getters'
 export type { ManufacturerDTO } from './api/v2/manufacturers/[id]/getters'
 export type { SearchResultsDTO } from './api/v2/search/search'
+export type { InaccuracyReportListDTO } from './api/v2/report/getters'
 /**
  * Barometer dimensions database JSON structure
  */

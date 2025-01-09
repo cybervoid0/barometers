@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis'
 import { NextRequest, NextResponse } from 'next/server'
 import { InaccuracyReport } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
 import { getInaccuracyReportList } from './getters'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { cleanObject } from '@/utils/misc'
@@ -45,8 +46,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Could not determine IP address' }, { status: 400 })
     }
     const body: Partial<InaccuracyReport> = await req.json()
-    const { reporterEmail, issueType, description, barometerId } = cleanObject(body)
-    if (!reporterEmail || !issueType || !description || !barometerId)
+    const { reporterEmail, reporterName, description, barometerId } = cleanObject(body)
+    if (!reporterEmail || !reporterName || !description || !barometerId)
       throw new Error('Report params are not complete')
     const redisKey = `rate-limit:${ip}:${barometerId}`
     const attempts = await redis.incr(redisKey)
@@ -62,7 +63,8 @@ export async function POST(req: NextRequest) {
         { status: 429 },
       )
     }
-    const { id } = await createReport(barometerId, reporterEmail, issueType, description)
+    const { id } = await createReport(barometerId, reporterEmail, reporterName, description)
+    revalidatePath('/admin/report/')
     return NextResponse.json({ message: 'Inaccuracy report created', id }, { status: 201 })
   } catch (error) {
     console.error('Error sending inaccuracy report:', error)

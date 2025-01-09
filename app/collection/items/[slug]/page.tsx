@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
-import { Container, Title, Text, Box, Divider, Tooltip, Group } from '@mantine/core'
+import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
 import dayjs from 'dayjs'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ImageCarousel } from './components/carousel'
@@ -97,12 +97,9 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           </Tooltip>
         </Box>
 
-        <Group mb="sm">
-          <IsAdmin>
-            <DeleteBarometer size="compact-md" barometer={barometer} />
-          </IsAdmin>
-          <InaccuracyReport size="compact-md" barometer={barometer} />
-        </Group>
+        <IsAdmin>
+          <DeleteBarometer mb="sm" size="compact-md" barometer={barometer} />
+        </IsAdmin>
 
         {barometer.manufacturer && (
           <Box>
@@ -165,6 +162,8 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </IsAdmin>
           }
         />
+
+        <InaccuracyReport mt="xs" size="compact-md" barometer={barometer} />
 
         <Divider
           mx="lg"

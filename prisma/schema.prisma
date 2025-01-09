@@ -58,9 +58,9 @@ model Barometer {
 
 model InaccuracyReport {
   id            String                 @id @default(uuid())
-  issueType     String
   barometerId   String
   barometer     Barometer              @relation(fields: [barometerId], references: [id])
+  reporterName  String
   reporterEmail String
   description   String
   status        InaccuracyReportStatus @default(PENDING)

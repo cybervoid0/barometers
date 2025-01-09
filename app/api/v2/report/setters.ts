@@ -5,14 +5,14 @@ export const createReport = withPrisma(
     prisma,
     barometerId: string,
     reporterEmail: string,
-    issueType: string,
+    reporterName: string,
     description: string,
   ) => {
     const newReport = await prisma.inaccuracyReport.create({
       data: {
         barometerId,
         reporterEmail,
-        issueType,
+        reporterName,
         description,
       },
     })
