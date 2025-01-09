@@ -20,6 +20,7 @@ import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { DeleteBarometer } from './components/delete-barometer'
+import InaccuracyReport from './components/inaccuracy-report'
 
 export const dynamic = 'force-static'
 
@@ -97,7 +98,7 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
         </Box>
 
         <IsAdmin>
-          <DeleteBarometer size="compact-md" mb="sm" barometer={barometer} />
+          <DeleteBarometer mb="sm" size="compact-md" barometer={barometer} />
         </IsAdmin>
 
         {barometer.manufacturer && (
@@ -161,6 +162,8 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
             </IsAdmin>
           }
         />
+
+        <InaccuracyReport mt="xs" size="compact-md" barometer={barometer} />
 
         <Divider
           mx="lg"

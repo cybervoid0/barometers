@@ -14,18 +14,19 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     })
   }
   return (
-    <Container size="sm" py="xl">
-      <Group align="center">
-        <Title order={2}>Welcome, {data?.user?.name ?? 'Admin'}</Title>
-        <Tooltip color="dark.2" label="Log out">
-          <ActionIcon color="dark.3" onClick={logOut}>
-            <IconLogout />
-          </ActionIcon>
-        </Tooltip>
-      </Group>
-
+    <>
+      <Container size="xl" py="xl">
+        <Group align="center">
+          <Title order={2}>Welcome, {data?.user?.name ?? 'Admin'}</Title>
+          <Tooltip color="dark.2" label="Log out">
+            <ActionIcon color="dark.3" onClick={logOut}>
+              <IconLogout />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      </Container>
       {children}
-    </Container>
+    </>
   )
 }
 

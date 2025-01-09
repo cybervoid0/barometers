@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Title, Button, TextInput, Select, Textarea } from '@mantine/core'
+import { Box, Title, Button, TextInput, Select, Textarea, Container } from '@mantine/core'
 import dayjs from 'dayjs'
 import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -16,7 +16,7 @@ import { createBarometer } from '@/utils/fetch'
 import { slug, getThumbnailBase64 } from '@/utils/misc'
 import { googleStorageImagesFolder } from '@/app/constants'
 
-export function AddCard() {
+export default function AddCard() {
   const { condition, categories, manufacturers } = useBarometers()
 
   const form = useForm<BarometerFormProps>({
@@ -96,74 +96,81 @@ export function AddCard() {
   }
 
   return (
-    <Box mt="lg" flex={1}>
-      <Title mb="lg" order={3} tt="capitalize">
-        Add new barometer
-      </Title>
-      <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
-        <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
-        <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
-        <TextInput
-          label="Year"
-          required
-          placeholder="YYYY"
-          maxLength={4}
-          value={form.values.date}
-          onChange={e => {
-            const year = e.target.value.replace(/\D/g, '').slice(0, 4)
-            form.setFieldValue('date', year)
-          }}
-          error={form.errors.date}
-        />
-        <TextInput required label="Date description" {...form.getInputProps('dateDescription')} />
-        <Select
-          data={categories.data.map(({ name, id }) => ({
-            label: name,
-            value: id,
-          }))}
-          label="Category"
-          required
-          allowDeselect={false}
-          {...form.getInputProps('categoryId')}
-        />
-        <Select
-          data={manufacturers.data.map(({ name, id }) => ({
-            label: name,
-            value: id,
-          }))}
-          label="Manufacturer"
-          allowDeselect={false}
-          leftSection={<AddManufacturer onAddManufacturer={onAddManufacturer} />}
-          {...form.getInputProps('manufacturerId')}
-          styles={{
-            input: {
-              paddingLeft: '2.5rem',
-            },
-          }}
-        />
-        <Select
-          label="Condition"
-          data={condition.data.map(({ name, id }) => ({
-            label: name,
-            value: id,
-          }))}
-          allowDeselect={false}
-          {...form.getInputProps('conditionId')}
-        />
-        {/* Images upload */}
-        <FileUpload
-          fileNames={form.values.images}
-          setFileNames={images => form.setFieldValue('images', images)}
-          validateError={form.errors.images}
-          clearValidateError={() => form.clearFieldError('images')}
-        />
-        {/* Dimensions */}
-        <Dimensions form={form} />
-        <Textarea label="Description" autosize minRows={2} {...form.getInputProps('description')} />
-        <Button mt="lg" type="submit" variant="outline" color="dark">
+    <Container size="sm">
+      <Box mt="lg" flex={1}>
+        <Title mb="lg" order={3} tt="capitalize">
           Add new barometer
-        </Button>
+        </Title>
+        <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
+          <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
+          <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
+          <TextInput
+            label="Year"
+            required
+            placeholder="YYYY"
+            maxLength={4}
+            value={form.values.date}
+            onChange={e => {
+              const year = e.target.value.replace(/\D/g, '').slice(0, 4)
+              form.setFieldValue('date', year)
+            }}
+            error={form.errors.date}
+          />
+          <TextInput required label="Date description" {...form.getInputProps('dateDescription')} />
+          <Select
+            data={categories.data.map(({ name, id }) => ({
+              label: name,
+              value: id,
+            }))}
+            label="Category"
+            required
+            allowDeselect={false}
+            {...form.getInputProps('categoryId')}
+          />
+          <Select
+            data={manufacturers.data.map(({ name, id }) => ({
+              label: name,
+              value: id,
+            }))}
+            label="Manufacturer"
+            allowDeselect={false}
+            leftSection={<AddManufacturer onAddManufacturer={onAddManufacturer} />}
+            {...form.getInputProps('manufacturerId')}
+            styles={{
+              input: {
+                paddingLeft: '2.5rem',
+              },
+            }}
+          />
+          <Select
+            label="Condition"
+            data={condition.data.map(({ name, id }) => ({
+              label: name,
+              value: id,
+            }))}
+            allowDeselect={false}
+            {...form.getInputProps('conditionId')}
+          />
+          {/* Images upload */}
+          <FileUpload
+            fileNames={form.values.images}
+            setFileNames={images => form.setFieldValue('images', images)}
+            validateError={form.errors.images}
+            clearValidateError={() => form.clearFieldError('images')}
+          />
+          {/* Dimensions */}
+          <Dimensions form={form} />
+          <Textarea
+            label="Description"
+            autosize
+            minRows={2}
+            {...form.getInputProps('description')}
+          />
+          <Button mt="lg" type="submit" variant="outline" color="dark">
+            Add new barometer
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </Container>
   )
 }
