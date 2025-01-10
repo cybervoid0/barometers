@@ -39,7 +39,7 @@ export const getBarometersByParams = withPrisma(
         })
       : null
 
-    const skip = (page - 1) * pageSize
+    const skip = pageSize ? (page - 1) * pageSize : undefined
     const where: Prisma.BarometerWhereInput | undefined = category
       ? { categoryId: category.id }
       : undefined
@@ -75,7 +75,7 @@ export const getBarometersByParams = withPrisma(
           },
         },
         skip,
-        take: pageSize,
+        take: pageSize || undefined,
         orderBy: [getSortCriteria(sortBy), { name: 'asc' }],
       }),
       prisma.barometer.count({ where }),
@@ -83,10 +83,11 @@ export const getBarometersByParams = withPrisma(
 
     return {
       barometers,
-      page,
+      // if page size is 0 the DB returns all records in one page
+      page: pageSize ? page : 1,
+      totalPages: pageSize ? Math.ceil(totalItems / pageSize) : 1,
       totalItems,
       pageSize,
-      totalPages: Math.ceil(totalItems / pageSize),
     }
   },
 )

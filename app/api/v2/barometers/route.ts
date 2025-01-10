@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
     const category = searchParams.get('category')
     const sortBy = searchParams.get('sort') as SortValue | null
-    const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
-    const page = Math.max(Number(searchParams.get('page')) || 1, 1)
+    const size = Math.max(Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE), 0)
+    const page = Math.max(Number(searchParams.get('page') || 1), 1)
     const dbResponse = await getBarometersByParams(category, page, size, sortBy)
     return NextResponse.json(dbResponse, { status: dbResponse.barometers.length > 0 ? 200 : 404 })
   } catch (error) {
