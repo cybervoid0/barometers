@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturer } from './getters'
+import { slug } from '@/utils/misc'
 
 interface Parameters {
   params: {
@@ -23,6 +24,9 @@ export async function GET(req: NextRequest, { params: { id } }: Parameters) {
   }
 }
 
+/**
+ * Update manufacturer with a specified ID
+ */
 export const PUT = withPrisma(async (prisma, req: NextRequest, { params: { id } }: Parameters) => {
   try {
     const manufData = await req.json()
@@ -33,7 +37,10 @@ export const PUT = withPrisma(async (prisma, req: NextRequest, { params: { id } 
 
     const updatedManufacturer = await prisma.manufacturer.update({
       where: { id },
-      data: manufData,
+      data: {
+        ...manufData,
+        slug: manufData.name ? slug(manufData.name) : manufacturer.slug,
+      },
     })
 
     return NextResponse.json(updatedManufacturer, { status: 200 })
@@ -53,7 +60,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest, { params: { id } 
 /**
  * Delete manufacturer by ID
  */
-/* eslint-disable prettier/prettier */
+
 export const DELETE = withPrisma(
   async (prisma, req: NextRequest, { params: { id } }: Parameters) => {
     try {
