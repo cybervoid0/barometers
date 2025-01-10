@@ -32,7 +32,8 @@ export const useBarometers = () => {
     isLoading: manufacturersIsLoading,
   } = useQuery({
     queryKey: ['manufacturers'],
-    queryFn: fetchManufacturerList,
+    // size 0 returns all manufacturers without pagination
+    queryFn: () => fetchManufacturerList({ size: '0' }),
   })
 
   const { mutate: deleteMnf } = useMutation({
@@ -65,7 +66,7 @@ export const useBarometers = () => {
         isLoading: typesIsLoading,
       },
       manufacturers: {
-        data: manufacturers ?? [],
+        data: manufacturers?.manufacturers ?? [],
         isLoading: manufacturersIsLoading,
         delete: deleteMnf,
       },

@@ -3,13 +3,17 @@ import { Manufacturer } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
 import { slug } from '@/utils/misc'
+import { DEFAULT_PAGE_SIZE } from '../parameters'
 
 /**
  * Retrieve a list of all Manufacturers
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const manufacturers = await getManufacturers()
+    const { searchParams } = req.nextUrl
+    const size = Math.max(Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE), 0)
+    const page = Math.max(Number(searchParams.get('page') || 1), 1)
+    const manufacturers = await getManufacturers(page, size)
     return NextResponse.json(manufacturers, { status: 200 })
   } catch (error) {
     return NextResponse.json(

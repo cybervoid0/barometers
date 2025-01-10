@@ -1,18 +1,37 @@
 import { withPrisma } from '@/prisma/prismaClient'
 
-export const getManufacturers = withPrisma(prisma =>
-  prisma.manufacturer.findMany({
-    select: {
-      name: true,
-      id: true,
-      city: true,
-      country: true,
-      description: true,
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  }),
-)
+export const getManufacturers = withPrisma(async (prisma, page: number, pageSize: number) => {
+  const skip = pageSize ? (page - 1) * pageSize : undefined
+  const [manufacturers, totalItems] = await Promise.all([
+    prisma.manufacturer.findMany({
+      select: {
+        name: true,
+        slug: true,
+        id: true,
+        city: true,
+        country: true,
+        description: true,
+      },
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        {
+          createdAt: 'asc',
+        },
+      ],
+      skip,
+      take: pageSize || undefined,
+    }),
+    prisma.manufacturer.count(),
+  ])
+  return {
+    manufacturers,
+    page: pageSize ? page : 1,
+    totalPages: pageSize ? Math.ceil(totalItems / pageSize) : 1,
+    totalItems,
+    pageSize,
+  }
+})
 
 export type ManufacturerListDTO = Awaited<ReturnType<typeof getManufacturers>>

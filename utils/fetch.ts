@@ -92,8 +92,14 @@ export async function fetchConditions(): Promise<ConditionListDTO> {
 }
 
 /******* Manufacturers ********/
-export async function fetchManufacturerList(): Promise<ManufacturerListDTO> {
-  const res = await fetch(baseUrl + manufacturersApiRoute)
+export async function fetchManufacturerList(searchParams?: {
+  page?: string
+  size?: string
+}): Promise<ManufacturerListDTO> {
+  const url = baseUrl + manufacturersApiRoute
+  const res = await fetch(`${url}${searchParams ? `?${new URLSearchParams(searchParams)}` : ''}`, {
+    cache: 'no-cache',
+  })
   return res.json()
 }
 export async function fetchManufacturer(id: string): Promise<ManufacturerDTO> {
