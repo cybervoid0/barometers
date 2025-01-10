@@ -12,12 +12,18 @@ import { barometerRoute } from '@/app/constants'
 import { Table } from '@/app/components/table'
 import { Pagination } from '@/app/components/pagination'
 
+const itemsOnPage = 6
+
 export default function ReportList() {
   const searchParams = useSearchParams()
-  const page = Number(searchParams.get('page') ?? '1')
+  const page = searchParams.get('page') ?? '1'
   const { data } = useQuery({
     queryKey: ['inaccuracyReport', page],
-    queryFn: () => fetchReportList(Object.fromEntries(searchParams.entries())),
+    queryFn: () =>
+      fetchReportList({
+        page,
+        size: String(itemsOnPage),
+      }),
   })
   const { accessor } = createColumnHelper<InaccuracyReportListDTO['reports'][number]>()
   const columns = [
@@ -69,7 +75,7 @@ export default function ReportList() {
         <Table table={table} />
       </Box>
       <Center>
-        <Pagination value={page} total={data?.totalPages ?? 1} />
+        <Pagination value={+page} total={data?.totalPages ?? 1} />
       </Center>
     </Container>
   )

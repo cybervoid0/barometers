@@ -4,6 +4,7 @@ import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './category-card.module.scss'
 import { CategoryDTO } from '@/app/types'
+import { CategoryIcon } from '../category-icon'
 
 interface CategoryCardProps {
   name: string
@@ -17,6 +18,12 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
         <Box className={styles.container}>
+          <CategoryIcon
+            bgColor="transparent"
+            size={45}
+            category={name}
+            className={styles.cat_icon}
+          />
           {image && (
             <NextImage
               fill

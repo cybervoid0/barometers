@@ -1,6 +1,6 @@
 import { type Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
-import { Container, Title, Text, Box, Divider, Tooltip } from '@mantine/core'
+import { Container, Title, Text, Box, Divider, Tooltip, Stack } from '@mantine/core'
 import dayjs from 'dayjs'
 import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
 import { ImageCarousel } from './components/carousel'
@@ -101,69 +101,73 @@ export default async function BarometerItem({ params: { slug } }: BarometerItemP
           <DeleteBarometer mb="sm" size="compact-md" barometer={barometer} />
         </IsAdmin>
 
-        {barometer.manufacturer && (
-          <Box>
-            <Title className={sx.heading} order={3}>
-              Manufacturer/Retailer:&nbsp;
-            </Title>
-            <Text c="dark.3" fw={400} display="inline">
-              {`${barometer.manufacturer.name}${barometer.manufacturer.city ? `, ${barometer.manufacturer.city}` : ''}`}
-              <IsAdmin>
-                <ManufacturerEdit barometer={barometer} />
-              </IsAdmin>
-            </Text>
-          </Box>
-        )}
-
-        <IsAdmin>
-          <Title className={sx.heading} order={3}>
-            Year:&nbsp;
-          </Title>
-          <Text c="dark.3" fw={400} display="inline">
-            {dayjs(barometer.date).format('YYYY')}
-            <DateEdit barometer={barometer} />
-          </Text>
-        </IsAdmin>
-
-        <Box>
-          <Title className={sx.heading} order={3}>
-            Dating:&nbsp;
-          </Title>
-          <Text c="dark.3" fw={400} display="inline">
-            {barometer.dateDescription}
-            <IsAdmin>
-              <TextFieldEdit barometer={barometer} property="dateDescription" />
-            </IsAdmin>
-          </Text>
-        </Box>
-
-        {dimensions && dimensions.length > 0 && (
-          <Box>
-            <Title className={sx.heading} fw={500} order={3}>
-              Dimensions:{' '}
-              {dimensions.map((dimension, index, arr) => (
-                <Text c="dark.3" display="inline" key={index}>
-                  {dimension.dim} {dimension.value}
-                  {index < arr.length - 1 ? ', ' : ''}
+        <Stack gap={0}>
+          <Box style={{ flexGrow: 1 }}>
+            {barometer.manufacturer && (
+              <Box>
+                <Title className={sx.heading} order={3}>
+                  Manufacturer/Retailer:&nbsp;
+                </Title>
+                <Text c="dark.3" fw={400} display="inline">
+                  {`${barometer.manufacturer.name}${barometer.manufacturer.city ? `, ${barometer.manufacturer.city}` : ''}`}
+                  <IsAdmin>
+                    <ManufacturerEdit barometer={barometer} />
+                  </IsAdmin>
                 </Text>
-              ))}
-              <IsAdmin>
-                <DimensionEdit barometer={barometer} />
-              </IsAdmin>
-            </Title>
-          </Box>
-        )}
+              </Box>
+            )}
 
-        <Condition
-          condition={barometer.condition}
-          editButton={
             <IsAdmin>
-              <ConditionEdit barometer={barometer} />
+              <Title className={sx.heading} order={3}>
+                Year:&nbsp;
+              </Title>
+              <Text c="dark.3" fw={400} display="inline">
+                {dayjs(barometer.date).format('YYYY')}
+                <DateEdit barometer={barometer} />
+              </Text>
             </IsAdmin>
-          }
-        />
 
-        <InaccuracyReport mt="xs" size="compact-md" barometer={barometer} />
+            <Box>
+              <Title className={sx.heading} order={3}>
+                Dating:&nbsp;
+              </Title>
+              <Text c="dark.3" fw={400} display="inline">
+                {barometer.dateDescription}
+                <IsAdmin>
+                  <TextFieldEdit barometer={barometer} property="dateDescription" />
+                </IsAdmin>
+              </Text>
+            </Box>
+
+            {dimensions && dimensions.length > 0 && (
+              <Box>
+                <Title className={sx.heading} fw={500} order={3}>
+                  Dimensions:{' '}
+                  {dimensions.map((dimension, index, arr) => (
+                    <Text c="dark.3" display="inline" key={index}>
+                      {dimension.dim} {dimension.value}
+                      {index < arr.length - 1 ? ', ' : ''}
+                    </Text>
+                  ))}
+                  <IsAdmin>
+                    <DimensionEdit barometer={barometer} />
+                  </IsAdmin>
+                </Title>
+              </Box>
+            )}
+
+            <Condition
+              condition={barometer.condition}
+              editButton={
+                <IsAdmin>
+                  <ConditionEdit barometer={barometer} />
+                </IsAdmin>
+              }
+            />
+          </Box>
+
+          <InaccuracyReport size="compact-md" barometer={barometer} className={sx.inaccuracy} />
+        </Stack>
 
         <Divider
           mx="lg"

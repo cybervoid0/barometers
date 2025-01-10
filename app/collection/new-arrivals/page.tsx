@@ -1,9 +1,11 @@
 import React from 'react'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
+import Link from 'next/link'
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute, categoriesRoute } from '@/app/constants'
+import { CategoryIcon } from '@/app/components/category-icon'
 
 const itemsOnPage = 12
 
@@ -26,8 +28,15 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
         </Title>
 
         <Grid justify="center" gutter="xl">
-          {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+          {barometers.map(({ name, id, images, manufacturer, slug, category }, i) => (
+            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id} pos="relative">
+              <Link href={categoriesRoute + category.name}>
+                <CategoryIcon
+                  category={category.name}
+                  bgColor="white"
+                  style={{ position: 'absolute', zIndex: 10, right: '15px', top: '18px' }}
+                />
+              </Link>
               <BarometerCard
                 priority={i < 8}
                 image={images[0]}

@@ -46,7 +46,7 @@ export const getCategoryPages = withPrisma(
   async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
     const categories = await prisma.category.findMany({ select: { name: true } })
     return categories.map(({ name }) => ({
-      url: baseUrl + categoriesRoute + name.toLowerCase(),
+      url: baseUrl + categoriesRoute + name,
       priority: 0.9,
       lastModified: new Date(),
     }))

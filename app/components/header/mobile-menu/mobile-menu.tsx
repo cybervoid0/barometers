@@ -88,7 +88,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                               <Anchor
                                 c="inherit"
                                 component={Link}
-                                href={categoriesRoute + name.toLowerCase()}
+                                href={categoriesRoute + name}
                                 onClick={props.onClose}
                               >
                                 <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>

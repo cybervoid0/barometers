@@ -115,7 +115,7 @@ export const generateStaticParams = withPrisma(async prisma => {
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {
         params.push({
-          category: [name.toLowerCase(), sort, String(page)],
+          category: [name, sort, String(page)],
         })
       }
     }

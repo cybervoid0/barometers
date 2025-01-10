@@ -175,10 +175,7 @@ export async function fetchReportList(
   searchParams: Record<string, string>,
 ): Promise<InaccuracyReportListDTO> {
   const url = baseUrl + reportRoute
-  const qs = new URLSearchParams({
-    size: '6',
-    ...searchParams,
-  })
+  const qs = new URLSearchParams(searchParams)
   const res = await fetch(`${url}?${qs.toString()}`, {
     cache: 'no-cache',
   })

@@ -40,9 +40,9 @@ export default withBundleAnalyzer({
     return config
   },
   redirects: async () => {
-    const categories = ['miscellaneous', 'RECORDERS', 'POCKET', 'MERCURY', 'BOURDON', 'ANEROID']
+    const categories = ['miscellaneous', 'recorders', 'pocket', 'mercury', 'bourdon', 'aneroid']
     return categories.map(name => {
-      const source = '/collection/categories/' + name.toLowerCase()
+      const source = '/collection/categories/' + name
       return {
         source, // old route
         destination: source + '/date/1', // new route
