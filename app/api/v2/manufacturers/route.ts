@@ -3,7 +3,7 @@ import { Manufacturer } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
-import { slug as slugify } from '@/utils/misc'
+import { slug as slugify, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { brandsRoute } from '@/utils/routes-front'
 
@@ -40,7 +40,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
 
-    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(trimTrailingSlash(brandsRoute))
     revalidatePath(brandsRoute + slug)
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
@@ -71,7 +71,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
 
-    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(trimTrailingSlash(brandsRoute))
     revalidatePath(brandsRoute + slug)
     return NextResponse.json(updatedManufacturer, { status: 200 })
   } catch (error) {

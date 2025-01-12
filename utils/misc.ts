@@ -94,3 +94,8 @@ export async function getThumbnailBase64(
   // Convert the canvas content to a PNG Base64 string
   return canvas.toDataURL('image/png') // Use PNG for lossless quality
 }
+
+/**
+ * Removes slashes at the end of API route URL
+ */
+export const trimTrailingSlash = (url: string) => url.replace(/\/+$/, '')

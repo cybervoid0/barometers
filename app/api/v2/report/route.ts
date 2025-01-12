@@ -4,8 +4,9 @@ import { InaccuracyReport } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { getInaccuracyReportList } from './getters'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { cleanObject } from '@/utils/misc'
+import { cleanObject, trimTrailingSlash } from '@/utils/misc'
 import { createReport } from './setters'
+import { viewReportsRoute } from '@/utils/routes-front'
 
 // inaccuracy report TTL, minutes
 const REPORT_COOL_DOWN = 10
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       )
     }
     const { id } = await createReport(barometerId, reporterEmail, reporterName, description)
-    revalidatePath('/admin/report/')
+    revalidatePath(trimTrailingSlash(viewReportsRoute))
     return NextResponse.json({ message: 'Inaccuracy report created', id }, { status: 201 })
   } catch (error) {
     console.error('Error sending inaccuracy report:', error)

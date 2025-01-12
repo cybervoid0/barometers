@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturer } from './getters'
 import { brandsRoute } from '@/utils/routes-front'
+import { trimTrailingSlash } from '@/utils/misc'
 
 interface Props {
   params: {
@@ -43,7 +44,7 @@ export const DELETE = withPrisma(async (prisma, req: NextRequest, { params: { sl
       },
     })
 
-    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(trimTrailingSlash(brandsRoute))
     revalidatePath(brandsRoute + slug)
     return NextResponse.json({ message: 'Manufacturer deleted successfully' }, { status: 200 })
   } catch (error) {

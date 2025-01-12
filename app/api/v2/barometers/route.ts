@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
-import { cleanObject, slug as slugify } from '@/utils/misc'
+import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
@@ -52,7 +52,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
     await revalidateCategory(prisma, categoryId)
-    revalidatePath(newArrivals) // regenerate new arrivals page
+    revalidatePath(trimTrailingSlash(newArrivals)) // regenerate new arrivals page
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

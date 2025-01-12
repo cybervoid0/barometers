@@ -6,6 +6,7 @@ import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
 import { barometerRoute, newArrivals } from '@/utils/routes-front'
 import { deleteImagesFromGoogleStorage } from './deleteFromStorage'
+import { trimTrailingSlash } from '@/utils/misc'
 
 interface Props {
   params: {
@@ -64,7 +65,7 @@ export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { s
     })
     await deleteImagesFromGoogleStorage(imagesBeforeDbUpdate)
     revalidatePath(barometerRoute + barometer.slug)
-    revalidatePath(newArrivals)
+    revalidatePath(trimTrailingSlash(newArrivals))
     await revalidateCategory(prisma, barometer.categoryId)
 
     return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })

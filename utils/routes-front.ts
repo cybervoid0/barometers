@@ -3,6 +3,7 @@ export const homeRoute = '/'
 export const historyRoute = '/history/'
 export const aboutRoute = '/about/'
 export const brandsRoute = '/brands/'
+export const termsRoute = '/terms-and-conditions/'
 
 // Collection
 export const categoriesRoute = '/collection/categories/'
