@@ -1,0 +1,10 @@
+.grid {
+  @include sm() {
+    & > div {
+      border-right: 1px solid var(--mantine-color-dark-1);
+    }
+    & > div:nth-child(2n) {
+      border-right: none;
+    }
+  }
+}

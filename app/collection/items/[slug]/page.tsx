@@ -24,16 +24,13 @@ import InaccuracyReport from './components/inaccuracy-report'
 
 export const dynamic = 'force-static'
 
-interface Slug {
-  slug: string
-}
-interface BarometerItemProps {
-  params: Slug
+interface Props {
+  params: {
+    slug: string
+  }
 }
 
-export async function generateMetadata({
-  params: { slug },
-}: BarometerItemProps): Promise<Metadata> {
+export async function generateMetadata({ params: { slug } }: Props): Promise<Metadata> {
   const { description, name, images } = await getBarometer(slug)
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
@@ -73,7 +70,7 @@ export const generateStaticParams = withPrisma(prisma =>
   prisma.barometer.findMany({ select: { slug: true } }),
 )
 
-export default async function BarometerItem({ params: { slug } }: BarometerItemProps) {
+export default async function BarometerItem({ params: { slug } }: Props) {
   const barometer = await getBarometer(slug)
 
   const dimensions = barometer.dimensions as Dimensions

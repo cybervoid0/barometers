@@ -4,7 +4,7 @@ export type { CategoryDTO } from './api/v2/categories/[name]/getters'
 export type { BarometerDTO } from './api/v2/barometers/[slug]/getters'
 export type { ConditionListDTO } from './api/v2/conditions/getters'
 export type { ManufacturerListDTO } from './api/v2/manufacturers/getters'
-export type { ManufacturerDTO } from './api/v2/manufacturers/[id]/getters'
+export type { ManufacturerDTO } from './api/v2/manufacturers/[slug]/getters'
 export type { SearchResultsDTO } from './api/v2/search/search'
 export type { InaccuracyReportListDTO } from './api/v2/report/getters'
 /**

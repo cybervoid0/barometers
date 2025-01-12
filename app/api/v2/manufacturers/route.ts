@@ -46,3 +46,34 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
     )
   }
 })
+
+/**
+ * Update manufacturer
+ */
+export const PUT = withPrisma(async (prisma, req: NextRequest) => {
+  try {
+    const manufData = await req.json()
+    const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
+    if (!manufacturer) {
+      return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
+    }
+
+    const updatedManufacturer = await prisma.manufacturer.update({
+      where: { id: manufacturer.id },
+      data: {
+        ...manufData,
+        slug: manufData.name ? slug(manufData.name) : manufacturer.slug,
+      },
+    })
+
+    return NextResponse.json(updatedManufacturer, { status: 200 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      {
+        message: error instanceof Error ? error.message : 'Cannot update manufacturer',
+      },
+      { status: 500 },
+    )
+  }
+})

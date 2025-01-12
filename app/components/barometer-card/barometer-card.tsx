@@ -1,11 +1,11 @@
-import { Box, Text, Anchor } from '@mantine/core'
+import { Box, Text, Anchor, BoxProps } from '@mantine/core'
 import Link from 'next/link'
 import NextImage from 'next/image'
 import styles from './styles.module.scss'
 import { BarometerListDTO } from '@/app/types'
 import { googleStorageImagesFolder } from '@/app/constants'
 
-interface BarometerCardProps {
+interface BarometerCardProps extends BoxProps {
   image?: BarometerListDTO['barometers'][number]['images'][number]
   name: string
   link: string
@@ -19,9 +19,10 @@ export async function BarometerCard({
   link,
   manufacturer,
   priority,
+  ...props
 }: BarometerCardProps) {
   return (
-    <Box>
+    <Box {...props}>
       <Anchor underline="never" c="dark" className={styles.anchor} component={Link} href={link}>
         <Box className={styles.bg_gradient}>
           {image ? (

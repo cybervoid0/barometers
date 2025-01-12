@@ -84,16 +84,16 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedManufacturerIndex, manufacturers])
 
-  const update = async (manufacturer: ManufacturerForm) => {
+  const update = async (formValues: ManufacturerForm) => {
     try {
-      const manufacturerId = manufacturers.data[selectedManufacturerIndex].id
+      const manufacturer = manufacturers.data[selectedManufacturerIndex]
       const updatedBarometer = {
         id: barometer.id,
-        manufacturerId,
+        manufacturerId: manufacturer.id,
       }
       const [{ slug }, { name }] = await Promise.all([
         updateBarometer(updatedBarometer),
-        updateManufacturer(manufacturerId, manufacturer),
+        updateManufacturer(formValues),
       ])
       showInfo(`${name} updated`, 'Success')
       close()
@@ -114,7 +114,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
                 variant="outline"
                 color="dark"
                 onClick={() =>
-                  manufacturers.delete(manufacturers.data[selectedManufacturerIndex].id)
+                  manufacturers.delete(manufacturers.data[selectedManufacturerIndex].slug)
                 }
               >
                 <IconTrash />
