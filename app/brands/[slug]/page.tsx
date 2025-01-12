@@ -1,5 +1,5 @@
 import { type Metadata } from 'next'
-import { Container, Grid, GridCol, Title, Text } from '@mantine/core'
+import { Container, Grid, GridCol, Title } from '@mantine/core'
 import Link from 'next/link'
 import { getManufacturer } from '@/app/api/v2/manufacturers/[slug]/getters'
 import { withPrisma } from '@/prisma/prismaClient'
@@ -7,6 +7,8 @@ import { title } from '@/app/metadata'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
 import { CategoryIcon } from '@/app/components/category-icon'
+import { MD } from '@/app/components/md'
+import sx from '../styles.module.scss'
 
 interface Props {
   params: {
@@ -62,9 +64,7 @@ export default async function Manufacturer({ params: { slug } }: Props) {
         {manufacturer.name}
       </Title>
 
-      <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
-        {manufacturer.description}
-      </Text>
+      <MD className={sx.description}>{manufacturer.description}</MD>
 
       <Grid justify="center" gutter="xl">
         {barometers.map(({ name, id, images, slug: barometerSlug, category }, i) => (
