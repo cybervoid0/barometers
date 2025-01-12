@@ -11,7 +11,7 @@ export const dynamic = 'force-static'
 export default function About() {
   return (
     <Container py="xl">
-      <Paper shadow="lg" px="xl" py="xl">
+      <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <Title mb="md" order={3} component="h2">
           Greetings, my name is Leo.
         </Title>
@@ -58,17 +58,16 @@ export default function About() {
           documents from historical manufacturers and period advertisements, further enriching the
           collection’s historical value.
         </Text>
-        <Text pb="0.5rem" className={styles.paragraph}>
+        <Text pb="xs" className={styles.paragraph}>
           I am very excited to be able to share my collection online with enthusiasts around the
           world. Each barometer is accompanied by high-quality photographs and a detailed
           description, ensuring that the beauty and craftsmanship of these instruments are fully
           appreciated. I am always happy to answer any questions you may have about the barometers
           or their history.
         </Text>
-        <Divider mx="xl" />
+        <Divider my="md" mx={{ base: 'sm', sm: 'xl' }} />
         <Flex
-          pt="lg"
-          pb="xs"
+          pt="xs"
           gap="lg"
           direction={{ base: 'column', xs: 'row' }}
           wrap="nowrap"
@@ -84,6 +83,7 @@ export default function About() {
             discover the incredible world of weather forecasters. Currently available in Russian.
           </Text>
           <Image
+            mb="sm"
             w={{ base: '70%', xs: 'unset' }}
             alt="Book"
             width={160}
@@ -94,7 +94,7 @@ export default function About() {
             placeholder="blur"
           />
         </Flex>
-        <Divider mx="xl" />
+        <Divider my="md" mx={{ base: 'sm', sm: 'xl' }} />
         <Title mb="md" mt="lg" order={3} component="h2">
           Why Barometers?
         </Title>

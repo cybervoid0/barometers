@@ -52,7 +52,7 @@ export default async function Manufacturers() {
         barometer makers, along with detailed descriptions and iconic works by each master from the
         collection, representing the finest traditions of craftsmanship.
       </Text>
-      <Paper shadow="lg" px="xl" py="lg">
+      <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <SimpleGrid cols={{ base: 1, sm: 2 }} className={sx.grid}>
           <Column items={firstColumn} />
           <Column items={secondColumn} />

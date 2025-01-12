@@ -25,7 +25,7 @@ export default function History() {
       <Title component="h2" className={sx.title}>
         History of the Barometer
       </Title>
-      <Paper shadow="lg" px="xl" py="xl">
+      <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <Title component="h3" className={sx.header}>
           The Discovery of Torricelli and the First Barometer
         </Title>
