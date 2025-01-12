@@ -65,7 +65,7 @@ export default async function Collection({ params: { category } }: CollectionPro
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">
-        <Title mb="sm" fw={500} order={2} tt="capitalize">
+        <Title tt="capitalize" component="h2">
           {categoryName}
         </Title>
         {description && <DescriptionText size="sm" description={description} />}
