@@ -40,13 +40,8 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
 
-    try {
-      console.log('revalidate on create new', brandsRoute, brandsRoute + slug)
-      revalidatePath(brandsRoute)
-      revalidatePath(brandsRoute + slug)
-    } catch (error) {
-      console.log('Error revalidating on create new', brandsRoute, brandsRoute + slug)
-    }
+    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(brandsRoute + slug)
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     return NextResponse.json(
@@ -75,13 +70,9 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         slug,
       },
     })
-    try {
-      console.log('revalidate on update', brandsRoute, brandsRoute + slug)
-      revalidatePath(brandsRoute)
-      revalidatePath(brandsRoute + slug)
-    } catch (error) {
-      console.log('Error revalidating on update', brandsRoute, brandsRoute + slug)
-    }
+
+    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(brandsRoute + slug)
     return NextResponse.json(updatedManufacturer, { status: 200 })
   } catch (error) {
     console.error(error)

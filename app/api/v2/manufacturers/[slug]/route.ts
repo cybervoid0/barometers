@@ -42,14 +42,9 @@ export const DELETE = withPrisma(async (prisma, req: NextRequest, { params: { sl
         id: manufacturer.id,
       },
     })
-    try {
-      console.log('revalidate on delete', brandsRoute, brandsRoute + slug)
-      revalidatePath(brandsRoute)
-      revalidatePath(brandsRoute + slug)
-    } catch (error) {
-      console.log('Error revalidating', brandsRoute, brandsRoute + slug)
-    }
 
+    revalidatePath(brandsRoute.replace(/\/+$/, ''))
+    revalidatePath(brandsRoute + slug)
     return NextResponse.json({ message: 'Manufacturer deleted successfully' }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
