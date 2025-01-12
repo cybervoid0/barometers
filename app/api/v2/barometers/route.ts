@@ -6,7 +6,7 @@ import { cleanObject, slug as slugify } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
-import { barometerRoute, newArrivals } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/utils/routes-front'
 import { revalidateCategory } from './revalidate'
 
 /**

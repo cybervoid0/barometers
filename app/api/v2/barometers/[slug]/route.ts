@@ -4,7 +4,7 @@ import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
-import { barometerRoute, newArrivals } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/utils/routes-front'
 import { deleteImagesFromGoogleStorage } from './deleteFromStorage'
 
 interface Props {

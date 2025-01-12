@@ -1,8 +1,8 @@
-import { Container, SimpleGrid, Anchor, Title, Paper, Stack } from '@mantine/core'
+import { Container, SimpleGrid, Anchor, Title, Paper, Stack, Text } from '@mantine/core'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { withPrisma } from '@/prisma/prismaClient'
-import { manufacturersRoute } from '../constants'
+import { brandsRoute } from '@/utils/routes-front'
 import { title } from '../metadata'
 import sx from './styles.module.scss'
 
@@ -38,7 +38,7 @@ const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerLis
         key={id}
         c="dark"
         tt="capitalize"
-        href={manufacturersRoute + slug}
+        href={brandsRoute + slug}
         component={Link}
       >
         {name}
@@ -55,9 +55,15 @@ export default async function Manufacturers() {
   const secondColumn = manufacturers.slice(halfwayIndex)
   return (
     <Container>
-      <Title my="xl" component="h2">
+      <Title mt="xl" mb="sm" component="h2">
         Manufacturers
       </Title>
+      <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
+        Discover the master craftsmen and renowned manufacturers behind these exceptional
+        barometers, each reflecting timeless artistry and precision. Here is a curated list of
+        barometer makers, along with detailed descriptions and iconic works by each master from the
+        collection, representing the finest traditions of craftsmanship.
+      </Text>
       <Paper shadow="lg" px="xl" py="lg">
         <SimpleGrid cols={{ base: 1, sm: 2 }} className={sx.grid}>
           <Column items={firstColumn} />

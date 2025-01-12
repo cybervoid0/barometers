@@ -9,9 +9,9 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import sx from './tabs.module.scss'
-import { menuData } from '../menudata'
+import { menuData } from '@/utils/menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
-import { categoriesRoute } from '@/app/constants'
+import { categoriesRoute } from '@/utils/routes-front'
 import { isAdmin } from '../../is-admin'
 
 const WideScreenTabs = ({ className, ...props }: CenterProps) => {

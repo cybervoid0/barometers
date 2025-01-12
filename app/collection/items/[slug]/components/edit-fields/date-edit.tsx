@@ -19,7 +19,7 @@ import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/utils/routes-front'
 import { showInfo, showError } from '@/utils/notification'
 
 interface DateEditProps extends UnstyledButtonProps {

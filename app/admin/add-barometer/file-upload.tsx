@@ -16,7 +16,7 @@ import {
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import { showError } from '@/utils/notification'
 import { deleteImage, uploadFileToCloud, createImageUrls } from '@/utils/fetch'
-import { googleStorageImagesFolder } from '@/app/constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface FileUploadProps {
   fileNames: string[]

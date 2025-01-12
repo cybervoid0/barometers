@@ -7,7 +7,7 @@ import {
   manufacturersApiRoute,
   imageUploadApiRoute,
   reportRoute,
-} from '@/app/constants'
+} from '@/utils/routes-back'
 import type {
   CategoryDTO,
   CategoryListDTO,

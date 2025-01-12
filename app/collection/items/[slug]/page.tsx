@@ -1,8 +1,10 @@
 import { type Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
-import { Container, Title, Text, Box, Divider, Tooltip, Stack } from '@mantine/core'
+import { Container, Title, Text, Box, Divider, Tooltip, Stack, Anchor } from '@mantine/core'
 import dayjs from 'dayjs'
-import { googleStorageImagesFolder, barometerRoute } from '@/app/constants'
+import Link from 'next/link'
+import { googleStorageImagesFolder } from '@/utils/constants'
+import { barometerRoute, brandsRoute } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
@@ -105,12 +107,18 @@ export default async function BarometerItem({ params: { slug } }: Props) {
                 <Title className={sx.heading} order={3}>
                   Manufacturer/Retailer:&nbsp;
                 </Title>
-                <Text c="dark.3" fw={400} display="inline">
+                <Anchor
+                  underline="always"
+                  href={brandsRoute + barometer.manufacturer.slug}
+                  component={Link}
+                  c="dark.3"
+                  fw={400}
+                >
                   {`${barometer.manufacturer.name}${barometer.manufacturer.city ? `, ${barometer.manufacturer.city}` : ''}`}
-                  <IsAdmin>
-                    <ManufacturerEdit barometer={barometer} />
-                  </IsAdmin>
-                </Text>
+                </Anchor>
+                <IsAdmin>
+                  <ManufacturerEdit barometer={barometer} />
+                </IsAdmin>
               </Box>
             )}
 

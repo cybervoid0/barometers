@@ -13,7 +13,7 @@ import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import './styles.css'
-import { googleStorageImagesFolder } from '@/app/constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ImageCarouselProps {
   barometer: BarometerDTO

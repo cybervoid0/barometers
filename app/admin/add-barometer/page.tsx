@@ -14,7 +14,7 @@ import { Dimensions } from './dimensions'
 import { type BarometerFormProps } from '../../types'
 import { createBarometer } from '@/utils/fetch'
 import { slug, getThumbnailBase64 } from '@/utils/misc'
-import { googleStorageImagesFolder } from '@/app/constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 export default function AddCard() {
   const { condition, categories, manufacturers } = useBarometers()

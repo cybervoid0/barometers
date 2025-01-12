@@ -21,7 +21,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import type { BarometerDTO, ManufacturerDTO } from '@/app/types'
 import { showError, showInfo } from '@/utils/notification'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { updateBarometer, updateManufacturer } from '@/utils/fetch'
 

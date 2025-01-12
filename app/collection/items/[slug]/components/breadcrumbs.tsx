@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Breadcrumbs, Anchor, Text } from '@mantine/core'
-import { categoriesRoute } from '@/app/constants'
+import { categoriesRoute } from '@/utils/routes-front'
 
 interface BreadcrumbsComponentProps {
   type: string

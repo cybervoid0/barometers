@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { slug as slugify } from '@/utils/misc'
-import { barometerRoute, categoriesRoute } from './constants'
+import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

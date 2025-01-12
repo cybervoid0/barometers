@@ -5,7 +5,7 @@ import { getManufacturer } from '@/app/api/v2/manufacturers/[slug]/getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '@/app/metadata'
 import { BarometerCard } from '@/app/components/barometer-card'
-import { barometerRoute, categoriesRoute } from '@/app/constants'
+import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
 import { CategoryIcon } from '@/app/components/category-icon'
 
 interface Props {
@@ -58,11 +58,13 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const barometers = await getBarometersByManufacturer(slug)
   return (
     <Container>
-      <Title tt="capitalize" my="xl" component="h2">
+      <Title tt="capitalize" mt="xl" mb="sm" component="h2">
         {manufacturer.name}
       </Title>
 
-      <Text>{manufacturer.description}</Text>
+      <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
+        {manufacturer.description}
+      </Text>
 
       <Grid justify="center" gutter="xl">
         {barometers.map(({ name, id, images, slug: barometerSlug, category }, i) => (

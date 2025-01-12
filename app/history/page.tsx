@@ -1,7 +1,7 @@
 import { Container, Title, Text, Box, Center } from '@mantine/core'
 import Image from 'next/image'
 import sx from './styles.module.scss'
-import { googleStorageImagesFolder } from '../constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 import { ShowMore } from '../components/showmore'
 
 export const dynamic = 'force-static'

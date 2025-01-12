@@ -1,12 +1,8 @@
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
-import {
-  barometerRoute,
-  googleStorageImagesFolder,
-  categoriesRoute,
-  BAROMETERS_PER_CATEGORY_PAGE,
-} from '@/app/constants'
+import { googleStorageImagesFolder, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
+import { categoriesRoute, barometerRoute } from '@/utils/routes-front'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { SortValue, SortOptions } from '@/app/types'
 import Sort from './sort'

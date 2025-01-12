@@ -1,5 +1,5 @@
 import { Box, Container, Stack, Title } from '@mantine/core'
-import { barometerRoute } from '../constants'
+import { barometerRoute } from '@/utils/routes-front'
 import { SearchItem } from './search-item'
 import { searchBarometers } from '@/utils/fetch'
 import { SearchInfo } from './search-info'

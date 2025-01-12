@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { BarometerDTO } from '@/app/types'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { updateBarometer } from '@/utils/fetch'
 

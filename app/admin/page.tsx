@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Anchor, Container, Button, Stack } from '@mantine/core'
-import { addBarometerRoute, viewReportsRoute } from '../constants'
+import { addBarometerRoute, viewReportsRoute } from '@/utils/routes-front'
 
 export default function Admin() {
   return (

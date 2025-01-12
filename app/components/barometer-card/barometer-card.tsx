@@ -3,7 +3,7 @@ import Link from 'next/link'
 import NextImage from 'next/image'
 import styles from './styles.module.scss'
 import { BarometerListDTO } from '@/app/types'
-import { googleStorageImagesFolder } from '@/app/constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface BarometerCardProps extends BoxProps {
   image?: BarometerListDTO['barometers'][number]['images'][number]
