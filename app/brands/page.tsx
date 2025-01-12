@@ -14,11 +14,6 @@ export const metadata: Metadata = {
 
 const getManufacturerList = withPrisma(async prisma =>
   prisma.manufacturer.findMany({
-    where: {
-      NOT: {
-        name: 'unsigned',
-      },
-    },
     select: {
       id: true,
       name: true,
@@ -31,16 +26,9 @@ const getManufacturerList = withPrisma(async prisma =>
 )
 
 const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerList>> }) => (
-  <Stack gap="xs">
+  <Stack gap="md">
     {items.map(({ id, name, slug }) => (
-      <Anchor
-        w="fit-content"
-        key={id}
-        c="dark"
-        tt="capitalize"
-        href={brandsRoute + slug}
-        component={Link}
-      >
+      <Anchor key={id} href={brandsRoute + slug} component={Link} className={sx.brand}>
         {name}
       </Anchor>
     ))}

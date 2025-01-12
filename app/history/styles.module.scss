@@ -9,7 +9,9 @@
   }
 }
 .header {
-  margin-top: 3rem;
+  &:not(:first-child) {
+    margin-top: 3rem;
+  }
   margin-bottom: 1rem;
   font-size: large;
   font-weight: 600;
@@ -31,6 +33,7 @@
   }
 }
 .title {
+  margin-bottom: var(--mantine-spacing-lg);
   font-size: 30px;
   @include sm() {
     font-size: 35px;

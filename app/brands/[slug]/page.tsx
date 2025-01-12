@@ -46,11 +46,6 @@ export async function generateMetadata({ params: { slug } }: Props): Promise<Met
 
 export const generateStaticParams = withPrisma(async prisma =>
   prisma.manufacturer.findMany({
-    where: {
-      NOT: {
-        name: 'unsigned',
-      },
-    },
     select: { slug: true },
   }),
 )

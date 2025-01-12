@@ -12,3 +12,11 @@
 .description {
   margin-bottom: 1.6rem;
 }
+
+.brand {
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+  width: fit-content;
+  text-transform: capitalize;
+  color: var(--mantine-color-dark-4);
+}
