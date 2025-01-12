@@ -6,7 +6,7 @@ import { withPrisma } from '@/prisma/prismaClient'
  */
 export const searchBarometers = withPrisma(
   async (prisma, query: string, page: number, pageSize: number) => {
-    const skip = (page - 1) * pageSize
+    const skip = pageSize ? (page - 1) * pageSize : undefined
 
     const where: Prisma.BarometerWhereInput = {
       OR: [
@@ -46,7 +46,10 @@ export const searchBarometers = withPrisma(
           },
         },
         skip,
-        take: pageSize,
+        take: pageSize || undefined,
+        orderBy: {
+          createdAt: 'desc',
+        },
       }),
       prisma.barometer.count({
         where,
@@ -65,8 +68,9 @@ export const searchBarometers = withPrisma(
     return {
       barometers: barometersWithFirstImage,
       totalItems,
-      page,
-      totalPages: Math.ceil(totalItems / pageSize),
+      // if page size is 0 the DB returns all records in one page
+      page: pageSize ? page : 1,
+      totalPages: pageSize ? Math.ceil(totalItems / pageSize) : 1,
       pageSize,
     }
   },

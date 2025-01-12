@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { Collection, WithContext } from 'schema-dts'
-import { email, github, instagram } from './constants'
+import { email, github, instagram } from '@/utils/constants'
 
 export const title = 'Barometers Realm'
 export const description =

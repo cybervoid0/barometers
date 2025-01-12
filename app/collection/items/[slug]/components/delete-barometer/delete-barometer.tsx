@@ -8,7 +8,7 @@ import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
 import sx from './styles.module.scss'
-import { categoriesRoute } from '@/app/constants'
+import { categoriesRoute } from '@/utils/routes-front'
 
 interface Props extends ButtonProps {
   barometer: BarometerDTO

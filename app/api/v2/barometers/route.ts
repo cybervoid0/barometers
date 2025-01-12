@@ -6,7 +6,7 @@ import { cleanObject, slug as slugify } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
-import { barometerRoute, newArrivals } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/utils/routes-front'
 import { revalidateCategory } from './revalidate'
 
 /**
@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
     const category = searchParams.get('category')
     const sortBy = searchParams.get('sort') as SortValue | null
-    const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
-    const page = Math.max(Number(searchParams.get('page')) || 1, 1)
+    const size = Math.max(Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE), 0)
+    const page = Math.max(Number(searchParams.get('page') || 1), 1)
     const dbResponse = await getBarometersByParams(category, page, size, sortBy)
     return NextResponse.json(dbResponse, { status: dbResponse.barometers.length > 0 ? 200 : 404 })
   } catch (error) {

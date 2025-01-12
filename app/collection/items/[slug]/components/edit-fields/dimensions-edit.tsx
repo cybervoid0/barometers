@@ -19,7 +19,7 @@ import {
 } from '@mantine/core'
 import { IconEdit, IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
 import { BarometerDTO, Dimensions } from '@/app/types'
-import { barometerRoute } from '@/app/constants'
+import { barometerRoute } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { updateBarometer } from '@/utils/fetch'
 

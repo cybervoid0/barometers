@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCategory } from './getters'
 
-interface Params {
+interface Props {
   params: {
     name: string
   }
@@ -10,7 +10,7 @@ interface Params {
 /**
  * Get Category details
  */
-export async function GET(_req: NextRequest, { params: { name } }: Params) {
+export async function GET(_req: NextRequest, { params: { name } }: Props) {
   try {
     const category = await getCategory(name)
     return NextResponse.json(category, { status: 200 })

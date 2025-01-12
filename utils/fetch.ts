@@ -7,7 +7,7 @@ import {
   manufacturersApiRoute,
   imageUploadApiRoute,
   reportRoute,
-} from '@/app/constants'
+} from '@/utils/routes-back'
 import type {
   CategoryDTO,
   CategoryListDTO,
@@ -92,16 +92,22 @@ export async function fetchConditions(): Promise<ConditionListDTO> {
 }
 
 /******* Manufacturers ********/
-export async function fetchManufacturerList(): Promise<ManufacturerListDTO> {
-  const res = await fetch(baseUrl + manufacturersApiRoute)
+export async function fetchManufacturerList(searchParams?: {
+  page?: string
+  size?: string
+}): Promise<ManufacturerListDTO> {
+  const url = baseUrl + manufacturersApiRoute
+  const res = await fetch(`${url}${searchParams ? `?${new URLSearchParams(searchParams)}` : ''}`, {
+    cache: 'no-cache',
+  })
   return res.json()
 }
-export async function fetchManufacturer(id: string): Promise<ManufacturerDTO> {
-  const res = await fetch(baseUrl + manufacturersApiRoute + id)
+export async function fetchManufacturer(slug: string): Promise<ManufacturerDTO> {
+  const res = await fetch(baseUrl + manufacturersApiRoute + slug)
   return res.json()
 }
-export async function deleteManufacturer(id: string) {
-  await fetch(baseUrl + manufacturersApiRoute + id, {
+export async function deleteManufacturer(slug: string) {
+  await fetch(baseUrl + manufacturersApiRoute + slug, {
     method: 'DELETE',
   })
 }
@@ -119,10 +125,9 @@ export async function addManufacturer(
   return res.json()
 }
 export async function updateManufacturer(
-  id: string,
   updatedData: Partial<Manufacturer>,
 ): Promise<Manufacturer> {
-  const res = await fetch(`${baseUrl + manufacturersApiRoute}/${id}`, {
+  const res = await fetch(baseUrl + manufacturersApiRoute, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

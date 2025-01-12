@@ -4,10 +4,10 @@ import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
-import { barometerRoute, newArrivals } from '@/app/constants'
+import { barometerRoute, newArrivals } from '@/utils/routes-front'
 import { deleteImagesFromGoogleStorage } from './deleteFromStorage'
 
-interface Params {
+interface Props {
   params: {
     slug: string
   }
@@ -16,7 +16,7 @@ interface Params {
 /**
  * Get Barometer details by slug
  */
-export async function GET(_req: NextRequest, { params: { slug } }: Params) {
+export async function GET(_req: NextRequest, { params: { slug } }: Props) {
   try {
     const barometer = await getBarometer(slug)
     return NextResponse.json(barometer, { status: 200 })
@@ -35,7 +35,7 @@ export async function GET(_req: NextRequest, { params: { slug } }: Params) {
  * Delete Barometer by slug
  */
 /* eslint-disable prettier/prettier */
-export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Params) => {
+export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Props) => {
   try {
     const barometer = await prisma.barometer.findFirst({
       where: {

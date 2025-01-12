@@ -3,7 +3,7 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 import styles from './style.module.css'
 import { SearchResultsDTO } from '../types'
-import { googleStorageImagesFolder } from '../constants'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ItemProps {
   image: SearchResultsDTO['barometers'][number]['image']

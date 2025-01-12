@@ -1,9 +1,9 @@
 import { withPrisma } from '@/prisma/prismaClient'
 
-export const getManufacturer = withPrisma((prisma, id: string) =>
-  prisma.manufacturer.findUnique({
+export const getManufacturer = withPrisma((prisma, slug: string) =>
+  prisma.manufacturer.findUniqueOrThrow({
     where: {
-      id,
+      slug,
     },
   }),
 )

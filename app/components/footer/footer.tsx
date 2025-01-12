@@ -1,7 +1,7 @@
 import { Anchor, Box, Container, Group, Text, Tooltip } from '@mantine/core'
 import Link from 'next/link'
 import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
-import { instagram, email } from '@/app/constants'
+import { instagram, email } from '@/utils/constants'
 import sx from './styles.module.scss'
 
 export function Footer() {

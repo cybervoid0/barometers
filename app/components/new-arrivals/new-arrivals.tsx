@@ -1,7 +1,7 @@
 import { Anchor, Button, Text } from '@mantine/core'
 import Link from 'next/link'
 import React from 'react'
-import { newArrivals } from '@/app/constants'
+import { newArrivals } from '@/utils/routes-front'
 
 export function NewArrivals() {
   return (

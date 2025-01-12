@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
-import { barometerRoute, categoriesRoute } from '@/app/constants'
+import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
 import { CategoryIcon } from '@/app/components/category-icon'
 
 const itemsOnPage = 12

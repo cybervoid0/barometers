@@ -24,6 +24,7 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
           id: true,
           city: true,
           name: true,
+          slug: true,
           country: true,
           description: true,
         },
