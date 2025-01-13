@@ -9,7 +9,7 @@ export const HeadingImage: FC = () => {
     <Container className={styles.componentContainer}>
       <NextImage
         priority
-        quality={50}
+        quality={80}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         alt="Barograph"
         src={headingImage}

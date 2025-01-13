@@ -11,13 +11,41 @@ import { Footer, Header } from './components'
 import Providers from './providers'
 import styles from './styles.module.scss'
 import { meta, jsonLd } from './metadata'
+import { withPrisma } from '@/prisma/prismaClient'
 
 export const viewport: Viewport = {
   colorScheme: 'only light',
   themeColor: [{ color: 'white' }],
 }
 
-export const metadata = meta
+export const generateMetadata = withPrisma(async prisma => {
+  const images = (
+    await prisma.category.findMany({
+      select: {
+        name: true,
+        image: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    })
+  ).map(({ image, name }) => ({
+    url: image.url,
+    alt: name,
+  }))
+  return {
+    ...meta,
+    openGraph: {
+      ...meta.openGraph,
+      images,
+    },
+    twitter: {
+      ...meta.twitter,
+      images,
+    },
+  }
+})
 
 export default function RootLayout({ children }: { children: any }) {
   return (

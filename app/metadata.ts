@@ -51,39 +51,13 @@ export const keywords = [
   'vidie',
   'marine',
 ]
-export const images: { url: string; alt: string }[] = [
-  {
-    url: '/images/categories/aneroid.png',
-    alt: 'Aneroid barometers',
-  },
-  {
-    url: '/images/categories/bourdon.png',
-    alt: 'Bourdon barometers',
-  },
-  {
-    url: '/images/categories/forecasting.png',
-    alt: 'Weather forecasters',
-  },
-  {
-    url: '/images/categories/mercury.png',
-    alt: 'Quicksilver barometers',
-  },
-  {
-    url: '/images/categories/pocket.png',
-    alt: 'Pocket barometers',
-  },
-  {
-    url: '/images/categories/recorders.png',
-    alt: 'Weather indicators and recorders',
-  },
-]
+
 export const openGraph = {
   title,
   siteName: title,
   description,
   url,
   emails: email,
-  images,
   type: 'website',
   locale: 'en_US',
 }
@@ -91,7 +65,6 @@ export const twitter = {
   card: 'summary_large_image',
   title,
   description,
-  images,
 }
 export const jsonLd: WithContext<Collection> = {
   '@context': 'https://schema.org',

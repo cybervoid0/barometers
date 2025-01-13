@@ -29,7 +29,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               fill
               priority={priority}
               loading={priority ? 'eager' : 'lazy'}
-              quality={50}
+              quality={80}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               src={image.url}
               alt={name}
