@@ -77,7 +77,6 @@ export const jsonLd: WithContext<Collection> = {
     email,
     name: 'Leo Shirokov',
   },
-  image: `${url}/images/categories/aneroid.png`,
 }
 export const meta: Metadata = {
   metadataBase: new URL(url),

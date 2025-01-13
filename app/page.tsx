@@ -5,7 +5,6 @@ import { categoriesRoute } from '@/utils/routes-front'
 import { SearchField } from './components/search-field'
 import { getCategories } from './api/v2/categories/getters'
 import { NewArrivals } from './components/new-arrivals'
-//import sx from './styles.module.scss'
 
 export const dynamic = 'force-static'
 
