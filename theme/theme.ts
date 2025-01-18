@@ -1,7 +1,8 @@
 'use client'
 
-import { createTheme, virtualColor, colorsTuple } from '@mantine/core'
+import { createTheme, virtualColor, colorsTuple, Anchor, Button } from '@mantine/core'
 import { Raleway } from 'next/font/google'
+import anchorSx from './anchor.module.scss'
 
 const raleway = Raleway({
   subsets: ['cyrillic', 'latin'],
@@ -18,6 +19,14 @@ export const theme = createTheme({
     }),
   },
   components: {
+    Anchor: Anchor.extend({
+      defaultProps: {
+        c: 'dark',
+      },
+      classNames: {
+        root: anchorSx.root,
+      },
+    }),
     Pagination: {
       defaultProps: {
         mt: 'lg',
@@ -28,10 +37,10 @@ export const theme = createTheme({
         },
       },
     },
-    Button: {
+    Button: Button.extend({
       defaultProps: {
         color: 'dark',
       },
-    },
+    }),
   },
 })

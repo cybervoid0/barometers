@@ -11,10 +11,6 @@
 }
 .anchor {
   display: block;
-  transition: color ease-out 0.4s;
-  &:hover {
-    color: #93360a !important;
-  }
   & > p, & span {
     color: inherit !important;
   }

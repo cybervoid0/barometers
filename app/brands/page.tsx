@@ -50,7 +50,7 @@ const getManufacturerList = withPrisma(async prisma => {
 const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerList>> }) => (
   <Stack gap="md">
     {items.map(({ id, name, slug, image }) => (
-      <Anchor c="dark" key={id} href={brandsRoute + slug} component={Link}>
+      <Anchor key={id} href={brandsRoute + slug} component={Link}>
         <Group gap="xs" wrap="nowrap">
           {image ? (
             <Image
