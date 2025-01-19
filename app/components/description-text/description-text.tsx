@@ -18,9 +18,7 @@ export const DescriptionText = ({ description }: DescriptionTextProps) => {
         hideLabel="Hide"
         styles={{ control: { color: '#242424', fontWeight: 600 } }}
       >
-        {paragraphs.map((paragraph, i) => (
-          <MD key={i}>{paragraph}</MD>
-        ))}
+        <MD>{paragraphs.join('\n')}</MD>
       </Spoiler>
     </>
   )

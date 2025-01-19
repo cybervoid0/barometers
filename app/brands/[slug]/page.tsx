@@ -59,37 +59,8 @@ export default async function Manufacturer({ params: { slug } }: Props) {
         {manufacturer.firstName ?? ''} {manufacturer.name}
       </Title>
 
-      {manufacturer.successors.length > 0 && (
-        <>
-          <Title fz="1.2rem" fw={500} display="inline" order={3}>
-            {`Successor: `}
-          </Title>
-          {manufacturer.successors.map(({ id, name, slug: successorSlug }, i, arr) => (
-            <Fragment key={id}>
-              <Anchor underline="always" href={brandsRoute + successorSlug} component={Link}>
-                {name}
-              </Anchor>
-              {i < arr.length && `, `}
-            </Fragment>
-          ))}
-        </>
-      )}
-
-      {manufacturer.predecessors.length > 0 && (
-        <>
-          <Title fz="1.2rem" fw={500} display="inline" order={3}>
-            {`Predecessor: `}
-          </Title>
-          {manufacturer.predecessors.map(({ id, name, slug: predecessorSlug }, i, arr) => (
-            <Fragment key={id}>
-              <Anchor underline="always" href={brandsRoute + predecessorSlug} component={Link}>
-                {name}
-              </Anchor>
-              {i < arr.length && `, `}
-            </Fragment>
-          ))}
-        </>
-      )}
+      <Connections label="Successor" brands={manufacturer.successors} />
+      <Connections label="Predecessor" brands={manufacturer.predecessors} />
 
       <MD className={sx.description}>{manufacturer.description}</MD>
 
@@ -109,3 +80,30 @@ export default async function Manufacturer({ params: { slug } }: Props) {
     </Container>
   )
 }
+
+/**
+ * The Connections component displays a list of related manufacturers (e.g., successors or predecessors) with a label.
+ * If the list is empty, the component renders nothing.
+ */
+const Connections = ({
+  brands,
+  label,
+}: {
+  label: string
+  brands: Awaited<ReturnType<typeof getManufacturer>>['successors']
+}) =>
+  brands.length > 0 && (
+    <>
+      <Title fz="1.2rem" fw={500} display="inline" order={3}>
+        {`${label}${brands.length > 1 ? 's' : ''}: `}
+      </Title>
+      {brands.map(({ id, name, firstName, slug }, i, arr) => (
+        <Fragment key={id}>
+          <Anchor underline="always" href={brandsRoute + slug} component={Link}>
+            {firstName} {name}
+          </Anchor>
+          {i < arr.length - 1 && `, `}
+        </Fragment>
+      ))}
+    </>
+  )

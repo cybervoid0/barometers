@@ -26,23 +26,32 @@ export async function GET(req: NextRequest) {
   }
 }
 
-//! Protect this function
 /**
  * Create a new Manufacturer
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const manufData: Manufacturer = await req.json().then(cleanObject)
+    const { successors, ...manufData }: { successors?: { id: string }[] } & Manufacturer = await req
+      .json()
+      .then(cleanObject)
 
     const { id, slug } = await prisma.manufacturer.create({
       data: {
         ...manufData,
         slug: getBrandSlug(manufData.name, manufData.firstName),
+        ...(successors
+          ? {
+              successors: {
+                connect: successors,
+              },
+            }
+          : {}),
       },
     })
 
     revalidatePath(trimTrailingSlash(brandsRoute))
     revalidatePath(brandsRoute + slug)
+    await revalidateSuccessors(successors)
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     return NextResponse.json(
@@ -57,12 +66,14 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, ...manufData } = await req.json().then(data =>
-      // replace empty strings with NULLs
-      traverse.map(data, function map(node) {
-        if (node === '') this.update(null)
-      }),
-    )
+    const { successors, ...manufData }: { successors?: { id: string }[] } & Manufacturer = await req
+      .json()
+      .then(data =>
+        // replace empty strings with NULLs
+        traverse.map(data, function map(node) {
+          if (node === '') this.update(null)
+        }),
+      )
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
     if (!manufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
@@ -88,6 +99,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
 
     revalidatePath(trimTrailingSlash(brandsRoute))
     revalidatePath(brandsRoute + slug)
+    await revalidateSuccessors(successors)
     return NextResponse.json(updatedManufacturer, { status: 200 })
   } catch (error) {
     console.error(error)
@@ -98,4 +110,16 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       { status: 500 },
     )
   }
+})
+
+const revalidateSuccessors = withPrisma(async (prisma, successorIds?: { id: string }[]) => {
+  if (typeof successorIds === 'undefined' || successorIds.length === 0) return
+  const inArray = successorIds.map(({ id }) => id)
+  const slugs = await prisma.manufacturer.findMany({
+    where: { id: { in: inArray } },
+    select: { slug: true },
+  })
+  slugs.forEach(({ slug }) => {
+    revalidatePath(brandsRoute + slug)
+  })
 })

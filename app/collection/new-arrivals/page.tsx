@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
+import { Container, Grid, GridCol, Stack, Title, Text } from '@mantine/core'
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
@@ -24,6 +24,14 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
         <Title tt="capitalize" mb="sm" component="h2">
           Last Added
         </Title>
+
+        <Text>Discover the latest additions to the collection!</Text>
+        <Text mb="xl">
+          This section highlights newly added barometers and weather instruments from every
+          category. Whether it&apos;s a self-registering recorder, a rare Bourdon barometer, or a
+          compact pocket device, each piece reflects the fascinating evolution of weather
+          measurement. Explore and find inspiration in these timeless tools.
+        </Text>
 
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer, slug, category }) => (

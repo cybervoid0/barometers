@@ -29,7 +29,7 @@
     color: black;
     font-weight: 600;
     letter-spacing: 0.08rem;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     @include sm() {
       font-size: 1.8rem;
     }
@@ -38,9 +38,8 @@
   .logo {
     height: 3rem;
     aspect-ratio: 1;
-    height: 2rem;
     @include sm() {
-      height: 2.5rem;
+      height: 3.8rem;
     }
     position: relative;
   }

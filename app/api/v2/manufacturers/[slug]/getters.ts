@@ -9,6 +9,7 @@ export const getManufacturer = withPrisma((prisma, slug: string) =>
       predecessors: {
         select: {
           id: true,
+          firstName: true,
           name: true,
           slug: true,
         },
@@ -16,6 +17,7 @@ export const getManufacturer = withPrisma((prisma, slug: string) =>
       successors: {
         select: {
           id: true,
+          firstName: true,
           name: true,
           slug: true,
         },
