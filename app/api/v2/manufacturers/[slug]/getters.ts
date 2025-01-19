@@ -5,6 +5,22 @@ export const getManufacturer = withPrisma((prisma, slug: string) =>
     where: {
       slug,
     },
+    include: {
+      predecessors: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      successors: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
   }),
 )
 

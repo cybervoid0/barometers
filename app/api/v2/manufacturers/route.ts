@@ -1,9 +1,10 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { Manufacturer } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+import traverse from 'traverse'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
-import { slug as slugify, trimTrailingSlash } from '@/utils/misc'
+import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { brandsRoute } from '@/utils/routes-front'
 
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const manufData: Manufacturer = await req.json()
+    const manufData: Manufacturer = await req.json().then(cleanObject)
 
     const { id, slug } = await prisma.manufacturer.create({
       data: {
@@ -56,7 +57,12 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const manufData = await req.json()
+    const { successors, ...manufData } = await req.json().then(data =>
+      // replace empty strings with NULLs
+      traverse.map(data, function map(node) {
+        if (node === '') this.update(null)
+      }),
+    )
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
     if (!manufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
@@ -67,6 +73,13 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       where: { id: manufacturer.id },
       data: {
         ...manufData,
+        ...(successors
+          ? {
+              successors: {
+                set: successors,
+              },
+            }
+          : {}),
         slug,
       },
     })

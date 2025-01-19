@@ -114,7 +114,10 @@ export default async function BarometerItem({ params: { slug } }: Props) {
                   c="dark.3"
                   fw={400}
                 >
-                  {`${barometer.manufacturer.name}${barometer.manufacturer.city ? `, ${barometer.manufacturer.city}` : ''}`}
+                  {(() => {
+                    const { firstName, name, city } = barometer.manufacturer
+                    return `${firstName ? `${firstName} ` : ''}${name}${city ? `, ${city}` : ''}`
+                  })()}
                 </Anchor>
                 <IsAdmin>
                   <ManufacturerEdit barometer={barometer} />

@@ -4,14 +4,6 @@ export const getManufacturers = withPrisma(async (prisma, page: number, pageSize
   const skip = pageSize ? (page - 1) * pageSize : undefined
   const [manufacturers, totalItems] = await Promise.all([
     prisma.manufacturer.findMany({
-      select: {
-        name: true,
-        slug: true,
-        id: true,
-        city: true,
-        country: true,
-        description: true,
-      },
       orderBy: [
         {
           name: 'asc',
@@ -22,6 +14,22 @@ export const getManufacturers = withPrisma(async (prisma, page: number, pageSize
       ],
       skip,
       take: pageSize || undefined,
+      include: {
+        predecessors: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        successors: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
     }),
     prisma.manufacturer.count(),
   ])

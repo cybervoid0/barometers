@@ -14,9 +14,10 @@ import {
   Title,
   Select,
   Group,
+  MultiSelect,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { isLength } from 'validator'
+import { isLength, isURL } from 'validator'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import type { BarometerDTO, ManufacturerDTO } from '@/app/types'
@@ -29,17 +30,23 @@ interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
-type ManufacturerForm = Partial<NonNullable<ManufacturerDTO>>
+type ManufacturerForm = Omit<Partial<NonNullable<ManufacturerDTO>>, 'successors'> & {
+  successors: string[]
+}
+const initialValues: ManufacturerForm = {
+  name: '',
+  firstName: '',
+  city: '',
+  country: '',
+  url: '',
+  description: '',
+  successors: [],
+}
 export function ManufacturerEdit({ size = 18, barometer, ...props }: ManufacturerEditProps) {
   const { manufacturers } = useBarometers()
   const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
   const form = useForm<ManufacturerForm>({
-    initialValues: {
-      name: '',
-      city: '',
-      country: '',
-      description: '',
-    },
+    initialValues,
     validate: {
       name: val =>
         isLength(val ?? '', { min: 2, max: 100 })
@@ -49,6 +56,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
         isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
       country: val =>
         isLength(val ?? '', { max: 100 }) ? null : 'Country should be shorter that 100 symbols',
+      url: val => (val === '' || isURL(val ?? '') ? null : 'Must be a valid URL'),
     },
   })
 
@@ -75,9 +83,12 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     const manufacturerFormData = {
       id: selectedManufacturer?.id ?? '',
       name: selectedManufacturer?.name ?? '',
+      firstName: selectedManufacturer?.firstName ?? '',
       city: selectedManufacturer?.city ?? '',
       country: selectedManufacturer?.country ?? '',
       description: selectedManufacturer?.description ?? '',
+      url: selectedManufacturer?.url ?? '',
+      successors: selectedManufacturer?.successors.map(({ id }) => id),
     } as ManufacturerForm
     form.setValues(manufacturerFormData)
     form.resetDirty(manufacturerFormData)
@@ -91,9 +102,13 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
         id: barometer.id,
         manufacturerId: manufacturer.id,
       }
+      const updatedManufacturer = {
+        ...formValues,
+        successors: form.values.successors.map(id => ({ id })),
+      }
       const [{ slug }, { name }] = await Promise.all([
         updateBarometer(updatedBarometer),
-        updateManufacturer(formValues),
+        updateManufacturer(updatedManufacturer),
       ])
       showInfo(`${name} updated`, 'Success')
       close()
@@ -130,9 +145,26 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
             label="Manufacturer"
             onChange={index => setSelectedManufacturerIndex(Number(index))}
           />
-          <TextInput id="manufacturer-name" required label="Name" {...form.getInputProps('name')} />
+          <TextInput label="First name" {...form.getInputProps('firstName')} />
+          <TextInput
+            id="manufacturer-name"
+            required
+            label="Name / Company name"
+            {...form.getInputProps('name')}
+          />
           <TextInput label="Country" {...form.getInputProps('country')} />
           <TextInput label="City" {...form.getInputProps('city')} />
+          <TextInput label="External URL" {...form.getInputProps('url')} />
+          <MultiSelect
+            label="Successors"
+            placeholder="Select brands"
+            data={manufacturers.data.map(({ name, id }) => ({
+              value: id,
+              label: name,
+            }))}
+            value={form.values.successors}
+            onChange={successors => form.setValues({ successors })}
+          />
           <Textarea
             autosize
             minRows={2}
