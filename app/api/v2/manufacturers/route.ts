@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import traverse from 'traverse'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
-import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils/misc'
+import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { brandsRoute } from '@/utils/routes-front'
 
@@ -37,7 +37,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
     const { id, slug } = await prisma.manufacturer.create({
       data: {
         ...manufData,
-        slug: slugify(manufData.name),
+        slug: getBrandSlug(manufData.name, manufData.firstName),
       },
     })
 
@@ -68,7 +68,9 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
     }
     // update slug if name was changed
-    const slug = manufData.name ? slugify(manufData.name) : manufacturer.slug
+    const slug = manufData.name
+      ? getBrandSlug(manufData.name, manufData.firstName)
+      : manufacturer.slug
     const updatedManufacturer = await prisma.manufacturer.update({
       where: { id: manufacturer.id },
       data: {
