@@ -1,10 +1,12 @@
 import { type Metadata } from 'next'
-import { Container, Grid, GridCol, Title } from '@mantine/core'
+import { Anchor, Container, Grid, GridCol, Title } from '@mantine/core'
+import Link from 'next/link'
+import { Fragment } from 'react'
 import { getManufacturer } from '@/app/api/v2/manufacturers/[slug]/getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '@/app/metadata'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
-import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
+import { barometerRoute, brandsRoute, categoriesRoute } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import sx from '../styles.module.scss'
 
@@ -54,8 +56,40 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   return (
     <Container size="xl">
       <Title tt="capitalize" mt="xl" mb="sm" component="h2">
-        {manufacturer.name}
+        {manufacturer.firstName ?? ''} {manufacturer.name}
       </Title>
+
+      {manufacturer.successors.length > 0 && (
+        <>
+          <Title fz="1.2rem" fw={500} display="inline" order={3}>
+            {`Successor: `}
+          </Title>
+          {manufacturer.successors.map(({ id, name, slug: successorSlug }, i, arr) => (
+            <Fragment key={id}>
+              <Anchor underline="always" href={brandsRoute + successorSlug} component={Link}>
+                {name}
+              </Anchor>
+              {i < arr.length && `, `}
+            </Fragment>
+          ))}
+        </>
+      )}
+
+      {manufacturer.predecessors.length > 0 && (
+        <>
+          <Title fz="1.2rem" fw={500} display="inline" order={3}>
+            {`Predecessor: `}
+          </Title>
+          {manufacturer.predecessors.map(({ id, name, slug: predecessorSlug }, i, arr) => (
+            <Fragment key={id}>
+              <Anchor underline="always" href={brandsRoute + predecessorSlug} component={Link}>
+                {name}
+              </Anchor>
+              {i < arr.length && `, `}
+            </Fragment>
+          ))}
+        </>
+      )}
 
       <MD className={sx.description}>{manufacturer.description}</MD>
 

@@ -19,6 +19,7 @@ const getManufacturerList = withPrisma(async prisma => {
   const brands = await prisma.manufacturer.findMany({
     select: {
       id: true,
+      firstName: true,
       name: true,
       slug: true,
       barometers: {
@@ -49,7 +50,7 @@ const getManufacturerList = withPrisma(async prisma => {
 
 const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerList>> }) => (
   <Stack gap="md">
-    {items.map(({ id, name, slug, image }) => (
+    {items.map(({ id, firstName, name, slug, image }) => (
       <Anchor key={id} href={brandsRoute + slug} component={Link}>
         <Group gap="xs" wrap="nowrap">
           {image ? (
@@ -65,7 +66,9 @@ const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerLis
           ) : (
             <WiBarometer size={32} />
           )}
-          <Text className={sx.brand}>{name}</Text>
+          <Text className={sx.brand}>
+            {firstName} {name}
+          </Text>
         </Group>
       </Anchor>
     ))}

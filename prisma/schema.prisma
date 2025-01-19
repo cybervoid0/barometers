@@ -10,16 +10,17 @@ datasource db {
 }
 
 model Image {
-  id          String      @id @default(uuid())
-  url         String
-  blurData    String
-  description String?
-  name        String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  categories  Category?   @relation("CategoryImage")
-  barometers  Barometer[] @relation("BarometerImages")
-  order       Int?
+  id            String        @id @default(uuid())
+  url           String
+  blurData      String
+  description   String?
+  name          String?
+  order         Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  categories    Category?     @relation("CategoryImage")
+  barometers    Barometer[]   @relation("BarometerImages")
+  manufacturers Manufacturer? @relation("ManufacturerImage")
 }
 
 model Category {
@@ -74,15 +75,23 @@ enum InaccuracyReportStatus {
 }
 
 model Manufacturer {
-  id          String      @id @default(uuid())
-  name        String      @unique
-  slug        String      @unique
-  country     String?
-  city        String?
-  description String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  barometers  Barometer[]
+  id           String         @id @default(uuid())
+  firstName    String?
+  name         String         @unique
+  slug         String         @unique
+  country      String?
+  city         String?
+  description  String?
+  url          String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  barometers   Barometer[]
+  imageId      String?        @unique
+  image        Image?         @relation("ManufacturerImage", fields: [imageId], references: [id])
+  // self-referencing relations
+  // some brands may have multiple successors and/or predecessors
+  successors   Manufacturer[] @relation("ManufacturerSuccessors")
+  predecessors Manufacturer[] @relation("ManufacturerSuccessors")
 }
 
 model Condition {
