@@ -1,21 +1,21 @@
 import Link from 'next/link'
-import { Anchor, Container, Button, Stack } from '@mantine/core'
+import { Container, Button, Stack } from '@mantine/core'
 import { addBarometerRoute, viewReportsRoute } from '@/utils/routes-front'
 
 export default function Admin() {
   return (
     <Container size="lg">
       <Stack gap="xs" w="15rem">
-        <Anchor c="dark" href={addBarometerRoute} component={Link}>
+        <Link href={addBarometerRoute}>
           <Button fullWidth size="compact-sm">
             Add new barometer
           </Button>
-        </Anchor>
-        <Anchor c="dark" href={viewReportsRoute} component={Link}>
+        </Link>
+        <Link href={viewReportsRoute}>
           <Button fullWidth size="compact-sm">
             View Inaccuracy Reports
           </Button>
-        </Anchor>
+        </Link>
       </Stack>
     </Container>
   )
