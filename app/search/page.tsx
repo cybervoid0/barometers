@@ -25,7 +25,9 @@ export default async function Search({ searchParams }: SearchProps) {
               <SearchItem
                 image={image}
                 name={name}
-                manufacturer={manufacturer?.name}
+                manufacturer={
+                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+                }
                 link={barometerRoute + slug}
                 key={id}
                 dating={dateDescription}

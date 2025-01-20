@@ -55,6 +55,7 @@ export const getBarometersByParams = withPrisma(
           collectionId: true,
           manufacturer: {
             select: {
+              firstName: true,
               name: true,
             },
           },

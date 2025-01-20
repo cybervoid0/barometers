@@ -33,3 +33,4 @@ export const SortOptions = [
 ] as const satisfies { value: string; label: string }[]
 
 export type SortValue = (typeof SortOptions)[number]['value']
+export type DynamicOptions = 'auto' | 'force-dynamic' | 'error' | 'force-static'

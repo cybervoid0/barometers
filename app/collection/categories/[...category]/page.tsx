@@ -4,7 +4,7 @@ import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
 import { googleStorageImagesFolder, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
 import { categoriesRoute, barometerRoute } from '@/utils/routes-front'
 import { BarometerCard } from '@/app/components/barometer-card'
-import { SortValue, SortOptions } from '@/app/types'
+import { SortValue, SortOptions, DynamicOptions } from '@/app/types'
 import Sort from './sort'
 import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
@@ -12,6 +12,10 @@ import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
+
+// all non-generated posts will give 404
+export const dynamicParams = false
+export const dynamic: DynamicOptions = 'force-static'
 
 interface CollectionProps {
   params: {
@@ -78,7 +82,9 @@ export default async function Collection({ params: { category } }: CollectionPro
                 image={images[0]}
                 name={name}
                 link={barometerRoute + slug}
-                manufacturer={manufacturer?.name}
+                manufacturer={
+                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+                }
               />
             </GridCol>
           ))}
@@ -88,9 +94,6 @@ export default async function Collection({ params: { category } }: CollectionPro
     </Container>
   )
 }
-
-// all non-generated posts will give 404
-export const dynamicParams = false
 
 export const generateStaticParams = withPrisma(async prisma => {
   const categories = await prisma.category.findMany({ select: { name: true, id: true } })
@@ -107,7 +110,7 @@ export const generateStaticParams = withPrisma(async prisma => {
     const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
     const barometersPerCategory = categoryData?._count._all ?? 0
     const pagesPerCategory = Math.ceil(barometersPerCategory / BAROMETERS_PER_CATEGORY_PAGE)
-    // generate all combinations of of category/sort/page for static page generation
+    // generate all category/sort/page combinations for static page generation
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {
         params.push({

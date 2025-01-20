@@ -26,6 +26,7 @@ export const searchBarometers = withPrisma(
           slug: true,
           manufacturer: {
             select: {
+              firstName: true,
               name: true,
             },
           },

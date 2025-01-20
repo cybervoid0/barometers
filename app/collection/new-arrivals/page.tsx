@@ -41,7 +41,9 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
                 barometerLink={barometerRoute + slug}
                 categoryName={category.name}
                 categoryLink={categoriesRoute + category.name}
-                manufacturer={manufacturer.name}
+                manufacturer={
+                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+                }
                 image={images.at(0)!}
               />
             </GridCol>

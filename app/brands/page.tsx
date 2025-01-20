@@ -8,8 +8,9 @@ import { brandsRoute } from '@/utils/routes-front'
 import { title } from '../metadata'
 import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
+import { DynamicOptions } from '../types'
 
-export const dynamic = 'force-static'
+export const dynamic: DynamicOptions = 'force-static'
 
 export const metadata: Metadata = {
   title: `${title} - Manufacturers`,
@@ -66,9 +67,7 @@ const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerLis
           ) : (
             <WiBarometer size={32} />
           )}
-          <Text className={sx.brand}>
-            {firstName} {name}
-          </Text>
+          <Text className={sx.brand}>{name + (firstName ? `, ${firstName}` : '')}</Text>
         </Group>
       </Anchor>
     ))}
