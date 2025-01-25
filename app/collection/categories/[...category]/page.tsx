@@ -12,6 +12,7 @@ import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory } from '@/app/api/v2/categories/[name]/getters'
 import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
+import { FooterVideo } from '@/app/components/footer-video'
 
 // all non-generated posts will give 404
 export const dynamicParams = false
@@ -91,6 +92,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         </Grid>
         {totalPages > 1 && <Pagination total={totalPages} value={+page} />}
       </Stack>
+      {categoryName === 'recorders' && <FooterVideo />}
     </Container>
   )
 }

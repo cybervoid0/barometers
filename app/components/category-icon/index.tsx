@@ -40,6 +40,8 @@ function LetterCircle({
         fill={bgColor}
         stroke={alpha(color, 0.5)}
         strokeWidth="3"
+        rx="4px"
+        ry="4px"
       />
       <text
         x="49"

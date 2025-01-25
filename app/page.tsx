@@ -13,7 +13,7 @@ export default async function HomePage() {
   return (
     <>
       <HeadingImage />
-      <Container size="xl" pb="2.3rem">
+      <Container size="xl">
         <Group align="center" wrap="nowrap">
           <NewArrivals />
           <SearchField
