@@ -1,5 +1,5 @@
-import { Container, Title, Text, Box, Center, Paper } from '@mantine/core'
-import Image from 'next/image'
+import { Container, Title, Text, Box, Center, Paper, Image } from '@mantine/core'
+import NextImage from 'next/image'
 import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { ShowMore } from '../components/showmore'
@@ -10,8 +10,10 @@ function Figure({ src }: { src: string }) {
   return (
     <Center className={sx.figure}>
       <Image
+        component={NextImage}
         src={`${googleStorageImagesFolder}history/${src}`}
         width="400"
+        w={{ base: '100%', xs: '400px' }}
         height="400"
         alt="Figure"
       />
@@ -87,6 +89,7 @@ export default function History() {
           mountains to prove the change in atmospheric pressure at altitude.
         </Text>
         <ShowMore>
+          <Figure src="2-fig-scale.png" />
           <Text className={sx.paragraph}>
             The first Torricellian experiment outside of Italy was conducted in 1646 by the French
             scientist, physician, and poet Pierre Petit. He learned the details of Torricelli&apos;s
@@ -546,7 +549,7 @@ export default function History() {
           used in scientific research.
         </Text>
         <ShowMore>
-          <Figure src="figure-25_Kew-barometer.png" />
+          <Figure src="13-fig-kew.png" />
           <Text className={sx.paragraph}>
             A special place belongs to highly accurate barometers used in meteorological
             laboratories. These instruments include the &ldquo;Normal Barometer&rdquo;
@@ -833,12 +836,13 @@ export default function History() {
           </Text>
         </ShowMore>
         <Title component="h3" className={sx.header}>
-          Aneroid Mechanisms: The Vidie Mechanism and the Continental Console Mechanism
+          Aneroid Mechanisms: The Vidie mechanism and the conventional continental cantilever type
+          movement
         </Title>
         <Text className={sx.paragraph}>
           Aneroid barometers, invented by Lucien Vidie, used a metal capsule that deformed under air
-          pressure. Later, the continental console mechanism, based on a rack and pinion system, was
-          developed, improving the accuracy and stability of measurements.
+          pressure. Later, the conventional continental cantilever type movement, based on a rack
+          and pinion system, was developed, improving the accuracy and stability of measurements.
         </Text>
         <ShowMore>
           <Figure src="figure-39_mountain-barometer.png" />
@@ -858,9 +862,9 @@ export default function History() {
             and atmospheric pressure is balanced solely by the elasticity of the capsule itself. As
             the capsule deforms, the gear (pinion) rotates, causing the rack to move linearly,
             which, in turn, moves the barometer&apos;s pointer. This mechanism became the foundation
-            of the so-called standard continental console mechanism, which ensured the smooth and
-            precise conversion of the capsule&apos;s deformation into pointer movement, improving
-            measurement accuracy.
+            of the so-called conventional continental cantilever type movement, which ensured the
+            smooth and precise conversion of the capsule&apos;s deformation into pointer movement,
+            improving measurement accuracy.
           </Text>
         </ShowMore>
         <Title component="h3" className={sx.header}>
@@ -1018,6 +1022,7 @@ export default function History() {
           prepare for rain.
         </Text>
         <ShowMore>
+          <Figure src="27-fig-hum.png" />
           <Text className={sx.paragraph}>
             In addition to observing nature, people have long created simple but remarkably
             effective tools for predicting the weather, which became reliable assistants in everyday
