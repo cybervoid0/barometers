@@ -5,6 +5,7 @@ import sx from './styles.module.scss'
 export function FooterVideo() {
   return (
     <video
+      playsInline
       autoPlay
       loop
       muted
