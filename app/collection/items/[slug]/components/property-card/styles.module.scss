@@ -1,0 +1,29 @@
+.card {
+  max-width: 450px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--mantine-spacing-sm);
+  flex-wrap: nowrap;
+  background-color: var(--mantine-color-gray-0);
+  border-radius: var(--mantine-radius-xs);
+  overflow: hidden;
+}
+
+.icon {
+  height: 60px;
+  width: 60px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #fff 50%, var(--mantine-color-gray-0));
+  border-radius: var(--mantine-radius-xs);
+}
+
+.stack {
+  gap: 0.2rem;
+  flex-grow: 1;
+}
+
+.title {
+  font-weight: 600;
+  color: var(--mantine-color-primary);
+  font-size: var(--mantine-font-size-lg);
+}

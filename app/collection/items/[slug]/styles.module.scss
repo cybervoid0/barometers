@@ -26,3 +26,10 @@
 .inaccuracy {
   align-self: flex-end;
 }
+
+.simpleGrid {
+  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  justify-content: center;
+  gap: var(--mantine-spacing-md);
+}

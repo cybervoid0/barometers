@@ -1,16 +1,16 @@
 'use client'
 
-import { Spoiler, TextProps } from '@mantine/core'
+import { Spoiler, Box, BoxProps } from '@mantine/core'
 import { MD } from '../md'
 
-interface DescriptionTextProps extends TextProps {
+interface DescriptionTextProps extends BoxProps {
   description: string
 }
 
-export const DescriptionText = ({ description }: DescriptionTextProps) => {
+export const DescriptionText = ({ description, ...props }: DescriptionTextProps) => {
   const [firstParagraph, ...paragraphs] = description.split('\n')
   return (
-    <>
+    <Box {...props}>
       <MD>{firstParagraph}</MD>
       <Spoiler
         maxHeight={0}
@@ -20,6 +20,6 @@ export const DescriptionText = ({ description }: DescriptionTextProps) => {
       >
         <MD>{paragraphs.join('\n')}</MD>
       </Spoiler>
-    </>
+    </Box>
   )
 }

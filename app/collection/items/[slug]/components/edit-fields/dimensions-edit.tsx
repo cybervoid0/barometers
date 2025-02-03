@@ -30,7 +30,7 @@ interface DimensionEditProps {
   barometer: BarometerDTO
 }
 
-export default function DimensionEdit({ barometer }: DimensionEditProps) {
+export function DimensionEdit({ barometer }: DimensionEditProps) {
   const [opened, { open, close }] = useDisclosure(false)
   const form = useForm<DimFormProps>({
     initialValues: {
