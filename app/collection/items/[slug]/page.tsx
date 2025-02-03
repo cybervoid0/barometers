@@ -7,21 +7,13 @@ import {
   Box,
   Divider,
   Anchor,
-  SimpleGrid,
+  Grid,
   Paper,
   List,
   ListItem,
   Group,
+  Center,
 } from '@mantine/core'
-import {
-  IconDimensions,
-  IconBuildingFactory2,
-  IconCalendarFilled,
-  IconListCheck,
-  IconHistory,
-  IconNumber,
-  IconHash,
-} from '@tabler/icons-react'
 import { brandsRoute } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -40,8 +32,14 @@ import { DescriptionEdit } from './components/edit-fields/description-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
-import sx from './styles.module.scss'
-// TODO:
+// icon images
+import {
+  conditionsImg,
+  datingImg,
+  dimensionsImg,
+  manufacturerImg,
+  serialNoImg,
+} from './components/property-card'
 import InaccuracyReport from './components/inaccuracy-report'
 
 export const dynamic = 'force-static'
@@ -70,13 +68,15 @@ export default async function Page({ params: { slug } }: Props) {
         <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
         <ImageCarousel barometer={barometer} />
         <Paper p="lg">
-          <Group mb="lg" align="center" justify="space-between">
-            <Title order={2}>{barometer.name}</Title>
+          <Group mb="lg" align="center" justify="space-between" wrap="nowrap">
+            <Title fw={600} order={2}>
+              {barometer.name}
+            </Title>
             <DeleteBarometer barometer={barometer} />
           </Group>
-          <SimpleGrid spacing="md" className={sx.simpleGrid}>
+          <Grid justify="center" mb="lg">
             <PropertyCard
-              icon={<IconBuildingFactory2 />}
+              icon={manufacturerImg}
               title="Manufacturer/Retailer"
               content={
                 <Anchor
@@ -90,33 +90,33 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<ManufacturerEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={<IconNumber />}
+              icon={serialNoImg}
               title="Serial Number"
               content={barometer.serial}
               edit={<TextFieldEdit barometer={barometer} property="serial" />}
             />
             <PropertyCard
               adminOnly
-              icon={<IconHash />}
+              icon={serialNoImg}
               title="Collection ID"
               content={barometer.collectionId}
               edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
             />
             <PropertyCard
               adminOnly
-              icon={<IconCalendarFilled />}
+              icon={datingImg}
               title="Year"
               content={dayjs(barometer.date).format('YYYY')}
               edit={<DateEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={<IconHistory />}
+              icon={datingImg}
               title="Dating"
               content={barometer.dateDescription}
               edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
             />
             <PropertyCard
-              icon={<IconDimensions />}
+              icon={dimensionsImg}
               title="Dimensions"
               content={
                 <List listStyleType="none">
@@ -135,12 +135,12 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<DimensionEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={<IconListCheck />}
+              icon={conditionsImg}
               title="Condition"
               content={<Condition condition={barometer.condition} />}
               edit={<ConditionEdit barometer={barometer} />}
             />
-          </SimpleGrid>
+          </Grid>
 
           <Divider
             labelPosition="right"
@@ -157,6 +157,10 @@ export default async function Page({ params: { slug } }: Props) {
               <Text>Add description</Text>
             </IsAdmin>
           )}
+
+          <Center>
+            <InaccuracyReport barometer={barometer} />
+          </Center>
         </Paper>
       </Box>
     </Container>

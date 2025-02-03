@@ -1,12 +1,15 @@
-.card {
+.gridCol {
   max-width: 450px;
-  width: 100%;
-  margin: 0 auto;
+  overflow: hidden;
+}
+
+.card {
+  height: 100%;
   padding: var(--mantine-spacing-sm);
+  justify-content: center;
   flex-wrap: nowrap;
   background-color: var(--mantine-color-gray-0);
   border-radius: var(--mantine-radius-xs);
-  overflow: hidden;
 }
 
 .icon {
