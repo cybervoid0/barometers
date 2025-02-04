@@ -1,16 +1,18 @@
 'use client'
 
 import React from 'react'
-import { Button, ButtonProps, Group, Modal, Text } from '@mantine/core'
+import { Button, ActionIcon, ActionIconProps, Group, Modal, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
+import { IconTrash } from '@tabler/icons-react'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
 import sx from './styles.module.scss'
 import { categoriesRoute } from '@/utils/routes-front'
+import { IsAdmin } from '@/app/components/is-admin'
 
-interface Props extends ButtonProps {
+interface Props extends ActionIconProps {
   barometer: BarometerDTO
 }
 
@@ -29,10 +31,10 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
     }
   }
   return (
-    <>
-      <Button onClick={open} {...props}>
-        Delete barometer
-      </Button>
+    <IsAdmin>
+      <ActionIcon {...props} onClick={open} className={sx.deleteButton}>
+        <IconTrash />
+      </ActionIcon>
       <Modal
         centered
         opened={opened}
@@ -55,6 +57,6 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
           </Button>
         </Group>
       </Modal>
-    </>
+    </IsAdmin>
   )
 }

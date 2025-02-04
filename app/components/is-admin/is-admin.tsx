@@ -11,6 +11,7 @@ export function isAdmin(session: Session | null): boolean {
 }
 
 export function IsAdmin({ children }: PropsWithChildren) {
-  const { data } = useSession()
-  return isAdmin(data) ? <>{children}</> : <></>
+  const { data, status } = useSession()
+  if (status === 'loading') return null
+  return isAdmin(data) ? <>{children}</> : null
 }

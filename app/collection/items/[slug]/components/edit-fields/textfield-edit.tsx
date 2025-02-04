@@ -25,8 +25,7 @@ export function TextFieldEdit({ size = 18, barometer, property, ...props }: Text
   const { open, close, opened, form, update } = useEditField({
     property,
     barometer,
-    validate: val =>
-      isLength(String(val), { min: 2, max: 200 }) ? null : 'Incorrect length (>2 <200)',
+    validate: val => (isLength(String(val), { max: 200 }) ? null : 'Incorrect length (<200)'),
   })
   return (
     <>

@@ -37,24 +37,37 @@ model Category {
 }
 
 model Barometer {
-  id              String             @id @default(uuid())
-  collectionId    String             @unique
-  name            String             @unique
-  slug            String             @unique
+  /// Table ID
+  id              String   @id @default(uuid())
+  /// Collection internal ID
+  collectionId    String   @unique
+  /// Serial number written on the barometer
+  serial          String?
+  /// Barometer descriptive name
+  name            String   @unique
+  /// URL Representation of the name
+  slug            String   @unique
+  /// History of the barometer. May contain Markdown layout
   description     String
-  conditionId     String
-  date            DateTime
-  dateDescription String
-  manufacturerId  String
+  /// Barometer dimensions, e.g. weight, length, diameter etc.
   dimensions      Json?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  categoryId      String
-  category        Category           @relation(fields: [categoryId], references: [id])
-  condition       Condition          @relation(fields: [conditionId], references: [id])
-  manufacturer    Manufacturer       @relation(fields: [manufacturerId], references: [id])
-  images          Image[]            @relation("BarometerImages")
-  reports         InaccuracyReport[]
+  /// Date for barometers sorting
+  date            DateTime
+  /// Date to display on pages, e.g. "c.1870", "mid 19th century"
+  dateDescription String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // table relations
+  conditionId    String
+  manufacturerId String
+  categoryId     String
+  category       Category           @relation(fields: [categoryId], references: [id])
+  condition      Condition          @relation(fields: [conditionId], references: [id])
+  manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id])
+  images         Image[]            @relation("BarometerImages")
+  reports        InaccuracyReport[]
 }
 
 model InaccuracyReport {

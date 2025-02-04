@@ -73,7 +73,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         <Title tt="capitalize" component="h2">
           {categoryName}
         </Title>
-        {description && <DescriptionText size="sm" description={description} />}
+        {description && <DescriptionText description={description} />}
         <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
