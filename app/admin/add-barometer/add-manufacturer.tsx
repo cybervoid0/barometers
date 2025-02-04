@@ -19,6 +19,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
 
   const form = useForm({
     initialValues: {
+      firstName: '',
       name: '',
       city: '',
       country: '',
@@ -29,6 +30,10 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
         isLength(val, { min: 2, max: 100 })
           ? null
           : 'Name should be longer than 2 and shorter than 100 symbols',
+      firstName: val =>
+        isLength(val ?? '', { max: 100 })
+          ? null
+          : 'First name should be longer than 2 and shorter than 100 symbols',
       city: val =>
         isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
       country: val =>
@@ -66,6 +71,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           <Title mb="lg" order={3}>
             Add Manufacturer
           </Title>
+          <TextInput label="First name" {...form.getInputProps('firstName')} />
           <TextInput id="manufacturer-name" required label="Name" {...form.getInputProps('name')} />
           <TextInput label="Country" {...form.getInputProps('country')} />
           <TextInput label="City" {...form.getInputProps('city')} />
