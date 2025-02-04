@@ -61,7 +61,7 @@ export const generateStaticParams = withPrisma(prisma =>
 export default async function Page({ params: { slug } }: Props) {
   const barometer = await getBarometer(slug)
   const { firstName, name, city } = barometer.manufacturer
-  const dimensions = barometer.dimensions as Dimensions
+  const dimensions = (barometer.dimensions ?? []) as Dimensions
   return (
     <Container size="xl">
       <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
@@ -116,6 +116,7 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
             />
             <PropertyCard
+              adminOnly={dimensions.length === 0}
               icon={dimensionsImg}
               title="Dimensions"
               content={
