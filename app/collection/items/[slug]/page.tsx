@@ -12,7 +12,6 @@ import {
   List,
   ListItem,
   Group,
-  Center,
 } from '@mantine/core'
 import { brandsRoute } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
@@ -74,7 +73,7 @@ export default async function Page({ params: { slug } }: Props) {
             </Title>
             <DeleteBarometer barometer={barometer} />
           </Group>
-          <Grid justify="center" mb="lg">
+          <Grid justify="center" mb="xl">
             <PropertyCard
               icon={manufacturerImg}
               title="Manufacturer/Retailer"
@@ -143,25 +142,19 @@ export default async function Page({ params: { slug } }: Props) {
             />
           </Grid>
 
-          <Divider
-            labelPosition="right"
-            label={
-              <IsAdmin>
-                <DescriptionEdit barometer={barometer} />
-              </IsAdmin>
-            }
-          />
+          <Divider labelPosition="center" label={<InaccuracyReport barometer={barometer} />} />
           {barometer.description ? (
-            <DescriptionText mt="1rem" description={barometer.description} />
+            <DescriptionText mt="lg" description={barometer.description} />
           ) : (
             <IsAdmin>
               <Text>Add description</Text>
             </IsAdmin>
           )}
-
-          <Center>
-            <InaccuracyReport barometer={barometer} />
-          </Center>
+          <IsAdmin>
+            <Group justify="flex-end">
+              <DescriptionEdit barometer={barometer} />
+            </Group>
+          </IsAdmin>
         </Paper>
       </Box>
     </Container>

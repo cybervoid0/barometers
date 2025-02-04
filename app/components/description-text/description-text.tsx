@@ -1,7 +1,7 @@
 'use client'
 
 import { Spoiler, Box, BoxProps } from '@mantine/core'
-import { MD } from '../md'
+import { MD } from '@/app/components/md'
 
 interface DescriptionTextProps extends BoxProps {
   description: string

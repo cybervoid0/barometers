@@ -74,7 +74,7 @@ export default function InaccuracyReport({ barometer, ...props }: Props) {
           </Text>
         }
       >
-        <Button color="primary" {...props} onClick={open}>
+        <Button variant="light" color="primary" {...props} onClick={open}>
           <Text fw={400} fz="sm" size="md" lts="0.05rem" tt="uppercase">
             Report inaccuracy
           </Text>
