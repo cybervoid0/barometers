@@ -15,10 +15,9 @@ export async function generateMetadata({
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
     images &&
-    images.toReversed().map(image => ({
+    images.slice(0, 1).map(image => ({
       url: googleStorageImagesFolder + image.url,
       alt: name,
-      order: image.order,
     }))
   const url = barometerRoute + slug
   return {
