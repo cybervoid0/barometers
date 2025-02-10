@@ -72,7 +72,9 @@ export default async function Page({ params: { slug } }: Props) {
               <Title fw={600} order={2} tt="capitalize">
                 {barometer.name}
               </Title>
-              <TextFieldEdit barometer={barometer} property="name" />
+              <IsAdmin>
+                <TextFieldEdit barometer={barometer} property="name" />
+              </IsAdmin>
             </Group>
             <DeleteBarometer barometer={barometer} />
           </Group>
