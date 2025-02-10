@@ -68,9 +68,12 @@ export default async function Page({ params: { slug } }: Props) {
         <ImageCarousel barometer={barometer} />
         <Paper p="lg">
           <Group mb="lg" align="center" justify="space-between" wrap="nowrap">
-            <Title fw={600} order={2}>
-              {barometer.name}
-            </Title>
+            <Group align="center" gap="sm">
+              <Title fw={600} order={2} tt="capitalize">
+                {barometer.name}
+              </Title>
+              <TextFieldEdit barometer={barometer} property="name" />
+            </Group>
             <DeleteBarometer barometer={barometer} />
           </Group>
           <Grid justify="center" mb="xl">

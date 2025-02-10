@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Button, ActionIcon, ActionIconProps, Group, Modal, Text } from '@mantine/core'
+import { Button, ActionIcon, ActionIconProps, Group, Modal, Text, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
 import { IconTrash } from '@tabler/icons-react'
@@ -32,9 +32,11 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
   }
   return (
     <IsAdmin>
-      <ActionIcon {...props} onClick={open} className={sx.deleteButton}>
-        <IconTrash />
-      </ActionIcon>
+      <Tooltip tt="capitalize" label={`Delete ${barometer.name}`}>
+        <ActionIcon {...props} onClick={open} className={sx.deleteButton}>
+          <IconTrash />
+        </ActionIcon>
+      </Tooltip>
       <Modal
         centered
         opened={opened}

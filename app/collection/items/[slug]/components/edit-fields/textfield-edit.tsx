@@ -9,6 +9,7 @@ import {
   Stack,
   Tooltip,
   Box,
+  Center,
 } from '@mantine/core'
 import { isLength } from 'validator'
 import { IconEdit } from '@tabler/icons-react'
@@ -31,7 +32,9 @@ export function TextFieldEdit({ size = 18, barometer, property, ...props }: Text
     <>
       <Tooltip label={`Edit ${property}`}>
         <UnstyledButton {...props} onClick={open}>
-          <IconEdit color="brown" size={size} />
+          <Center>
+            <IconEdit color="brown" size={size} />
+          </Center>
         </UnstyledButton>
       </Tooltip>
       <Modal
