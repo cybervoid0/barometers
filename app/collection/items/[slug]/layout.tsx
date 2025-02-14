@@ -1,16 +1,17 @@
 import { Metadata } from 'next/types'
-import { PropsWithChildren } from 'react'
+import { ReactNode, PropsWithChildren } from 'react'
 import capitalize from 'lodash/capitalize'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { barometerRoute } from '@/utils/routes-front'
 
-export async function generateMetadata({
-  params: { slug },
-}: {
+export interface ItemProps extends PropsWithChildren {
   params: { slug: string }
-}): Promise<Metadata> {
+  modal: ReactNode
+}
+
+export async function generateMetadata({ params: { slug } }: ItemProps): Promise<Metadata> {
   const { description, name, images } = await getBarometer(slug)
   const barometerTitle = `${title}: ${capitalize(name)}`
   const barometerImages =
@@ -39,6 +40,11 @@ export async function generateMetadata({
   }
 }
 
-export default function CollectionItemLayout({ children }: PropsWithChildren) {
-  return <>{children}</>
+export default function CollectionItemLayout({ children, modal }: ItemProps) {
+  return (
+    <>
+      {children}
+      {modal}
+    </>
+  )
 }
