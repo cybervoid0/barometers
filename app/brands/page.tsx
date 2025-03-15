@@ -2,7 +2,7 @@ import { Container, SimpleGrid, Anchor, Title, Paper, Stack, Text, Group } from 
 import Link from 'next/link'
 import { Metadata } from 'next'
 import Image from 'next/image'
-import { WiBarometer } from 'react-icons/wi'
+import { IconCircleArrowUp } from '@tabler/icons-react'
 import { withPrisma } from '@/prisma/prismaClient'
 import { brandsRoute } from '@/utils/routes-front'
 import { title } from '../metadata'
@@ -65,7 +65,7 @@ const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerLis
               sizes="32px"
             />
           ) : (
-            <WiBarometer size={32} />
+            <IconCircleArrowUp size={32} />
           )}
           <Text className={sx.brand}>{name + (firstName ? `, ${firstName}` : '')}</Text>
         </Group>

@@ -16,8 +16,7 @@ import {
 } from '@mantine/core'
 import Link from 'next/link'
 import * as motion from 'framer-motion/client'
-import { SiMaildotru, SiInstagram } from 'react-icons/si'
-import { IoIosArrowForward as Arrow } from 'react-icons/io'
+import { IconChevronRight, IconAt, IconBrandInstagram } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { instagram, email } from '@/utils/constants'
@@ -77,7 +76,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                               animate={{ rotate: opened[i] ? 90 : 0 }}
                               transition={{ duration: 0.3 }}
                             >
-                              <Arrow />
+                              <IconChevronRight />
                             </Center>
                           </Group>
                         </UnstyledButton>
@@ -132,12 +131,12 @@ export const MobileMenu: FC<DrawerProps> = props => {
           <Group h="4rem" align="center" justify="space-evenly">
             <Anchor aria-label="Instagram" target="_blank" href={instagram} lh={0}>
               <ActionIcon variant="default" size="sm" bd="none">
-                <SiInstagram size="100%" />
+                <IconBrandInstagram size="100%" />
               </ActionIcon>
             </Anchor>
             <Anchor aria-label="Email" target="_blank" href={`mailto:${email}`} lh={0}>
               <ActionIcon variant="default" size="sm" bd="none">
-                <SiMaildotru size="100%" />
+                <IconAt size="100%" />
               </ActionIcon>
             </Anchor>
           </Group>
