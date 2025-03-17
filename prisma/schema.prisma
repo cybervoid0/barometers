@@ -36,6 +36,13 @@ model Category {
   image       Image       @relation("CategoryImage", fields: [imageId], references: [id])
 }
 
+model SubCategory {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  barometers  Barometer[]
+}
+
 model Barometer {
   /// Table ID
   id              String   @id @default(uuid())
@@ -55,6 +62,8 @@ model Barometer {
   date            DateTime
   /// Date to display on pages, e.g. "c.1870", "mid 19th century"
   dateDescription String
+  /// History of ownership and origin of the barometer
+  provenance      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -63,6 +72,8 @@ model Barometer {
   conditionId    String
   manufacturerId String
   categoryId     String
+  subCategoryId  Int?
+  subCategory    SubCategory?       @relation(fields: [subCategoryId], references: [id])
   category       Category           @relation(fields: [categoryId], references: [id])
   condition      Condition          @relation(fields: [conditionId], references: [id])
   manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id])
