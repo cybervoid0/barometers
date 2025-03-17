@@ -7,6 +7,7 @@ import {
   manufacturersApiRoute,
   imageUploadApiRoute,
   reportRoute,
+  subcategoriesRoute,
 } from '@/utils/routes-back'
 import type {
   CategoryDTO,
@@ -184,5 +185,10 @@ export async function fetchReportList(
   const res = await fetch(`${url}?${qs.toString()}`, {
     cache: 'no-cache',
   })
+  return res.json()
+}
+/******* Subcategories ********/
+export async function fetchSubcategoryList() {
+  const res = await fetch(baseUrl + subcategoriesRoute)
   return res.json()
 }

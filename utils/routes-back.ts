@@ -7,3 +7,4 @@ export const conditionsApiRoute = `${base}conditions/`
 export const imageUploadApiRoute = `${base}upload/images/`
 export const barometersSearchRoute = `${base}search/`
 export const reportRoute = `${base}report/`
+export const subcategoriesRoute = `${base}subcategories/`

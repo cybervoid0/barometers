@@ -38,6 +38,7 @@ import {
   dimensionsImg,
   manufacturerImg,
   serialNoImg,
+  subcategories,
 } from './components/property-card'
 import InaccuracyReport from './components/inaccuracy-report'
 
@@ -144,6 +145,12 @@ export default async function Page({ params: { slug } }: Props) {
               title="Condition"
               content={<Condition condition={barometer.condition} />}
               edit={<ConditionEdit barometer={barometer} />}
+            />
+            <PropertyCard
+              adminOnly
+              icon={subcategories}
+              title="Subcategories"
+              content={barometer.subCategory?.name}
             />
           </Grid>
 
