@@ -31,6 +31,7 @@ import { DescriptionEdit } from './components/edit-fields/description-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
+import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 // icon images
 import {
   conditionsImg,
@@ -39,6 +40,7 @@ import {
   manufacturerImg,
   serialNoImg,
   subcategories,
+  price,
 } from './components/property-card'
 import InaccuracyReport from './components/inaccuracy-report'
 
@@ -151,6 +153,15 @@ export default async function Page({ params: { slug } }: Props) {
               icon={subcategories}
               title="Subcategories"
               content={barometer.subCategory?.name}
+            />
+            <PropertyCard
+              adminOnly
+              icon={price}
+              title="Estimated Price"
+              content={
+                barometer.estimatedPrice ? `€${barometer.estimatedPrice.toFixed(2)}` : undefined
+              }
+              edit={<EstimatedPriceEdit barometer={barometer} />}
             />
           </Grid>
 
