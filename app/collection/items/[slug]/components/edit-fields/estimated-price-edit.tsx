@@ -4,44 +4,52 @@ import {
   Modal,
   UnstyledButton,
   UnstyledButtonProps,
-  Textarea,
+  TextInput,
   Button,
   Stack,
   Tooltip,
   Box,
+  Center,
 } from '@mantine/core'
+import { isDecimal } from 'validator'
 import { IconEdit } from '@tabler/icons-react'
-import { useEditField } from './useEditField'
 import { BarometerDTO } from '@/app/types'
+import { useEditField } from './useEditField'
 
-interface DescriptionEditProps extends UnstyledButtonProps {
+interface Props extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-const property = 'description'
+const property: keyof BarometerDTO = 'estimatedPrice'
 
-export function DescriptionEdit({ size = 18, barometer, ...props }: DescriptionEditProps) {
-  const { open, opened, close, form, update } = useEditField({ property, barometer })
+export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
+  const { open, close, opened, form, update } = useEditField({
+    property,
+    barometer,
+    validate: val => (isDecimal(val as string) ? null : 'Wrong decimal number'),
+  })
   return (
     <>
-      <Tooltip label={`Edit ${property}`}>
+      <Tooltip label="Edit Estimated Price">
         <UnstyledButton {...props} onClick={open}>
-          <IconEdit color="brown" size={size} />
+          <Center>
+            <IconEdit color="brown" size={size} />
+          </Center>
         </UnstyledButton>
       </Tooltip>
       <Modal
         centered
         opened={opened}
         onClose={close}
-        title={`Edit ${property}`}
-        size="xl"
+        title="Edit Estimated Price"
+        size="md"
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
         <Box component="form" onSubmit={form.onSubmit(update)}>
           <Stack>
-            <Textarea autosize {...form.getInputProps(property)} />
+            <TextInput leftSection="€" required {...form.getInputProps(property)} />
             <Button fullWidth color="dark" variant="outline" type="submit">
               Save
             </Button>

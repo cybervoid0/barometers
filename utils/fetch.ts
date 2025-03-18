@@ -7,6 +7,7 @@ import {
   manufacturersApiRoute,
   imageUploadApiRoute,
   reportRoute,
+  subcategoriesRoute,
 } from '@/utils/routes-back'
 import type {
   CategoryDTO,
@@ -18,6 +19,7 @@ import type {
   ManufacturerDTO,
   SearchResultsDTO,
   InaccuracyReportListDTO,
+  SubcategoryListDTO,
 } from '@/app/types'
 import { handleApiError } from './misc'
 import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
@@ -184,5 +186,10 @@ export async function fetchReportList(
   const res = await fetch(`${url}?${qs.toString()}`, {
     cache: 'no-cache',
   })
+  return res.json()
+}
+/******* Subcategories ********/
+export async function fetchSubcategoryList(): Promise<SubcategoryListDTO> {
+  const res = await fetch(baseUrl + subcategoriesRoute)
   return res.json()
 }
