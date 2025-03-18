@@ -26,7 +26,7 @@ interface Props extends ButtonProps {
 }
 const maxFeedbackLen = 1000
 
-export default function InaccuracyReport({ barometer, ...props }: Props) {
+export function InaccuracyReport({ barometer, ...props }: Props) {
   const queryClient = useQueryClient()
   const [isOpened, { open, close }] = useDisclosure(false)
   const form = useForm({

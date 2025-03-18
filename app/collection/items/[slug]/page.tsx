@@ -24,14 +24,17 @@ import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { IsAdmin } from '@/app/components/is-admin'
 import { PropertyCard } from './components/property-card/property-card'
 import { DeleteBarometer } from './components/delete-barometer'
+import { InaccuracyReport } from './components/inaccuracy-report'
+import { MD } from '@/app/components/md'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
-import { DescriptionEdit } from './components/edit-fields/description-edit'
+import { TextAreaEdit } from './components/edit-fields/textarea-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
+import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
 // icon images
 import {
   conditionsImg,
@@ -42,7 +45,6 @@ import {
   subcategories,
   price,
 } from './components/property-card'
-import InaccuracyReport from './components/inaccuracy-report'
 
 export const dynamic = 'force-static'
 
@@ -149,10 +151,11 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<ConditionEdit barometer={barometer} />}
             />
             <PropertyCard
-              adminOnly
+              adminOnly={!barometer.subCategory?.name}
               icon={subcategories}
               title="Subcategories"
               content={barometer.subCategory?.name}
+              edit={<SubcategoryEdit barometer={barometer} />}
             />
             <PropertyCard
               adminOnly
@@ -175,7 +178,17 @@ export default async function Page({ params: { slug } }: Props) {
           )}
           <IsAdmin>
             <Group justify="flex-end">
-              <DescriptionEdit barometer={barometer} />
+              <TextAreaEdit barometer={barometer} property="description" />
+            </Group>
+          </IsAdmin>
+
+          <IsAdmin>
+            <Title fw={600} order={2} tt="capitalize">
+              Provenance
+            </Title>
+            {barometer.provenance ? <MD>{barometer.provenance}</MD> : <Text>No text</Text>}
+            <Group justify="flex-end">
+              <TextAreaEdit barometer={barometer} property="provenance" />
             </Group>
           </IsAdmin>
         </Paper>

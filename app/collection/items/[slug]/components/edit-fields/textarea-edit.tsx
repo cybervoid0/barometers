@@ -14,14 +14,13 @@ import { IconEdit } from '@tabler/icons-react'
 import { useEditField } from './useEditField'
 import { BarometerDTO } from '@/app/types'
 
-interface DescriptionEditProps extends UnstyledButtonProps {
+interface Props extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
+  property: keyof BarometerDTO
 }
 
-const property = 'description'
-
-export function DescriptionEdit({ size = 18, barometer, ...props }: DescriptionEditProps) {
+export function TextAreaEdit({ size = 18, barometer, property, ...props }: Props) {
   const { open, opened, close, form, update } = useEditField({ property, barometer })
   return (
     <>
