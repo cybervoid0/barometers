@@ -86,7 +86,7 @@ export default async function Page({ params: { slug } }: Props) {
           <Grid justify="center" mb="xl">
             <PropertyCard
               icon={manufacturerImg}
-              title="Manufacturer/Retailer"
+              title="Manufacturer or Retailer"
               content={
                 <Anchor
                   underline="always"
@@ -153,7 +153,7 @@ export default async function Page({ params: { slug } }: Props) {
             <PropertyCard
               adminOnly={!barometer.subCategory?.name}
               icon={subcategories}
-              title="Subcategories"
+              title="Movement (Tube) Type"
               content={barometer.subCategory?.name}
               edit={<SubcategoryEdit barometer={barometer} />}
             />
