@@ -65,7 +65,7 @@ model Barometer {
   /// History of ownership and origin of the barometer
   provenance      String?
   /// Estimated price
-  estimatedPrice  Decimal?
+  estimatedPrice  Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

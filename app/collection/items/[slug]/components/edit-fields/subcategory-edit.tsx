@@ -27,7 +27,7 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
   const { open, close, opened, form, update } = useEditField({ property, barometer })
   return (
     <>
-      <Tooltip label="Edit Subcategory">
+      <Tooltip label="Edit Movement Type">
         <UnstyledButton {...props} onClick={open}>
           <IconEdit color="brown" size={size} />
         </UnstyledButton>
@@ -36,7 +36,7 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
         centered
         opened={opened}
         onClose={close}
-        title="Edit Subcategory"
+        title="Edit Movement Type"
         size="md"
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}

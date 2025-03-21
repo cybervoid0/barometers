@@ -1,12 +1,12 @@
-import Image, { StaticImageData } from 'next/image'
 import { Group, Center, Stack, Title, Text, GridCol } from '@mantine/core'
 import { ReactNode, FC } from 'react'
+import { type IconProps } from '@tabler/icons-react'
 import { IsAdmin } from '@/app/components/is-admin'
 import sx from './styles.module.scss'
 
 interface PropertyCardProps {
   id?: string | number
-  icon: StaticImageData
+  icon: FC<IconProps>
   title: string
   content: ReactNode
   /**
@@ -18,11 +18,11 @@ interface PropertyCardProps {
    */
   adminOnly?: boolean
 }
-const Card: FC<PropertyCardProps> = ({ content, icon, title, edit }) => (
+const Card: FC<PropertyCardProps> = ({ content, icon: Icon, title, edit }) => (
   <GridCol span={{ base: 12, sm: 6, lg: 4 }} className={sx.gridCol}>
     <Group className={sx.card}>
       <Center className={sx.icon}>
-        <Image width={60} height={60} src={icon} alt={title} />
+        <Icon width={35} height={35} title={title} strokeWidth={1.2} />
       </Center>
       <Stack className={sx.stack}>
         <Title order={3} className={sx.title}>

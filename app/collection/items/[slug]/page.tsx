@@ -13,6 +13,17 @@ import {
   ListItem,
   Group,
 } from '@mantine/core'
+import {
+  IconBuildingFactory2,
+  IconCalendarQuestion,
+  IconTimeline,
+  IconNumber,
+  IconTopologyRing2,
+  IconDimensions,
+  IconTagStarred,
+  IconCategory2,
+  IconCurrencyEuro,
+} from '@tabler/icons-react'
 import { brandsRoute } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -35,16 +46,6 @@ import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
-// icon images
-import {
-  conditionsImg,
-  datingImg,
-  dimensionsImg,
-  manufacturerImg,
-  serialNoImg,
-  subcategories,
-  price,
-} from './components/property-card'
 
 export const dynamic = 'force-static'
 
@@ -85,7 +86,7 @@ export default async function Page({ params: { slug } }: Props) {
           </Group>
           <Grid justify="center" mb="xl">
             <PropertyCard
-              icon={manufacturerImg}
+              icon={IconBuildingFactory2}
               title="Manufacturer or Retailer"
               content={
                 <Anchor
@@ -99,34 +100,34 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<ManufacturerEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={serialNoImg}
+              icon={IconNumber}
               title="Serial Number"
               content={barometer.serial}
               edit={<TextFieldEdit barometer={barometer} property="serial" />}
             />
             <PropertyCard
               adminOnly
-              icon={serialNoImg}
+              icon={IconTopologyRing2}
               title="Collection ID"
               content={barometer.collectionId}
               edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
             />
             <PropertyCard
               adminOnly
-              icon={datingImg}
+              icon={IconCalendarQuestion}
               title="Year"
               content={dayjs(barometer.date).format('YYYY')}
               edit={<DateEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={datingImg}
+              icon={IconTimeline}
               title="Dating"
               content={barometer.dateDescription}
               edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
             />
             <PropertyCard
               adminOnly={dimensions.length === 0}
-              icon={dimensionsImg}
+              icon={IconDimensions}
               title="Dimensions"
               content={
                 <List listStyleType="none">
@@ -145,21 +146,25 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<DimensionEdit barometer={barometer} />}
             />
             <PropertyCard
-              icon={conditionsImg}
+              icon={IconTagStarred}
               title="Condition"
               content={<Condition condition={barometer.condition} />}
               edit={<ConditionEdit barometer={barometer} />}
             />
             <PropertyCard
               adminOnly={!barometer.subCategory?.name}
-              icon={subcategories}
+              icon={IconCategory2}
               title="Movement (Tube) Type"
-              content={barometer.subCategory?.name}
+              content={
+                <Text size="sm" tt="capitalize">
+                  {barometer.subCategory?.name}
+                </Text>
+              }
               edit={<SubcategoryEdit barometer={barometer} />}
             />
             <PropertyCard
               adminOnly
-              icon={price}
+              icon={IconCurrencyEuro}
               title="Estimated Price"
               content={
                 barometer.estimatedPrice ? `€${barometer.estimatedPrice.toFixed(2)}` : undefined
