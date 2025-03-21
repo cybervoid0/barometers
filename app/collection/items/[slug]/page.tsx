@@ -126,26 +126,6 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
             />
             <PropertyCard
-              adminOnly={dimensions.length === 0}
-              icon={IconDimensions}
-              title="Dimensions"
-              content={
-                <List listStyleType="none">
-                  {dimensions.map(dim => (
-                    <ListItem key={dim.dim}>
-                      <Text size="sm" tt="capitalize" fw={500} component="span">
-                        {dim.dim}:
-                      </Text>{' '}
-                      <Text size="sm" component="span">
-                        {dim.value}
-                      </Text>
-                    </ListItem>
-                  ))}
-                </List>
-              }
-              edit={<DimensionEdit barometer={barometer} />}
-            />
-            <PropertyCard
               icon={IconTagStarred}
               title="Condition"
               content={<Condition condition={barometer.condition} />}
@@ -170,6 +150,25 @@ export default async function Page({ params: { slug } }: Props) {
                 barometer.estimatedPrice ? `€${barometer.estimatedPrice.toFixed(2)}` : undefined
               }
               edit={<EstimatedPriceEdit barometer={barometer} />}
+            />
+            <PropertyCard
+              adminOnly={dimensions.length === 0}
+              icon={IconDimensions}
+              title="Dimensions"
+              content={
+                <List listStyleType="none">
+                  {/* For non-admins show only the first two items */}
+                  {dimensions.slice(0, 2).map(({ dim, value }) => (
+                    <DimListItem key={dim} name={dim} value={value} />
+                  ))}
+                  <IsAdmin>
+                    {dimensions.slice(2).map(({ dim, value }) => (
+                      <DimListItem key={dim} name={dim} value={value} />
+                    ))}
+                  </IsAdmin>
+                </List>
+              }
+              edit={<DimensionEdit barometer={barometer} />}
             />
           </Grid>
 
@@ -201,3 +200,14 @@ export default async function Page({ params: { slug } }: Props) {
     </Container>
   )
 }
+
+const DimListItem = ({ name, value }: { name: string; value: string }) => (
+  <ListItem>
+    <Text size="sm" tt="capitalize" fw={500} component="span">
+      {name}:
+    </Text>{' '}
+    <Text size="sm" component="span">
+      {value}
+    </Text>
+  </ListItem>
+)
