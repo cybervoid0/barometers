@@ -137,3 +137,6 @@ public/uploads
 .vercel
 
 .idea
+
+# Postgre SQL (Neon) Backups
+backups

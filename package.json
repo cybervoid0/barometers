@@ -22,7 +22,8 @@
     "prettier:write": "prettier --write \"**/*.{ts,tsx}\"",
     "test": "yarn run prettier:check && yarn run lint && yarn run typecheck && yarn run jest",
     "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "storybook:build": "storybook build",
+    "dump": "bun db-backup.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -46,6 +47,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
     "framer-motion": "^11.5.4",
     "fs-extra": "^11.2.0",
     "next": "14.2.16",
