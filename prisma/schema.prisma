@@ -81,6 +81,14 @@ model Barometer {
   manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id])
   images         Image[]            @relation("BarometerImages")
   reports        InaccuracyReport[]
+  materials      Material[]         @relation("BarometerMaterials")
+}
+
+model Material {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  barometers  Barometer[] @relation("BarometerMaterials")
 }
 
 model InaccuracyReport {
