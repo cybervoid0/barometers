@@ -190,7 +190,11 @@ export default async function Page({ params: { slug } }: Props) {
             </IsAdmin>
           )}
 
-          <Divider labelPosition="center" label={<InaccuracyReport barometer={barometer} />} />
+          <Divider
+            py="lg"
+            labelPosition="center"
+            label={<InaccuracyReport barometer={barometer} />}
+          />
 
           <IsAdmin>
             <Group mb="sm" align="center" gap="sm">
