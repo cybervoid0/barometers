@@ -147,7 +147,9 @@ export default async function Page({ params: { slug } }: Props) {
               icon={IconCurrencyEuro}
               title="Estimated Price"
               content={
-                barometer.estimatedPrice ? `€${barometer.estimatedPrice.toFixed(2)}` : undefined
+                barometer.estimatedPrice !== null
+                  ? `€${barometer.estimatedPrice.toFixed(2)}`
+                  : undefined
               }
               edit={<EstimatedPriceEdit barometer={barometer} />}
             />
@@ -171,8 +173,15 @@ export default async function Page({ params: { slug } }: Props) {
               edit={<DimensionEdit barometer={barometer} />}
             />
           </Grid>
+          <Group align="center" gap="sm">
+            <Title fw={600} order={2} tt="capitalize">
+              Description
+            </Title>
+            <IsAdmin>
+              <TextAreaEdit barometer={barometer} property="description" />
+            </IsAdmin>
+          </Group>
 
-          <Divider labelPosition="center" label={<InaccuracyReport barometer={barometer} />} />
           {barometer.description ? (
             <DescriptionText mt="lg" description={barometer.description} />
           ) : (
@@ -180,20 +189,19 @@ export default async function Page({ params: { slug } }: Props) {
               <Text>Add description</Text>
             </IsAdmin>
           )}
-          <IsAdmin>
-            <Group justify="flex-end">
-              <TextAreaEdit barometer={barometer} property="description" />
-            </Group>
-          </IsAdmin>
+
+          <Divider labelPosition="center" label={<InaccuracyReport barometer={barometer} />} />
 
           <IsAdmin>
-            <Title fw={600} order={2} tt="capitalize">
-              Provenance
-            </Title>
-            {barometer.provenance ? <MD>{barometer.provenance}</MD> : <Text>No text</Text>}
-            <Group justify="flex-end">
-              <TextAreaEdit barometer={barometer} property="provenance" />
+            <Group mb="sm" align="center" gap="sm">
+              <Title fw={600} order={2} tt="capitalize">
+                Provenance
+              </Title>
+              <IsAdmin>
+                <TextAreaEdit barometer={barometer} property="provenance" />
+              </IsAdmin>
             </Group>
+            {barometer.provenance ? <MD>{barometer.provenance}</MD> : <Text>No text</Text>}
           </IsAdmin>
         </Paper>
       </Box>
