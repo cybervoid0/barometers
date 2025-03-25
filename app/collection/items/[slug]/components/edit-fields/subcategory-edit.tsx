@@ -1,5 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 'use client'
 
+import { useForm } from '@mantine/form'
 import {
   Modal,
   UnstyledButton,
@@ -10,21 +13,66 @@ import {
   Tooltip,
   Box,
 } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { IconEdit } from '@tabler/icons-react'
+import { useCallback, useEffect } from 'react'
 import { BarometerDTO } from '@/app/types'
-import { useEditField } from './useEditField'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { showError, showInfo } from '@/utils/notification'
+import { updateBarometer } from '@/utils/fetch'
+import { barometerRoute } from '@/utils/routes-front'
 
 interface Props extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-const property: keyof BarometerDTO = 'subCategoryId'
+interface Form {
+  subCategoryId: number | null
+}
 
 export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
   const { subcategories } = useBarometers()
-  const { open, close, opened, form, update } = useEditField({ property, barometer })
+  const [opened, { open, close }] = useDisclosure(false)
+  const form = useForm<Form>({
+    initialValues: { subCategoryId: null },
+  })
+
+  const update = useCallback(
+    async ({ subCategoryId }: typeof form.values) => {
+      try {
+        // don't update DB if selected value doesn't differ from the recorded
+        if (subCategoryId === barometer.subCategoryId) {
+          close()
+          return
+        }
+
+        const { slug } = await updateBarometer({
+          id: barometer.id,
+          subCategoryId,
+        })
+
+        showInfo(`${barometer.name} updated`, 'Success')
+        close()
+        window.location.href = barometerRoute + (slug ?? '')
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Error updating barometer')
+      }
+    },
+    [barometer.id, barometer.name, barometer.subCategoryId, close, form],
+  )
+
+  // set initial form values on modal open
+  useEffect(() => {
+    const { subCategoryId } = barometer
+    form.setValues({ subCategoryId })
+    form.resetDirty({ subCategoryId })
+  }, [barometer])
+
+  // Reset form when modal is reopened
+  useEffect(() => {
+    if (opened) form.reset()
+  }, [opened])
   return (
     <>
       <Tooltip label="Edit Movement Type">
@@ -44,16 +92,17 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
         <Box component="form" onSubmit={form.onSubmit(update)}>
           <Stack>
             <Select
+              placeholder="Pick value"
+              clearable
               data={subcategories.data.map(({ name, id }) => ({
                 label: name,
                 value: String(id),
               }))}
-              value={String(form.values.subCategoryId ?? '1')}
-              onChange={id => {
-                const newSC = subcategories.data.find(sc => String(sc.id) === id)
-                form.setValues({ subCategoryId: newSC?.id })
-              }}
-              allowDeselect={false}
+              value={form.values.subCategoryId !== null ? String(form.values.subCategoryId) : null}
+              onChange={value =>
+                form.setValues({ subCategoryId: value !== null ? Number(value) : null })
+              }
+              allowDeselect
             />
             <Button fullWidth color="dark" variant="outline" type="submit">
               Save
