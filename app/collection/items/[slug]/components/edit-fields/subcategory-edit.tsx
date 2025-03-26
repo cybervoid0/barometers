@@ -59,7 +59,7 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
         showError(error instanceof Error ? error.message : 'Error updating barometer')
       }
     },
-    [barometer.id, barometer.name, barometer.subCategoryId, close, form],
+    [barometer.id, barometer.name, barometer.subCategoryId, close],
   )
 
   // set initial form values on modal open

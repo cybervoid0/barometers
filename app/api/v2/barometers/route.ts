@@ -73,7 +73,8 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const barometerData = await req.json()
+    // extracting materials before cleaning object to keep empty array
+    const { materials, ...barometerData } = await req.json()
     const { images, id, ...barometer } = cleanObject(barometerData)
     const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
     // modify slug if name has changed
@@ -94,6 +95,14 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
               ? {
                   images: {
                     create: images,
+                  },
+                }
+              : {}),
+            ...(materials && Array.isArray(materials)
+              ? {
+                  materials: {
+                    // `set` replaces all previously connected materials
+                    set: materials.map((materialId: number) => ({ id: materialId })),
                   },
                 }
               : {}),

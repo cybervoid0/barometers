@@ -43,6 +43,12 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
         },
       },
       subCategory: true,
+      materials: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   })
   if (barometer === null) throw new NotFoundError()

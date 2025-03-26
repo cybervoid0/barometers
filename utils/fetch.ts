@@ -1,14 +1,5 @@
 import { InaccuracyReport, Manufacturer } from '@prisma/client'
-import {
-  barometersApiRoute,
-  barometersSearchRoute,
-  categoriesApiRoute,
-  conditionsApiRoute,
-  manufacturersApiRoute,
-  imageUploadApiRoute,
-  reportRoute,
-  subcategoriesRoute,
-} from '@/utils/routes-back'
+import { ApiRoutes } from '@/utils/routes-back'
 import type {
   CategoryDTO,
   CategoryListDTO,
@@ -20,22 +11,20 @@ import type {
   SearchResultsDTO,
   InaccuracyReportListDTO,
   SubcategoryListDTO,
+  MaterialListDTO,
 } from '@/app/types'
 import { handleApiError } from './misc'
 import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-
 /******* Barometers ********/
 export async function fetchBarometer(slug: string): Promise<BarometerDTO> {
-  const res = await fetch(baseUrl + barometersApiRoute + slug)
+  const res = await fetch(ApiRoutes.Barometers + slug)
   return res.json()
 }
 export async function fetchBarometerList(
   searchParams: Record<string, string>,
 ): Promise<BarometerListDTO> {
-  const url = baseUrl + barometersApiRoute
-  const res = await fetch(`${url}?${new URLSearchParams(searchParams)}`, {
+  const res = await fetch(`${ApiRoutes.Barometers}?${new URLSearchParams(searchParams)}`, {
     cache: 'no-cache',
   })
   return res.json()
@@ -44,12 +33,12 @@ export async function searchBarometers(
   searchParams: Record<string, string>,
 ): Promise<SearchResultsDTO> {
   const pageSize = '10'
-  const url = `${baseUrl + barometersSearchRoute}?${new URLSearchParams({ ...searchParams, size: pageSize })}`
+  const url = `${ApiRoutes.BarometerSearch}?${new URLSearchParams({ ...searchParams, size: pageSize })}`
   const res = await fetch(url, { cache: 'no-cache' })
   return res.json()
 }
 export async function createBarometer<T>(barometer: T): Promise<{ id: string }> {
-  const res = await fetch(baseUrl + barometersApiRoute, {
+  const res = await fetch(ApiRoutes.Barometers, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -60,7 +49,7 @@ export async function createBarometer<T>(barometer: T): Promise<{ id: string }> 
   return res.json()
 }
 export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }> {
-  const res = await fetch(barometersApiRoute, {
+  const res = await fetch(ApiRoutes.Barometers, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -71,7 +60,7 @@ export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }
   return res.json()
 }
 export async function deleteBarometer(slug: string): Promise<{ message: string }> {
-  const res = await fetch(`${barometersApiRoute}/${slug}`, {
+  const res = await fetch(`${ApiRoutes.Barometers}/${slug}`, {
     method: 'DELETE',
   })
   if (!res.ok) await handleApiError(res)
@@ -79,17 +68,17 @@ export async function deleteBarometer(slug: string): Promise<{ message: string }
 }
 /******* Categories ********/
 export async function fetchCategoryList(): Promise<CategoryListDTO> {
-  const res = await fetch(baseUrl + categoriesApiRoute)
+  const res = await fetch(ApiRoutes.Categories)
   return res.json()
 }
 export async function fetchCategory(name: string): Promise<CategoryDTO> {
-  const res = await fetch(baseUrl + categoriesApiRoute + name)
+  const res = await fetch(ApiRoutes.Categories + name)
   return res.json()
 }
 
 /******* Conditions ********/
 export async function fetchConditions(): Promise<ConditionListDTO> {
-  const res = await fetch(baseUrl + conditionsApiRoute)
+  const res = await fetch(ApiRoutes.Conditions)
   return res.json()
 }
 
@@ -98,25 +87,27 @@ export async function fetchManufacturerList(searchParams?: {
   page?: string
   size?: string
 }): Promise<ManufacturerListDTO> {
-  const url = baseUrl + manufacturersApiRoute
-  const res = await fetch(`${url}${searchParams ? `?${new URLSearchParams(searchParams)}` : ''}`, {
-    cache: 'no-cache',
-  })
+  const res = await fetch(
+    `${ApiRoutes.Manufacturers}${searchParams ? `?${new URLSearchParams(searchParams)}` : ''}`,
+    {
+      cache: 'no-cache',
+    },
+  )
   return res.json()
 }
 export async function fetchManufacturer(slug: string): Promise<ManufacturerDTO> {
-  const res = await fetch(baseUrl + manufacturersApiRoute + slug)
+  const res = await fetch(ApiRoutes.Manufacturers + slug)
   return res.json()
 }
 export async function deleteManufacturer(slug: string) {
-  await fetch(baseUrl + manufacturersApiRoute + slug, {
+  await fetch(ApiRoutes.Manufacturers + slug, {
     method: 'DELETE',
   })
 }
 export async function addManufacturer(
   manufacturer: Partial<Manufacturer>,
 ): Promise<{ id: string }> {
-  const res = await fetch(baseUrl + manufacturersApiRoute, {
+  const res = await fetch(ApiRoutes.Manufacturers, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -129,7 +120,7 @@ export async function addManufacturer(
 export async function updateManufacturer(
   updatedData: Partial<Manufacturer>,
 ): Promise<Manufacturer> {
-  const res = await fetch(baseUrl + manufacturersApiRoute, {
+  const res = await fetch(ApiRoutes.Manufacturers, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -141,7 +132,7 @@ export async function updateManufacturer(
 }
 /******* Images ********/
 export async function createImageUrls(files: FileProps[]): Promise<UrlDto> {
-  const res = await fetch(imageUploadApiRoute, {
+  const res = await fetch(ApiRoutes.ImageUpload, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -162,7 +153,7 @@ export async function uploadFileToCloud(url: string, file: File) {
   if (!res.ok) await handleApiError(res)
 }
 export async function deleteImage(fileName: string) {
-  const url = `${imageUploadApiRoute}?${new URLSearchParams({ fileName })}`
+  const url = `${ApiRoutes.ImageUpload}?${new URLSearchParams({ fileName })}`
   const res = await fetch(url, {
     method: 'DELETE',
   })
@@ -170,7 +161,7 @@ export async function deleteImage(fileName: string) {
 }
 /******* Inaccuracy Report ********/
 export async function createReport(report: Partial<InaccuracyReport>): Promise<{ id: string }> {
-  const res = await fetch(baseUrl + reportRoute, {
+  const res = await fetch(ApiRoutes.Reports, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(report),
@@ -181,15 +172,19 @@ export async function createReport(report: Partial<InaccuracyReport>): Promise<{
 export async function fetchReportList(
   searchParams: Record<string, string>,
 ): Promise<InaccuracyReportListDTO> {
-  const url = baseUrl + reportRoute
   const qs = new URLSearchParams(searchParams)
-  const res = await fetch(`${url}?${qs.toString()}`, {
+  const res = await fetch(`${ApiRoutes.Reports}?${qs.toString()}`, {
     cache: 'no-cache',
   })
   return res.json()
 }
-/******* Subcategories ********/
+/******* Subcategories (Movement types) ********/
 export async function fetchSubcategoryList(): Promise<SubcategoryListDTO> {
-  const res = await fetch(baseUrl + subcategoriesRoute)
+  const res = await fetch(ApiRoutes.Subcategories)
+  return res.json()
+}
+/******* Materials ********/
+export async function fetchMaterialList(): Promise<MaterialListDTO> {
+  const res = await fetch(ApiRoutes.Materials)
   return res.json()
 }

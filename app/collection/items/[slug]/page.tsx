@@ -23,6 +23,7 @@ import {
   IconTagStarred,
   IconCategory2,
   IconCurrencyEuro,
+  IconWood,
 } from '@tabler/icons-react'
 import { brandsRoute } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
@@ -46,6 +47,7 @@ import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
+import { MaterialsEdit } from './components/edit-fields/materials-edit'
 
 export const dynamic = 'force-static'
 
@@ -171,6 +173,15 @@ export default async function Page({ params: { slug } }: Props) {
                 </List>
               }
               edit={<DimensionEdit barometer={barometer} />}
+            />
+            <PropertyCard
+              adminOnly={!barometer.materials || barometer.materials.length === 0}
+              icon={IconWood}
+              title="Materials"
+              content={
+                <Text size="sm">{barometer.materials.map(item => item.name).join(', ')}</Text>
+              }
+              edit={<MaterialsEdit barometer={barometer} />}
             />
           </Grid>
           <Group align="center" gap="sm">

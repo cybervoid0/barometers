@@ -7,6 +7,7 @@ import {
   fetchManufacturerList,
   deleteManufacturer,
   fetchSubcategoryList,
+  fetchMaterialList,
 } from '@/utils/fetch'
 
 export const useBarometers = () => {
@@ -36,6 +37,14 @@ export const useBarometers = () => {
     queryFn: fetchSubcategoryList,
   })
   const {
+    data: materials,
+    error: materialsError,
+    isLoading: materialsIsLoading,
+  } = useQuery({
+    queryKey: ['materials'],
+    queryFn: fetchMaterialList,
+  })
+  const {
     data: manufacturers,
     error: manufacturersError,
     isLoading: manufacturersIsLoading,
@@ -59,10 +68,12 @@ export const useBarometers = () => {
   })
 
   useEffect(() => {
-    ;[typesError, conditionError, manufacturersError, subcategoriesError].forEach(err => {
-      if (err instanceof Error) showError(err.message)
-    })
-  }, [typesError, conditionError, manufacturersError, subcategoriesError])
+    ;[typesError, conditionError, manufacturersError, subcategoriesError, materialsError].forEach(
+      err => {
+        if (err instanceof Error) showError(err.message)
+      },
+    )
+  }, [typesError, conditionError, manufacturersError, subcategoriesError, materialsError])
 
   return useMemo(
     () => ({
@@ -83,6 +94,10 @@ export const useBarometers = () => {
         data: subcategories ?? [],
         isLoading: subcategoriesIsLoading,
       },
+      materials: {
+        data: materials,
+        isLoading: materialsIsLoading,
+      },
     }),
     [
       condition,
@@ -94,6 +109,8 @@ export const useBarometers = () => {
       deleteMnf,
       subcategories,
       subcategoriesIsLoading,
+      materials,
+      materialsIsLoading,
     ],
   )
 }
