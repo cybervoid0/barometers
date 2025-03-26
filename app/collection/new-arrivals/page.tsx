@@ -3,7 +3,7 @@ import { Container, Grid, GridCol, Stack, Title, Text } from '@mantine/core'
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
-import { barometerRoute, categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 const itemsOnPage = 12
 
@@ -38,9 +38,9 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
             <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
               <BarometerCardWithIcon
                 barometerName={name}
-                barometerLink={barometerRoute + slug}
+                barometerLink={FrontRoutes.Barometer + slug}
                 categoryName={category.name}
-                categoryLink={categoriesRoute + category.name}
+                categoryLink={FrontRoutes.Categories + category.name}
                 manufacturer={
                   (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
                 }

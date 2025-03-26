@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { BarometerDTO } from '@/app/types'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { updateBarometer } from '@/utils/fetch'
 
@@ -39,7 +39,7 @@ export function useEditField({ property, barometer, validate }: Props) {
 
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (slug ?? '')
+      window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error updating barometer')
     }

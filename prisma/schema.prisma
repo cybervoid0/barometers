@@ -36,6 +36,7 @@ model Category {
   image       Image       @relation("CategoryImage", fields: [imageId], references: [id])
 }
 
+/// Movement type
 model SubCategory {
   id          Int         @id @default(autoincrement())
   name        String      @unique
@@ -114,6 +115,7 @@ model Manufacturer {
   name         String         @unique
   slug         String         @unique
   country      String?
+  countries    Country[]      @relation("ManufacturerCountries")
   city         String?
   description  String?
   url          String?
@@ -126,6 +128,13 @@ model Manufacturer {
   // some brands may have multiple successors and/or predecessors
   successors   Manufacturer[] @relation("ManufacturerSuccessors")
   predecessors Manufacturer[] @relation("ManufacturerSuccessors")
+}
+
+model Country {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  code          String?
+  manufacturers Manufacturer[] @relation("ManufacturerCountries")
 }
 
 model Condition {

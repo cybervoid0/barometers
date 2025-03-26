@@ -20,7 +20,7 @@ import { IconChevronRight, IconAt, IconBrandInstagram } from '@tabler/icons-reac
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { instagram, email } from '@/utils/constants'
-import { categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { menuData } from '@/utils/menudata'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { isAdmin } from '../../is-admin'
@@ -88,7 +88,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                               <Anchor
                                 c="inherit"
                                 component={Link}
-                                href={categoriesRoute + name}
+                                href={FrontRoutes.Categories + name}
                                 onClick={props.onClose}
                               >
                                 <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>

@@ -4,7 +4,7 @@ import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
-import { barometerRoute, newArrivals } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { deleteImagesFromGoogleStorage } from './deleteFromStorage'
 import { trimTrailingSlash } from '@/utils/misc'
 
@@ -64,8 +64,8 @@ export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { s
       })
     })
     await deleteImagesFromGoogleStorage(imagesBeforeDbUpdate)
-    revalidatePath(barometerRoute + barometer.slug)
-    revalidatePath(trimTrailingSlash(newArrivals))
+    revalidatePath(FrontRoutes.Barometer + barometer.slug)
+    revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals))
     await revalidateCategory(prisma, barometer.categoryId)
 
     return NextResponse.json({ message: 'Barometer deleted successfully' }, { status: 200 })

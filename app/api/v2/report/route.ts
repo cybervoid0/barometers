@@ -6,7 +6,7 @@ import { getInaccuracyReportList } from './getters'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { cleanObject, trimTrailingSlash } from '@/utils/misc'
 import { createReport } from './setters'
-import { viewReportsRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 // inaccuracy report TTL, minutes
 const REPORT_COOL_DOWN = 10
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       )
     }
     const { id } = await createReport(barometerId, reporterEmail, reporterName, description)
-    revalidatePath(trimTrailingSlash(viewReportsRoute))
+    revalidatePath(trimTrailingSlash(FrontRoutes.Reports))
     return NextResponse.json({ message: 'Inaccuracy report created', id }, { status: 201 })
   } catch (error) {
     console.error('Error sending inaccuracy report:', error)

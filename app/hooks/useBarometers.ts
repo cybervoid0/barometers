@@ -44,6 +44,14 @@ export const useBarometers = () => {
     queryKey: ['materials'],
     queryFn: fetchMaterialList,
   })
+  /*   const {
+    data: materials,
+    error: materialsError,
+    isLoading: materialsIsLoading,
+  } = useQuery({
+    queryKey: ['materials'],
+    queryFn: fetchMaterialList,
+  }) */
   const {
     data: manufacturers,
     error: manufacturersError,

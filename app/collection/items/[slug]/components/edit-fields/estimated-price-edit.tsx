@@ -21,7 +21,7 @@ import { useCallback, useEffect } from 'react'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 interface Props extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -55,7 +55,7 @@ export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
 
         showInfo(`${barometer.name} updated`, 'Success')
         close()
-        window.location.href = barometerRoute + (slug ?? '')
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
         showError(error instanceof Error ? error.message : 'Error updating barometer')
       }

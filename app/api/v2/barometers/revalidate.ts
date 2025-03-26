@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { PrismaClient } from '@prisma/client'
 import { SortOptions } from '@/app/types'
 import { BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
-import { categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 /**
  * Revalidates the cache for a specific category by recalculating the paths that need to be revalidated.
@@ -22,7 +22,7 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
   const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
     Array.from(
       { length: pagesPerCategory },
-      (_, i) => `${categoriesRoute}${[categoryName, sort, String(i + 1)].join('/')}`,
+      (_, i) => `${FrontRoutes.Categories}${[categoryName, sort, String(i + 1)].join('/')}`,
     ),
   )
   await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))

@@ -6,7 +6,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
 import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { brandsRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 /**
  * Retrieve a list of all Manufacturers
@@ -49,8 +49,8 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
 
-    revalidatePath(trimTrailingSlash(brandsRoute))
-    revalidatePath(brandsRoute + slug)
+    revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
+    revalidatePath(FrontRoutes.Brands + slug)
     await revalidateSuccessors(successors)
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
@@ -97,8 +97,8 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
 
-    revalidatePath(trimTrailingSlash(brandsRoute))
-    revalidatePath(brandsRoute + slug)
+    revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
+    revalidatePath(FrontRoutes.Brands + slug)
     await revalidateSuccessors(successors)
     return NextResponse.json(updatedManufacturer, { status: 200 })
   } catch (error) {
@@ -120,6 +120,6 @@ const revalidateSuccessors = withPrisma(async (prisma, successorIds?: { id: stri
     select: { slug: true },
   })
   slugs.forEach(({ slug }) => {
-    revalidatePath(brandsRoute + slug)
+    revalidatePath(FrontRoutes.Brands + slug)
   })
 })

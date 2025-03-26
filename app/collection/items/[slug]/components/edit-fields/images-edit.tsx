@@ -28,7 +28,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { BarometerDTO } from '@/app/types'
 import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
 import { getThumbnailBase64 } from '@/utils/misc'
@@ -152,7 +152,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       const { slug } = await updateBarometer(updatedBarometer)
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (slug ?? '')
+      window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
       console.error(error)
       if (error instanceof Error) {

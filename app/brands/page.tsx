@@ -4,7 +4,7 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 import { IconCircleArrowUp } from '@tabler/icons-react'
 import { withPrisma } from '@/prisma/prismaClient'
-import { brandsRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
 import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
@@ -52,7 +52,7 @@ const getManufacturerList = withPrisma(async prisma => {
 const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerList>> }) => (
   <Stack gap="md">
     {items.map(({ id, firstName, name, slug, image }) => (
-      <Anchor key={id} href={brandsRoute + slug} component={Link}>
+      <Anchor key={id} href={FrontRoutes.Brands + slug} component={Link}>
         <Group gap="xs" wrap="nowrap">
           {image ? (
             <Image

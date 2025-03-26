@@ -17,7 +17,7 @@ import {
 } from '@mantine/core'
 import { IconEdit } from '@tabler/icons-react'
 import { BarometerDTO } from '@/app/types'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { updateBarometer } from '@/utils/fetch'
 import { useBarometers } from '@/app/hooks/useBarometers'
@@ -58,7 +58,7 @@ export function MaterialsEdit({ barometer }: Props) {
         const { slug } = await updateBarometer(updatedBarometer)
         showInfo(`${barometer.name} updated`, 'Success')
         close()
-        window.location.href = barometerRoute + (slug ?? '')
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
         showError(error instanceof Error ? error.message : 'Error updating barometer')
       }

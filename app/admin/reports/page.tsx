@@ -8,7 +8,7 @@ import { Anchor, Box, Center, Container, Title } from '@mantine/core'
 import dayjs from 'dayjs'
 import { fetchReportList } from '@/utils/fetch'
 import { InaccuracyReportListDTO } from '@/app/types'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { Table } from '@/app/components/table'
 import { Pagination } from '@/app/components/pagination'
 
@@ -33,7 +33,7 @@ export default function ReportList() {
         <Anchor
           size="sm"
           c="dark"
-          href={barometerRoute + info.row.original.barometer.slug}
+          href={FrontRoutes.Barometer + info.row.original.barometer.slug}
           component={Link}
         >
           {info.getValue()}

@@ -25,7 +25,7 @@ import {
   IconCurrencyEuro,
   IconWood,
 } from '@tabler/icons-react'
-import { brandsRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
@@ -93,11 +93,12 @@ export default async function Page({ params: { slug } }: Props) {
               content={
                 <Anchor
                   underline="always"
-                  href={brandsRoute + barometer.manufacturer.slug}
+                  href={FrontRoutes.Brands + barometer.manufacturer.slug}
                   component={Link}
                   c="dark.3"
                   fw={400}
-                >{`${firstName ? `${firstName} ` : ''}${name}${city ? `, ${city}` : ''}`}</Anchor>
+                  /* display manufacturer name and city (or country if city is not specified) */
+                >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Anchor>
               }
               edit={<ManufacturerEdit barometer={barometer} />}
             />

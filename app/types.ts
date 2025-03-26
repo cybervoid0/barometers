@@ -9,6 +9,7 @@ export type { SearchResultsDTO } from './api/v2/search/search'
 export type { InaccuracyReportListDTO } from './api/v2/report/getters'
 export type { SubcategoryListDTO } from './api/v2/subcategories/getters'
 export type { MaterialListDTO } from './api/v2/materials/getters'
+export type { CountryListDTO } from './api/v2/countries/getters'
 /**
  * Barometer dimensions database JSON structure
  */

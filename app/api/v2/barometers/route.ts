@@ -6,7 +6,7 @@ import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils/misc'
 import { SortValue } from '@/app/types'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
-import { barometerRoute, newArrivals } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { revalidateCategory } from './revalidate'
 
 /**
@@ -52,7 +52,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       },
     })
     await revalidateCategory(prisma, categoryId)
-    revalidatePath(trimTrailingSlash(newArrivals)) // regenerate new arrivals page
+    revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals)) // regenerate new arrivals page
     return NextResponse.json({ id }, { status: 201 })
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -111,7 +111,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         }),
       ])
     })
-    revalidatePath(barometerRoute + newData.slug)
+    revalidatePath(FrontRoutes.Barometer + newData.slug)
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {

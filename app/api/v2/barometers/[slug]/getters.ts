@@ -21,6 +21,7 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
       },
       manufacturer: {
         include: {
+          countries: true,
           successors: {
             select: {
               id: true,

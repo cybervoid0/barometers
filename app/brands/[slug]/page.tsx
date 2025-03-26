@@ -6,7 +6,7 @@ import { getManufacturer } from '@/app/api/v2/manufacturers/[slug]/getters'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '@/app/metadata'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
-import { barometerRoute, brandsRoute, categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import sx from '../styles.module.scss'
 
@@ -69,8 +69,8 @@ export default async function Manufacturer({ params: { slug } }: Props) {
           <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
             <BarometerCardWithIcon
               barometerName={name}
-              barometerLink={barometerRoute + barometerSlug}
-              categoryLink={categoriesRoute + category.name}
+              barometerLink={FrontRoutes.Barometer + barometerSlug}
+              categoryLink={FrontRoutes.Categories + category.name}
               categoryName={category.name}
               image={images.at(0)!}
             />
@@ -99,7 +99,7 @@ const Connections = ({
       </Title>
       {brands.map(({ id, name, firstName, slug }, i, arr) => (
         <Fragment key={id}>
-          <Anchor underline="always" href={brandsRoute + slug} component={Link}>
+          <Anchor underline="always" href={FrontRoutes.Brands + slug} component={Link}>
             {firstName} {name}
           </Anchor>
           {i < arr.length - 1 && `, `}

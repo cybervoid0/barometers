@@ -1,7 +1,7 @@
 import { Container, Grid, GridCol, Group } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
-import { categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { SearchField } from './components/search-field'
 import { getCategories } from './api/v2/categories/getters'
 import { NewArrivals } from './components/new-arrivals'
@@ -28,7 +28,7 @@ export default async function HomePage() {
                 priority={i < 3}
                 image={image}
                 name={name}
-                link={categoriesRoute + name}
+                link={FrontRoutes.Categories + name}
               />
             </GridCol>
           ))}

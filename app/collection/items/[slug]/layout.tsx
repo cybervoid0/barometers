@@ -4,7 +4,7 @@ import capitalize from 'lodash/capitalize'
 import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { title, openGraph, twitter } from '@/app/metadata'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 
 export async function generateMetadata({
   params: { slug },
@@ -19,7 +19,7 @@ export async function generateMetadata({
       url: googleStorageImagesFolder + image.url,
       alt: name,
     }))
-  const url = barometerRoute + slug
+  const url = FrontRoutes.Barometer + slug
   return {
     title: barometerTitle,
     description,

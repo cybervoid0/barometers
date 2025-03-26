@@ -9,7 +9,7 @@ import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
 import sx from './styles.module.scss'
-import { categoriesRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { IsAdmin } from '@/app/components/is-admin'
 
 interface Props extends ActionIconProps {
@@ -25,7 +25,7 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
       const { message } = await deleteBarometer(barometer.slug)
       showInfo(message, 'Success')
       close()
-      router.replace(categoriesRoute + barometer.category.name)
+      router.replace(FrontRoutes.Categories + barometer.category.name)
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error deleting barometer')
     }

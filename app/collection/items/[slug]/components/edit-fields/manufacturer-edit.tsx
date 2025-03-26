@@ -22,7 +22,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import type { BarometerDTO, ManufacturerDTO } from '@/app/types'
 import { showError, showInfo } from '@/utils/notification'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { updateBarometer, updateManufacturer } from '@/utils/fetch'
 
@@ -112,7 +112,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
       ])
       showInfo(`${name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (slug ?? '')
+      window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error updating barometer')
     }

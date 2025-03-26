@@ -1,5 +1,5 @@
 import { Box, Container, Stack, Title } from '@mantine/core'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { SearchItem } from './search-item'
 import { searchBarometers } from '@/utils/fetch'
 import { SearchInfo } from './search-info'
@@ -28,7 +28,7 @@ export default async function Search({ searchParams }: SearchProps) {
                 manufacturer={
                   (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
                 }
-                link={barometerRoute + slug}
+                link={FrontRoutes.Barometer + slug}
                 key={id}
                 dating={dateDescription}
               />

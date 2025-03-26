@@ -19,7 +19,7 @@ import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
-import { barometerRoute } from '@/utils/routes-front'
+import { FrontRoutes } from '@/utils/routes-front'
 import { showInfo, showError } from '@/utils/notification'
 
 interface DateEditProps extends UnstyledButtonProps {
@@ -56,7 +56,7 @@ export function DateEdit({ size = 18, barometer, ...props }: DateEditProps) {
       })
       showInfo(`${barometer.name} updated`, 'Success')
       close()
-      window.location.href = barometerRoute + (slug ?? '')
+      window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error updating barometer')
     }
