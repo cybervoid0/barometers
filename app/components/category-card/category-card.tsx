@@ -1,4 +1,5 @@
 import { AspectRatio, Title, Anchor, Box } from '@mantine/core'
+import clsx from 'clsx'
 import NextLink from 'next/link'
 import NextImage from 'next/image'
 import { FC } from 'react'
@@ -18,12 +19,18 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
   return (
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
-        <Box className={styles.container}>
+        <Box
+          className={clsx(
+            'relative w-full h-full rounded-md overflow-hidden',
+            'bg-[#dddddd] sm:bg-gradient-to-b sm:from-[#dddddd] sm:to-[#efefef]',
+            styles.container,
+          )}
+        >
           <CategoryIcon
             bgColor="transparent"
             size={45}
             category={name}
-            className={styles.cat_icon}
+            className="absolute right-1 top-2"
           />
           {image && (
             <NextImage
@@ -34,7 +41,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               src={googleStorageImagesFolder + image.url}
               alt={name}
-              className={styles.bg_image}
+              className="hover:scale-150 transition-transform duration-[10s] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] "
               style={{
                 objectFit: name === 'Recorders' ? 'cover' : 'contain',
               }}
@@ -42,7 +49,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               blurDataURL={image.blurData}
             />
           )}
-          <Title component="h3" className={styles.title}>
+          <Title component="h3" className={clsx('absolute  bottom-8 left-8', styles.title)}>
             {name}
           </Title>
         </Box>
