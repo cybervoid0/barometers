@@ -49,6 +49,9 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
           id: true,
           name: true,
         },
+        orderBy: {
+          name: 'asc',
+        },
       },
     },
   })
