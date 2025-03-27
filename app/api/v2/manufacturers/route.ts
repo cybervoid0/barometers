@@ -8,6 +8,10 @@ import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { FrontRoutes } from '@/utils/routes-front'
 
+interface ManufacturerDTO extends Manufacturer {
+  successors?: { id: string }[]
+  countries?: { id: number }[]
+}
 /**
  * Retrieve a list of all Manufacturers
  */
@@ -31,7 +35,7 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, ...manufData }: { successors?: { id: string }[] } & Manufacturer = await req
+    const { successors, countries, ...manufData }: ManufacturerDTO = await req
       .json()
       .then(cleanObject)
 
@@ -43,6 +47,13 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
           ? {
               successors: {
                 connect: successors,
+              },
+            }
+          : {}),
+        ...(countries
+          ? {
+              countries: {
+                connect: countries,
               },
             }
           : {}),
@@ -66,14 +77,12 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, ...manufData }: { successors?: { id: string }[] } & Manufacturer = await req
-      .json()
-      .then(data =>
-        // replace empty strings with NULLs
-        traverse.map(data, function map(node) {
-          if (node === '') this.update(null)
-        }),
-      )
+    const { successors, countries, ...manufData }: ManufacturerDTO = await req.json().then(data =>
+      // replace empty strings with NULLs
+      traverse.map(data, function map(node) {
+        if (node === '') this.update(null)
+      }),
+    )
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
     if (!manufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
@@ -90,6 +99,13 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
           ? {
               successors: {
                 set: successors,
+              },
+            }
+          : {}),
+        ...(countries
+          ? {
+              countries: {
+                set: countries,
               },
             }
           : {}),

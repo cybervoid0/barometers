@@ -15,6 +15,7 @@ export const getManufacturers = withPrisma(async (prisma, page: number, pageSize
       skip,
       take: pageSize || undefined,
       include: {
+        countries: true,
         predecessors: {
           select: {
             id: true,

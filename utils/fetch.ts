@@ -12,6 +12,7 @@ import type {
   InaccuracyReportListDTO,
   SubcategoryListDTO,
   MaterialListDTO,
+  CountryListDTO,
 } from '@/app/types'
 import { handleApiError } from './misc'
 import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
@@ -105,7 +106,7 @@ export async function deleteManufacturer(slug: string) {
   })
 }
 export async function addManufacturer(
-  manufacturer: Partial<Manufacturer>,
+  manufacturer: { countries: { id: number }[] } & Partial<Manufacturer>,
 ): Promise<{ id: string }> {
   const res = await fetch(ApiRoutes.Manufacturers, {
     method: 'POST',
@@ -186,5 +187,10 @@ export async function fetchSubcategoryList(): Promise<SubcategoryListDTO> {
 /******* Materials ********/
 export async function fetchMaterialList(): Promise<MaterialListDTO> {
   const res = await fetch(ApiRoutes.Materials)
+  return res.json()
+}
+/******* Countries ********/
+export async function fetchCountryList(): Promise<CountryListDTO> {
+  const res = await fetch(ApiRoutes.Countries)
   return res.json()
 }

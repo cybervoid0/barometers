@@ -1,4 +1,4 @@
-import { Container, SimpleGrid, Anchor, Title, Paper, Stack, Text, Group } from '@mantine/core'
+import { Container, SimpleGrid, Anchor, Title, Paper, Stack, Text, Group, Box } from '@mantine/core'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import Image from 'next/image'
@@ -16,70 +16,89 @@ export const metadata: Metadata = {
   title: `${title} - Manufacturers`,
 }
 
-const getManufacturerList = withPrisma(async prisma => {
-  const brands = await prisma.manufacturer.findMany({
-    select: {
-      id: true,
-      firstName: true,
-      name: true,
-      slug: true,
-      barometers: {
+const getBrandsByCountry = withPrisma(async prisma => {
+  const brandsByCountry = await prisma.country.findMany({
+    orderBy: {
+      name: 'asc',
+    },
+    include: {
+      manufacturers: {
+        orderBy: {
+          name: 'asc',
+        },
         select: {
-          images: {
-            where: {
-              order: 0,
-            },
+          id: true,
+          firstName: true,
+          name: true,
+          slug: true,
+          barometers: {
             select: {
-              url: true,
-              blurData: true,
+              images: {
+                where: {
+                  order: 0,
+                },
+                select: {
+                  url: true,
+                  blurData: true,
+                },
+                take: 1,
+              },
             },
             take: 1,
           },
         },
-        take: 1,
       },
     },
-    orderBy: {
-      name: 'asc',
-    },
   })
-  return brands.map(({ barometers, ...brand }) => ({
-    ...brand,
-    image: barometers.at(0)?.images.at(0),
+  return brandsByCountry.map(country => ({
+    ...country,
+    manufacturers: country.manufacturers.map(({ barometers, ...brand }) => ({
+      ...brand,
+      image: barometers.at(0)?.images.at(0),
+    })),
   }))
 })
 
-const Column = ({ items }: { items: Awaited<ReturnType<typeof getManufacturerList>> }) => (
-  <Stack gap="md">
-    {items.map(({ id, firstName, name, slug, image }) => (
-      <Anchor key={id} href={FrontRoutes.Brands + slug} component={Link}>
-        <Group gap="xs" wrap="nowrap">
-          {image ? (
-            <Image
-              height={32}
-              width={32}
-              alt={name}
-              src={googleStorageImagesFolder + image.url}
-              blurDataURL={image.blurData}
-              style={{ objectFit: 'contain' }}
-              sizes="32px"
-            />
-          ) : (
-            <IconCircleArrowUp size={32} />
-          )}
-          <Text className={sx.brand}>{name + (firstName ? `, ${firstName}` : '')}</Text>
-        </Group>
-      </Anchor>
-    ))}
-  </Stack>
+const BrandsOfCountry = ({
+  country,
+}: {
+  country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
+}) => (
+  <Box mb="lg" mr="md">
+    <Title order={3} className={sx.countryTitle}>
+      {country.name}
+    </Title>
+
+    <Stack gap="md">
+      {country.manufacturers.map(({ id, firstName, name, slug, image }) => (
+        <Anchor w="fit-content" key={id} href={FrontRoutes.Brands + slug} component={Link}>
+          <Group gap="xs" wrap="nowrap">
+            {image ? (
+              <Image
+                height={32}
+                width={32}
+                alt={name}
+                src={googleStorageImagesFolder + image.url}
+                blurDataURL={image.blurData}
+                style={{ objectFit: 'contain' }}
+                sizes="32px"
+              />
+            ) : (
+              <IconCircleArrowUp size={32} />
+            )}
+            <Text className={sx.brand}>{name + (firstName ? `, ${firstName}` : '')}</Text>
+          </Group>
+        </Anchor>
+      ))}
+    </Stack>
+  </Box>
 )
 
 export default async function Manufacturers() {
-  const manufacturers = await getManufacturerList()
-
-  const halfwayIndex = Math.floor(manufacturers.length / 2)
-  const firstColumn = manufacturers.slice(0, halfwayIndex)
-  const secondColumn = manufacturers.slice(halfwayIndex)
+  const countries = await getBrandsByCountry()
+  const firstColStates = ['France', 'Great Britain']
+  const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
+  const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
   return (
     <Container>
       <Title mt="xl" mb="sm" component="h2">
@@ -93,8 +112,16 @@ export default async function Manufacturers() {
       </Text>
       <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <SimpleGrid cols={{ base: 1, sm: 2 }} className={sx.grid}>
-          <Column items={firstColumn} />
-          <Column items={secondColumn} />
+          <Box>
+            {firstColumn.map(country => (
+              <BrandsOfCountry key={country.id} country={country} />
+            ))}
+          </Box>
+          <Box>
+            {secondColumn.map(country => (
+              <BrandsOfCountry key={country.id} country={country} />
+            ))}
+          </Box>
         </SimpleGrid>
       </Paper>
     </Container>

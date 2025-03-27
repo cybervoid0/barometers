@@ -18,3 +18,10 @@
   width: fit-content;
   text-transform: capitalize;
 }
+
+.countryTitle {
+  padding-inline: var(--mantine-spacing-lg);
+  padding-block: 0.1rem;
+  margin-bottom: var(--mantine-spacing-lg);
+  border-bottom: 1px solid var(--mantine-color-dark-3);
+}

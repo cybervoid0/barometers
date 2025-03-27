@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
@@ -20,7 +22,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { isLength, isURL } from 'validator'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
-import type { BarometerDTO, ManufacturerDTO } from '@/app/types'
+import type { BarometerDTO } from '@/app/types'
 import { showError, showInfo } from '@/utils/notification'
 import { FrontRoutes } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
@@ -30,22 +32,29 @@ interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
-type ManufacturerForm = Omit<Partial<NonNullable<ManufacturerDTO>>, 'successors'> & {
+
+interface Form {
+  name: string
+  firstName: string
+  city: string
+  countries: number[]
+  url: string
+  description: string
   successors: string[]
 }
-const initialValues: ManufacturerForm = {
+const initialValues: Form = {
   name: '',
   firstName: '',
   city: '',
-  country: '',
+  countries: [],
   url: '',
   description: '',
   successors: [],
 }
 export function ManufacturerEdit({ size = 18, barometer, ...props }: ManufacturerEditProps) {
-  const { manufacturers } = useBarometers()
+  const { manufacturers, countries } = useBarometers()
   const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
-  const form = useForm<ManufacturerForm>({
+  const form = useForm<Form>({
     initialValues,
     validate: {
       name: val =>
@@ -54,8 +63,6 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           : 'Name should be longer than 2 and shorter than 100 symbols',
       city: val =>
         isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
-      country: val =>
-        isLength(val ?? '', { max: 100 }) ? null : 'Country should be shorter that 100 symbols',
       url: val => (val === '' || isURL(val ?? '') ? null : 'Must be a valid URL'),
     },
   })
@@ -74,6 +81,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
   useEffect(() => {
     if (!opened) return
     resetManufacturerIndex()
+    form.reset()
   }, [opened, resetManufacturerIndex])
 
   // Set form values when selected manufacturer index changes
@@ -85,38 +93,41 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
       name: selectedManufacturer?.name ?? '',
       firstName: selectedManufacturer?.firstName ?? '',
       city: selectedManufacturer?.city ?? '',
-      country: selectedManufacturer?.country ?? '',
+      countries: selectedManufacturer?.countries.map(({ id }) => id) ?? [],
       description: selectedManufacturer?.description ?? '',
       url: selectedManufacturer?.url ?? '',
-      successors: selectedManufacturer?.successors.map(({ id }) => id),
-    } as ManufacturerForm
+      successors: selectedManufacturer?.successors.map(({ id }) => id) ?? [],
+    } as Form
     form.setValues(manufacturerFormData)
     form.resetDirty(manufacturerFormData)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedManufacturerIndex, manufacturers])
 
-  const update = async (formValues: ManufacturerForm) => {
-    try {
-      const manufacturer = manufacturers.data[selectedManufacturerIndex]
-      const updatedBarometer = {
-        id: barometer.id,
-        manufacturerId: manufacturer.id,
+  const update = useCallback(
+    async (formValues: Form) => {
+      try {
+        const manufacturer = manufacturers.data[selectedManufacturerIndex]
+        const updatedBarometer = {
+          id: barometer.id,
+          manufacturerId: manufacturer.id,
+        }
+        const updatedManufacturer = {
+          ...formValues,
+          successors: formValues.successors.map(id => ({ id })),
+          countries: formValues.countries.map(id => ({ id })),
+        }
+        const [{ slug }, { name }] = await Promise.all([
+          updateBarometer(updatedBarometer),
+          updateManufacturer(updatedManufacturer),
+        ])
+        showInfo(`${name} updated`, 'Success')
+        close()
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Error updating barometer')
       }
-      const updatedManufacturer = {
-        ...formValues,
-        successors: form.values.successors.map(id => ({ id })),
-      }
-      const [{ slug }, { name }] = await Promise.all([
-        updateBarometer(updatedBarometer),
-        updateManufacturer(updatedManufacturer),
-      ])
-      showInfo(`${name} updated`, 'Success')
-      close()
-      window.location.href = FrontRoutes.Barometer + (slug ?? '')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
-    }
-  }
+    },
+    [barometer.id, close, manufacturers.data, selectedManufacturerIndex],
+  )
 
   return (
     <>
@@ -152,7 +163,20 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
             label="Name / Company name"
             {...form.getInputProps('name')}
           />
-          <TextInput label="Country" {...form.getInputProps('country')} />
+          <MultiSelect
+            label="Countries"
+            placeholder={form.values.countries.length === 0 ? 'Select countries' : undefined}
+            data={countries.data?.map(({ id, name }) => ({
+              value: String(id),
+              label: name,
+            }))}
+            value={form.values.countries.map(String)}
+            onChange={states =>
+              form.setValues({
+                countries: states.map(Number),
+              })
+            }
+          />
           <TextInput label="City" {...form.getInputProps('city')} />
           <TextInput label="External URL" {...form.getInputProps('url')} />
           <MultiSelect

@@ -10,5 +10,6 @@ export const ApiRoutes = {
   Reports: `${base}report/`,
   Subcategories: `${base}subcategories/`,
   Materials: `${base}materials/`,
+  Countries: `${base}countries/`,
 } as const
 export type ApiRoutes = (typeof ApiRoutes)[keyof typeof ApiRoutes]

@@ -1,7 +1,17 @@
 'use client'
 
-import React from 'react'
-import { Box, Button, TextInput, Title, Textarea, Modal, ActionIcon, Tooltip } from '@mantine/core'
+import React, { useEffect } from 'react'
+import {
+  Box,
+  Button,
+  TextInput,
+  Title,
+  Textarea,
+  Modal,
+  ActionIcon,
+  Tooltip,
+  MultiSelect,
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
@@ -9,20 +19,30 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconSquareRoundedPlus } from '@tabler/icons-react'
 import { showError, showInfo } from '@/utils/notification'
 import { addManufacturer } from '@/utils/fetch'
+import { useBarometers } from '@/app/hooks/useBarometers'
 
 interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void
 }
 
+interface Form {
+  firstName: string
+  name: string
+  city: string
+  countries: number[]
+  description: string
+}
+
 export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
+  const { countries } = useBarometers()
   const [opened, { open, close }] = useDisclosure(false)
 
-  const form = useForm({
+  const form = useForm<Form>({
     initialValues: {
       firstName: '',
       name: '',
       city: '',
-      country: '',
+      countries: [],
       description: '',
     },
     validate: {
@@ -36,8 +56,6 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           : 'First name should be longer than 2 and shorter than 100 symbols',
       city: val =>
         isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
-      country: val =>
-        isLength(val ?? '', { max: 100 }) ? null : 'Country should be shorter that 100 symbols',
     },
   })
   const queryClient = useQueryClient()
@@ -56,6 +74,11 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
       showError(error.message || 'Error adding manufacturer')
     },
   })
+
+  useEffect(() => {
+    if (opened) form.reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened])
   return (
     <>
       <Modal opened={opened} onClose={close} centered>
@@ -65,7 +88,10 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           onSubmit={form.onSubmit((values, event) => {
             // prevent bubbling up to parent form
             event?.stopPropagation()
-            mutate(values)
+            mutate({
+              ...values,
+              countries: values.countries.map(id => ({ id })),
+            })
           })}
         >
           <Title mb="lg" order={3}>
@@ -73,7 +99,20 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           </Title>
           <TextInput label="First name" {...form.getInputProps('firstName')} />
           <TextInput id="manufacturer-name" required label="Name" {...form.getInputProps('name')} />
-          <TextInput label="Country" {...form.getInputProps('country')} />
+          <MultiSelect
+            label="Countries"
+            placeholder={form.values.countries.length === 0 ? 'Select countries' : undefined}
+            data={countries.data?.map(({ id, name }) => ({
+              value: String(id),
+              label: name,
+            }))}
+            value={form.values.countries.map(String)}
+            onChange={states =>
+              form.setValues({
+                countries: states.map(Number),
+              })
+            }
+          />
           <TextInput label="City" {...form.getInputProps('city')} />
           <Textarea
             autosize

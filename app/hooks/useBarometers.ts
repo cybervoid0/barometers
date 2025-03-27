@@ -8,6 +8,7 @@ import {
   deleteManufacturer,
   fetchSubcategoryList,
   fetchMaterialList,
+  fetchCountryList,
 } from '@/utils/fetch'
 
 export const useBarometers = () => {
@@ -44,14 +45,14 @@ export const useBarometers = () => {
     queryKey: ['materials'],
     queryFn: fetchMaterialList,
   })
-  /*   const {
-    data: materials,
-    error: materialsError,
-    isLoading: materialsIsLoading,
+  const {
+    data: countries,
+    error: countriesError,
+    isLoading: countriesIsLoading,
   } = useQuery({
-    queryKey: ['materials'],
-    queryFn: fetchMaterialList,
-  }) */
+    queryKey: ['countries'],
+    queryFn: fetchCountryList,
+  })
   const {
     data: manufacturers,
     error: manufacturersError,
@@ -76,12 +77,24 @@ export const useBarometers = () => {
   })
 
   useEffect(() => {
-    ;[typesError, conditionError, manufacturersError, subcategoriesError, materialsError].forEach(
-      err => {
-        if (err instanceof Error) showError(err.message)
-      },
-    )
-  }, [typesError, conditionError, manufacturersError, subcategoriesError, materialsError])
+    ;[
+      typesError,
+      conditionError,
+      manufacturersError,
+      subcategoriesError,
+      materialsError,
+      countriesError,
+    ].forEach(err => {
+      if (err instanceof Error) showError(err.message)
+    })
+  }, [
+    typesError,
+    conditionError,
+    manufacturersError,
+    subcategoriesError,
+    materialsError,
+    countriesError,
+  ])
 
   return useMemo(
     () => ({
@@ -106,6 +119,10 @@ export const useBarometers = () => {
         data: materials,
         isLoading: materialsIsLoading,
       },
+      countries: {
+        data: countries,
+        isLoading: countriesIsLoading,
+      },
     }),
     [
       condition,
@@ -119,6 +136,8 @@ export const useBarometers = () => {
       subcategoriesIsLoading,
       materials,
       materialsIsLoading,
+      countries,
+      countriesIsLoading,
     ],
   )
 }
