@@ -114,7 +114,6 @@ model Manufacturer {
   firstName    String?
   name         String         @unique
   slug         String         @unique
-  country      String?
   countries    Country[]      @relation("ManufacturerCountries")
   city         String?
   description  String?
