@@ -18,7 +18,7 @@ model Image {
   order         Int?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  categories    Category?     @relation("CategoryImage")
+  categories    Category[]    @relation("CategoryImages")
   barometers    Barometer[]   @relation("BarometerImages")
   manufacturers Manufacturer? @relation("ManufacturerImage")
 }
@@ -29,11 +29,10 @@ model Category {
   description String
   label       String
   order       Int
-  imageId     String      @unique
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   barometers  Barometer[]
-  image       Image       @relation("CategoryImage", fields: [imageId], references: [id])
+  images      Image[]     @relation("CategoryImages")
 }
 
 /// Movement type
