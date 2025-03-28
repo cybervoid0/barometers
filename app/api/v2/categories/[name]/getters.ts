@@ -1,7 +1,10 @@
 import { withPrisma } from '@/prisma/prismaClient'
 
-export const getCategory = withPrisma((prisma, name: string) =>
-  prisma.category.findFirstOrThrow({
+export const getCategory = withPrisma(async (prisma, name: string) => {
+  const {
+    images: [image],
+    ...category
+  } = await prisma.category.findFirstOrThrow({
     where: {
       name: {
         equals: name,
@@ -14,14 +17,18 @@ export const getCategory = withPrisma((prisma, name: string) =>
       description: true,
       order: true,
       label: true,
-      image: {
+      images: {
         select: {
           url: true,
           blurData: true,
         },
       },
     },
-  }),
-)
+  })
+  return {
+    ...category,
+    image,
+  }
+})
 
 export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>

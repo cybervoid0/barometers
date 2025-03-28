@@ -23,14 +23,14 @@ export const generateMetadata = withPrisma(async prisma => {
     await prisma.category.findMany({
       select: {
         name: true,
-        image: {
+        images: {
           select: {
             url: true,
           },
         },
       },
     })
-  ).map(({ image, name }) => ({
+  ).map(({ images: [image], name }) => ({
     url: image.url,
     alt: name,
   }))
