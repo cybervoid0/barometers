@@ -10,17 +10,17 @@ datasource db {
 }
 
 model Image {
-  id            String        @id @default(uuid())
+  id            String         @id @default(uuid())
   url           String
   blurData      String
   description   String?
   name          String?
   order         Int?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  categories    Category[]    @relation("CategoryImages")
-  barometers    Barometer[]   @relation("BarometerImages")
-  manufacturers Manufacturer? @relation("ManufacturerImage")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  categories    Category[]     @relation("CategoryImages")
+  barometers    Barometer[]    @relation("BarometerImages")
+  manufacturers Manufacturer[] @relation("ManufacturerImages")
 }
 
 model Category {
@@ -120,8 +120,7 @@ model Manufacturer {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   barometers   Barometer[]
-  imageId      String?        @unique
-  image        Image?         @relation("ManufacturerImage", fields: [imageId], references: [id])
+  images       Image[]        @relation("ManufacturerImages")
   // self-referencing relations
   // some brands may have multiple successors and/or predecessors
   successors   Manufacturer[] @relation("ManufacturerSuccessors")
