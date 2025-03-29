@@ -40,7 +40,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               src={googleStorageImagesFolder + image.url}
               alt={name}
               className={clsx(
-                'hover:scale-150 transition-transform duration-[10s]',
+                'hover:scale-150 active:scale-150 transition-transform duration-[10s]',
                 'ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
               )}
               style={{

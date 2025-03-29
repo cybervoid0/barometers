@@ -65,7 +65,7 @@ const BrandsOfCountry = ({
   country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
 }) => (
   <Box mb="lg" mr="md">
-    <Title order={3} className={sx.countryTitle}>
+    <Title order={3} className="!mb-5 px-5 py-[0.1rem] border-b border-solid border-neutral-400">
       {country.name}
     </Title>
 
@@ -80,13 +80,15 @@ const BrandsOfCountry = ({
                 alt={name}
                 src={googleStorageImagesFolder + image.url}
                 blurDataURL={image.blurData}
-                style={{ objectFit: 'contain' }}
+                className="w-8 h-8 object-contain"
                 sizes="32px"
               />
             ) : (
               <IconCircleArrowUp size={32} />
             )}
-            <Text className={sx.brand}>{name + (firstName ? `, ${firstName}` : '')}</Text>
+            <Text fw={500} className="w-fit capitalize">
+              {name + (firstName ? `, ${firstName}` : '')}
+            </Text>
           </Group>
         </Anchor>
       ))}
@@ -105,10 +107,10 @@ export default async function Manufacturers() {
         Manufacturers
       </Title>
       <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
-        Discover the master craftsmen and renowned manufacturers behind these exceptional
-        barometers, each reflecting timeless artistry and precision. Here is a curated list of
-        barometer makers, along with detailed descriptions and iconic works by each master from the
-        collection, representing the finest traditions of craftsmanship.
+        Discover the master craftsmen, renowned manufacturers and distinguished sellers behind these
+        exceptional barometers, each reflecting timeless artistry and precision. Here is a curated
+        list of barometer makers, along with detailed descriptions and iconic works by each master
+        from the collection, representing the finest traditions of craftsmanship.
       </Text>
       <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <SimpleGrid cols={{ base: 1, sm: 2 }} className={sx.grid}>

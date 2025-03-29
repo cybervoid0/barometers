@@ -2,7 +2,6 @@
 
 import { createTheme, virtualColor, colorsTuple, Anchor, Button } from '@mantine/core'
 import { Raleway } from 'next/font/google'
-import anchorSx from './anchor.module.scss'
 
 const raleway = Raleway({
   subsets: ['cyrillic', 'latin'],
@@ -23,8 +22,13 @@ export const theme = createTheme({
       defaultProps: {
         c: 'dark',
       },
-      classNames: {
-        root: anchorSx.root,
+      styles: {
+        root: {
+          transition: 'transition: color ease-out 0.4s',
+          '&:hover': {
+            color: '#93360a',
+          },
+        },
       },
     }),
     Pagination: {

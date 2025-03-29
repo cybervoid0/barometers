@@ -1,5 +1,5 @@
 import { type Metadata } from 'next'
-import { Anchor, Container, Grid, GridCol, Title } from '@mantine/core'
+import { Anchor, Box, Container, Grid, GridCol, Title } from '@mantine/core'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { getManufacturer } from '@/app/api/v2/manufacturers/[slug]/getters'
@@ -8,7 +8,6 @@ import { title } from '@/app/metadata'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
-import sx from '../styles.module.scss'
 
 interface Props {
   params: {
@@ -55,14 +54,16 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const barometers = await getBarometersByManufacturer(slug)
   return (
     <Container size="xl">
-      <Title tt="capitalize" mt="xl" mb="sm" component="h2">
-        {manufacturer.firstName ?? ''} {manufacturer.name}
-      </Title>
+      <Box className="mb-4">
+        <Title tt="capitalize" mt="xl" mb="sm" component="h2">
+          {manufacturer.firstName ?? ''} {manufacturer.name}
+        </Title>
 
-      <Connections label="Successor" brands={manufacturer.successors} />
-      <Connections label="Predecessor" brands={manufacturer.predecessors} />
+        <Connections label="Successor" brands={manufacturer.successors} />
+        <Connections label="Predecessor" brands={manufacturer.predecessors} />
+      </Box>
 
-      <MD className={sx.description}>{manufacturer.description}</MD>
+      <MD className="mb-6">{manufacturer.description}</MD>
 
       <Grid justify="center" gutter="xl">
         {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
