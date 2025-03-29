@@ -20,8 +20,8 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
       <AspectRatio ratio={1}>
         <Box
           className={clsx(
-            'relative w-full h-full rounded-md overflow-hidden',
-            'bg-[#dddddd] sm:bg-gradient-to-b sm:from-[#dddddd] sm:to-[#efefef]',
+            'relative h-full w-full overflow-hidden rounded-md',
+            'bg-page-bg sm:bg-gradient-to-b sm:from-card-bg sm:to-page-bg',
           )}
         >
           <CategoryIcon
@@ -40,7 +40,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               src={googleStorageImagesFolder + image.url}
               alt={name}
               className={clsx(
-                'hover:scale-150 active:scale-150 transition-transform duration-[10s]',
+                'transition-transform duration-[10s] hover:scale-150 active:scale-150',
                 'ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
               )}
               style={{
@@ -54,9 +54,8 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
             unstyled
             component="h3"
             className={clsx(
-              'absolute px-1 bottom-8 left-8 pointer-events-none',
-              'text-lg tracking-widest leading-snug uppercase text-white',
-              'bg-[var(--mantine-color-primary)]',
+              'pointer-events-none absolute bottom-8 left-8 bg-primary px-1',
+              'text-lg uppercase leading-snug tracking-widest text-white',
             )}
           >
             {name}

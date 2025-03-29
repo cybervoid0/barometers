@@ -5,6 +5,8 @@ module.exports = {
   ...baseConfig,
   semi: false,
   singleQuote: true,
-  trailingComma: 'all', 
-  arrowParens: 'avoid', 
+  trailingComma: 'all',
+  arrowParens: 'avoid',
+  plugins: ['prettier-plugin-tailwindcss'],
+  tailwindConfig: './tailwind.config.cjs',
 }

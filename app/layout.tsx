@@ -9,7 +9,6 @@ import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 import { Footer, Header } from './components'
 import Providers from './providers'
-import styles from './styles.module.scss'
 import { meta, jsonLd } from './metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 
@@ -70,7 +69,7 @@ export default function RootLayout({ children }: { children: any }) {
           <Notifications />
           <Stack h="100vh" gap={0}>
             <Header />
-            <Box className={styles.main}>{children}</Box>
+            <Box className="flex-grow bg-page-bg pb-12 shadow-lg">{children}</Box>
             <Footer />
           </Stack>
         </Providers>

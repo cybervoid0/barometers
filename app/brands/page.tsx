@@ -65,7 +65,7 @@ const BrandsOfCountry = ({
   country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
 }) => (
   <Box mb="lg" mr="md">
-    <Title order={3} className="!mb-5 px-5 py-[0.1rem] border-b border-solid border-neutral-400">
+    <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
       {country.name}
     </Title>
 
@@ -80,7 +80,7 @@ const BrandsOfCountry = ({
                 alt={name}
                 src={googleStorageImagesFolder + image.url}
                 blurDataURL={image.blurData}
-                className="w-8 h-8 object-contain"
+                className="h-8 w-8 object-contain"
                 sizes="32px"
               />
             ) : (
