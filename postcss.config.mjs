@@ -11,6 +11,7 @@ const config = {
       },
     },
     '@tailwindcss/postcss': {},
+    autoprefixer: {},
   },
 }
 
