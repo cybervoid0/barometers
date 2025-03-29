@@ -21,7 +21,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
         <Box
           className={clsx(
             'relative h-full w-full overflow-hidden rounded-md',
-            'bg-page-bg sm:bg-gradient-to-b sm:from-card-bg sm:to-page-bg',
+            'bg-card-bg sm:bg-gradient-to-b sm:from-card-bg sm:to-page-bg',
           )}
         >
           <CategoryIcon
