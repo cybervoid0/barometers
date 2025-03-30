@@ -36,6 +36,7 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
               slug: true,
             },
           },
+          images: true,
         },
       },
       images: {

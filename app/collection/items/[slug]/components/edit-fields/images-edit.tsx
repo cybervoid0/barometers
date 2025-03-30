@@ -26,7 +26,6 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { BarometerDTO } from '@/app/types'
-import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
@@ -76,7 +75,7 @@ function SortableImage({
       />
       <Box {...listeners}>
         <NextImage
-          className={sx.thumbnail}
+          className="h-auto w-auto"
           alt="Barometer"
           key={image}
           src={googleStorageImagesFolder + image}
@@ -113,7 +112,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       form.setFieldValue('images', newOrder)
     }
   }
-  const updateBarometerWithImages = async (values: FormProps) => {
+  const update = async (values: FormProps) => {
     // exit if no image was changed
     if (isEqual(values.images, barometer.images)) {
       close()
@@ -227,16 +226,16 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         centered
         opened={opened}
         onClose={onClose}
-        classNames={{ title: sx.imageEditModalTitle }}
+        styles={{ title: { fontWeight: 500, fontSize: '22px' } }}
       >
-        <Box pos="relative" component="form" onSubmit={form.onSubmit(updateBarometerWithImages)}>
+        <Box pos="relative" component="form" onSubmit={form.onSubmit(update)}>
           <LoadingOverlay visible={isUploading} zIndex={100} />
           <Stack>
             <FileButton multiple onChange={uploadImages} accept="image/**">
               {fbProps => (
                 <Button
                   color="dark.4"
-                  className={sx.addImageBtn}
+                  className="self-start"
                   leftSection={<IconPhotoPlus />}
                   {...fbProps}
                 >
@@ -262,7 +261,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         </Box>
       </Modal>
       <Tooltip label="Edit images">
-        <UnstyledButton className={sx.imageEdit} {...props} onClick={open}>
+        <UnstyledButton className="absolute right-20 top-0 z-10" {...props} onClick={open}>
           <IconEdit color="brown" size={size} />
         </UnstyledButton>
       </Tooltip>
