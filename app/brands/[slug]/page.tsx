@@ -1,4 +1,5 @@
 import { type Metadata } from 'next'
+import NextImage from 'next/image'
 import { Anchor, Box, Container, Grid, GridCol, Title } from '@mantine/core'
 import Link from 'next/link'
 import { Fragment } from 'react'
@@ -8,6 +9,7 @@ import { title } from '@/app/metadata'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface Props {
   params: {
@@ -27,8 +29,8 @@ const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
         },
       },
       images: {
-        where: {
-          order: 0,
+        orderBy: {
+          order: 'asc',
         },
       },
     },
@@ -52,19 +54,31 @@ export const generateStaticParams = withPrisma(async prisma =>
 export default async function Manufacturer({ params: { slug } }: Props) {
   const manufacturer = await getManufacturer(slug)
   const barometers = await getBarometersByManufacturer(slug)
+  const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
+
   return (
     <Container size="xl">
       <Box className="mb-4">
         <Title tt="capitalize" mt="xl" mb="sm" component="h2">
-          {manufacturer.firstName ?? ''} {manufacturer.name}
+          {fullName}
         </Title>
-
         <Connections label="Successor" brands={manufacturer.successors} />
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
       </Box>
-
-      <MD className="mb-6">{manufacturer.description}</MD>
-
+      <div className="my-8 flex flex-col items-center gap-8 sm:flex-row">
+        {manufacturer.images.map(image => (
+          <NextImage
+            key={image.id}
+            width={250}
+            height={250}
+            src={googleStorageImagesFolder + image.url}
+            alt={image.name ?? 'Manufacturer'}
+            className="w-2/3 sm:w-[250px]"
+          />
+        ))}
+      </div>
+      <MD className="my-8">{manufacturer.description}</MD>
+      <Title className="!mb-8" order={2}>{`Barometers by ${fullName} in the collection`}</Title>
       <Grid justify="center" gutter="xl">
         {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
           <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
@@ -73,7 +87,7 @@ export default async function Manufacturer({ params: { slug } }: Props) {
               barometerLink={FrontRoutes.Barometer + barometerSlug}
               categoryLink={FrontRoutes.Categories + category.name}
               categoryName={category.name}
-              image={images.at(0)!}
+              image={images[0]}
             />
           </GridCol>
         ))}

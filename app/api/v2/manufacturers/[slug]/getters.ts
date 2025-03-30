@@ -22,6 +22,7 @@ export const getManufacturer = withPrisma((prisma, slug: string) =>
           slug: true,
         },
       },
+      images: true,
     },
   }),
 )
