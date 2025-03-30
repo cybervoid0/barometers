@@ -11,6 +11,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 interface ManufacturerDTO extends Manufacturer {
   successors?: { id: string }[]
   countries?: { id: number }[]
+  images?: { id: string; url: string; blurData: string }[]
 }
 /**
  * Retrieve a list of all Manufacturers
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, countries, ...manufData }: ManufacturerDTO = await req
+    const { successors, countries, images, ...manufData }: ManufacturerDTO = await req
       .json()
       .then(cleanObject)
 
@@ -54,6 +55,13 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
           ? {
               countries: {
                 connect: countries,
+              },
+            }
+          : {}),
+        ...(images
+          ? {
+              images: {
+                create: images,
               },
             }
           : {}),
@@ -77,12 +85,14 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, countries, ...manufData }: ManufacturerDTO = await req.json().then(data =>
-      // replace empty strings with NULLs
-      traverse.map(data, function map(node) {
-        if (node === '') this.update(null)
-      }),
-    )
+    const { successors, countries, images, ...manufData }: ManufacturerDTO = await req
+      .json()
+      .then(data =>
+        // replace empty strings with NULLs
+        traverse.map(data, function map(node) {
+          if (node === '') this.update(null)
+        }),
+      )
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
     if (!manufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
@@ -91,32 +101,46 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     const slug = manufData.name
       ? getBrandSlug(manufData.name, manufData.firstName)
       : manufacturer.slug
-    const updatedManufacturer = await prisma.manufacturer.update({
-      where: { id: manufacturer.id },
-      data: {
-        ...manufData,
-        ...(successors
-          ? {
-              successors: {
-                set: successors,
-              },
-            }
-          : {}),
-        ...(countries
-          ? {
-              countries: {
-                set: countries,
-              },
-            }
-          : {}),
-        slug,
-      },
+    await prisma.$transaction(async tx => {
+      await Promise.all([
+        // delete old images if the new ones are provided
+        images
+          ? tx.image.deleteMany({ where: { barometers: { some: { id: manufacturer.id } } } })
+          : Promise.resolve(),
+        await tx.manufacturer.update({
+          where: { id: manufacturer.id },
+          data: {
+            ...manufData,
+            ...(successors
+              ? {
+                  successors: {
+                    set: successors,
+                  },
+                }
+              : {}),
+            ...(countries
+              ? {
+                  countries: {
+                    set: countries,
+                  },
+                }
+              : {}),
+            images: images
+              ? {
+                  deleteMany: {},
+                  create: images,
+                }
+              : {},
+            slug,
+          },
+        }),
+      ])
     })
 
     revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
     revalidatePath(FrontRoutes.Brands + slug)
     await revalidateSuccessors(successors)
-    return NextResponse.json(updatedManufacturer, { status: 200 })
+    return NextResponse.json({ slug }, { status: 200 })
   } catch (error) {
     console.error(error)
     return NextResponse.json(

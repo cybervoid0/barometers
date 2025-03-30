@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Modal,
   UnstyledButton,
@@ -17,6 +15,7 @@ import {
   Select,
   Group,
   MultiSelect,
+  LoadingOverlay,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { isLength, isURL } from 'validator'
@@ -26,23 +25,19 @@ import type { BarometerDTO } from '@/app/types'
 import { showError, showInfo } from '@/utils/notification'
 import { FrontRoutes } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
-import { updateBarometer, updateManufacturer } from '@/utils/fetch'
+import { deleteImage, updateBarometer, updateManufacturer } from '@/utils/fetch'
+import { ManufacturerImageEdit } from './manufacturer-image-edit'
+import { type ManufacturerForm } from './types'
+import { getThumbnailBase64 } from '@/utils/misc'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-interface Form {
-  name: string
-  firstName: string
-  city: string
-  countries: number[]
-  url: string
-  description: string
-  successors: string[]
-}
-const initialValues: Form = {
+const initialValues: ManufacturerForm = {
+  id: '',
   name: '',
   firstName: '',
   city: '',
@@ -50,11 +45,21 @@ const initialValues: Form = {
   url: '',
   description: '',
   successors: [],
+  images: [],
 }
 export function ManufacturerEdit({ size = 18, barometer, ...props }: ManufacturerEditProps) {
+  const [isLoading, setIsLoading] = useState(false)
   const { manufacturers, countries } = useBarometers()
   const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
-  const form = useForm<Form>({
+  const currentBrand = useMemo(
+    () => manufacturers.data[selectedManufacturerIndex],
+    [manufacturers.data, selectedManufacturerIndex],
+  )
+  const brandImages = useMemo(
+    () => currentBrand?.images?.map(({ url }) => url),
+    [currentBrand?.images],
+  )
+  const form = useForm<ManufacturerForm>({
     initialValues,
     validate: {
       name: val =>
@@ -68,6 +73,19 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
   })
 
   const [opened, { open, close }] = useDisclosure()
+  const onClose = async () => {
+    // delete unused files from storage
+    try {
+      setIsLoading(true)
+      const extraImages = form.values.images.filter(img => !brandImages?.includes(img))
+      await Promise.all(extraImages.map(deleteImage))
+    } catch (error) {
+      // do nothing
+    } finally {
+      setIsLoading(false)
+      close()
+    }
+  }
 
   // Reset selected manufacturer index
   const resetManufacturerIndex = useCallback(() => {
@@ -82,38 +100,64 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     if (!opened) return
     resetManufacturerIndex()
     form.reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, resetManufacturerIndex])
 
   // Set form values when selected manufacturer index changes
   useEffect(() => {
-    const selectedManufacturer = manufacturers?.data[selectedManufacturerIndex]
     // pick all manufacturer fields and put empty string if not present
     const manufacturerFormData = {
-      id: selectedManufacturer?.id ?? '',
-      name: selectedManufacturer?.name ?? '',
-      firstName: selectedManufacturer?.firstName ?? '',
-      city: selectedManufacturer?.city ?? '',
-      countries: selectedManufacturer?.countries.map(({ id }) => id) ?? [],
-      description: selectedManufacturer?.description ?? '',
-      url: selectedManufacturer?.url ?? '',
-      successors: selectedManufacturer?.successors.map(({ id }) => id) ?? [],
-    } as Form
+      id: currentBrand?.id ?? '',
+      name: currentBrand?.name ?? '',
+      firstName: currentBrand?.firstName ?? '',
+      city: currentBrand?.city ?? '',
+      countries: currentBrand?.countries?.map(({ id }) => id) ?? [],
+      description: currentBrand?.description ?? '',
+      url: currentBrand?.url ?? '',
+      successors: currentBrand?.successors?.map(({ id }) => id) ?? [],
+      images: currentBrand?.images?.map(({ url }) => url) ?? [],
+    } satisfies ManufacturerForm
     form.setValues(manufacturerFormData)
     form.resetDirty(manufacturerFormData)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedManufacturerIndex, manufacturers])
 
   const update = useCallback(
-    async (formValues: Form) => {
+    async (formValues: ManufacturerForm) => {
+      setIsLoading(true)
       try {
-        const manufacturer = manufacturers.data[selectedManufacturerIndex]
+        // erase deleted images
+        const extraFiles = brandImages?.filter(url => !formValues.images.includes(url))
+        if (extraFiles)
+          await Promise.all(
+            extraFiles?.map(async file => {
+              try {
+                await deleteImage(file)
+              } catch (error) {
+                // don't mind if it was not possible to delete the file
+              }
+            }),
+          )
+
         const updatedBarometer = {
           id: barometer.id,
-          manufacturerId: manufacturer.id,
+          manufacturerId: currentBrand.id,
         }
         const updatedManufacturer = {
           ...formValues,
           successors: formValues.successors.map(id => ({ id })),
           countries: formValues.countries.map(id => ({ id })),
+          images: await Promise.all(
+            formValues.images.map(async (url, i) => {
+              const blurData = await getThumbnailBase64(googleStorageImagesFolder + url)
+              return {
+                url,
+                order: i,
+                name: barometer.name,
+                blurData,
+              }
+            }),
+          ),
         }
         const [{ slug }, { name }] = await Promise.all([
           updateBarometer(updatedBarometer),
@@ -123,15 +167,18 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
         close()
         window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating barometer')
+        showError(error instanceof Error ? error.message : 'Error updating manufacturer')
+      } finally {
+        setIsLoading(false)
       }
     },
-    [barometer.id, close, manufacturers.data, selectedManufacturerIndex],
+    [barometer.id, barometer.name, brandImages, close, currentBrand?.id],
   )
 
   return (
     <>
-      <Modal opened={opened} onClose={close} centered>
+      <Modal pos="relative" opened={opened} onClose={onClose} centered>
+        <LoadingOverlay visible={isLoading} zIndex={100} />
         <Box flex={1} component="form" onSubmit={form.onSubmit(update)}>
           <Group mb="lg" align="center">
             <Title order={3}>Edit Manufacturer</Title>
@@ -139,9 +186,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
               <ActionIcon
                 variant="outline"
                 color="dark"
-                onClick={() =>
-                  manufacturers.delete(manufacturers.data[selectedManufacturerIndex].slug)
-                }
+                onClick={() => manufacturers.delete(currentBrand?.slug)}
               >
                 <IconTrash />
               </ActionIcon>
@@ -189,6 +234,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
             value={form.values.successors}
             onChange={successors => form.setValues({ successors })}
           />
+          <ManufacturerImageEdit imageUrls={brandImages} form={form} setLoading={setIsLoading} />
           <Textarea
             autosize
             minRows={2}

@@ -16,6 +16,15 @@ export const getManufacturers = withPrisma(async (prisma, page: number, pageSize
       take: pageSize || undefined,
       include: {
         countries: true,
+        images: {
+          select: {
+            url: true,
+            id: true,
+            blurData: true,
+            order: true,
+            name: true,
+          },
+        },
         predecessors: {
           select: {
             id: true,
