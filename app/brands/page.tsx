@@ -6,7 +6,6 @@ import { IconCircleArrowUp } from '@tabler/icons-react'
 import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
-import sx from './styles.module.scss'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { DynamicOptions } from '../types'
 
@@ -113,7 +112,10 @@ export default async function Manufacturers() {
         from the collection, representing the finest traditions of craftsmanship.
       </Text>
       <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
-        <SimpleGrid cols={{ base: 1, sm: 2 }} className={sx.grid}>
+        <SimpleGrid
+          cols={{ base: 1, sm: 2 }}
+          className="sm:[&>div:nth-child(2n)]:border-r-0 sm:[&>div]:border-r sm:[&>div]:border-neutral-400"
+        >
           <Box>
             {firstColumn.map(country => (
               <BrandsOfCountry key={country.id} country={country} />

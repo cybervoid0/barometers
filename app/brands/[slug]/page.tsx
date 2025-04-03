@@ -108,7 +108,7 @@ const Connections = ({
   brands: Awaited<ReturnType<typeof getManufacturer>>['successors']
 }) =>
   brands.length > 0 && (
-    <>
+    <div>
       <Title fz="1.2rem" fw={500} display="inline" order={3}>
         {`${label}${brands.length > 1 ? 's' : ''}: `}
       </Title>
@@ -120,5 +120,5 @@ const Connections = ({
           {i < arr.length - 1 && `, `}
         </Fragment>
       ))}
-    </>
+    </div>
   )
