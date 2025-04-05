@@ -15,7 +15,7 @@ import {
   Center,
 } from '@mantine/core'
 import Link from 'next/link'
-import * as motion from 'framer-motion/client'
+import { motion } from 'motion/react'
 import { IconChevronRight, IconAt, IconBrandInstagram } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
