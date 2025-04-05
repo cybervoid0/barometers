@@ -20,6 +20,11 @@ const getBrandsByCountry = withPrisma(async prisma => {
     orderBy: {
       name: 'asc',
     },
+    where: {
+      manufacturers: {
+        some: {},
+      },
+    },
     include: {
       manufacturers: {
         orderBy: {
