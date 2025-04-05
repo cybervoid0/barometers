@@ -10,7 +10,7 @@ interface ImageLightboxProps {
 }
 
 export function ImageLightbox({ src, name }: ImageLightboxProps) {
-  name ??= 'Manufacturer'
+  name ??= 'Image'
   const [opened, { open, close }] = useDisclosure(false)
 
   return (

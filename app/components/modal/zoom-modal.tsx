@@ -39,7 +39,7 @@ export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
             initial={{ opacity: 0, backgroundColor: 'rgba(0,0,0,0.0)' }}
             animate={{ opacity: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}
             exit={{ opacity: 0, backgroundColor: 'rgba(0,0,0,0.0)' }}
-            id="barometers-portal"
+            id="modal-portal"
             className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl"
           />
           <div className="fixed inset-0 z-[51] flex items-center justify-center">
