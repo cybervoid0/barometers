@@ -1,5 +1,4 @@
 import { type Metadata } from 'next'
-import NextImage from 'next/image'
 import { Anchor, Box, Container, Grid, GridCol, Title } from '@mantine/core'
 import Link from 'next/link'
 import { Fragment } from 'react'
@@ -10,6 +9,7 @@ import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import { googleStorageImagesFolder } from '@/utils/constants'
+import { ImageLightbox } from '@/app/components/modal'
 
 interface Props {
   params: {
@@ -67,13 +67,10 @@ export default async function Manufacturer({ params: { slug } }: Props) {
       </Box>
       <div className="my-8 flex flex-col items-center gap-8 sm:flex-row">
         {manufacturer.images.map(image => (
-          <NextImage
-            key={image.id}
-            width={250}
-            height={250}
+          <ImageLightbox
             src={googleStorageImagesFolder + image.url}
-            alt={image.name ?? 'Manufacturer'}
-            className="w-2/3 sm:w-[250px]"
+            name={image.name}
+            key={image.id}
           />
         ))}
       </div>
