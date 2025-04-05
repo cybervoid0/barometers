@@ -27,7 +27,7 @@ export function ImageLightbox({ src, name }: ImageLightboxProps) {
 
       <ZoomModal isOpened={opened} close={close}>
         <NextImage
-          className="h-auto w-auto"
+          className="h-auto max-h-screen w-auto"
           width={1000}
           height={1000}
           quality={100}
