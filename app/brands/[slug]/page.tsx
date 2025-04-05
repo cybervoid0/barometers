@@ -58,7 +58,6 @@ export default async function Manufacturer({ params: { slug } }: Props) {
 
   return (
     <Container size="xl">
-      <div className=""></div>
       <Box className="mb-4">
         <Title tt="capitalize" mt="xl" mb="sm" component="h2">
           {fullName}
