@@ -12,7 +12,7 @@ import 'swiper/css'
 import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import './styles.css'
+import './swiper-styles.css'
 import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ImageCarouselProps {
@@ -51,7 +51,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 sizes="(max-width: 768px) 1024px, 100vw"
                 placeholder="blur"
                 blurDataURL={image.blurData}
-                style={{ objectFit: 'contain' }}
+                className="cursor-zoom-in object-contain"
               />
             </Box>
           </SwiperSlide>

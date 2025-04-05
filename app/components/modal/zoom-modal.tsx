@@ -1,5 +1,6 @@
 'use client'
 
+import { CloseButton } from '@mantine/core'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
@@ -49,7 +50,12 @@ export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
+              className="relative"
             >
+              <CloseButton
+                onClick={close}
+                className="!absolute right-2 top-2 !bg-neutral-100 hover:!bg-neutral-200"
+              />
               {children}
             </motion.div>
           </div>

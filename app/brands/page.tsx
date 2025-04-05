@@ -1,4 +1,4 @@
-import { Container, SimpleGrid, Anchor, Title, Paper, Stack, Text, Group, Box } from '@mantine/core'
+import { Container, SimpleGrid, Title, Paper, Text, Box } from '@mantine/core'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import Image from 'next/image'
@@ -68,15 +68,15 @@ const BrandsOfCountry = ({
 }: {
   country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
 }) => (
-  <Box mb="lg" mr="md">
+  <div className="mb-5 mr-4">
     <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
       {country.name}
     </Title>
 
-    <Stack gap="md">
+    <div className="flex flex-col gap-4">
       {country.manufacturers.map(({ id, firstName, name, slug, image }) => (
-        <Anchor w="fit-content" key={id} href={FrontRoutes.Brands + slug} component={Link}>
-          <Group gap="xs" wrap="nowrap">
+        <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
+          <div className="flex flex-nowrap items-center gap-3">
             {image ? (
               <Image
                 height={32}
@@ -90,14 +90,14 @@ const BrandsOfCountry = ({
             ) : (
               <IconCircleArrowUp size={32} />
             )}
-            <Text fw={500} className="w-fit capitalize">
+            <p className="w-fit font-medium capitalize">
               {name + (firstName ? `, ${firstName}` : '')}
-            </Text>
-          </Group>
-        </Anchor>
+            </p>
+          </div>
+        </Link>
       ))}
-    </Stack>
-  </Box>
+    </div>
+  </div>
 )
 
 export default async function Manufacturers() {
