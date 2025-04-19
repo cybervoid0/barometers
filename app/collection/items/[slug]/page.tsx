@@ -187,7 +187,7 @@ export default async function Page({ params: { slug } }: Props) {
           </Grid>
           <Group align="center" gap="sm">
             <Title fw={600} order={2} tt="capitalize">
-              Description
+              Object Overview
             </Title>
             <IsAdmin>
               <TextAreaEdit barometer={barometer} property="description" />
