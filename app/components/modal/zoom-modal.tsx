@@ -1,19 +1,21 @@
 'use client'
 
 import { CloseButton } from '@mantine/core'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useClickOutside } from '@mantine/hooks'
 
-interface ZoomModalProps extends PropsWithChildren {
+interface ZoomModalProps {
   isOpened: boolean
   close: () => void
+  children: ReactNode | ((props: { onLoad: () => void }) => ReactNode)
 }
 
 export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
   const [mounted, setMounted] = useState(false)
   const childrenContainer = useClickOutside(close)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   // the component is rendered on the client
   useEffect(() => {
@@ -52,11 +54,16 @@ export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
               exit={{ scale: 0.8, opacity: 0 }}
               className="relative"
             >
-              <CloseButton
-                onClick={close}
-                className="!absolute right-2 top-2 !bg-neutral-100 hover:!bg-neutral-200"
-              />
-              {children}
+              {imageLoaded && (
+                <CloseButton
+                  onClick={close}
+                  className="!absolute right-2 top-2 !bg-neutral-100 hover:!bg-neutral-200"
+                />
+              )}
+
+              {children && typeof children === 'function'
+                ? children({ onLoad: () => setImageLoaded(true) })
+                : children}
             </motion.div>
           </div>
         </>

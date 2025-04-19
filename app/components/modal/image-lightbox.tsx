@@ -26,15 +26,18 @@ export function ImageLightbox({ src, name }: ImageLightboxProps) {
       />
 
       <ZoomModal isOpened={opened} close={close}>
-        <NextImage
-          className="h-auto max-h-screen w-auto"
-          width={1000}
-          height={1000}
-          quality={100}
-          src={src}
-          alt={name}
-          loading="lazy"
-        />
+        {({ onLoad }) => (
+          <NextImage
+            className="h-auto max-h-screen w-auto"
+            width={1000}
+            height={1000}
+            quality={100}
+            src={src}
+            alt={name}
+            loading="lazy"
+            onLoad={onLoad}
+          />
+        )}
       </ZoomModal>
     </>
   )

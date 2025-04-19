@@ -52,7 +52,7 @@ export default function About() {
           <span className={styles.bookTitle}>Barometer Odyssey*</span>, a book that explores the
           evolution of barometers over time.
         </Text>
-        <div className="xs:justify-start mb-3 flex justify-center gap-2 py-3">
+        <div className="mb-3 flex justify-center gap-2 py-3 xs:justify-start">
           <Anchor
             href="https://www.ozon.ru/product/barometr-odisseya-1918748239/?at=mqtkyRVAEhMBgPkoc8x4EGrHK39QKWiopqMgXhv53xWD&keywords=%D0%B1%D0%B0%D1%80%D0%BE%D0%BC%D0%B5%D1%82%D1%80+%D0%BE%D0%B4%D0%B8%D1%81%D1%81%D0%B5%D1%8F"
             target="_blank"
