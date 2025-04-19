@@ -9,7 +9,7 @@ import { useClickOutside } from '@mantine/hooks'
 interface ZoomModalProps {
   isOpened: boolean
   close: () => void
-  children: ReactNode | ((props: { onLoad: () => void }) => ReactNode)
+  children: (props: { onLoad: () => void }) => ReactNode
 }
 
 export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
@@ -61,9 +61,7 @@ export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
                 />
               )}
 
-              {children && typeof children === 'function'
-                ? children({ onLoad: () => setImageLoaded(true) })
-                : children}
+              {children({ onLoad: () => setImageLoaded(true) })}
             </motion.div>
           </div>
         </>
