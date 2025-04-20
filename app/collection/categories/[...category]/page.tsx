@@ -10,8 +10,7 @@ import { DescriptionText } from '@/app/components/description-text'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getCategory } from '@/app/api/v2/categories/[name]/getters'
-import { getBarometersByParams } from '@/app/api/v2/barometers/getters'
+import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
 
 // all non-generated posts will give 404

@@ -13,9 +13,10 @@ import type {
   SubcategoryListDTO,
   MaterialListDTO,
   CountryListDTO,
+  UrlDto,
+  FileProps,
 } from '@/app/types'
 import { handleApiError } from './misc'
-import { UrlDto, FileProps } from '@/app/api/v2/upload/images/types'
 
 /******* Barometers ********/
 export async function fetchBarometer(slug: string): Promise<BarometerDTO> {

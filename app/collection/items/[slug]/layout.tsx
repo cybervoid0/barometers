@@ -1,7 +1,7 @@
 import { Metadata } from 'next/types'
 import { PropsWithChildren } from 'react'
 import capitalize from 'lodash/capitalize'
-import { getBarometer } from '@/app/api/v2/barometers/[slug]/getters'
+import { getBarometer } from '@/app/services'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { FrontRoutes } from '@/utils/routes-front'

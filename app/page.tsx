@@ -1,10 +1,10 @@
 import { Container, Grid, GridCol, Group } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
-import { FrontRoutes } from '@/utils/routes-front'
 import { SearchField } from './components/search-field'
-import { getCategories } from './api/v2/categories/getters'
 import { NewArrivals } from './components/new-arrivals'
+import { FrontRoutes } from '@/utils/routes-front'
+import { getCategories } from './services'
 
 export const dynamic = 'force-static'
 
