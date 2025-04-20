@@ -22,14 +22,17 @@ import { AccessRole } from '@prisma/client'
 import { instagram, email } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { menuData } from '@/utils/menudata'
-import { useBarometers } from '@/app/hooks/useBarometers'
 import { isAdmin } from '../../is-admin'
+import { CategoryListDTO } from '@/app/types'
 
-export const MobileMenu: FC<DrawerProps> = props => {
+interface Props extends DrawerProps {
+  categories: CategoryListDTO
+}
+
+export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
   const { data: session } = useSession()
   const [opened, setOpened] = useState<Record<number, boolean>>({})
   const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
-  const { categories } = useBarometers()
 
   return (
     <Drawer
@@ -83,7 +86,7 @@ export const MobileMenu: FC<DrawerProps> = props => {
                       </List.Item>
                       <Collapse transitionDuration={500} in={opened[i]}>
                         <List px="xl" listStyleType="none">
-                          {categories.data.map(({ name, label, id }) => (
+                          {categories.map(({ name, label, id }) => (
                             <List.Item pb="sm" key={id}>
                               <Anchor
                                 c="inherit"

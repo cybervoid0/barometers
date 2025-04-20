@@ -10,12 +10,15 @@ import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import sx from './tabs.module.scss'
 import { menuData } from '@/utils/menudata'
-import { useBarometers } from '@/app/hooks/useBarometers'
 import { FrontRoutes } from '@/utils/routes-front'
 import { isAdmin } from '../../is-admin'
+import { CategoryListDTO } from '@/app/types'
 
-const WideScreenTabs = ({ className, ...props }: CenterProps) => {
-  const { categories } = useBarometers()
+interface Props extends CenterProps {
+  categories: CategoryListDTO
+}
+
+const WideScreenTabs = ({ className, categories = [], ...props }: Props) => {
   const { data: session } = useSession()
   const router = useRouter()
   const pathname = usePathname()
@@ -78,7 +81,7 @@ const WideScreenTabs = ({ className, ...props }: CenterProps) => {
                 >
                   <Menu.Target>{renderTab()}</Menu.Target>
                   <Menu.Dropdown>
-                    {categories.data.map(({ label, id, name }) => (
+                    {categories.map(({ label, id, name }) => (
                       <Anchor
                         key={id}
                         href={FrontRoutes.Categories + name.toLocaleLowerCase()}

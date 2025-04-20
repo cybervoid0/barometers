@@ -10,6 +10,7 @@ export type { InaccuracyReportListDTO } from './api/v2/report/getters'
 export type { SubcategoryListDTO } from './api/v2/subcategories/getters'
 export type { MaterialListDTO } from './api/v2/materials/getters'
 export type { CountryListDTO } from './api/v2/countries/getters'
+export type { UrlDto, FileProps } from './api/v2/upload/images/types'
 /**
  * Barometer dimensions database JSON structure
  */
