@@ -1,19 +1,16 @@
-import { Pool, neonConfig } from '@neondatabase/serverless'
-import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
-import { WebSocket } from 'undici'
 
-neonConfig.webSocketConstructor = WebSocket
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
 
 function getPrismaClient(): PrismaClient {
-  const connectionString = `${process.env.DATABASE_URL}`
-  const pool = new Pool({ connectionString })
-  const adapter = new PrismaNeon(pool)
-
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['info', 'warn', 'error'] : [],
+  if (globalForPrisma.prisma) return globalForPrisma.prisma
+  const prisma = new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : [],
   })
+  globalForPrisma.prisma = prisma
+  return prisma
 }
 
 /**
@@ -49,10 +46,6 @@ type AsyncFunction<T, Args extends any[]> = {
 export function withPrisma<T, Args extends any[]>(fn: AsyncFunction<T, Args>) {
   return async function wrappedWithParams(...args: Args): Promise<T> {
     const prisma = getPrismaClient()
-    try {
-      return await fn(prisma, ...args)
-    } finally {
-      await prisma.$disconnect()
-    }
+    return fn(prisma, ...args)
   }
 }
