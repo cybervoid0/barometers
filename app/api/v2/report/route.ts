@@ -12,9 +12,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 const REPORT_COOL_DOWN = 10
 const REPORT_MAX_ATTEMPTS = 3
 
-console.log('🚀 ~ process.env.REDIS_URL:', process.env.REDIS_URL)
 const redis = new Redis(process.env.REDIS_URL!)
-console.log('🚀 ~ Redis:', redis.config)
 
 /**
  * Fetches a paginated list of inaccuracy reports for barometers.
