@@ -4,21 +4,22 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Image {
   id            String         @id @default(uuid())
   url           String
+  blurData      String
   description   String?
   name          String?
+  order         Int?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  order         Int?
-  blurData      String
-  barometers    Barometer[]    @relation("BarometerImages")
   categories    Category[]     @relation("CategoryImages")
+  barometers    Barometer[]    @relation("BarometerImages")
   manufacturers Manufacturer[] @relation("ManufacturerImages")
 }
 
@@ -44,40 +45,43 @@ model SubCategory {
 
 model Barometer {
   /// Table ID
-  id              String             @id @default(uuid())
+  id              String   @id @default(uuid())
   /// Collection internal ID
-  collectionId    String             @unique
+  collectionId    String   @unique
+  /// Serial number written on the barometer
+  serial          String?
   /// Barometer descriptive name
-  name            String             @unique
+  name            String   @unique
   /// URL Representation of the name
-  slug            String             @unique
+  slug            String   @unique
   /// History of the barometer. May contain Markdown layout
   description     String
-  conditionId     String
+  /// Barometer dimensions, e.g. weight, length, diameter etc.
+  dimensions      Json?
   /// Date for barometers sorting
   date            DateTime
   /// Date to display on pages, e.g. "c.1870", "mid 19th century"
   dateDescription String
-  manufacturerId  String
-  /// Barometer dimensions, e.g. weight, length, diameter etc.
-  dimensions      Json?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  categoryId      String
-  /// Serial number written on the barometer
-  serial          String?
   /// History of ownership and origin of the barometer
   provenance      String?
-  subCategoryId   Int?
   /// Estimated price
   estimatedPrice  Float?
-  category        Category           @relation(fields: [categoryId], references: [id])
-  condition       Condition          @relation(fields: [conditionId], references: [id])
-  manufacturer    Manufacturer       @relation(fields: [manufacturerId], references: [id])
-  subCategory     SubCategory?       @relation(fields: [subCategoryId], references: [id])
-  reports         InaccuracyReport[]
-  images          Image[]            @relation("BarometerImages")
-  materials       Material[]         @relation("BarometerMaterials")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // table relations
+  conditionId    String
+  manufacturerId String
+  categoryId     String
+  subCategoryId  Int?
+  subCategory    SubCategory?       @relation(fields: [subCategoryId], references: [id])
+  category       Category           @relation(fields: [categoryId], references: [id])
+  condition      Condition          @relation(fields: [conditionId], references: [id])
+  manufacturer   Manufacturer       @relation(fields: [manufacturerId], references: [id])
+  images         Image[]            @relation("BarometerImages")
+  reports        InaccuracyReport[]
+  materials      Material[]         @relation("BarometerMaterials")
 }
 
 model Material {
@@ -90,29 +94,37 @@ model Material {
 model InaccuracyReport {
   id            String                 @id @default(uuid())
   barometerId   String
+  barometer     Barometer              @relation(fields: [barometerId], references: [id])
+  reporterName  String
   reporterEmail String
   description   String
   status        InaccuracyReportStatus @default(PENDING)
   createdAt     DateTime               @default(now())
-  reporterName  String
-  barometer     Barometer              @relation(fields: [barometerId], references: [id])
+}
+
+enum InaccuracyReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
 }
 
 model Manufacturer {
-  id             String         @id @default(uuid())
-  name           String         @unique
-  city           String?
-  description    String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  slug           String         @unique
-  firstName      String?
-  url            String?
-  barometers     Barometer[]
-  countries      Country[]      @relation("ManufacturerCountries")
-  images         Image[]        @relation("ManufacturerImages")
-  Manufacturer_A Manufacturer[] @relation("ManufacturerSuccessors")
-  Manufacturer_B Manufacturer[] @relation("ManufacturerSuccessors")
+  id           String         @id @default(uuid())
+  firstName    String?
+  name         String         @unique
+  slug         String         @unique
+  countries    Country[]      @relation("ManufacturerCountries")
+  city         String?
+  description  String?
+  url          String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  barometers   Barometer[]
+  images       Image[]        @relation("ManufacturerImages")
+  // self-referencing relations
+  // some brands may have multiple successors and/or predecessors
+  successors   Manufacturer[] @relation("ManufacturerSuccessors")
+  predecessors Manufacturer[] @relation("ManufacturerSuccessors")
 }
 
 model Country {
@@ -141,12 +153,6 @@ model User {
   avatarURL String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-}
-
-enum InaccuracyReportStatus {
-  PENDING
-  REVIEWED
-  RESOLVED
 }
 
 enum AccessRole {
