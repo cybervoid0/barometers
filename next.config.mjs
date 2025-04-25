@@ -31,7 +31,7 @@ export default withBundleAnalyzer({
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'storage.googleapis.com',
+        hostname: 's3.aowif.org',
       },
     ],
   },
