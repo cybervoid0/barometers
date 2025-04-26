@@ -15,8 +15,7 @@ import {
 } from '@mantine/core'
 import styles from './styles.module.scss'
 import { ShowMore } from '../components/showmore'
-import leo from '@/public/images/leo-shirokov.png'
-import aboutCircle from '@/public/images/about-circle.png'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 export const dynamic = 'force-static'
 
@@ -36,10 +35,9 @@ export default function About() {
             width={79}
             height={125}
             sizes="(max-width: 768px) 100vw, 50vw"
-            src={leo}
+            src={`${googleStorageImagesFolder}shared/leo-shirokov.png`}
             className={styles.leoImage}
             component={NextImage}
-            placeholder="blur"
           />
           I am a collector and restorer of antique barometers, a member of the Society for the
           History of Technology (SHOT), European Society for Environmental History (ESEH) and the
@@ -121,9 +119,8 @@ export default function About() {
             width={160}
             height={160}
             sizes="(max-width: 576px) 70vw, 160px"
-            src={aboutCircle}
+            src={`${googleStorageImagesFolder}shared/about-circle.png`}
             component={NextImage}
-            placeholder="blur"
           />
         </Flex>
         <Divider my="md" mx={{ base: 'sm', sm: 'xl' }} />

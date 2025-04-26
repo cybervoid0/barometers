@@ -4,6 +4,7 @@ import { Group, Anchor, Title, Container, Box, Flex, Tooltip } from '@mantine/co
 import { IconSearch } from '@tabler/icons-react'
 import { Navigation } from './navigation'
 import { getCategories } from '@/app/services'
+import { googleStorageImagesFolder } from '@/utils/constants'
 
 // server component
 
@@ -36,7 +37,7 @@ export async function Header() {
                     <NextImage
                       fill
                       quality={40}
-                      src="/images/logo-arrow.png"
+                      src={`${googleStorageImagesFolder}shared/logo-arrow.png`}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       alt="logo"
                       className="object-contain"
