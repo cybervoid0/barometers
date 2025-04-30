@@ -10,6 +10,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { ImageLightbox } from '@/app/components/modal'
+import { warmImages } from '@/utils/image-loader'
 
 interface Props {
   params: {
@@ -55,7 +56,14 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const manufacturer = await getManufacturer(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
-
+  const brandImages = manufacturer.images.map(({ url }) => url)
+  await warmImages(brandImages, {
+    widths: [256, 640],
+  })
+  await warmImages(brandImages, {
+    widths: [1080, 2048],
+    quality: 100,
+  })
   return (
     <Container size="xl">
       <Box className="mb-4">

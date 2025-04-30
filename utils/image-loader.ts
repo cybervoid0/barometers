@@ -31,17 +31,32 @@ export default function customImageLoader({ src, width, quality }: Props) {
 }
 
 const limit = pLimit(10)
-const defaultWidths = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840]
-export async function warmImages(imgUrls: string[], widths = defaultWidths, quantity = 80) {
-  await Promise.allSettled(
-    imgUrls.flatMap(imgUrl =>
-      widths.map(width =>
-        limit(async () => {
-          const url = `${googleStorageImagesFolder + imgUrl}?${new URLSearchParams({ width: String(width), quantity: String(quantity) })}`
-          const res = await fetch(url, { method: 'HEAD' })
-          console.log('🚀 ~ warmImages ~ res:', url, res.status, '--->')
-        }),
+interface Params {
+  widths?: number[]
+  quality?: number
+}
+const defaultParams: Params = {
+  widths: [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  quality: 80,
+}
+/**
+ * Makes sure images are generated and cached ahead of time so users don’t have to wait when they visit the site
+ */
+export async function warmImages(imgUrls: string[], { quality, widths } = defaultParams) {
+  if (process.env.NODE_ENV === 'production') {
+    await Promise.allSettled(
+      imgUrls.flatMap(imgUrl =>
+        widths?.map(width =>
+          limit(async () => {
+            const searchParams = new URLSearchParams({
+              width: String(width),
+              quality: String(quality),
+            })
+            const url = `${googleStorageImagesFolder + imgUrl}?${searchParams}`
+            await fetch(url, { method: 'HEAD' })
+          }),
+        ),
       ),
-    ),
-  )
+    )
+  }
 }

@@ -48,6 +48,7 @@ import { DateEdit } from './components/edit-fields/date-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
+import { warmImages } from '@/utils/image-loader'
 
 export const dynamic = 'force-static'
 
@@ -69,6 +70,10 @@ export default async function Page({ params: { slug } }: Props) {
   const barometer = await getBarometer(slug)
   const { firstName, name, city } = barometer.manufacturer
   const dimensions = (barometer.dimensions ?? []) as Dimensions
+  await warmImages(
+    barometer.images.map(({ url }) => url),
+    { quality: 85 },
+  )
   return (
     <Container size="xl">
       <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>

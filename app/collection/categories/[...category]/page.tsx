@@ -12,6 +12,7 @@ import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
+import { warmImages } from '@/utils/image-loader'
 
 // all non-generated posts will give 404
 export const dynamicParams = false
@@ -66,6 +67,10 @@ export default async function Collection({ params: { category } }: CollectionPro
     sort as SortValue,
   )
   const { description } = await getCategory(categoryName)
+  await warmImages(
+    barometers.filter(({ images }) => images.length > 0).map(({ images }) => images.at(0)!.url),
+    { quality: 50 },
+  )
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">

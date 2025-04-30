@@ -8,6 +8,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
 import { googleStorageImagesFolder } from '@/utils/constants'
 import { DynamicOptions } from '../types'
+import { warmImages } from '@/utils/image-loader'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -81,6 +82,7 @@ const BrandsOfCountry = ({
               <Image
                 height={32}
                 width={32}
+                quality={80}
                 alt={name}
                 src={googleStorageImagesFolder + image.url}
                 blurDataURL={image.blurData}
@@ -104,6 +106,12 @@ export default async function Manufacturers() {
   const firstColStates = ['France', 'Great Britain']
   const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
+  const images = countries.flatMap(
+    ({ manufacturers }) =>
+      manufacturers.filter(({ image }) => Boolean(image)).map(({ image }) => image!.url),
+    [32, 64],
+  )
+  await warmImages(images)
   return (
     <Container>
       <Title mt="xl" mb="sm" component="h2">

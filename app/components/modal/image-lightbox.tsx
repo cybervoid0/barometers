@@ -18,6 +18,7 @@ export function ImageLightbox({ src, name }: ImageLightboxProps) {
       <NextImage
         width={250}
         height={250}
+        quality={80}
         src={src}
         alt={name}
         className="w-2/3 cursor-zoom-in sm:w-[250px]"
