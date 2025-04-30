@@ -1,3 +1,5 @@
+import { googleStorageImagesFolder } from './constants'
+
 interface Props {
   src: string
   width: number
@@ -25,4 +27,19 @@ export default function customImageLoader({ src, width, quality }: Props) {
     return `${imageOptimizationApi}/image/${fullSrc}?${query.toString()}`
   }
   return `${imageOptimizationApi}/image/${src}?${query.toString()}`
+}
+
+const defaultWidths = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840]
+export async function warmImages(imgUrls: string[], widths = defaultWidths, quantity = 80) {
+  await Promise.allSettled(
+    imgUrls.map(imgUrl =>
+      Promise.allSettled(
+        widths.map(async width => {
+          const url = `${googleStorageImagesFolder + imgUrl}?${new URLSearchParams({ width: String(width), quantity: String(quantity) })}`
+          const res = await fetch(url, { method: 'HEAD' })
+          console.log('🚀 ~ warmImages ~ res:', url, res.status)
+        }),
+      ),
+    ),
+  )
 }
