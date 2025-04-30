@@ -1,3 +1,4 @@
+import pLimit from 'p-limit'
 import { googleStorageImagesFolder } from './constants'
 
 interface Props {
@@ -29,15 +30,16 @@ export default function customImageLoader({ src, width, quality }: Props) {
   return `${imageOptimizationApi}/image/${src}?${query.toString()}`
 }
 
+const limit = pLimit(10)
 const defaultWidths = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840]
 export async function warmImages(imgUrls: string[], widths = defaultWidths, quantity = 80) {
   await Promise.allSettled(
-    imgUrls.map(imgUrl =>
-      Promise.allSettled(
-        widths.map(async width => {
+    imgUrls.flatMap(imgUrl =>
+      widths.map(width =>
+        limit(async () => {
           const url = `${googleStorageImagesFolder + imgUrl}?${new URLSearchParams({ width: String(width), quantity: String(quantity) })}`
           const res = await fetch(url, { method: 'HEAD' })
-          console.log('🚀 ~ warmImages ~ res:', url, res.status)
+          console.log('🚀 ~ warmImages ~ res:', url, res.status, '--->')
         }),
       ),
     ),

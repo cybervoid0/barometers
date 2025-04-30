@@ -49,6 +49,7 @@
     "motion": "^12.6.3",
     "next": "^14.2.26",
     "next-auth": "^4.24.7",
+    "p-limit": "^6.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-markdown": "^9.0.1",
