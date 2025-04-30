@@ -53,7 +53,8 @@ export async function warmImages(imgUrls: string[], { quality, widths } = defaul
               quality: String(quality),
             })
             const url = `${googleStorageImagesFolder + imgUrl}?${searchParams}`
-            await fetch(url, { method: 'HEAD' })
+            const res = await fetch(url, { method: 'HEAD' })
+            console.log('🚀 ~ caching:', url, res.status)
           }),
         ),
       ),
