@@ -39,7 +39,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
       >
         {barometer.images.map((image, i) => (
           <SwiperSlide key={image.id}>
-            <Box pos="relative" className="swiper-zoom-container">
+            <Box className="swiper-zoom-container">
               <Image
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
@@ -51,7 +51,9 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 sizes="(max-width: 768px) 1024px, 100vw"
                 placeholder="blur"
                 blurDataURL={image.blurData}
-                className="cursor-zoom-in object-contain"
+                style={{
+                  objectFit: 'contain',
+                }}
               />
             </Box>
           </SwiperSlide>

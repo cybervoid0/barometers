@@ -76,7 +76,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+            <GridCol span={{ base: 6, md: 4, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 5}
                 image={images[0]}

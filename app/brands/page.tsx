@@ -85,7 +85,6 @@ const BrandsOfCountry = ({
                 src={googleStorageImagesFolder + image.url}
                 blurDataURL={image.blurData}
                 className="h-8 w-8 object-contain"
-                sizes="32px"
               />
             ) : (
               <IconCircleArrowUp size={32} />

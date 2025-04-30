@@ -33,7 +33,7 @@ export async function BarometerCard({
               src={googleStorageImagesFolder + image.url}
               alt={name}
               fill
-              sizes="(max-width: 575px) 50vw, (max-width: 1350px) 25vw, 20vw"
+              sizes="(max-width: 991px) 50vw, (max-width: 1200px) 33vw, 25vw"
               style={{ objectFit: 'contain' }}
               placeholder="blur"
               blurDataURL={image.blurData ?? undefined}
