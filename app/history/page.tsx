@@ -1,7 +1,6 @@
 import { Container, Title, Text, Box, Center, Paper, Image } from '@mantine/core'
 import NextImage from 'next/image'
 import sx from './styles.module.scss'
-import { googleStorageImagesFolder } from '@/utils/constants'
 import { ShowMore } from '../components/showmore'
 
 export const dynamic = 'force-static'
@@ -11,7 +10,7 @@ function Figure({ src }: { src: string }) {
     <Center className={sx.figure}>
       <Image
         component={NextImage}
-        src={`${googleStorageImagesFolder}history/${src}`}
+        src={`/history/${src}`}
         width="400"
         w={{ base: '100%', xs: '400px' }}
         height="400"

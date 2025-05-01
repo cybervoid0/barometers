@@ -13,7 +13,6 @@ import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import './swiper-styles.css'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ImageCarouselProps {
   barometer: BarometerDTO
@@ -45,7 +44,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 loading={i === 0 ? 'eager' : 'lazy'}
                 quality={85}
                 fill
-                src={googleStorageImagesFolder + image.url}
+                src={image.url}
                 alt={barometer.name}
                 component={NextImage}
                 sizes="(max-width: 768px) 1024px, 100vw"

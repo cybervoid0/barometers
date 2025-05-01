@@ -1,6 +1,6 @@
 'use client'
 
-import { googleStorageImagesFolder } from '@/utils/constants'
+import { imageStorage } from '@/utils/constants'
 import sx from './styles.module.scss'
 
 export function FooterVideo() {
@@ -15,7 +15,7 @@ export function FooterVideo() {
         e.preventDefault()
       }}
     >
-      <source src={`${googleStorageImagesFolder}shared/Baro_small.mp4`} type="video/mp4" />
+      <source src={`${imageStorage}shared/Baro_small.mp4`} type="video/mp4" />
     </video>
   )
 }

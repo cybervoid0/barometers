@@ -2,7 +2,6 @@ import { Box, Title, Container } from '@mantine/core'
 import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './heading-image.module.scss'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 export const HeadingImage: FC = () => {
   return (
@@ -12,7 +11,7 @@ export const HeadingImage: FC = () => {
         quality={80}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         alt="Barograph"
-        src={`${googleStorageImagesFolder}shared/landing-header.png`}
+        src="/shared/landing-header.png"
         fill
         className={styles.image}
       />

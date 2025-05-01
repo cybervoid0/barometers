@@ -15,7 +15,6 @@ import {
 } from '@mantine/core'
 import styles from './styles.module.scss'
 import { ShowMore } from '../components/showmore'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 export const dynamic = 'force-static'
 
@@ -35,7 +34,7 @@ export default function About() {
             width={79}
             height={125}
             sizes="(max-width: 768px) 100vw, 50vw"
-            src={`${googleStorageImagesFolder}shared/leo-shirokov.png`}
+            src="/shared/leo-shirokov.png"
             className={styles.leoImage}
             component={NextImage}
           />
@@ -119,7 +118,7 @@ export default function About() {
             width={160}
             height={160}
             sizes="(max-width: 576px) 70vw, 160px"
-            src={`${googleStorageImagesFolder}shared/about-circle.png`}
+            src="/shared/about-circle.png"
             component={NextImage}
           />
         </Flex>

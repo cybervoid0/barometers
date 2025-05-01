@@ -6,7 +6,6 @@ import { IconCircleArrowUp } from '@tabler/icons-react'
 import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
-import { googleStorageImagesFolder } from '@/utils/constants'
 import { DynamicOptions } from '../types'
 import { warmImages } from '@/utils/image-loader'
 
@@ -84,7 +83,7 @@ const BrandsOfCountry = ({
                 width={32}
                 quality={80}
                 alt={name}
-                src={googleStorageImagesFolder + image.url}
+                src={image.url}
                 blurDataURL={image.blurData}
                 className="h-8 w-8 object-contain"
               />

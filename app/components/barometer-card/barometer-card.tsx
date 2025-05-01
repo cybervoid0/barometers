@@ -3,7 +3,6 @@ import Link from 'next/link'
 import NextImage from 'next/image'
 import styles from './styles.module.scss'
 import { BarometerListDTO } from '@/app/types'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface BarometerCardProps extends BoxProps {
   image?: BarometerListDTO['barometers'][number]['images'][number]
@@ -30,7 +29,7 @@ export async function BarometerCard({
               priority={priority}
               loading={priority ? 'eager' : 'lazy'}
               quality={50}
-              src={googleStorageImagesFolder + image.url}
+              src={image.url}
               alt={name}
               fill
               sizes="(max-width: 991px) 50vw, (max-width: 1200px) 33vw, 25vw"

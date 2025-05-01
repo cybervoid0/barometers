@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
-import { googleStorageImagesFolder, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
+import { imageStorage, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { SortValue, SortOptions, DynamicOptions } from '@/app/types'
@@ -35,7 +35,7 @@ export async function generateMetadata({
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: googleStorageImagesFolder + images.at(0)!.url,
+      url: imageStorage + images.at(0)!.url,
       alt: name,
     }))
   const url = `${FrontRoutes.Categories}${category.join('/')}`

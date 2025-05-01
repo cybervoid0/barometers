@@ -2,7 +2,7 @@ import { Metadata } from 'next/types'
 import { PropsWithChildren } from 'react'
 import capitalize from 'lodash/capitalize'
 import { getBarometer } from '@/app/services'
-import { googleStorageImagesFolder } from '@/utils/constants'
+import { imageStorage } from '@/utils/constants'
 import { title, openGraph, twitter } from '@/app/metadata'
 import { FrontRoutes } from '@/utils/routes-front'
 
@@ -16,7 +16,7 @@ export async function generateMetadata({
   const barometerImages =
     images &&
     images.slice(0, 1).map(image => ({
-      url: googleStorageImagesFolder + image.url,
+      url: imageStorage + image.url,
       alt: name,
     }))
   const url = FrontRoutes.Barometer + slug

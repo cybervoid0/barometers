@@ -5,7 +5,6 @@ import NextImage from 'next/image'
 import { FC } from 'react'
 import { CategoryDTO } from '@/app/types'
 import { CategoryIcon } from '../category-icon'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface CategoryCardProps {
   name: string
@@ -37,7 +36,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               loading={priority ? 'eager' : 'lazy'}
               quality={80}
               sizes="(max-width: 575px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              src={googleStorageImagesFolder + image.url}
+              src={image.url}
               alt={name}
               className={clsx(
                 'transition-transform duration-[10s] hover:scale-150 active:scale-150',

@@ -26,7 +26,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { BarometerDTO } from '@/app/types'
-import { googleStorageImagesFolder } from '@/utils/constants'
+import { imageStorage } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
@@ -78,7 +78,7 @@ function SortableImage({
           className="h-auto w-auto"
           alt="Barometer"
           key={image}
-          src={googleStorageImagesFolder + image}
+          src={imageStorage + image}
           width={100}
           height={200}
           quality={50}
@@ -137,7 +137,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         id: barometer.id,
         images: await Promise.all(
           values.images.map(async (url, i) => {
-            const blurData = await getThumbnailBase64(googleStorageImagesFolder + url)
+            const blurData = await getThumbnailBase64(imageStorage + url)
             return {
               url,
               order: i,

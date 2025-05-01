@@ -29,7 +29,7 @@ import { deleteImage, updateBarometer, updateManufacturer } from '@/utils/fetch'
 import { ManufacturerImageEdit } from './manufacturer-image-edit'
 import { type ManufacturerForm } from './types'
 import { getThumbnailBase64 } from '@/utils/misc'
-import { googleStorageImagesFolder } from '@/utils/constants'
+import { imageStorage } from '@/utils/constants'
 
 interface ManufacturerEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -149,7 +149,7 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           countries: formValues.countries.map(id => ({ id })),
           images: await Promise.all(
             formValues.images.map(async (url, i) => {
-              const blurData = await getThumbnailBase64(googleStorageImagesFolder + url)
+              const blurData = await getThumbnailBase64(imageStorage + url)
               return {
                 url,
                 order: i,

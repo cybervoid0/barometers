@@ -16,7 +16,7 @@ import {
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import { showError } from '@/utils/notification'
 import { deleteImage, uploadFileToCloud, createImageUrls } from '@/utils/fetch'
-import { googleStorageImagesFolder } from '@/utils/constants'
+import { imageStorage } from '@/utils/constants'
 
 interface FileUploadProps {
   fileNames: string[]
@@ -93,7 +93,7 @@ export function FileUpload({
                   bg="white"
                   onClick={() => handleDeleteFile(i)}
                 />
-                <Image h="3rem" w="3rem" src={googleStorageImagesFolder + fileName} />
+                <Image h="3rem" w="3rem" src={imageStorage + fileName} />
               </Paper>
             ))}
           </Group>
