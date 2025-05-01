@@ -14,7 +14,7 @@ export default function customImageLoader({ src, width, quality }: Props) {
   const fullSrc = `${minioUrl}${src}`
   if (width) query.set('width', String(width))
   if (quality) query.set('quality', String(quality))
-  return `${imageOptimizationApi}/image/${fullSrc}?${query}`
+  return `${imageOptimizationApi}/image/${fullSrc}?${query.toString()}`
 }
 
 const limit = pLimit(10)
@@ -40,7 +40,8 @@ export async function warmImages(imgUrls: string[], { quality, widths } = defaul
               quality: String(quality),
             })
             const url = `${imageStorage + imgUrl}?${searchParams}`
-            await fetch(url)
+            const res = await fetch(url)
+            console.log('🚀 ~ caching:', url, res.status)
           }),
         ),
       ),
