@@ -7,7 +7,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
 import { DynamicOptions } from '../types'
-import { warmImages } from '@/utils/image-loader'
+import { markForWarming } from '@/utils/images'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -110,7 +110,7 @@ export default async function Manufacturers() {
       manufacturers.filter(({ image }) => Boolean(image)).map(({ image }) => image!.url),
     [32, 64],
   )
-  await warmImages(images)
+  await markForWarming(images)
   return (
     <Container>
       <Title mt="xl" mb="sm" component="h2">
