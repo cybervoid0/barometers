@@ -34,28 +34,35 @@ export async function markForWarming(imgUrls: string[], params?: Params) {
         images.push({ url, width, quality })
       }
     }
-    await redis.set(redisKey, JSON.stringify(images))
+    await redis.set(redisKey, JSON.stringify(images), 'EX', 900) // store for 15 minutes
+    await redis.quit()
   }
 }
 
 const limit = pLimit(10)
 export async function warmImages() {
-  if (process.env.NODE_ENV === 'production') {
-    const record = await redis.get(redisKey)
-    const images: ImageRecord[] = record ? JSON.parse(record) : []
-    await Promise.all(
-      images.map(({ url, width, quality }) =>
-        limit(async () => {
-          const searchParams = new URLSearchParams({
-            width: String(width),
-            quality: String(quality),
-          })
-          const path = `${imageStorage + url}?${searchParams}`
-          const res = await fetch(path)
-          console.log('🚀 ~ caching:', path, res.status)
-        }),
-      ),
-    )
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      const record = await redis.get(redisKey)
+      const images: ImageRecord[] = record ? JSON.parse(record) : []
+      await Promise.all(
+        images.map(({ url, width, quality }) =>
+          limit(async () => {
+            const searchParams = new URLSearchParams({
+              width: String(width),
+              quality: String(quality),
+            })
+            const path = `${imageStorage + url}?${searchParams}`
+            const res = await fetch(path)
+            console.log('🚀 ~ caching:', path, res.status)
+          }),
+        ),
+      )
+    }
     await redis.del(redisKey)
+  } catch (error) {
+    console.error(error)
+  } finally {
+    await redis.quit()
   }
 }
