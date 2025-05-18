@@ -32,7 +32,7 @@ export function FileUpload({
 }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
 
-  const googleUploadImages = async (files: File[] | null) => {
+  const uploadImages = async (files: File[] | null) => {
     if (clearValidateError) clearValidateError()
     if (!files || !Array.isArray(files) || files.length === 0) return
     setIsUploading(true)
@@ -69,7 +69,7 @@ export function FileUpload({
     <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
       <Stack gap="xs" align="flex-start">
         <Group w="100%" justify="space-between">
-          <FileButton onChange={googleUploadImages} accept="image/*" multiple>
+          <FileButton onChange={uploadImages} accept="image/*" multiple>
             {props => (
               <Tooltip color="dark.3" withArrow label="Add image">
                 <ActionIcon loading={isUploading} variant="default" {...props}>

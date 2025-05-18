@@ -1,17 +1,17 @@
 import { Image } from '@prisma/client'
-import bucket from '@/utils/googleStorage'
+import { minioClient, minioBucket } from '@/utils/minio'
 
 /**
- * Deletes selected Google Storage images
+ * Deletes selected images from storage
  */
-export async function deleteImagesFromGoogleStorage(images: Image[]) {
+export async function deleteImagesFromStorage(images: Image[]) {
   await Promise.all(
     images.map(async image => {
       try {
-        await bucket.file(image.url).delete()
+        await minioClient.removeObject(minioBucket, image.url)
       } catch (error) {
         // don't throw error if image was not deleted
-        console.error(`Could not delete ${image.url} from Google Storage`)
+        console.error(`Could not delete ${image.url} from storage`)
         console.error(error)
       }
     }),

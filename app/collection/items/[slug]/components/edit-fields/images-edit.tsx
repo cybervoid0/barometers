@@ -162,7 +162,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     }
   }
   /**
-   * Upload images to google storage
+   * Upload images to storage
    */
   const uploadImages = async (files: File[]) => {
     if (!files || !Array.isArray(files) || files.length === 0) return

@@ -72,7 +72,7 @@ function SortableImage({
 
 export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
   /**
-   * Upload images to google storage
+   * Upload images to storage
    */
   const uploadImages = useCallback(async (files: File[]) => {
     if (!files || !Array.isArray(files) || files.length === 0) return

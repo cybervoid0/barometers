@@ -5,7 +5,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
 import { FrontRoutes } from '@/utils/routes-front'
-import { deleteImagesFromGoogleStorage } from './deleteFromStorage'
+import { deleteImagesFromStorage } from './deleteFromStorage'
 import { trimTrailingSlash } from '@/utils/misc'
 
 interface Props {
@@ -63,7 +63,7 @@ export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { s
         },
       })
     })
-    await deleteImagesFromGoogleStorage(imagesBeforeDbUpdate)
+    await deleteImagesFromStorage(imagesBeforeDbUpdate)
     revalidatePath(FrontRoutes.Barometer + barometer.slug)
     revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals))
     await revalidateCategory(prisma, barometer.categoryId)
