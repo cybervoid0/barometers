@@ -1,36 +1,3 @@
-# Restore Database from the Backup
-
-1. Run the backup script:
-
-   ```shell
-    bun db-backup.ts
-   ```
-
-   The script will create a file `backup_<date>.dump` in `/backups` folder
-
-1. Copy the created `.dump` file to the server temp folder
-   ```shell
-    scp ./backups/backup_<date>.dump  root@aowif.org:/tmp/
-   ```
-1. Copy the `.dump` file from the server `/tmp` folder to the Postgres Docker container `ugkwc0sgoso0wokss08sw8k8`
-
-```shell
-  docker cp /tmp/backup_<date>.dump ugkwc0sgoso0wokss08sw8k8:/backup_<date>.dump
-```
-
-1. Clear the `aowif` database on the Postgres server by deleting and recreating:
-   ```
-    psql -U cybervoid -d postgres
-    DROP DATABASE awif;
-    CREATE DATABASE awif;
-    exit
-   ```
-1. Finalize the database restore in the Postgres Docker container
-
-```shell
-pg_restore -U cybervoid -d awif /backup_<date>.dump
-```
-
 # 🔄 Restore PostgreSQL Database from a Backup
 
 1. **Run the backup script locally:**
