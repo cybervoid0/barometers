@@ -13,7 +13,7 @@
     "build": "next build",
     "postinstall": "prisma generate",
     "warm": "npm run build:warm && node dist/utils/warm-images.js",
-    "build:warm": "esbuild utils/warm-images.ts --bundle --platform=node --target=node14 --external:* --outfile=dist/utils/warm-images.js",
+    "build:warm": "esbuild utils/warm-images.ts --bundle --platform=node --external:* --outfile=dist/utils/warm-images.js",
     "analyze": "ANALYZE=true next build",
     "start": "next start -p $PORT",
     "typecheck": "tsc --noEmit",
