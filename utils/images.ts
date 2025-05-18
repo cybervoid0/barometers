@@ -25,6 +25,7 @@ interface ImageRecord {
 }
 export async function markForWarming(imgUrls: string[], params?: Params) {
   if (process.env.NODE_ENV === 'production') {
+    if (redis.status !== 'ready') throw new Error('Redis connection is not ready')
     const widths = params?.widths ?? defaultWidths
     const quality = params?.quality ?? defaultQuality
     const record = await redis.get(redisKey)
@@ -35,7 +36,6 @@ export async function markForWarming(imgUrls: string[], params?: Params) {
       }
     }
     await redis.set(redisKey, JSON.stringify(images), 'EX', 900) // store for 15 minutes
-    await redis.quit()
   }
 }
 
@@ -62,7 +62,5 @@ export async function warmImages() {
     await redis.del(redisKey)
   } catch (error) {
     console.error(error)
-  } finally {
-    await redis.quit()
   }
 }

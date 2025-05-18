@@ -36,10 +36,10 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
       description: '',
     },
     validate: {
-      reporterEmail: value => (!isEmail(value) ? 'Invalid email' : null),
-      reporterName: value =>
+      reporterEmail: (value: string) => (!isEmail(value) ? 'Invalid email' : null),
+      reporterName: (value: string) =>
         !isLength(value, { min: 2, max: 50 }) ? 'Value must be between 2 and 50 characters' : null,
-      description: value =>
+      description: (value: string) =>
         !isLength(value, { min: 5, max: maxFeedbackLen })
           ? `Value must be between 5 and ${maxFeedbackLen} characters`
           : null,

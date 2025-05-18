@@ -19,15 +19,16 @@ export default function Register() {
       repeatPassword: '',
     },
     validate: {
-      name: val => (isLength(val, { min: 2, max: 50 }) ? null : 'name should be 2-50 symbols long'),
-      email: val => (isEmail(val) ? null : 'invalid email'),
-      password: val =>
+      name: (val: string) =>
+        isLength(val, { min: 2, max: 50 }) ? null : 'name should be 2-50 symbols long',
+      email: (val: string) => (isEmail(val) ? null : 'invalid email'),
+      password: (val: string) =>
         isLength(val, {
           min: 6,
         })
           ? null
           : 'should be at least 6 symbols long',
-      repeatPassword: (val, { password }) =>
+      repeatPassword: (val: string, { password }: { password: string }) =>
         val && val === password ? null : 'passwords are not identical',
     },
   })
