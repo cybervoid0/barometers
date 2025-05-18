@@ -1,7 +1,7 @@
 import Redis from 'ioredis'
 import pLimit from 'p-limit'
 import * as dotenv from 'dotenv'
-import { imageStorage } from './constants'
+import { imageStorage } from './constants.js'
 
 dotenv.config()
 const redis = new Redis(process.env.REDIS_URL!)
