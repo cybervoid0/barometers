@@ -18,7 +18,7 @@ const defaultQuality = 80
 /**
  * Makes sure images are generated and cached ahead of time so users don’t have to wait when they visit the site
  */
-interface ImageRecord {
+export interface ImageRecord {
   url: string
   width: number
   quality: number
