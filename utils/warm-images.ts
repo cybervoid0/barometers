@@ -1,3 +1,3 @@
-import { warmImages } from './images.js'
+import { warmImages } from './images.ts'
 
 warmImages()
