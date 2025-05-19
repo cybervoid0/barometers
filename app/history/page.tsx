@@ -2,6 +2,7 @@ import { Container, Title, Text, Box, Center, Paper, Image } from '@mantine/core
 import NextImage from 'next/image'
 import sx from './styles.module.scss'
 import { ShowMore } from '../components/showmore'
+import customImageLoader from '@/utils/image-loader'
 
 export const dynamic = 'force-static'
 
@@ -9,11 +10,12 @@ function Figure({ src }: { src: string }) {
   return (
     <Center className={sx.figure}>
       <Image
+        unoptimized
         component={NextImage}
-        src={`/history/${src}`}
-        width="400"
+        src={customImageLoader({ src: `/history/${src}`, width: 400, quality: 80 })}
+        width={400}
+        height={400}
         w={{ base: '100%', xs: '400px' }}
-        height="400"
         alt="Figure"
       />
     </Center>

@@ -1,7 +1,7 @@
-import { Box, Text, Anchor, BoxProps } from '@mantine/core'
-import Link from 'next/link'
+import { Box, Anchor, BoxProps } from '@mantine/core'
 import NextImage from 'next/image'
-import styles from './styles.module.scss'
+import Link from 'next/link'
+import customImageLoader from '@/utils/image-loader'
 import { BarometerListDTO } from '@/app/types'
 
 interface BarometerCardProps extends BoxProps {
@@ -22,32 +22,30 @@ export async function BarometerCard({
 }: BarometerCardProps) {
   return (
     <Box {...props}>
-      <Anchor underline="never" c="dark" className={styles.anchor} component={Link} href={link}>
-        <Box className={styles.bg_gradient}>
+      <Anchor underline="never" c="dark" className="block" component={Link} href={link}>
+        <div className="relative flex h-60 w-full items-center justify-center rounded-md bg-[linear-gradient(180deg,_#fbfbfb,_#efefef)] bg-contain bg-center bg-no-repeat">
           {image ? (
             <NextImage
+              unoptimized
               priority={priority}
-              loading={priority ? 'eager' : 'lazy'}
-              quality={50}
-              src={image.url}
+              src={customImageLoader({ src: image.url, quality: 90, width: 300 })}
               alt={name}
               fill
-              sizes="(max-width: 991px) 50vw, (max-width: 1200px) 33vw, 25vw"
               style={{ objectFit: 'contain' }}
               placeholder="blur"
               blurDataURL={image.blurData ?? undefined}
             />
           ) : (
-            <Text>No image</Text>
+            <p>No image</p>
           )}
-        </Box>
-        <Text mb="0.2rem" size="xs" fw={500} lts={1} tt="uppercase" ta="center">
+        </div>
+        <p className="mb-1 text-center text-xs font-medium uppercase tracking-wider text-inherit">
           {name}
-        </Text>
+        </p>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <Text c="inherit" size="8px" fw={500} lts={1} tt="uppercase" ta="center" lh="xs">
+          <p className="text-center text-[8px] font-medium uppercase leading-none tracking-wider text-inherit">
             {manufacturer}
-          </Text>
+          </p>
         )}
       </Anchor>
     </Box>

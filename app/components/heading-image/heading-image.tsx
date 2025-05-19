@@ -2,16 +2,16 @@ import { Box, Title, Container } from '@mantine/core'
 import NextImage from 'next/image'
 import { FC } from 'react'
 import styles from './heading-image.module.scss'
+import customImageLoader from '@/utils/image-loader'
 
 export const HeadingImage: FC = () => {
   return (
     <Container className={styles.componentContainer}>
       <NextImage
+        unoptimized
         priority
-        quality={80}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         alt="Barograph"
-        src="/shared/landing-header.png"
+        src={customImageLoader({ src: '/shared/landing-header.png', width: 1000, quality: 80 })}
         fill
         className={styles.image}
       />

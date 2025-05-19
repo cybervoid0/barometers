@@ -7,7 +7,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
 import { DynamicOptions } from '../types'
-import { markForWarming } from '@/utils/images'
+import customImageLoader from '@/utils/image-loader'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -67,50 +67,49 @@ const BrandsOfCountry = ({
   country,
 }: {
   country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
-}) => (
-  <div className="mb-5 mr-4">
-    <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
-      {country.name}
-    </Title>
+}) => {
+  const width = 32
+  const quality = 75
+  return (
+    <div className="mb-5 mr-4">
+      <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
+        {country.name}
+      </Title>
 
-    <div className="flex flex-col gap-4">
-      {country.manufacturers.map(({ id, firstName, name, slug, image }) => (
-        <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
-          <div className="flex flex-nowrap items-center gap-3">
-            {image ? (
-              <Image
-                height={32}
-                width={32}
-                quality={80}
-                alt={name}
-                src={image.url}
-                blurDataURL={image.blurData}
-                className="h-8 w-8 object-contain"
-              />
-            ) : (
-              <IconCircleArrowUp size={32} />
-            )}
-            <p className="w-fit font-medium capitalize">
-              {name + (firstName ? `, ${firstName}` : '')}
-            </p>
-          </div>
-        </Link>
-      ))}
+      <div className="flex flex-col gap-4">
+        {country.manufacturers.map(({ id, firstName, name, slug, image }) => (
+          <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
+            <div className="flex flex-nowrap items-center gap-3">
+              {image ? (
+                <Image
+                  unoptimized
+                  width={width}
+                  height={width}
+                  alt={name}
+                  loading="lazy"
+                  src={customImageLoader({ src: image.url, width, quality })}
+                  blurDataURL={image.blurData}
+                  className="h-8 w-8 object-contain"
+                />
+              ) : (
+                <IconCircleArrowUp size={32} />
+              )}
+              <p className="w-fit font-medium capitalize">
+                {name + (firstName ? `, ${firstName}` : '')}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default async function Manufacturers() {
   const countries = await getBrandsByCountry()
   const firstColStates = ['France', 'Great Britain']
   const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
-  const images = countries.flatMap(
-    ({ manufacturers }) =>
-      manufacturers.filter(({ image }) => Boolean(image)).map(({ image }) => image!.url),
-    [32, 64],
-  )
-  await markForWarming(images)
   return (
     <Container>
       <Title mt="xl" mb="sm" component="h2">

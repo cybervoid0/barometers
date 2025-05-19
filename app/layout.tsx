@@ -46,7 +46,7 @@ export const generateMetadata = withPrisma(async prisma => {
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <GoogleAnalytics gaId="G-Q8ZR89R225" />
         <ColorSchemeScript />
