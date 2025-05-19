@@ -17,20 +17,15 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
     where: { id: categoryId },
     select: { name: true },
   })
-  console.log('🚀 ~ revalidateCategory ~ categoryName:', categoryName)
   const barometersInCategory = await prisma.barometer.count({ where: { categoryId } })
-  console.log('🚀 ~ revalidateCategory ~ barometersInCategory:', barometersInCategory)
   const pagesPerCategory = Math.ceil(barometersInCategory / BAROMETERS_PER_CATEGORY_PAGE)
-  console.log('🚀 ~ revalidateCategory ~ pagesPerCategory:', pagesPerCategory)
   const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
     Array.from(
       { length: pagesPerCategory },
       (_, i) => `${FrontRoutes.Categories}${[categoryName, sort, String(i + 1)].join('/')}`,
     ),
   )
-  console.log('🚀 ~ revalidateCategory ~ pathsToRevalidate:', pathsToRevalidate)
   for (const path of pathsToRevalidate) {
     revalidatePath(path)
-    console.log('revalidated', path)
   }
 }
