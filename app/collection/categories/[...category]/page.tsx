@@ -67,9 +67,10 @@ export default async function Collection({ params: { category } }: CollectionPro
     sort as SortValue,
   )
   const { description } = await getCategory(categoryName)
+  // for barometer cards
   await markForWarming(
     barometers.filter(({ images }) => images.length > 0).map(({ images }) => images.at(0)!.url),
-    { quality: 50 },
+    { quality: 90, widths: [300] },
   )
   return (
     <Container py="xl" size="xl">

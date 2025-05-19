@@ -11,7 +11,11 @@ export const dynamic = 'force-static'
 
 export default async function HomePage() {
   const categories = await getCategories()
-  await markForWarming(categories.map(({ image }) => image.url))
+  // for category cards
+  await markForWarming(
+    categories.map(({ image }) => image.url),
+    { quality: 80, widths: [400] },
+  )
   return (
     <>
       <HeadingImage />

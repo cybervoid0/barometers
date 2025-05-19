@@ -18,9 +18,10 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
     page: searchParams.page ?? 1,
     size: searchParams.size ?? itemsOnPage,
   })
+  // for barometer cards
   await markForWarming(
     barometers.filter(({ images }) => images.length > 0).map(({ images }) => images[0].url),
-    { quality: 50 },
+    { quality: 90, widths: [300] },
   )
   return (
     <Container py="xl" size="xl">

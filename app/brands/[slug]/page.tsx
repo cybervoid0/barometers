@@ -56,12 +56,15 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
   const brandImages = manufacturer.images.map(({ url }) => url)
+  // for image light boxes
   await markForWarming(brandImages, {
-    widths: [256, 640],
+    widths: [250, 100],
+    quality: 80,
   })
+  // for barometer cards
   await markForWarming(brandImages, {
-    widths: [1080, 2048],
-    quality: 100,
+    widths: [300],
+    quality: 90,
   })
   return (
     <Container size="xl">

@@ -70,9 +70,10 @@ export default async function Page({ params: { slug } }: Props) {
   const barometer = await getBarometer(slug)
   const { firstName, name, city } = barometer.manufacturer
   const dimensions = (barometer.dimensions ?? []) as Dimensions
+  // for image carousel
   await markForWarming(
     barometer.images.map(({ url }) => url),
-    { quality: 85 },
+    { quality: 90, widths: [1500] },
   )
   return (
     <Container size="xl">

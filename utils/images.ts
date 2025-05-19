@@ -7,14 +7,11 @@ dotenv.config()
 const redis = new Redis(process.env.REDIS_URL!)
 
 const redisKey = 'ready-to-warm'
-type Params =
-  | {
-      widths?: number[]
-      quality?: number
-    }
-  | undefined
-const defaultWidths = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840]
-const defaultQuality = 80
+interface Params {
+  widths: number[]
+  quality: number
+}
+
 /**
  * Makes sure images are generated and cached ahead of time so users don’t have to wait when they visit the site
  */
@@ -23,11 +20,9 @@ export interface ImageRecord {
   width: number
   quality: number
 }
-export async function markForWarming(imgUrls: string[], params?: Params) {
+export async function markForWarming(imgUrls: string[], { quality, widths }: Params) {
   if (process.env.NODE_ENV === 'production') {
     if (redis.status !== 'ready') throw new Error('Redis connection is not ready')
-    const widths = params?.widths ?? defaultWidths
-    const quality = params?.quality ?? defaultQuality
     const record = await redis.get(redisKey)
     const images: ImageRecord[] = record ? JSON.parse(record) : []
     for (const url of imgUrls) {
@@ -53,6 +48,7 @@ export async function warmImages() {
           })
           const path = `${imageStorage + url}?${searchParams}`
           const res = await fetch(path)
+          // eslint-disable-next-line no-console
           console.log('🚀 ~ caching:', path, res.status)
         })
       }
