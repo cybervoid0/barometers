@@ -111,8 +111,11 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
         }),
       ])
     })
+    console.log('starting revalidation')
     revalidatePath(FrontRoutes.Barometer + newData.slug)
+    console.log('revalidating category')
     await revalidateCategory(prisma, newData.categoryId ?? categoryId)
+    console.log('revalidated category')
     return NextResponse.json({ slug: newData.slug }, { status: 200 })
   } catch (error) {
     console.error(error)
