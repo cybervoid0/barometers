@@ -14,8 +14,7 @@ import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
 import { markForWarming } from '@/utils/images'
 
-// all non-generated posts will give 404
-export const dynamicParams = false
+export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
 
 interface CollectionProps {

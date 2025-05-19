@@ -33,5 +33,4 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
     revalidatePath(path)
     console.log('revalidated', path)
   }
-  //await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
 }
