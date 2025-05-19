@@ -15,3 +15,4 @@ The site is built using TypeScript and the Next.js framework and is hosted on Ve
   rm -rf /var/cache/nginx/imgcache/*
   ```
   
+  
