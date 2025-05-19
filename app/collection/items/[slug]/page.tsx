@@ -51,6 +51,7 @@ import { MaterialsEdit } from './components/edit-fields/materials-edit'
 import { markForWarming } from '@/utils/images'
 
 export const dynamic = 'force-static'
+export const dynamicParams = true
 
 interface Props {
   params: {
