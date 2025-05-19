@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 import Redis from 'ioredis'
 import pLimit from 'p-limit'
 import * as dotenv from 'dotenv'
-import { imageStorage } from './constants.ts'
+import customImageLoader from './image-loader.ts'
 
 dotenv.config()
 const redis = new Redis(process.env.REDIS_URL!)
@@ -40,16 +41,24 @@ export async function warmImages() {
     if (process.env.NODE_ENV === 'production') {
       const record = await redis.get(redisKey)
       const images: ImageRecord[] = record ? JSON.parse(record) : []
+      console.log(`Processing ${images.length} images`)
       for (const { url, width, quality } of images) {
         await limit(async () => {
-          const searchParams = new URLSearchParams({
-            width: String(width),
-            quality: String(quality),
-          })
-          const path = `${imageStorage + url}?${searchParams}`
-          const res = await fetch(path)
-          // eslint-disable-next-line no-console
-          console.log('🚀 ~ caching:', path, res.status)
+          try {
+            const path = customImageLoader({ src: url, width, quality })
+            const res = await fetch(path, {
+              method: 'GET',
+              headers: {
+                Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'User-Agent':
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Cache-Control': 'no-cache',
+              },
+            })
+            console.log(`🚀 ~ warmed: ${path} ${res.ok} ${res.statusText}`)
+          } catch (error) {
+            console.error('🚀 ~ warmImages ~ error:', error)
+          }
         })
       }
     }
