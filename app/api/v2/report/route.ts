@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis'
+import Redis from 'ioredis'
 import { NextRequest, NextResponse } from 'next/server'
 import { InaccuracyReport } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
@@ -12,7 +12,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 const REPORT_COOL_DOWN = 10
 const REPORT_MAX_ATTEMPTS = 3
 
-const redis = Redis.fromEnv()
+const redis = new Redis(process.env.REDIS_URL!)
 
 /**
  * Fetches a paginated list of inaccuracy reports for barometers.

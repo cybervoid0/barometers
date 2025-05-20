@@ -34,7 +34,7 @@ export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
   const form = useForm({
     initialValues: { estimatedPrice: '' },
     validate: {
-      estimatedPrice: value => (isDecimal(value) ? null : 'Wrong decimal number'),
+      estimatedPrice: (value: string) => (isDecimal(value) ? null : 'Wrong decimal number'),
     },
   })
   const [opened, { open, close }] = useDisclosure(false)

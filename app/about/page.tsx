@@ -15,8 +15,6 @@ import {
 } from '@mantine/core'
 import styles from './styles.module.scss'
 import { ShowMore } from '../components/showmore'
-import leo from '@/public/images/leo-shirokov.png'
-import aboutCircle from '@/public/images/about-circle.png'
 
 export const dynamic = 'force-static'
 
@@ -36,10 +34,9 @@ export default function About() {
             width={79}
             height={125}
             sizes="(max-width: 768px) 100vw, 50vw"
-            src={leo}
+            src="/shared/leo-shirokov.png"
             className={styles.leoImage}
             component={NextImage}
-            placeholder="blur"
           />
           I am a collector and restorer of antique barometers, a member of the Society for the
           History of Technology (SHOT), European Society for Environmental History (ESEH) and the
@@ -73,7 +70,7 @@ export default function About() {
           </Anchor>
         </div>
         <Text className={styles.paragraph}>
-          My collection features more than 100 rare and exceptional items, including mercury and
+          My collection features more than 150 rare and exceptional items, including mercury and
           aneroid barometers, as well as barographs, mainly from the Victorian era. Some of the most
           esteemed manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph
           Hicks, Peter Dollond, Thomas Mason, Dominicus Sala, Breguet, J.C. Vickery, Gottlieb Lufft,
@@ -121,9 +118,8 @@ export default function About() {
             width={160}
             height={160}
             sizes="(max-width: 576px) 70vw, 160px"
-            src={aboutCircle}
+            src="/shared/about-circle.png"
             component={NextImage}
-            placeholder="blur"
           />
         </Flex>
         <Divider my="md" mx={{ base: 'sm', sm: 'xl' }} />

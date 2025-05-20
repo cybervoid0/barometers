@@ -22,18 +22,8 @@ export default withBundleAnalyzer({
     prependData: `@import "./_mantine.scss";`,
   },
   images: {
-    formats: ['image/avif'],
-    localPatterns: [
-      {
-        pathname: '/images/**',
-      },
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'storage.googleapis.com',
-      },
-    ],
+    loader: 'custom',
+    loaderFile: './utils/image-loader.ts',
   },
   webpack: config => {
     config.resolve.alias['@'] = path.resolve('./')

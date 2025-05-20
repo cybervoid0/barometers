@@ -18,7 +18,7 @@ export function SignInForm() {
       password: '',
     },
     validate: {
-      email: val => (isEmail(val) ? null : 'invalid email'),
+      email: (val: string) => (isEmail(val) ? null : 'invalid email'),
     },
   })
 

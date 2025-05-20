@@ -50,6 +50,7 @@ import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
 
 export const dynamic = 'force-static'
+export const dynamicParams = true
 
 interface Props {
   params: {

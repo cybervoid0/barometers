@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
-import { googleStorageImagesFolder, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
+import { imageStorage, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { SortValue, SortOptions, DynamicOptions } from '@/app/types'
@@ -13,8 +13,7 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
 
-// all non-generated posts will give 404
-export const dynamicParams = false
+export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
 
 interface CollectionProps {
@@ -34,7 +33,7 @@ export async function generateMetadata({
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: googleStorageImagesFolder + images.at(0)!.url,
+      url: imageStorage + images.at(0)!.url,
       alt: name,
     }))
   const url = `${FrontRoutes.Categories}${category.join('/')}`
@@ -76,7 +75,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
         <Grid justify="center" gutter="xl">
           {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+            <GridCol span={{ base: 6, md: 4, lg: 3 }} key={id}>
               <BarometerCard
                 priority={i < 5}
                 image={images[0]}

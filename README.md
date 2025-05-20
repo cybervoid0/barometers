@@ -10,3 +10,9 @@ The site is built using TypeScript and the Next.js framework and is hosted on Ve
 - **Collection Owner, Text and Concept** — Leo Shirokov
 - **Development and Implementation, "Design"** — Alexander Shenshin
   
+  Clear image cache
+  ```shell
+  rm -rf /var/cache/nginx/imgcache/*
+  ```
+  
+  

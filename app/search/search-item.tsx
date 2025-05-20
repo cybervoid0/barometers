@@ -3,7 +3,6 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 import styles from './style.module.css'
 import { SearchResultsDTO } from '../types'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface ItemProps {
   image: SearchResultsDTO['barometers'][number]['image']
@@ -24,7 +23,7 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
               component={NextImage}
               fill
               alt={name}
-              src={image?.url && googleStorageImagesFolder + image.url}
+              src={image?.url}
               style={{ objectFit: 'contain' }}
               sizes="100px"
               placeholder="blur"

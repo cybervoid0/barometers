@@ -8,7 +8,6 @@ import { title } from '@/app/metadata'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
-import { googleStorageImagesFolder } from '@/utils/constants'
 import { ImageLightbox } from '@/app/components/modal'
 
 interface Props {
@@ -55,7 +54,6 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const manufacturer = await getManufacturer(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
-
   return (
     <Container size="xl">
       <Box className="mb-4">
@@ -67,11 +65,7 @@ export default async function Manufacturer({ params: { slug } }: Props) {
       </Box>
       <div className="my-8 flex flex-col items-center gap-8 sm:flex-row">
         {manufacturer.images.map(image => (
-          <ImageLightbox
-            src={googleStorageImagesFolder + image.url}
-            name={image.name}
-            key={image.id}
-          />
+          <ImageLightbox src={image.url} name={image.name} key={image.id} />
         ))}
       </div>
       <MD className="my-8">{manufacturer.description}</MD>

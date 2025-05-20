@@ -25,5 +25,7 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
       (_, i) => `${FrontRoutes.Categories}${[categoryName, sort, String(i + 1)].join('/')}`,
     ),
   )
-  await Promise.all(pathsToRevalidate.map(path => revalidatePath(path)))
+  for (const path of pathsToRevalidate) {
+    revalidatePath(path)
+  }
 }

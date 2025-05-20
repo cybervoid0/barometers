@@ -17,7 +17,6 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
     page: searchParams.page ?? 1,
     size: searchParams.size ?? itemsOnPage,
   })
-
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">

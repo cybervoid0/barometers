@@ -6,10 +6,7 @@ import path from 'path'
 
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
-const url =
-  process.env.DATABASE_URL_UNPOOLED ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_URL
+const url = process.env.DATABASE_URL
 if (!url) throw new Error('No DATABASE_URL in .env')
 
 ensureDirSync('backups')

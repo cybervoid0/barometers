@@ -16,7 +16,6 @@ import { UseFormReturnType } from '@mantine/form'
 import { createImageUrls, deleteImage, uploadFileToCloud } from '@/utils/fetch'
 import { ManufacturerForm } from './types'
 import { showError } from '@/utils/notification'
-import { googleStorageImagesFolder } from '@/utils/constants'
 
 interface Props {
   imageUrls: string[]
@@ -62,7 +61,7 @@ function SortableImage({
           className="h-auto w-auto"
           alt="Barometer"
           key={image}
-          src={googleStorageImagesFolder + image}
+          src={image}
           width={100}
           height={200}
         />
@@ -73,7 +72,7 @@ function SortableImage({
 
 export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
   /**
-   * Upload images to google storage
+   * Upload images to storage
    */
   const uploadImages = useCallback(async (files: File[]) => {
     if (!files || !Array.isArray(files) || files.length === 0) return

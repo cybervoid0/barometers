@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useClickOutside } from '@mantine/hooks'
+import { useScrollLock } from '@/app/hooks/useScrollLock'
 
 interface ZoomModalProps {
   isOpened: boolean
@@ -23,13 +24,7 @@ export function ZoomModal({ children, close, isOpened }: ZoomModalProps) {
   }, [])
 
   // setting scroll lock if the modal is opened
-  useEffect(() => {
-    if (!mounted) return undefined
-    document.body.style.overflow = isOpened ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpened, mounted])
+  useScrollLock(isOpened)
 
   if (!mounted) return null
 

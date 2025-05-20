@@ -4,6 +4,7 @@ import { Group, Anchor, Title, Container, Box, Flex, Tooltip } from '@mantine/co
 import { IconSearch } from '@tabler/icons-react'
 import { Navigation } from './navigation'
 import { getCategories } from '@/app/services'
+import customImageLoader from '@/utils/image-loader'
 
 // server component
 
@@ -34,10 +35,13 @@ export async function Header() {
                   {/* Logo image */}
                   <Box className="relative aspect-square h-10 sm:h-12">
                     <NextImage
+                      unoptimized
                       fill
-                      quality={40}
-                      src="/images/logo-arrow.png"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      src={customImageLoader({
+                        src: '/shared/logo-arrow.png',
+                        quality: 60,
+                        width: 48,
+                      })}
                       alt="logo"
                       className="object-contain"
                     />
