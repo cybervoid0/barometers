@@ -28,7 +28,7 @@ export async function BarometerCard({
             <NextImage
               unoptimized
               priority={priority}
-              src={customImageLoader({ src: image.url, quality: 90, width: 300 })}
+              src={customImageLoader({ src: image.url, quality: 95, width: 300 })}
               alt={name}
               fill
               style={{ objectFit: 'contain' }}
