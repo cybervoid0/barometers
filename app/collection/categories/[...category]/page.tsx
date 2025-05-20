@@ -12,7 +12,6 @@ import { Pagination } from './pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
-import { markForWarming } from '@/utils/images'
 
 export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
@@ -66,11 +65,6 @@ export default async function Collection({ params: { category } }: CollectionPro
     sort as SortValue,
   )
   const { description } = await getCategory(categoryName)
-  // for barometer cards
-  await markForWarming(
-    barometers.filter(({ images }) => images.length > 0).map(({ images }) => images.at(0)!.url),
-    { quality: 90, widths: [300] },
-  )
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">

@@ -9,7 +9,6 @@ import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import { ImageLightbox } from '@/app/components/modal'
-import { markForWarming } from '@/utils/images'
 
 interface Props {
   params: {
@@ -55,17 +54,6 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const manufacturer = await getManufacturer(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
-  const brandImages = manufacturer.images.map(({ url }) => url)
-  // for image light boxes
-  await markForWarming(brandImages, {
-    widths: [250, 100],
-    quality: 80,
-  })
-  // for barometer cards
-  await markForWarming(brandImages, {
-    widths: [300],
-    quality: 90,
-  })
   return (
     <Container size="xl">
       <Box className="mb-4">

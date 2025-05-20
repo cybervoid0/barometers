@@ -4,7 +4,6 @@ import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { Pagination } from '@/app/components/pagination'
 import { FrontRoutes } from '@/utils/routes-front'
-import { markForWarming } from '@/utils/images'
 
 const itemsOnPage = 12
 
@@ -18,11 +17,6 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
     page: searchParams.page ?? 1,
     size: searchParams.size ?? itemsOnPage,
   })
-  // for barometer cards
-  await markForWarming(
-    barometers.filter(({ images }) => images.length > 0).map(({ images }) => images[0].url),
-    { quality: 90, widths: [300] },
-  )
   return (
     <Container py="xl" size="xl">
       <Stack gap="xs">

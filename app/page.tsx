@@ -5,17 +5,11 @@ import { SearchField } from './components/search-field'
 import { NewArrivals } from './components/new-arrivals'
 import { FrontRoutes } from '@/utils/routes-front'
 import { getCategories } from './services'
-import { markForWarming } from '@/utils/images'
 
 export const dynamic = 'force-static'
 
 export default async function HomePage() {
   const categories = await getCategories()
-  // for category cards
-  await markForWarming(
-    categories.map(({ image }) => image.url),
-    { quality: 80, widths: [400] },
-  )
   return (
     <>
       <HeadingImage />
