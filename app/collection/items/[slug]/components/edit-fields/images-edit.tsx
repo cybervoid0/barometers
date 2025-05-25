@@ -12,7 +12,6 @@ import {
   UnstyledButton,
   UnstyledButtonProps,
 } from '@mantine/core'
-import NextImage from 'next/image'
 import { IconEdit, IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import { DndContext, closestCenter } from '@dnd-kit/core'
@@ -31,6 +30,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
 import { getThumbnailBase64 } from '@/utils/misc'
+import customImageLoader from '@/utils/image-loader'
 
 interface ImagesEditProps extends UnstyledButtonProps {
   size?: string | number | undefined
@@ -74,14 +74,10 @@ function SortableImage({
         onClick={() => handleDelete(image)}
       />
       <Box {...listeners}>
-        <NextImage
-          className="h-auto w-auto"
+        <img
+          src={customImageLoader({ src: image, quality: 85, width: 100 })}
           alt="Barometer"
-          key={image}
-          src={imageStorage + image}
-          width={100}
-          height={200}
-          quality={50}
+          className="min-h-[100px] w-[100px] object-contain"
         />
       </Box>
     </Box>
@@ -107,7 +103,6 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     if (active.id !== over.id) {
       const oldIndex = form.values.images.findIndex(image => image === active.id)
       const newIndex = form.values.images.findIndex(image => image === over.id)
-
       const newOrder = arrayMove(form.values.images, oldIndex, newIndex)
       form.setFieldValue('images', newOrder)
     }
@@ -246,7 +241,7 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
 
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={form.values.images} strategy={horizontalListSortingStrategy}>
-                <Group>
+                <Group align="flex-start">
                   {form.getValues().images.map(img => (
                     <SortableImage key={img} image={img} handleDelete={handleDeleteFile} />
                   ))}

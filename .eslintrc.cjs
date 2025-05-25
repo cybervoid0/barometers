@@ -21,5 +21,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'jsx-a11y/no-noninteractive-element-interactions': 'off',
+    '@next/next/no-img-element': 'off',
   },
 }
