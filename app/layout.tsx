@@ -1,4 +1,5 @@
-import { Viewport } from 'next'
+import { type PropsWithChildren } from 'react'
+import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { ColorSchemeScript, Box, Stack } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
@@ -44,7 +45,7 @@ export const generateMetadata = withPrisma(async prisma => {
   }
 })
 
-export default function RootLayout({ children }: { children: any }) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

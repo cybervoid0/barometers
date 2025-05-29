@@ -14,7 +14,7 @@ import {
 } from '@mantine/core'
 import { IconEdit, IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
-import { DndContext, closestCenter } from '@dnd-kit/core'
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import {
   useSortable,
@@ -98,8 +98,9 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barometerImages, opened])
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
+    if (!over) return
     if (active.id !== over.id) {
       const oldIndex = form.values.images.findIndex(image => image === active.id)
       const newIndex = form.values.images.findIndex(image => image === over.id)

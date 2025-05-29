@@ -9,7 +9,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { DndContext, closestCenter } from '@dnd-kit/core'
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { Fieldset, ActionIcon, FileButton, CloseButton } from '@mantine/core'
 import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
 import { UseFormReturnType } from '@mantine/form'
@@ -120,7 +120,7 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
     [imageUrls],
   )
 
-  const handleDragEnd = useCallback((event: any) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event
     if (!over) return
     if (active.id !== over.id) {
