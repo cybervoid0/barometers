@@ -5,11 +5,9 @@ interface Props {
 }
 
 export default function customImageLoader({ src, width, quality }: Props) {
-  const query = new URLSearchParams()
-  const imageOptimizationApi = process.env.NEXT_PUBLIC_IMAGE_OPTIMIZATION_URL
-  const minioUrl = `${process.env.NEXT_PUBLIC_MINIO_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/`
-  const fullSrc = `${minioUrl}${src}`
-  if (width) query.set('width', String(width))
-  if (quality) query.set('quality', String(quality))
-  return `${imageOptimizationApi}/image/${fullSrc}?${query.toString()}`
+  const base = process.env.NEXT_PUBLIC_MINIO_URL
+  if (!base) throw new Error('Image storage URL is not set')
+  const widthValue = width || 512
+  const qualityValue = quality || 75
+  return `${base}/cdn-cgi/image/width=${widthValue},quality=${qualityValue},format=auto/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${src}`
 }
