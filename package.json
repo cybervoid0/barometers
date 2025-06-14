@@ -9,7 +9,8 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
+    "prisma": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
     "build": "next build",
     "postinstall": "prisma generate",
     "warm": "NODE_OPTIONS='--loader ts-node/esm' ts-node utils/warm-images.ts",
@@ -94,6 +95,7 @@
     "@typescript-eslint/parser": "^7.13.1",
     "autoprefixer": "^10.4.21",
     "babel-loader": "^9.1.3",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
