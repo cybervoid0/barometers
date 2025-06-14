@@ -1,8 +1,9 @@
-import { Text, Group, Image, Anchor, Box, Stack, Paper } from '@mantine/core'
-import NextImage from 'next/image'
+import { Text, Group, Anchor, Box, Stack, Paper } from '@mantine/core'
+import Image from 'next/image'
 import Link from 'next/link'
 import styles from './style.module.css'
 import { SearchResultsDTO } from '../types'
+import customImageLoader from '@/utils/image-loader'
 
 interface ItemProps {
   image: SearchResultsDTO['barometers'][number]['image']
@@ -19,16 +20,17 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
       <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
         <Group gap="0.5rem" wrap="nowrap">
           <Box className={styles.image}>
-            <Image
-              component={NextImage}
-              fill
-              alt={name}
-              src={image?.url}
-              style={{ objectFit: 'contain' }}
-              sizes="100px"
-              placeholder="blur"
-              blurDataURL={image?.blurData}
-            />
+            {image && (
+              <Image
+                unoptimized
+                fill
+                alt={name}
+                src={customImageLoader({ src: image.url, width: 100, quality: 80 })}
+                style={{ objectFit: 'contain' }}
+                placeholder="blur"
+                blurDataURL={image.blurData}
+              />
+            )}
           </Box>
           <Stack gap="xs" justify="center" mih="70px">
             <Text tt="capitalize" fw={500} lh="100%">
