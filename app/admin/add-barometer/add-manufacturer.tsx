@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import {
   Box,
   Button,
@@ -11,15 +11,19 @@ import {
   ActionIcon,
   Tooltip,
   MultiSelect,
+  FileButton,
+  Group,
+  CloseButton,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { IconSquareRoundedPlus } from '@tabler/icons-react'
+import { IconSquareRoundedPlus, IconPhotoPlus, IconX } from '@tabler/icons-react'
 import { showError, showInfo } from '@/utils/notification'
 import { addManufacturer } from '@/utils/fetch'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { generateIcon } from '@/utils/misc'
 
 interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void
@@ -31,11 +35,14 @@ interface Form {
   city: string
   countries: number[]
   description: string
+  icon?: string | null
 }
 
 export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   const { countries } = useBarometers()
   const [opened, { open, close }] = useDisclosure(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const form = useForm<Form>({
     initialValues: {
@@ -44,6 +51,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
       city: '',
       countries: [],
       description: '',
+      icon: null,
     },
     validate: {
       name: val =>
@@ -76,24 +84,55 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   })
 
   useEffect(() => {
-    if (opened) form.reset()
+    if (opened) {
+      form.reset()
+      setSelectedFile(null)
+      setPreviewUrl(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened])
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
+
+  const handleFileSelect = useCallback((file: File | null) => {
+    setSelectedFile(file)
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setPreviewUrl(url)
+    } else {
+      setPreviewUrl(null)
+    }
+  }, [])
+
+  const handleSubmit = useCallback(
+    async (values: Form, event?: React.FormEvent) => {
+      event?.stopPropagation()
+
+      let iconData: string | null = null
+      if (selectedFile) {
+        const fileUrl = URL.createObjectURL(selectedFile)
+        iconData = await generateIcon(fileUrl, 50)
+        URL.revokeObjectURL(fileUrl)
+      }
+
+      mutate({
+        ...values,
+        countries: values.countries.map(id => ({ id })),
+        icon: iconData,
+      })
+    },
+    [mutate, selectedFile],
+  )
   return (
     <>
       <Modal opened={opened} onClose={close} centered>
-        <Box
-          flex={1}
-          component="form"
-          onSubmit={form.onSubmit((values, event) => {
-            // prevent bubbling up to parent form
-            event?.stopPropagation()
-            mutate({
-              ...values,
-              countries: values.countries.map(id => ({ id })),
-            })
-          })}
-        >
+        <Box flex={1} component="form" onSubmit={form.onSubmit(handleSubmit)}>
           <Title mb="lg" order={3}>
             Add Manufacturer
           </Title>
@@ -120,6 +159,48 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
             label="Description"
             {...form.getInputProps('description')}
           />
+
+          <Box>
+            <Title order={6} mb="xs">
+              Icon
+            </Title>
+            <Group align="flex-start">
+              <FileButton onChange={handleFileSelect} accept="image/*">
+                {props => (
+                  <Button
+                    {...props}
+                    variant="outline"
+                    color="dark.4"
+                    leftSection={<IconPhotoPlus size={16} />}
+                  >
+                    Select Icon
+                  </Button>
+                )}
+              </FileButton>
+
+              {previewUrl && (
+                <Box pos="relative">
+                  <CloseButton
+                    pos="absolute"
+                    right={-8}
+                    top={-8}
+                    size="sm"
+                    radius="xl"
+                    bg="white"
+                    c="dark.3"
+                    onClick={() => handleFileSelect(null)}
+                    icon={<IconX size={12} />}
+                  />
+                  <img
+                    src={previewUrl}
+                    alt="Icon preview"
+                    className="h-12 w-12 rounded border object-cover"
+                  />
+                </Box>
+              )}
+            </Group>
+          </Box>
+
           <Button mt="lg" type="submit" color="dark" variant="outline">
             Add Manufacturer
           </Button>

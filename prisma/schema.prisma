@@ -6,7 +6,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Image {
@@ -121,6 +120,7 @@ model Manufacturer {
   updatedAt    DateTime       @updatedAt
   barometers   Barometer[]
   images       Image[]        @relation("ManufacturerImages")
+  icon         Bytes?
   // self-referencing relations
   // some brands may have multiple successors and/or predecessors
   successors   Manufacturer[] @relation("ManufacturerSuccessors")

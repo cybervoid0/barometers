@@ -8,10 +8,11 @@ import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils/misc'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { FrontRoutes } from '@/utils/routes-front'
 
-interface ManufacturerDTO extends Manufacturer {
+interface ManufacturerDTO extends Omit<Manufacturer, 'icon'> {
   successors?: { id: string }[]
   countries?: { id: number }[]
   images?: { id: string; url: string; blurData: string }[]
+  icon?: string | null
 }
 /**
  * Retrieve a list of all Manufacturers
@@ -36,13 +37,20 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, countries, images, ...manufData }: ManufacturerDTO = await req
+    const { successors, countries, images, icon, ...manufData }: ManufacturerDTO = await req
       .json()
       .then(cleanObject)
+
+    // Convert base64 to Buffer
+    const iconBuffer =
+      icon && typeof icon === 'string'
+        ? Buffer.from(icon.replace(/^data:image\/\w+;base64,/, ''), 'base64')
+        : null
 
     const { id, slug } = await prisma.manufacturer.create({
       data: {
         ...manufData,
+        icon: iconBuffer,
         slug: getBrandSlug(manufData.name, manufData.firstName),
         ...(successors
           ? {
@@ -85,7 +93,7 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
  */
 export const PUT = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const { successors, countries, images, ...manufData }: ManufacturerDTO = await req
+    const { successors, countries, images, icon, ...manufData }: ManufacturerDTO = await req
       .json()
       .then(data =>
         // replace empty strings with NULLs
@@ -93,6 +101,12 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
           if (node === '') this.update(null)
         }),
       )
+
+    // Convert base64 to Buffer
+    const iconBuffer =
+      icon && typeof icon === 'string'
+        ? Buffer.from(icon.replace(/^data:image\/\w+;base64,/, ''), 'base64')
+        : null
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: manufData.id } })
     if (!manufacturer) {
       return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
@@ -111,6 +125,7 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
           where: { id: manufacturer.id },
           data: {
             ...manufData,
+            icon: iconBuffer,
             ...(successors
               ? {
                   successors: {

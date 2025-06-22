@@ -43,6 +43,19 @@ export async function handleApiError(res: Response): Promise<void> {
   }
 }
 
+function loadImage(imgUrl: string): Promise<HTMLImageElement> {
+  // Load original full-size image
+  const image = new Image()
+  image.crossOrigin = 'Anonymous' // Enable CORS to fetch the image
+  image.src = imgUrl
+
+  // Wait for the image to load
+  return new Promise((resolve, reject) => {
+    image.onload = () => resolve(image)
+    image.onerror = reject
+  })
+}
+
 /**
  * Creates a blurred thumbnail from an image URL and returns it as a Base64-encoded JPEG string.
  *
@@ -58,17 +71,7 @@ export async function getThumbnailBase64(
   blurRadius: number = 1,
   targetHeight: number = 32, // Fixed height
 ): Promise<string> {
-  // Load original full-size image
-  const image = new Image()
-  image.crossOrigin = 'Anonymous' // Enable CORS to fetch the image
-  image.src = imgUrl
-
-  // Wait for the image to load
-  await new Promise((resolve, reject) => {
-    image.onload = resolve
-    image.onerror = reject
-  })
-
+  const image = await loadImage(imgUrl)
   // Calculate proportional width based on the fixed height
   const aspectRatio = image.width / image.height
   const targetWidth = targetHeight * aspectRatio
@@ -95,6 +98,25 @@ export async function getThumbnailBase64(
 
   // Convert the canvas content to a PNG Base64 string
   return canvas.toDataURL('image/png') // Use PNG for lossless quality
+}
+
+export async function generateIcon(
+  imgUrl?: string,
+  size: number = 32,
+  backgroundColor: string = '#efefef',
+): Promise<string | null> {
+  if (!imgUrl) return null
+  const image = await loadImage(imgUrl)
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas context not available')
+  canvas.width = size
+  canvas.height = size
+  ctx.fillStyle = backgroundColor
+  ctx.fillRect(0, 0, size, size)
+  ctx.drawImage(image, 0, 0, size, size)
+
+  return canvas.toDataURL('image/png')
 }
 
 /**

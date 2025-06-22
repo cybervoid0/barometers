@@ -7,7 +7,6 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
 import { DynamicOptions } from '../types'
-import customImageLoader from '@/utils/image-loader'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -16,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 const getBrandsByCountry = withPrisma(async prisma => {
-  const brandsByCountry = await prisma.country.findMany({
+  return prisma.country.findMany({
     orderBy: {
       name: 'asc',
     },
@@ -50,17 +49,11 @@ const getBrandsByCountry = withPrisma(async prisma => {
             },
             take: 1,
           },
+          icon: true,
         },
       },
     },
   })
-  return brandsByCountry.map(country => ({
-    ...country,
-    manufacturers: country.manufacturers.map(({ barometers, ...brand }) => ({
-      ...brand,
-      image: barometers.at(0)?.images.at(0),
-    })),
-  }))
 })
 
 const BrandsOfCountry = ({
@@ -69,7 +62,6 @@ const BrandsOfCountry = ({
   country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
 }) => {
   const width = 32
-  const quality = 75
   return (
     <div className="mb-5 mr-4">
       <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
@@ -77,29 +69,32 @@ const BrandsOfCountry = ({
       </Title>
 
       <div className="flex flex-col gap-4">
-        {country.manufacturers.map(({ id, firstName, name, slug, image }) => (
-          <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
-            <div className="flex flex-nowrap items-center gap-3">
-              {image ? (
-                <Image
-                  unoptimized
-                  width={width}
-                  height={width}
-                  alt={name}
-                  loading="lazy"
-                  src={customImageLoader({ src: image.url, width, quality })}
-                  blurDataURL={image.blurData}
-                  className="h-8 w-8 object-contain"
-                />
-              ) : (
-                <IconCircleArrowUp size={32} />
-              )}
-              <p className="w-fit font-medium capitalize">
-                {name + (firstName ? `, ${firstName}` : '')}
-              </p>
-            </div>
-          </Link>
-        ))}
+        {country.manufacturers.map(({ id, firstName, name, slug, icon }) => {
+          const base64 = icon ? Buffer.from(icon).toString('base64') : null
+          const image = base64 ? `data:image/png;base64,${base64}` : null
+          return (
+            <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
+              <div className="flex flex-nowrap items-center gap-3">
+                {image ? (
+                  <Image
+                    unoptimized
+                    width={width}
+                    height={width}
+                    alt={name}
+                    loading="lazy"
+                    src={image}
+                    className="h-8 w-8 object-contain"
+                  />
+                ) : (
+                  <IconCircleArrowUp size={32} />
+                )}
+                <p className="w-fit font-medium capitalize">
+                  {name + (firstName ? `, ${firstName}` : '')}
+                </p>
+              </div>
+            </Link>
+          )
+        })}
       </div>
     </div>
   )
