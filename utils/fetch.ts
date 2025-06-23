@@ -107,7 +107,9 @@ export async function deleteManufacturer(slug: string) {
   })
 }
 export async function addManufacturer(
-  manufacturer: { countries: { id: number }[] } & Partial<Manufacturer>,
+  manufacturer: { countries: { id: number }[] } & Partial<Omit<Manufacturer, 'icon'>> & {
+      icon?: string | null
+    },
 ): Promise<{ id: string }> {
   const res = await fetch(ApiRoutes.Manufacturers, {
     method: 'POST',
