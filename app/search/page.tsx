@@ -6,10 +6,11 @@ import { SearchInfo } from './search-info'
 import { Pagination } from '@/app/components/pagination'
 
 interface SearchProps {
-  searchParams: Record<string, string>
+  searchParams: Promise<Record<string, string>>
 }
 
-export default async function Search({ searchParams }: SearchProps) {
+export default async function Search(props: SearchProps) {
+  const searchParams = await props.searchParams
   const { barometers = [], page = 1, totalPages = 0 } = await searchBarometers(searchParams)
 
   return (
