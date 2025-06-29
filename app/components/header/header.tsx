@@ -20,7 +20,7 @@ export async function Header() {
                 <Navigation categories={categories} />
                 <Tooltip color="primary" label="Search Barometers">
                   <Anchor visibleFrom="md" c="dark" component={NextLink} href="/search">
-                    <IconSearch size="1.2rem" />
+                    <IconSearch size={19} />
                   </Anchor>
                 </Tooltip>
               </Group>
