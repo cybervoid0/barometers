@@ -7,7 +7,6 @@ import {
   ActionIconProps,
   Group,
   Modal,
-  Text,
   Tooltip,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'

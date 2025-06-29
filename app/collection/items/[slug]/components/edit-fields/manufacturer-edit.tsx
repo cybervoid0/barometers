@@ -89,7 +89,7 @@ export function ManufacturerEdit({
         img => !brandImages?.includes(img),
       )
       await Promise.all(extraImages.map(deleteImage))
-    } catch (error) {
+    } catch {
       // do nothing
     } finally {
       setIsLoading(false)
@@ -145,7 +145,7 @@ export function ManufacturerEdit({
             extraFiles?.map(async file => {
               try {
                 await deleteImage(file)
-              } catch (error) {
+              } catch {
                 // don't mind if it was not possible to delete the file
               }
             }),

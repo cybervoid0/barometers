@@ -54,7 +54,7 @@ export async function DELETE(req: NextRequest) {
       { message: `${fileName} was deleted` },
       { status: 200 },
     )
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: `${fileName ?? 'Your file'} is already deleted` },
       { status: 200 },

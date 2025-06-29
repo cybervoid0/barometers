@@ -1,4 +1,4 @@
-import { Group, Center, Stack, Title, Text, GridCol } from '@mantine/core'
+import { Group, Center, Stack, Text, GridCol } from '@mantine/core'
 import { ReactNode, FC } from 'react'
 import { type IconProps } from '@tabler/icons-react'
 import { IsAdmin } from '@/app/components/is-admin'
