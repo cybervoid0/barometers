@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, HTMLAttributes } from 'react'
 import ReactMarkdown, { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -8,19 +8,19 @@ const defaultComponents: Components = {
   li: props => <li className="ml-8 list-disc" {...props} />,
   a: props => (
     <a
+      target="_blank"
+      rel="noopener noreferrer"
+      referrerPolicy="no-referrer"
       className="duration-400 underline transition-colors ease-out hover:text-amber-800"
       {...props}
     />
   ),
 }
 
-export const MD: FC<Parameters<typeof ReactMarkdown>[0]> = ({ children, className, ...props }) => (
-  <ReactMarkdown
-    {...props}
-    components={defaultComponents}
-    className={className}
-    remarkPlugins={[remarkGfm]}
-  >
-    {children}
-  </ReactMarkdown>
+export const MD: FC<HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => (
+  <div {...props}>
+    <ReactMarkdown components={defaultComponents} remarkPlugins={[remarkGfm]}>
+      {children?.toString()}
+    </ReactMarkdown>
+  </div>
 )

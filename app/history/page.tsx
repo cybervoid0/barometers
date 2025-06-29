@@ -12,7 +12,7 @@ function Figure({ src }: { src: string }) {
       <Image
         unoptimized
         component={NextImage}
-        src={customImageLoader({ src: `/history/${src}`, width: 400, quality: 80 })}
+        src={customImageLoader({ src: `/history/${src.trimEnd()}`, width: 400, quality: 80 })}
         width={400}
         height={400}
         w={{ base: '100%', xs: '400px' }}
