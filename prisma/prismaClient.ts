@@ -1,16 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+  prisma: PrismaClient
 }
 
-function getPrismaClient(): PrismaClient {
-  if (globalForPrisma.prisma) return globalForPrisma.prisma
-  const prisma = new PrismaClient({
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : [],
   })
+
+// В development режиме сохраняем в глобальной переменной для hot reload
+if (process.env.NODE_ENV === 'development') {
   globalForPrisma.prisma = prisma
-  return prisma
 }
 
 /**
@@ -45,7 +47,6 @@ type AsyncFunction<T, Args extends any[]> = {
  */
 export function withPrisma<T, Args extends any[]>(fn: AsyncFunction<T, Args>) {
   return async function wrappedWithParams(...args: Args): Promise<T> {
-    const prisma = getPrismaClient()
     return fn(prisma, ...args)
   }
 }
