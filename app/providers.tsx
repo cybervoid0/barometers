@@ -13,7 +13,9 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <MantineProvider defaultColorScheme="light" theme={theme}>
       <SessionProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </SessionProvider>
     </MantineProvider>
   )

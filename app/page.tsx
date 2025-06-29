@@ -18,7 +18,11 @@ export default async function HomePage() {
           <NewArrivals />
           <SearchField
             ml="auto"
-            w={{ base: '100%', xs: 'calc(50% - 1.25rem)', lg: 'calc(33% - 1.25rem)' }}
+            w={{
+              base: '100%',
+              xs: 'calc(50% - 1.25rem)',
+              lg: 'calc(33% - 1.25rem)',
+            }}
           />
         </Group>
         <Grid justify="center" gutter={{ base: '2rem', sm: '2.5rem' }}>

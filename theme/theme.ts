@@ -1,6 +1,12 @@
 'use client'
 
-import { createTheme, virtualColor, colorsTuple, Anchor, Button } from '@mantine/core'
+import {
+  createTheme,
+  virtualColor,
+  colorsTuple,
+  Anchor,
+  Button,
+} from '@mantine/core'
 import { Raleway } from 'next/font/google'
 
 const raleway = Raleway({

@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
         // give unique names to files
         const extension = path.extname(fileName).toLowerCase()
         const newFileName = `gallery/${uuid()}${extension}`
-        const signedUrl = await minioClient.presignedPutObject(minioBucket, newFileName)
+        const signedUrl = await minioClient.presignedPutObject(
+          minioBucket,
+          newFileName,
+        )
         return {
           signed: signedUrl,
           public: newFileName,
@@ -27,7 +30,10 @@ export async function POST(req: NextRequest) {
     )
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error uploading files' },
+      {
+        message:
+          error instanceof Error ? error.message : 'Error uploading files',
+      },
       { status: 500 },
     )
   }
@@ -37,10 +43,17 @@ export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const fileName = searchParams.get('fileName')
   try {
-    if (!fileName) return NextResponse.json({ message: 'File name is required' }, { status: 400 })
+    if (!fileName)
+      return NextResponse.json(
+        { message: 'File name is required' },
+        { status: 400 },
+      )
     // delete file from Minio storage
     await minioClient.removeObject(minioBucket, fileName)
-    return NextResponse.json({ message: `${fileName} was deleted` }, { status: 200 })
+    return NextResponse.json(
+      { message: `${fileName} was deleted` },
+      { status: 200 },
+    )
   } catch (error) {
     return NextResponse.json(
       { message: `${fileName ?? 'Your file'} is already deleted` },

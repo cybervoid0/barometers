@@ -77,7 +77,10 @@ export default async function Page(props: Props) {
   return (
     <Container size="xl">
       <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
-        <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
+        <BreadcrumbsComponent
+          catId={barometer.collectionId}
+          type={barometer.category.name}
+        />
         <ImageCarousel barometer={barometer} />
         <Paper p="lg">
           <Group mb="lg" align="center" justify="space-between" wrap="nowrap">
@@ -118,7 +121,9 @@ export default async function Page(props: Props) {
               icon={IconTopologyRing2}
               title="Collection ID"
               content={barometer.collectionId}
-              edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
+              edit={
+                <TextFieldEdit barometer={barometer} property="collectionId" />
+              }
             />
             <PropertyCard
               adminOnly
@@ -131,7 +136,12 @@ export default async function Page(props: Props) {
               icon={IconTimeline}
               title="Dating"
               content={barometer.dateDescription}
-              edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
+              edit={
+                <TextFieldEdit
+                  barometer={barometer}
+                  property="dateDescription"
+                />
+              }
             />
             <PropertyCard
               icon={IconTagStarred}
@@ -181,11 +191,15 @@ export default async function Page(props: Props) {
               edit={<DimensionEdit barometer={barometer} />}
             />
             <PropertyCard
-              adminOnly={!barometer.materials || barometer.materials.length === 0}
+              adminOnly={
+                !barometer.materials || barometer.materials.length === 0
+              }
               icon={IconWood}
               title="Materials"
               content={
-                <Text size="sm">{barometer.materials.map(item => item.name).join(', ')}</Text>
+                <Text size="sm">
+                  {barometer.materials.map(item => item.name).join(', ')}
+                </Text>
               }
               edit={<MaterialsEdit barometer={barometer} />}
             />
@@ -222,7 +236,11 @@ export default async function Page(props: Props) {
                 <TextAreaEdit barometer={barometer} property="provenance" />
               </IsAdmin>
             </Group>
-            {barometer.provenance ? <MD>{barometer.provenance}</MD> : <Text>No text</Text>}
+            {barometer.provenance ? (
+              <MD>{barometer.provenance}</MD>
+            ) : (
+              <Text>No text</Text>
+            )}
           </IsAdmin>
         </Paper>
       </Box>

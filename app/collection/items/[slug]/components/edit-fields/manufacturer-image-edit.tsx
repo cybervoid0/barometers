@@ -19,7 +19,10 @@ import { showError } from '@/utils/notification'
 
 interface Props {
   imageUrls: string[]
-  form: UseFormReturnType<ManufacturerForm, (values: ManufacturerForm) => ManufacturerForm>
+  form: UseFormReturnType<
+    ManufacturerForm,
+    (values: ManufacturerForm) => ManufacturerForm
+  >
   setLoading: (loading: boolean) => void
 }
 
@@ -30,9 +33,10 @@ function SortableImage({
   image: string
   handleDelete: (image: string) => void
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: image,
-  })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: image,
+    })
 
   return (
     <div
@@ -85,10 +89,14 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
         })),
       )
       await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+        urlsDto.urls.map((urlObj, index) =>
+          uploadFileToCloud(urlObj.signed, files[index]),
+        ),
       )
 
-      const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
+      const newImages = urlsDto.urls
+        .map(url => url.public)
+        .filter(url => Boolean(url))
       form.setFieldValue('images', prev => [...prev, ...newImages])
     } catch (error) {
       const defaultErrMsg = 'Error uploading files'
@@ -109,9 +117,13 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
       try {
         // if the image file was uploaded but not yet added to the entity
         if (!imageUrls?.includes(img)) await deleteImage(img)
-        form.setFieldValue('images', old => old.filter(file => !file.includes(img)))
+        form.setFieldValue('images', old =>
+          old.filter(file => !file.includes(img)),
+        )
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error deleting file')
+        showError(
+          error instanceof Error ? error.message : 'Error deleting file',
+        )
       } finally {
         setLoading(false)
       }
@@ -124,7 +136,9 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
     const { active, over } = event
     if (!over) return
     if (active.id !== over.id) {
-      const oldIndex = form.values.images.findIndex(image => image === active.id)
+      const oldIndex = form.values.images.findIndex(
+        image => image === active.id,
+      )
       const newIndex = form.values.images.findIndex(image => image === over.id)
 
       const newOrder = arrayMove(form.values.images, oldIndex, newIndex)
@@ -136,12 +150,22 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
   return (
     <Fieldset pos="relative" legend="Images" my="xs" p="xs" pt={0}>
       <div className="flex flex-nowrap gap-2">
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={form.values.images} strategy={horizontalListSortingStrategy}>
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={form.values.images}
+            strategy={horizontalListSortingStrategy}
+          >
             <div className="grow overflow-x-auto">
               <div className="flex flex-nowrap gap-1">
                 {form.values.images.map(img => (
-                  <SortableImage key={img} image={img} handleDelete={handleDeleteFile} />
+                  <SortableImage
+                    key={img}
+                    image={img}
+                    handleDelete={handleDeleteFile}
+                  />
                 ))}
               </div>
             </div>

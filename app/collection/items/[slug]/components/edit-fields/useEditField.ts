@@ -41,7 +41,9 @@ export function useEditField({ property, barometer, validate }: Props) {
       close()
       window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
+      showError(
+        error instanceof Error ? error.message : 'Error updating barometer',
+      )
     }
   }, [barometer, close, form.values, property])
 
@@ -59,5 +61,8 @@ export function useEditField({ property, barometer, validate }: Props) {
     if (opened) form.reset()
   }, [opened])
 
-  return useMemo(() => ({ form, opened, open, close, update }), [form, opened, open, close, update])
+  return useMemo(
+    () => ({ form, opened, open, close, update }),
+    [form, opened, open, close, update],
+  )
 }

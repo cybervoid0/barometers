@@ -10,7 +10,10 @@ export async function GET() {
     return NextResponse.json(countries, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error getting country list' },
+      {
+        message:
+          error instanceof Error ? error.message : 'Error getting country list',
+      },
       { status: 500 },
     )
   }

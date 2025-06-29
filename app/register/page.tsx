@@ -1,7 +1,15 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Button, Stack, Title, TextInput, PasswordInput, Center, Box } from '@mantine/core'
+import {
+  Button,
+  Stack,
+  Title,
+  TextInput,
+  PasswordInput,
+  Center,
+  Box,
+} from '@mantine/core'
 import { IconAt, IconUser } from '@tabler/icons-react'
 import { isEmail, isLength } from 'validator'
 import { useForm } from '@mantine/form'
@@ -20,7 +28,9 @@ export default function Register() {
     },
     validate: {
       name: (val: string) =>
-        isLength(val, { min: 2, max: 50 }) ? null : 'name should be 2-50 symbols long',
+        isLength(val, { min: 2, max: 50 })
+          ? null
+          : 'name should be 2-50 symbols long',
       email: (val: string) => (isEmail(val) ? null : 'invalid email'),
       password: (val: string) =>
         isLength(val, {
@@ -36,7 +46,10 @@ export default function Register() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       await register(values)
-      showInfo(`${values.name} was successfully registered`, 'User registration')
+      showInfo(
+        `${values.name} was successfully registered`,
+        'User registration',
+      )
       router.push('/signin')
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Registration error')
@@ -90,7 +103,13 @@ export default function Register() {
             />
           </Box>
 
-          <Button h="2rem" fullWidth type="submit" color="black" variant="outline">
+          <Button
+            h="2rem"
+            fullWidth
+            type="submit"
+            color="black"
+            variant="outline"
+          >
             Sign up
           </Button>
         </Stack>

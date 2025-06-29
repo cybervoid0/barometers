@@ -23,7 +23,9 @@ interface CollectionProps {
   }>
 }
 
-export async function generateMetadata(props: CollectionProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: CollectionProps,
+): Promise<Metadata> {
   const params = await props.params
 
   const { category } = params
@@ -88,7 +90,8 @@ export default async function Collection(props: CollectionProps) {
                 name={name}
                 link={FrontRoutes.Barometer + slug}
                 manufacturer={
-                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') +
+                  manufacturer.name
                 }
               />
             </GridCol>
@@ -102,7 +105,9 @@ export default async function Collection(props: CollectionProps) {
 }
 
 export const generateStaticParams = withPrisma(async prisma => {
-  const categories = await prisma.category.findMany({ select: { name: true, id: true } })
+  const categories = await prisma.category.findMany({
+    select: { name: true, id: true },
+  })
   const categoriesWithCount = await prisma.barometer.groupBy({
     by: ['categoryId'],
     _count: {
@@ -113,9 +118,13 @@ export const generateStaticParams = withPrisma(async prisma => {
   const params: { category: string[] }[] = []
 
   for (const { name, id } of categories) {
-    const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
+    const categoryData = categoriesWithCount.find(
+      ({ categoryId }) => categoryId === id,
+    )
     const barometersPerCategory = categoryData?._count._all ?? 0
-    const pagesPerCategory = Math.ceil(barometersPerCategory / BAROMETERS_PER_CATEGORY_PAGE)
+    const pagesPerCategory = Math.ceil(
+      barometersPerCategory / BAROMETERS_PER_CATEGORY_PAGE,
+    )
     // generate all category/sort/page combinations for static page generation
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {

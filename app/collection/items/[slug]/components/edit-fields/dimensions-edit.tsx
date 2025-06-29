@@ -65,7 +65,9 @@ export function DimensionEdit({ barometer }: DimensionEditProps) {
       close()
       window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
+      showError(
+        error instanceof Error ? error.message : 'Error updating barometer',
+      )
     }
   }
 
@@ -98,9 +100,17 @@ export function DimensionEdit({ barometer }: DimensionEditProps) {
           <Stack>
             <Stack gap="xs" align="flex-start">
               {form.values.dimensions?.map((_, i) => (
-                <Group w="100%" wrap="nowrap" gap="xs" key={form.key(`dimensions.${i}`)}>
+                <Group
+                  w="100%"
+                  wrap="nowrap"
+                  gap="xs"
+                  key={form.key(`dimensions.${i}`)}
+                >
                   <Tooltip color="dark.3" withArrow label="Delete parameter">
-                    <ActionIcon variant="default" onClick={() => removeDimension(i)}>
+                    <ActionIcon
+                      variant="default"
+                      onClick={() => removeDimension(i)}
+                    >
                       <IconTrash color="grey" size={20} />
                     </ActionIcon>
                   </Tooltip>

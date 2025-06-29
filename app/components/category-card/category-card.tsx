@@ -14,7 +14,12 @@ interface CategoryCardProps {
   priority: boolean
 }
 
-export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priority }) => {
+export const CategoryCard: FC<CategoryCardProps> = ({
+  name,
+  link,
+  image,
+  priority,
+}) => {
   return (
     <Anchor component={NextLink} href={link}>
       <AspectRatio ratio={1}>
@@ -36,7 +41,11 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               fill
               priority={priority}
               loading={priority ? 'eager' : 'lazy'}
-              src={customImageLoader({ src: image.url, quality: 80, width: 400 })}
+              src={customImageLoader({
+                src: image.url,
+                quality: 80,
+                width: 400,
+              })}
               alt={name}
               className={clsx(
                 'transition-transform duration-[10s] hover:scale-150 active:scale-150',

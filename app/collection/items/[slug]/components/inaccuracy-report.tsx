@@ -36,9 +36,12 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
       description: '',
     },
     validate: {
-      reporterEmail: (value: string) => (!isEmail(value) ? 'Invalid email' : null),
+      reporterEmail: (value: string) =>
+        !isEmail(value) ? 'Invalid email' : null,
       reporterName: (value: string) =>
-        !isLength(value, { min: 2, max: 50 }) ? 'Value must be between 2 and 50 characters' : null,
+        !isLength(value, { min: 2, max: 50 })
+          ? 'Value must be between 2 and 50 characters'
+          : null,
       description: (value: string) =>
         !isLength(value, { min: 5, max: maxFeedbackLen })
           ? `Value must be between 5 and ${maxFeedbackLen} characters`
@@ -70,7 +73,10 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
         label={
           <Text size="xs">
             Report issues in the description of &laquo;
-            <span style={{ textTransform: 'capitalize' }}>{barometer.name}</span>&raquo;
+            <span style={{ textTransform: 'capitalize' }}>
+              {barometer.name}
+            </span>
+            &raquo;
           </Text>
         }
       >
@@ -86,7 +92,13 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
         onClose={close}
         title={`Report Inaccuracy in ${barometer.name}`}
         centered
-        styles={{ title: { fontWeight: 500, fontSize: '1.2rem', textTransform: 'capitalize' } }}
+        styles={{
+          title: {
+            fontWeight: 500,
+            fontSize: '1.2rem',
+            textTransform: 'capitalize',
+          },
+        }}
       >
         <LoadingOverlay
           visible={isPending}
@@ -94,9 +106,20 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
           loaderProps={{ color: 'dark', type: 'oval' }}
           overlayProps={{ blur: 2 }}
         />
-        <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
-          <TextInput label="Name" required {...form.getInputProps('reporterName')} />
-          <TextInput label="Email" required {...form.getInputProps('reporterEmail')} />
+        <Box
+          component="form"
+          onSubmit={form.onSubmit(values => mutate(values))}
+        >
+          <TextInput
+            label="Name"
+            required
+            {...form.getInputProps('reporterName')}
+          />
+          <TextInput
+            label="Email"
+            required
+            {...form.getInputProps('reporterEmail')}
+          />
           <Textarea
             label="Feedback"
             description={(() => {

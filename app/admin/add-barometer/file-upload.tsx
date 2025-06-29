@@ -44,11 +44,15 @@ export function FileUpload({
         })),
       )
       await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+        urlsDto.urls.map((urlObj, index) =>
+          uploadFileToCloud(urlObj.signed, files[index]),
+        ),
       )
       setFileNames([...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)])
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error uploading files')
+      showError(
+        error instanceof Error ? error.message : 'Error uploading files',
+      )
     } finally {
       setIsUploading(false)
     }

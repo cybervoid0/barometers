@@ -7,7 +7,11 @@ interface BreadcrumbsComponentProps {
   catId: string
 }
 
-export function BreadcrumbsComponent({ type, catId, ...props }: BreadcrumbsComponentProps) {
+export function BreadcrumbsComponent({
+  type,
+  catId,
+  ...props
+}: BreadcrumbsComponentProps) {
   const breadcrumbs = [
     { title: 'Home', href: '/' },
     {

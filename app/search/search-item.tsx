@@ -13,11 +13,24 @@ interface ItemProps {
   dating?: string
 }
 
-export function SearchItem({ image, link, name, manufacturer, dating }: ItemProps) {
-  const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
+export function SearchItem({
+  image,
+  link,
+  name,
+  manufacturer,
+  dating,
+}: ItemProps) {
+  const noManufacturer =
+    !manufacturer || manufacturer.toLowerCase() === 'unsigned'
   return (
     <Paper shadow="sm" className={styles.paper}>
-      <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
+      <Anchor
+        c="dark"
+        w="fit-content"
+        display="block"
+        component={Link}
+        href={link}
+      >
         <Group gap="0.5rem" wrap="nowrap">
           <Box className={styles.image}>
             {image && (
@@ -25,7 +38,11 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
                 unoptimized
                 fill
                 alt={name}
-                src={customImageLoader({ src: image.url, width: 100, quality: 80 })}
+                src={customImageLoader({
+                  src: image.url,
+                  width: 100,
+                  quality: 80,
+                })}
                 style={{ objectFit: 'contain' }}
                 placeholder="blur"
                 blurDataURL={image.blurData}
@@ -37,8 +54,8 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
               {name}
             </Text>
             <Text size="xs">
-              {!noManufacturer && manufacturer} {!noManufacturer && dating && <>&mdash;</>}{' '}
-              {dating && dating}
+              {!noManufacturer && manufacturer}{' '}
+              {!noManufacturer && dating && <>&mdash;</>} {dating && dating}
             </Text>
           </Stack>
         </Group>

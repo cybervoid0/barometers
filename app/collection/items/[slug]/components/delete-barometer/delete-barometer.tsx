@@ -1,7 +1,15 @@
 'use client'
 
 import React from 'react'
-import { Button, ActionIcon, ActionIconProps, Group, Modal, Text, Tooltip } from '@mantine/core'
+import {
+  Button,
+  ActionIcon,
+  ActionIconProps,
+  Group,
+  Modal,
+  Text,
+  Tooltip,
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
 import { IconTrash } from '@tabler/icons-react'
@@ -26,13 +34,19 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
       close()
       router.replace(FrontRoutes.Categories + barometer.category.name)
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error deleting barometer')
+      showError(
+        error instanceof Error ? error.message : 'Error deleting barometer',
+      )
     }
   }
   return (
     <IsAdmin>
       <Tooltip tt="capitalize" label={`Delete ${barometer.name}`}>
-        <ActionIcon {...props} onClick={open} className="!bg-orange-800 hover:!bg-orange-900">
+        <ActionIcon
+          {...props}
+          onClick={open}
+          className="!bg-orange-800 hover:!bg-orange-900"
+        >
           <IconTrash />
         </ActionIcon>
       </Tooltip>
@@ -46,7 +60,10 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
         <div className="transform-none indent-4 font-medium leading-tight text-red-700">
-          <p>Are you sure you want to completely remove {barometer.name} from the database?</p>
+          <p>
+            Are you sure you want to completely remove {barometer.name} from the
+            database?
+          </p>
           <p>This action cannot be undone.</p>
         </div>
 

@@ -10,7 +10,11 @@ export const HeadingImage: FC = () => {
         unoptimized
         priority
         alt="Barograph"
-        src={customImageLoader({ src: '/shared/landing-header.png', width: 1000, quality: 80 })}
+        src={customImageLoader({
+          src: '/shared/landing-header.png',
+          width: 1000,
+          quality: 80,
+        })}
         fill
         className="z-10 animate-[fade-in_1s_ease-in-out,scale-down_2s_ease-out] bg-gradient-to-b from-[#e2e2e2] to-[#efefef] object-cover object-[right_55%_bottom_50%]"
       />

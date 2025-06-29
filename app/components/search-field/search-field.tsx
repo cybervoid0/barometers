@@ -3,7 +3,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect } from 'react'
-import { Box, TextInput, BoxProps, CloseButton, ActionIcon, ButtonGroup } from '@mantine/core'
+import {
+  Box,
+  TextInput,
+  BoxProps,
+  CloseButton,
+  ActionIcon,
+  ButtonGroup,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useRouter } from 'next/navigation'
@@ -25,7 +32,9 @@ export function SearchField({ queryString, ...props }: SearchProps) {
     },
     validate: {
       q: value =>
-        isLength(value.trim(), { min: 1, max: 100 }) ? null : 'Allowed length 1-100 symbols',
+        isLength(value.trim(), { min: 1, max: 100 })
+          ? null
+          : 'Allowed length 1-100 symbols',
     },
   })
 
@@ -41,7 +50,12 @@ export function SearchField({ queryString, ...props }: SearchProps) {
     router.push(`/search?${query}`, { scroll: true })
   }
   return (
-    <Box {...props} my="md" component="form" onSubmit={form.onSubmit(handleSearch)}>
+    <Box
+      {...props}
+      my="md"
+      component="form"
+      onSubmit={form.onSubmit(handleSearch)}
+    >
       <ButtonGroup>
         <TextInput
           autoComplete="off"

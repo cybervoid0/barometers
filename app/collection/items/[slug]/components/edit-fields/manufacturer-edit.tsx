@@ -47,10 +47,15 @@ const initialValues: ManufacturerForm = {
   successors: [],
   images: [],
 }
-export function ManufacturerEdit({ size = 18, barometer, ...props }: ManufacturerEditProps) {
+export function ManufacturerEdit({
+  size = 18,
+  barometer,
+  ...props
+}: ManufacturerEditProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { manufacturers, countries } = useBarometers()
-  const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
+  const [selectedManufacturerIndex, setSelectedManufacturerIndex] =
+    useState<number>(0)
   const currentBrand = useMemo(
     () => manufacturers.data[selectedManufacturerIndex],
     [manufacturers.data, selectedManufacturerIndex],
@@ -67,8 +72,11 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           ? null
           : 'Name should be longer than 2 and shorter than 100 symbols',
       city: val =>
-        isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
-      url: val => (val === '' || isURL(val ?? '') ? null : 'Must be a valid URL'),
+        isLength(val ?? '', { max: 100 })
+          ? null
+          : 'City should be shorter that 100 symbols',
+      url: val =>
+        val === '' || isURL(val ?? '') ? null : 'Must be a valid URL',
     },
   })
 
@@ -77,7 +85,9 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
     // delete unused files from storage
     try {
       setIsLoading(true)
-      const extraImages = form.values.images.filter(img => !brandImages?.includes(img))
+      const extraImages = form.values.images.filter(
+        img => !brandImages?.includes(img),
+      )
       await Promise.all(extraImages.map(deleteImage))
     } catch (error) {
       // do nothing
@@ -127,7 +137,9 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
       setIsLoading(true)
       try {
         // erase deleted images
-        const extraFiles = brandImages?.filter(url => !formValues.images.includes(url))
+        const extraFiles = brandImages?.filter(
+          url => !formValues.images.includes(url),
+        )
         if (extraFiles)
           await Promise.all(
             extraFiles?.map(async file => {
@@ -167,7 +179,11 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
         close()
         window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating manufacturer')
+        showError(
+          error instanceof Error
+            ? error.message
+            : 'Error updating manufacturer',
+        )
       } finally {
         setIsLoading(false)
       }
@@ -210,7 +226,11 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
           />
           <MultiSelect
             label="Countries"
-            placeholder={form.values.countries.length === 0 ? 'Select countries' : undefined}
+            placeholder={
+              form.values.countries.length === 0
+                ? 'Select countries'
+                : undefined
+            }
             data={countries.data?.map(({ id, name }) => ({
               value: String(id),
               label: name,
@@ -234,14 +254,24 @@ export function ManufacturerEdit({ size = 18, barometer, ...props }: Manufacture
             value={form.values.successors}
             onChange={successors => form.setValues({ successors })}
           />
-          <ManufacturerImageEdit imageUrls={brandImages} form={form} setLoading={setIsLoading} />
+          <ManufacturerImageEdit
+            imageUrls={brandImages}
+            form={form}
+            setLoading={setIsLoading}
+          />
           <Textarea
             autosize
             minRows={2}
             label="Description"
             {...form.getInputProps('description')}
           />
-          <Button fullWidth mt="lg" type="submit" color="dark" variant="outline">
+          <Button
+            fullWidth
+            mt="lg"
+            type="submit"
+            color="dark"
+            variant="outline"
+          >
             Update
           </Button>
         </Box>

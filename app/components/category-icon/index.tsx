@@ -92,7 +92,11 @@ export function CategoryIcon({ category, ...props }: CategoryLetterProps) {
         </Text>
       }
     >
-      <LetterCircle letter={cat.letter ?? '?'} color="var(--mantine-color-gray-6)" {...props} />
+      <LetterCircle
+        letter={cat.letter ?? '?'}
+        color="var(--mantine-color-gray-6)"
+        {...props}
+      />
     </Tooltip>
   )
 }

@@ -20,7 +20,12 @@ export async function GET(_req: NextRequest, props: Props) {
     return NextResponse.json(category, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error retrieving category details' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Error retrieving category details',
+      },
       { status: 500 },
     )
   }

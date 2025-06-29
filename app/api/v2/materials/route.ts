@@ -10,7 +10,12 @@ export async function GET() {
     return NextResponse.json(materials, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error getting barometer materials' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Error getting barometer materials',
+      },
       { status: 500 },
     )
   }

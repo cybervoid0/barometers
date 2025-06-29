@@ -22,13 +22,23 @@ export async function BarometerCard({
 }: BarometerCardProps) {
   return (
     <Box {...props}>
-      <Anchor underline="never" c="dark" className="block" component={Link} href={link}>
+      <Anchor
+        underline="never"
+        c="dark"
+        className="block"
+        component={Link}
+        href={link}
+      >
         <div className="relative flex h-60 w-full items-center justify-center rounded-md bg-[linear-gradient(180deg,_#fbfbfb,_#efefef)] bg-contain bg-center bg-no-repeat">
           {image ? (
             <NextImage
               unoptimized
               priority={priority}
-              src={customImageLoader({ src: image.url, quality: 95, width: 300 })}
+              src={customImageLoader({
+                src: image.url,
+                quality: 95,
+                width: 300,
+              })}
               alt={name}
               fill
               style={{ objectFit: 'contain' }}

@@ -19,13 +19,23 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl
     const category = searchParams.get('category')
     const sortBy = searchParams.get('sort') as SortValue | null
-    const size = Math.max(Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE), 0)
+    const size = Math.max(
+      Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE),
+      0,
+    )
     const page = Math.max(Number(searchParams.get('page') || 1), 1)
     const dbResponse = await getBarometersByParams(category, page, size, sortBy)
-    return NextResponse.json(dbResponse, { status: dbResponse.barometers.length > 0 ? 200 : 404 })
+    return NextResponse.json(dbResponse, {
+      status: dbResponse.barometers.length > 0 ? 200 : 404,
+    })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Could not retrieve barometer list' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Could not retrieve barometer list',
+      },
       { status: 500 },
     )
   }
@@ -59,7 +69,10 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error adding new barometer' },
+      {
+        message:
+          error instanceof Error ? error.message : 'Error adding new barometer',
+      },
       { status: 500 },
     )
   }
@@ -76,9 +89,14 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
     // extracting materials before cleaning object to keep empty array
     const { materials, ...barometerData } = await req.json()
     const { images, id, ...barometer } = cleanObject(barometerData)
-    const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({ where: { id } })
+    const { slug, categoryId } = await prisma.barometer.findUniqueOrThrow({
+      where: { id },
+    })
     // modify slug if name has changed
-    const newData = { ...barometer, slug: barometer.name ? slugify(barometer.name) : slug }
+    const newData = {
+      ...barometer,
+      slug: barometer.name ? slugify(barometer.name) : slug,
+    }
     // transaction will prevent deleting images in case barometer update fails
     await prisma.$transaction(async tx => {
       await Promise.all([
@@ -102,7 +120,9 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
               ? {
                   materials: {
                     // `set` replaces all previously connected materials
-                    set: materials.map((materialId: number) => ({ id: materialId })),
+                    set: materials.map((materialId: number) => ({
+                      id: materialId,
+                    })),
                   },
                 }
               : {}),

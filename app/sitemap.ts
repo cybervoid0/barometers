@@ -33,7 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 }
 export const getItemPages = withPrisma(
   async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
-    const barometers = await prisma.barometer.findMany({ select: { slug: true } })
+    const barometers = await prisma.barometer.findMany({
+      select: { slug: true },
+    })
     return barometers.map(({ slug }) => ({
       url: baseUrl + FrontRoutes.Barometer + slug,
       priority: 0.8,
@@ -43,7 +45,9 @@ export const getItemPages = withPrisma(
 )
 export const getCategoryPages = withPrisma(
   async (prisma, baseUrl: string): Promise<MetadataRoute.Sitemap> => {
-    const categories = await prisma.category.findMany({ select: { name: true } })
+    const categories = await prisma.category.findMany({
+      select: { name: true },
+    })
     return categories.map(({ name }) => ({
       url: baseUrl + FrontRoutes.Categories + name,
       priority: 0.9,

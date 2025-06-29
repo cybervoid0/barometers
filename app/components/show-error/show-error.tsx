@@ -14,7 +14,11 @@ export function ShowError({ message }: ServerErrorProps) {
   }, [message])
   return (
     <Center>
-      <Button onClick={() => window.location.reload()} variant="outline" color="dark">
+      <Button
+        onClick={() => window.location.reload()}
+        variant="outline"
+        color="dark"
+      >
         Reload
       </Button>
     </Center>

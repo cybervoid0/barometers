@@ -2,7 +2,15 @@
 
 import { useState, useEffect, Key } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Center, CenterProps, Tabs, Text, Menu, Anchor, Box } from '@mantine/core'
+import {
+  Center,
+  CenterProps,
+  Tabs,
+  Text,
+  Menu,
+  Anchor,
+  Box,
+} from '@mantine/core'
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'

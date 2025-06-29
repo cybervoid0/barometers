@@ -34,7 +34,8 @@ export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
   const form = useForm({
     initialValues: { estimatedPrice: '' },
     validate: {
-      estimatedPrice: (value: string) => (isDecimal(value) ? null : 'Wrong decimal number'),
+      estimatedPrice: (value: string) =>
+        isDecimal(value) ? null : 'Wrong decimal number',
     },
   })
   const [opened, { open, close }] = useDisclosure(false)
@@ -57,7 +58,9 @@ export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
         close()
         window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating barometer')
+        showError(
+          error instanceof Error ? error.message : 'Error updating barometer',
+        )
       }
     },
     [barometer.estimatedPrice, barometer.id, barometer.name, close, form],
@@ -96,7 +99,11 @@ export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
       >
         <Box component="form" onSubmit={form.onSubmit(update)}>
           <Stack>
-            <TextInput leftSection="€" required {...form.getInputProps(property)} />
+            <TextInput
+              leftSection="€"
+              required
+              {...form.getInputProps(property)}
+            />
             <Button fullWidth color="dark" variant="outline" type="submit">
               Save
             </Button>

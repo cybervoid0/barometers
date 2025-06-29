@@ -10,7 +10,12 @@ export async function GET() {
     return NextResponse.json(subcategories, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error getting barometer subcategories' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Error getting barometer subcategories',
+      },
       { status: 500 },
     )
   }

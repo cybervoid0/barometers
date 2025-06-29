@@ -7,7 +7,10 @@ interface DescriptionTextProps extends BoxProps {
   description: string
 }
 
-export const DescriptionText = ({ description, ...props }: DescriptionTextProps) => {
+export const DescriptionText = ({
+  description,
+  ...props
+}: DescriptionTextProps) => {
   const [firstParagraph, ...paragraphs] = description.split('\n')
   return (
     <Box {...props}>
