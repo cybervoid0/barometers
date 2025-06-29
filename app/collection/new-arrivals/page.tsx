@@ -8,10 +8,11 @@ import { FrontRoutes } from '@/utils/routes-front'
 const itemsOnPage = 12
 
 interface newArrivalsProps {
-  searchParams: Record<string, string>
+  searchParams: Promise<Record<string, string>>
 }
 
-export default async function NewArrivals({ searchParams }: newArrivalsProps) {
+export default async function NewArrivals(props: newArrivalsProps) {
+  const searchParams = await props.searchParams
   const { barometers, totalPages, page } = await fetchBarometerList({
     sort: 'last-added',
     page: searchParams.page ?? 1,

@@ -6,15 +6,19 @@ import { FrontRoutes } from '@/utils/routes-front'
 import { trimTrailingSlash } from '@/utils/misc'
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 /**
  * Query a specific manufacturer by slug
  */
-export async function GET(req: NextRequest, { params: { slug } }: Props) {
+export async function GET(req: NextRequest, props: Props) {
+  const params = await props.params
+
+  const { slug } = params
+
   try {
     const manufacturer = await getManufacturer(slug)
     return NextResponse.json(manufacturer, { status: 200 })
@@ -32,7 +36,9 @@ export async function GET(req: NextRequest, { params: { slug } }: Props) {
  * Delete manufacturer by ID
  */
 
-export const DELETE = withPrisma(async (prisma, req: NextRequest, { params: { slug } }: Props) => {
+export const DELETE = withPrisma(async (prisma, req: NextRequest, props: Props) => {
+  const params = await props.params
+  const { slug } = params
   try {
     const manufacturer = await prisma.manufacturer.findUnique({ where: { slug } })
     if (!manufacturer) {
