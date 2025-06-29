@@ -1,26 +1,23 @@
 module.exports = {
   extends: [
-    'mantine',
     'plugin:@next/next/recommended',
-    'plugin:jest/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
     'plugin:@tanstack/eslint-plugin-query/recommended',
-    'plugin:react-hooks/recommended',
   ],
-  plugins: ['testing-library', 'jest'],
-  overrides: [
-    {
-      files: ['**/?(*.)+(spec|test).[jt]s?(x)'],
-      extends: ['plugin:testing-library/react'],
-    },
-  ],
+  plugins: ['@typescript-eslint', 'react-hooks'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
     project: './tsconfig.json',
   },
   rules: {
     'react/react-in-jsx-scope': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
-    'jsx-a11y/no-noninteractive-element-interactions': 'off',
     '@next/next/no-img-element': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
   },
 }

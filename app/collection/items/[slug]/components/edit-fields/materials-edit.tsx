@@ -60,7 +60,9 @@ export function MaterialsEdit({ barometer }: Props) {
         close()
         window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating barometer')
+        showError(
+          error instanceof Error ? error.message : 'Error updating barometer',
+        )
       }
     },
     [barometer.id, barometer.materials, barometer.name, close],
@@ -106,12 +108,24 @@ export function MaterialsEdit({ barometer }: Props) {
         <Box component="form" onSubmit={form.onSubmit(handleUpdateBarometer)}>
           <MultiSelect
             label="Materials"
-            placeholder={form.values.materials.length === 0 ? 'Select materials' : undefined}
+            placeholder={
+              form.values.materials.length === 0
+                ? 'Select materials'
+                : undefined
+            }
             data={materialsData}
             value={form.values.materials.map(String)}
-            onChange={materials => form.setValues({ materials: materials.map(Number) })}
+            onChange={materials =>
+              form.setValues({ materials: materials.map(Number) })
+            }
           />
-          <Button fullWidth mt="lg" type="submit" color="dark" variant="outline">
+          <Button
+            fullWidth
+            mt="lg"
+            type="submit"
+            color="dark"
+            variant="outline"
+          >
             Update
           </Button>
         </Box>

@@ -3,8 +3,9 @@ import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
 import { withPrisma } from '@/prisma/prismaClient'
 
-export const getUserByEmail = withPrisma((prisma, email?: string | null | undefined) =>
-  prisma.user.findUniqueOrThrow({ where: { email: email ?? undefined } }),
+export const getUserByEmail = withPrisma(
+  (prisma, email?: string | null | undefined) =>
+    prisma.user.findUniqueOrThrow({ where: { email: email ?? undefined } }),
 )
 
 export const authConfig: AuthOptions = {
@@ -20,7 +21,10 @@ export const authConfig: AuthOptions = {
         if (!credentials) throw new Error('Unknown credentials')
         const user = await getUserByEmail(credentials.email)
         if (!user.password) throw new Error('Password is not stored')
-        const passwordMatch = await bcrypt.compare(credentials.password, user.password)
+        const passwordMatch = await bcrypt.compare(
+          credentials.password,
+          user.password,
+        )
         if (!passwordMatch) throw new Error('Wrong Password')
         return {
           id: user.id,

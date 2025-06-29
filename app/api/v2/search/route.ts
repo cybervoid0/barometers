@@ -6,7 +6,10 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
     const query = searchParams.get('q')
-    const pageSize = Math.max(Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE), 0)
+    const pageSize = Math.max(
+      Number(searchParams.get('size') ?? DEFAULT_PAGE_SIZE),
+      0,
+    )
     const page = Math.max(Number(searchParams.get('page') || 1), 1)
 
     if (!query) {
@@ -17,7 +20,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(barometers, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error searching barometers' },
+      {
+        message:
+          error instanceof Error ? error.message : 'Error searching barometers',
+      },
       { status: 500 },
     )
   }

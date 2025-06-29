@@ -3,7 +3,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table'
+import {
+  useReactTable,
+  createColumnHelper,
+  getCoreRowModel,
+} from '@tanstack/react-table'
 import { Anchor, Box, Center, Container, Title } from '@mantine/core'
 import dayjs from 'dayjs'
 import { fetchReportList } from '@/utils/fetch'
@@ -25,7 +29,8 @@ export default function ReportList() {
         size: String(itemsOnPage),
       }),
   })
-  const { accessor } = createColumnHelper<InaccuracyReportListDTO['reports'][number]>()
+  const { accessor } =
+    createColumnHelper<InaccuracyReportListDTO['reports'][number]>()
   const columns = [
     accessor('barometer.name', {
       header: 'Barometer',

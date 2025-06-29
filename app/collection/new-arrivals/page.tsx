@@ -27,27 +27,32 @@ export default async function NewArrivals(props: newArrivalsProps) {
 
         <Text>Discover the latest additions to the collection!</Text>
         <Text mb="xl">
-          This section highlights newly added barometers and weather instruments from every
-          category. Whether it&apos;s a self-registering recorder, a rare Bourdon barometer, or a
-          compact pocket device, each piece reflects the fascinating evolution of weather
-          measurement. Explore and find inspiration in these timeless tools.
+          This section highlights newly added barometers and weather instruments
+          from every category. Whether it&apos;s a self-registering recorder, a
+          rare Bourdon barometer, or a compact pocket device, each piece
+          reflects the fascinating evolution of weather measurement. Explore and
+          find inspiration in these timeless tools.
         </Text>
 
         <Grid justify="center" gutter="xl">
-          {barometers.map(({ name, id, images, manufacturer, slug, category }) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
-              <BarometerCardWithIcon
-                barometerName={name}
-                barometerLink={FrontRoutes.Barometer + slug}
-                categoryName={category.name}
-                categoryLink={FrontRoutes.Categories + category.name}
-                manufacturer={
-                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
-                }
-                image={images.at(0)!}
-              />
-            </GridCol>
-          ))}
+          {barometers.map(
+            ({ name, id, images, manufacturer, slug, category }) => (
+              <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+                <BarometerCardWithIcon
+                  barometerName={name}
+                  barometerLink={FrontRoutes.Barometer + slug}
+                  categoryName={category.name}
+                  categoryLink={FrontRoutes.Categories + category.name}
+                  manufacturer={
+                    (manufacturer.firstName
+                      ? `${manufacturer.firstName} `
+                      : '') + manufacturer.name
+                  }
+                  image={images.at(0)!}
+                />
+              </GridCol>
+            ),
+          )}
         </Grid>
         {totalPages > 1 && <Pagination total={totalPages} value={page} />}
       </Stack>

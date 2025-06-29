@@ -56,7 +56,9 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
         close()
         window.location.href = FrontRoutes.Barometer + (slug ?? '')
       } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating barometer')
+        showError(
+          error instanceof Error ? error.message : 'Error updating barometer',
+        )
       }
     },
     [barometer.id, barometer.name, barometer.subCategoryId, close],
@@ -98,9 +100,15 @@ export function SubcategoryEdit({ size = 18, barometer, ...props }: Props) {
                 label: name,
                 value: String(id),
               }))}
-              value={form.values.subCategoryId !== null ? String(form.values.subCategoryId) : null}
+              value={
+                form.values.subCategoryId !== null
+                  ? String(form.values.subCategoryId)
+                  : null
+              }
               onChange={value =>
-                form.setValues({ subCategoryId: value !== null ? Number(value) : null })
+                form.setValues({
+                  subCategoryId: value !== null ? Number(value) : null,
+                })
               }
               allowDeselect
             />

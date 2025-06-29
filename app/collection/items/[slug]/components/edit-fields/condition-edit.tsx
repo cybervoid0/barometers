@@ -22,9 +22,16 @@ interface TextFieldEditProps extends UnstyledButtonProps {
 
 const property = 'conditionId'
 
-export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
+export function ConditionEdit({
+  size = 18,
+  barometer,
+  ...props
+}: TextFieldEditProps) {
   const { condition } = useBarometers()
-  const { open, close, opened, form, update } = useEditField({ property, barometer })
+  const { open, close, opened, form, update } = useEditField({
+    property,
+    barometer,
+  })
   return (
     <>
       <Tooltip label="Edit condition">

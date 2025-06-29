@@ -10,7 +10,10 @@ export function Footer() {
         <div className="flex-grow text-center">
           <p className="mb-2 text-xs">
             By using this website, you agree to our{' '}
-            <Link className="text-sm font-semibold hover:underline" href="/terms-and-conditions">
+            <Link
+              className="text-sm font-semibold hover:underline"
+              href="/terms-and-conditions"
+            >
               Terms & Conditions
             </Link>
           </p>

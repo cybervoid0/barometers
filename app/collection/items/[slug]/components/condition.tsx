@@ -1,6 +1,13 @@
 'use client'
 
-import { Box, Popover, PopoverDropdown, PopoverTarget, UnstyledButton, Text } from '@mantine/core'
+import {
+  Box,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
+  UnstyledButton,
+  Text,
+} from '@mantine/core'
 import { IconInfoSquareRounded } from '@tabler/icons-react'
 import { ConditionListDTO } from '@/app/types'
 

@@ -23,7 +23,10 @@ export function Table<T>({ table, ...props }: Props<T>) {
                 <TableTd key={header.id}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                 </TableTd>
               )),
             )}
@@ -32,7 +35,9 @@ export function Table<T>({ table, ...props }: Props<T>) {
       <TableTbody>
         {table.getRowModel().rows.length === 0 ? (
           <TableTr>
-            <TableTd colSpan={table.getAllColumns().length}>No data available</TableTd>
+            <TableTd colSpan={table.getAllColumns().length}>
+              No data available
+            </TableTd>
           </TableTr>
         ) : (
           table.getRowModel().rows.map(row => (

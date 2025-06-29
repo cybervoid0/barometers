@@ -60,8 +60,11 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           ? null
           : 'First name should be longer than 2 and shorter than 100 symbols',
       city: val =>
-        isLength(val ?? '', { max: 100 }) ? null : 'City should be shorter that 100 symbols',
-      icon: val => (isLength(val ?? '', { min: 1 }) ? null : 'Icon should be selected'),
+        isLength(val ?? '', { max: 100 })
+          ? null
+          : 'City should be shorter that 100 symbols',
+      icon: val =>
+        isLength(val ?? '', { min: 1 }) ? null : 'Icon should be selected',
     },
   })
   const queryClient = useQueryClient()
@@ -74,7 +77,10 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
       form.reset()
       onAddManufacturer(id)
       close()
-      showInfo(`${variables.name} has been recorded as a manufacturer #${id ?? 0}`, 'Success')
+      showInfo(
+        `${variables.name} has been recorded as a manufacturer #${id ?? 0}`,
+        'Success',
+      )
     },
     onError: error => {
       showError(error.message || 'Error adding manufacturer')
@@ -129,10 +135,19 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
             Add Manufacturer
           </Title>
           <TextInput label="First name" {...form.getInputProps('firstName')} />
-          <TextInput id="manufacturer-name" required label="Name" {...form.getInputProps('name')} />
+          <TextInput
+            id="manufacturer-name"
+            required
+            label="Name"
+            {...form.getInputProps('name')}
+          />
           <MultiSelect
             label="Countries"
-            placeholder={form.values.countries.length === 0 ? 'Select countries' : undefined}
+            placeholder={
+              form.values.countries.length === 0
+                ? 'Select countries'
+                : undefined
+            }
             data={countries.data?.map(({ id, name }) => ({
               value: String(id),
               label: name,
@@ -162,7 +177,10 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
                 Add Manufacturer
               </Button>
             </div>
-            <IconUpload onFileChange={handleIconChange} errorMsg={form.errors.icon} />
+            <IconUpload
+              onFileChange={handleIconChange}
+              errorMsg={form.errors.icon}
+            />
           </div>
         </Box>
       </Modal>

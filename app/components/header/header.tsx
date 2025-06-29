@@ -1,6 +1,14 @@
 import NextLink from 'next/link'
 import NextImage from 'next/image'
-import { Group, Anchor, Title, Container, Box, Flex, Tooltip } from '@mantine/core'
+import {
+  Group,
+  Anchor,
+  Title,
+  Container,
+  Box,
+  Flex,
+  Tooltip,
+} from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import { Navigation } from './navigation'
 import { getCategories } from '@/app/services'
@@ -19,7 +27,12 @@ export async function Header() {
               <Group>
                 <Navigation categories={categories} />
                 <Tooltip color="primary" label="Search Barometers">
-                  <Anchor visibleFrom="md" c="dark" component={NextLink} href="/search">
+                  <Anchor
+                    visibleFrom="md"
+                    c="dark"
+                    component={NextLink}
+                    href="/search"
+                  >
                     <IconSearch size={19} />
                   </Anchor>
                 </Tooltip>

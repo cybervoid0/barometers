@@ -9,7 +9,9 @@ export const getSubcategories = withPrisma(async prisma => {
     ],
   })
   // case insensitive sorting is not supported in Prisma on the DB level
-  return subCats.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+  return subCats.sort((a, b) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+  )
 })
 
 export type SubcategoryListDTO = Awaited<ReturnType<typeof getSubcategories>>

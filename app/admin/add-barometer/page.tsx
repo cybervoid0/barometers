@@ -1,6 +1,14 @@
 'use client'
 
-import { Box, Title, Button, TextInput, Select, Textarea, Container } from '@mantine/core'
+import {
+  Box,
+  Title,
+  Button,
+  TextInput,
+  Select,
+  Textarea,
+  Container,
+} from '@mantine/core'
 import dayjs from 'dayjs'
 import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -33,8 +41,10 @@ export default function AddCard() {
       images: [],
     },
     validate: {
-      collectionId: val => (isLength(val, { max: 100 }) ? null : 'Too long catalogue ID (<100)'),
-      name: val => (isLength(val, { max: 200 }) ? null : 'Too long name (<200)'),
+      collectionId: val =>
+        isLength(val, { max: 100 }) ? null : 'Too long catalogue ID (<100)',
+      name: val =>
+        isLength(val, { max: 200 }) ? null : 'Too long name (<200)',
       images: val => (val.length > 0 ? null : 'At least one image is required'),
     },
   })
@@ -101,9 +111,21 @@ export default function AddCard() {
         <Title mb="lg" order={3} tt="capitalize">
           Add new barometer
         </Title>
-        <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
-          <TextInput label="Catalogue No." required {...form.getInputProps('collectionId')} />
-          <TextInput label="Title" required id="barometer-name" {...form.getInputProps('name')} />
+        <Box
+          component="form"
+          onSubmit={form.onSubmit(values => mutate(values))}
+        >
+          <TextInput
+            label="Catalogue No."
+            required
+            {...form.getInputProps('collectionId')}
+          />
+          <TextInput
+            label="Title"
+            required
+            id="barometer-name"
+            {...form.getInputProps('name')}
+          />
           <TextInput
             label="Year"
             required
@@ -116,7 +138,11 @@ export default function AddCard() {
             }}
             error={form.errors.date}
           />
-          <TextInput required label="Date description" {...form.getInputProps('dateDescription')} />
+          <TextInput
+            required
+            label="Date description"
+            {...form.getInputProps('dateDescription')}
+          />
           <Select
             data={categories.data.map(({ name, id }) => ({
               label: name,
@@ -134,7 +160,9 @@ export default function AddCard() {
             }))}
             label="Manufacturer"
             allowDeselect={false}
-            leftSection={<AddManufacturer onAddManufacturer={onAddManufacturer} />}
+            leftSection={
+              <AddManufacturer onAddManufacturer={onAddManufacturer} />
+            }
             {...form.getInputProps('manufacturerId')}
             styles={{
               input: {

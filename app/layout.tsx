@@ -52,7 +52,10 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <GoogleAnalytics gaId="G-Q8ZR89R225" />
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
         <meta
           name="google-site-verification"
           content="UO-Rt1mPCNM6GZFQEFMmvtMfz1Ft4T62yqfN5mDGyjU"
@@ -68,7 +71,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <Notifications />
           <Stack h="100vh" gap={0}>
             <Header />
-            <Box className="flex-grow bg-page-bg pb-12 shadow-lg">{children}</Box>
+            <Box className="flex-grow bg-page-bg pb-12 shadow-lg">
+              {children}
+            </Box>
             <Footer />
           </Stack>
         </Providers>

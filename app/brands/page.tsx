@@ -64,7 +64,10 @@ const BrandsOfCountry = ({
   const width = 32
   return (
     <div className="mb-5 mr-4">
-      <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
+      <Title
+        order={3}
+        className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]"
+      >
         {country.name}
       </Title>
 
@@ -103,20 +106,29 @@ const BrandsOfCountry = ({
 export default async function Manufacturers() {
   const countries = await getBrandsByCountry()
   const firstColStates = ['France', 'Great Britain']
-  const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
-  const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
+  const firstColumn = countries.filter(({ name }) =>
+    firstColStates.includes(name),
+  )
+  const secondColumn = countries.filter(
+    ({ name }) => !firstColStates.includes(name),
+  )
   return (
     <Container>
       <Title mt="xl" mb="sm" component="h2">
         Manufacturers
       </Title>
       <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
-        Discover the master craftsmen, renowned manufacturers and distinguished sellers behind these
-        exceptional barometers, each reflecting timeless artistry and precision. Here is a curated
-        list of barometer makers, along with detailed descriptions and iconic works by each master
-        from the collection, representing the finest traditions of craftsmanship.
+        Discover the master craftsmen, renowned manufacturers and distinguished
+        sellers behind these exceptional barometers, each reflecting timeless
+        artistry and precision. Here is a curated list of barometer makers,
+        along with detailed descriptions and iconic works by each master from
+        the collection, representing the finest traditions of craftsmanship.
       </Text>
-      <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
+      <Paper
+        shadow="lg"
+        px={{ base: 'md', xs: 'xl' }}
+        py={{ base: 'md', xs: 'xl' }}
+      >
         <SimpleGrid
           cols={{ base: 1, sm: 2 }}
           className="sm:[&>div:nth-child(2n)]:border-r-0 sm:[&>div]:border-r sm:[&>div]:border-neutral-400"

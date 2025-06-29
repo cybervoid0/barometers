@@ -77,19 +77,24 @@ export default async function Manufacturer(props: Props) {
         ))}
       </div>
       <MD className="my-8">{manufacturer.description}</MD>
-      <Title className="!mb-8" order={2}>{`Barometers by ${fullName} in the collection`}</Title>
+      <Title
+        className="!mb-8"
+        order={2}
+      >{`Barometers by ${fullName} in the collection`}</Title>
       <Grid justify="center" gutter="xl">
-        {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
-          <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
-            <BarometerCardWithIcon
-              barometerName={name}
-              barometerLink={FrontRoutes.Barometer + barometerSlug}
-              categoryLink={FrontRoutes.Categories + category.name}
-              categoryName={category.name}
-              image={images[0]}
-            />
-          </GridCol>
-        ))}
+        {barometers.map(
+          ({ name, id, images, slug: barometerSlug, category }) => (
+            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+              <BarometerCardWithIcon
+                barometerName={name}
+                barometerLink={FrontRoutes.Barometer + barometerSlug}
+                categoryLink={FrontRoutes.Categories + category.name}
+                categoryName={category.name}
+                image={images[0]}
+              />
+            </GridCol>
+          ),
+        )}
       </Grid>
     </Container>
   )
@@ -113,7 +118,11 @@ const Connections = ({
       </Title>
       {brands.map(({ id, name, firstName, slug }, i, arr) => (
         <Fragment key={id}>
-          <Anchor underline="always" href={FrontRoutes.Brands + slug} component={Link}>
+          <Anchor
+            underline="always"
+            href={FrontRoutes.Brands + slug}
+            component={Link}
+          >
             {firstName} {name}
           </Anchor>
           {i < arr.length - 1 && `, `}

@@ -21,8 +21,16 @@ interface Props extends UnstyledButtonProps {
   property: keyof BarometerDTO
 }
 
-export function TextAreaEdit({ size = 18, barometer, property, ...props }: Props) {
-  const { open, opened, close, form, update } = useEditField({ property, barometer })
+export function TextAreaEdit({
+  size = 18,
+  barometer,
+  property,
+  ...props
+}: Props) {
+  const { open, opened, close, form, update } = useEditField({
+    property,
+    barometer,
+  })
   return (
     <>
       <Tooltip label={`Edit ${property}`}>

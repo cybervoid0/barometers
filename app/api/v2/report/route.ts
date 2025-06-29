@@ -21,13 +21,21 @@ const redis = new Redis(process.env.REDIS_URL!)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
-    const size = Math.max(Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE, 1)
+    const size = Math.max(
+      Number(searchParams.get('size')) || DEFAULT_PAGE_SIZE,
+      1,
+    )
     const page = Math.max(Number(searchParams.get('page')) || 1, 1)
     const dbResponse = await getInaccuracyReportList(page, size)
-    return NextResponse.json(dbResponse, { status: dbResponse.reports.length > 0 ? 200 : 404 })
+    return NextResponse.json(dbResponse, {
+      status: dbResponse.reports.length > 0 ? 200 : 404,
+    })
   } catch (error) {
     console.error('Error fetching inaccuracy report list:', error)
-    const message = error instanceof Error ? error.message : 'Could not get inaccuracy report list'
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Could not get inaccuracy report list'
     return NextResponse.json({ message }, { status: 500 })
   }
 }
@@ -42,12 +50,18 @@ export async function POST(req: NextRequest) {
   try {
     // getting sender IP address
     const ip =
-      req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('remote-addr') || null
+      req.headers.get('x-forwarded-for')?.split(',')[0] ||
+      req.headers.get('remote-addr') ||
+      null
     if (!ip) {
-      return NextResponse.json({ message: 'Could not determine IP address' }, { status: 400 })
+      return NextResponse.json(
+        { message: 'Could not determine IP address' },
+        { status: 400 },
+      )
     }
     const body: Partial<InaccuracyReport> = await req.json()
-    const { reporterEmail, reporterName, description, barometerId } = cleanObject(body)
+    const { reporterEmail, reporterName, description, barometerId } =
+      cleanObject(body)
     if (!reporterEmail || !reporterName || !description || !barometerId)
       throw new Error('Report params are not complete')
     const redisKey = `rate-limit:${ip}:${barometerId}`
@@ -64,12 +78,23 @@ export async function POST(req: NextRequest) {
         { status: 429 },
       )
     }
-    const { id } = await createReport(barometerId, reporterEmail, reporterName, description)
+    const { id } = await createReport(
+      barometerId,
+      reporterEmail,
+      reporterName,
+      description,
+    )
     revalidatePath(trimTrailingSlash(FrontRoutes.Reports))
-    return NextResponse.json({ message: 'Inaccuracy report created', id }, { status: 201 })
+    return NextResponse.json(
+      { message: 'Inaccuracy report created', id },
+      { status: 201 },
+    )
   } catch (error) {
     console.error('Error sending inaccuracy report:', error)
-    const message = error instanceof Error ? error.message : 'Could not send inaccuracy report'
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Could not send inaccuracy report'
     return NextResponse.json({ message }, { status: 500 })
   }
 }

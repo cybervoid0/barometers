@@ -26,9 +26,12 @@ export async function fetchBarometer(slug: string): Promise<BarometerDTO> {
 export async function fetchBarometerList(
   searchParams: Record<string, string>,
 ): Promise<BarometerListDTO> {
-  const res = await fetch(`${ApiRoutes.Barometers}?${new URLSearchParams(searchParams)}`, {
-    cache: 'no-cache',
-  })
+  const res = await fetch(
+    `${ApiRoutes.Barometers}?${new URLSearchParams(searchParams)}`,
+    {
+      cache: 'no-cache',
+    },
+  )
   return res.json()
 }
 export async function searchBarometers(
@@ -39,7 +42,9 @@ export async function searchBarometers(
   const res = await fetch(url, { cache: 'no-cache' })
   return res.json()
 }
-export async function createBarometer<T>(barometer: T): Promise<{ id: string }> {
+export async function createBarometer<T>(
+  barometer: T,
+): Promise<{ id: string }> {
   const res = await fetch(ApiRoutes.Barometers, {
     method: 'POST',
     headers: {
@@ -50,7 +55,9 @@ export async function createBarometer<T>(barometer: T): Promise<{ id: string }> 
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
-export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }> {
+export async function updateBarometer<T>(
+  barometer: T,
+): Promise<{ slug: string }> {
   const res = await fetch(ApiRoutes.Barometers, {
     method: 'PUT',
     headers: {
@@ -61,7 +68,9 @@ export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }
   if (!res.ok) await handleApiError(res)
   return res.json()
 }
-export async function deleteBarometer(slug: string): Promise<{ message: string }> {
+export async function deleteBarometer(
+  slug: string,
+): Promise<{ message: string }> {
   const res = await fetch(`${ApiRoutes.Barometers}/${slug}`, {
     method: 'DELETE',
   })
@@ -97,7 +106,9 @@ export async function fetchManufacturerList(searchParams?: {
   )
   return res.json()
 }
-export async function fetchManufacturer(slug: string): Promise<ManufacturerDTO> {
+export async function fetchManufacturer(
+  slug: string,
+): Promise<ManufacturerDTO> {
   const res = await fetch(ApiRoutes.Manufacturers + slug)
   return res.json()
 }
@@ -107,7 +118,9 @@ export async function deleteManufacturer(slug: string) {
   })
 }
 export async function addManufacturer(
-  manufacturer: { countries: { id: number }[] } & Partial<Omit<Manufacturer, 'icon'>> & {
+  manufacturer: { countries: { id: number }[] } & Partial<
+    Omit<Manufacturer, 'icon'>
+  > & {
       icon?: string | null
     },
 ): Promise<{ id: string }> {
@@ -164,7 +177,9 @@ export async function deleteImage(fileName: string) {
   if (!res.ok) await handleApiError(res)
 }
 /******* Inaccuracy Report ********/
-export async function createReport(report: Partial<InaccuracyReport>): Promise<{ id: string }> {
+export async function createReport(
+  report: Partial<InaccuracyReport>,
+): Promise<{ id: string }> {
   const res = await fetch(ApiRoutes.Reports, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

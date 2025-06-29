@@ -22,10 +22,14 @@ export function cleanObject<T>(obj: T): T {
 }
 
 export function slug(text: string): string {
-  return encodeURIComponent(slugify(text, { lower: true, replacement: '_', remove: /[,.'"]/g }))
+  return encodeURIComponent(
+    slugify(text, { lower: true, replacement: '_', remove: /[,.'"]/g }),
+  )
 }
-export const getBrandSlug = (lastName: string, firstName?: string | undefined | null) =>
-  slug(`${firstName ? `${firstName}_` : ''}${lastName}`)
+export const getBrandSlug = (
+  lastName: string,
+  firstName?: string | undefined | null,
+) => slug(`${firstName ? `${firstName}_` : ''}${lastName}`)
 
 /**
  * Handles API response errors by extracting a detailed error message from the response body.
@@ -38,8 +42,10 @@ export async function handleApiError(res: Response): Promise<void> {
     const errorData = await res.json()
     const errorMessage = errorData.message || res.statusText
     throw new Error(errorMessage)
-  } catch (error) {
-    throw new Error(res.statusText ?? res.text ?? 'handleApiError: unknown error')
+  } catch {
+    throw new Error(
+      res.statusText ?? res.text ?? 'handleApiError: unknown error',
+    )
   }
 }
 

@@ -28,4 +28,6 @@ export const getInaccuracyReportList = withPrisma(
   },
 )
 
-export type InaccuracyReportListDTO = Awaited<ReturnType<typeof getInaccuracyReportList>>
+export type InaccuracyReportListDTO = Awaited<
+  ReturnType<typeof getInaccuracyReportList>
+>

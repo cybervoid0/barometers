@@ -28,7 +28,12 @@ import { BarometerDTO } from '@/app/types'
 import { imageStorage } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { showError, showInfo } from '@/utils/notification'
-import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
+import {
+  createImageUrls,
+  deleteImage,
+  updateBarometer,
+  uploadFileToCloud,
+} from '@/utils/fetch'
 import { getThumbnailBase64 } from '@/utils/misc'
 import customImageLoader from '@/utils/image-loader'
 
@@ -47,9 +52,10 @@ function SortableImage({
   image: string
   handleDelete: (image: string) => void
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: image,
-  })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: image,
+    })
 
   return (
     <Box
@@ -84,7 +90,10 @@ function SortableImage({
   )
 }
 export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
-  const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer])
+  const barometerImages = useMemo(
+    () => barometer.images.map(img => img.url),
+    [barometer],
+  )
   const [isUploading, setIsUploading] = useState(false)
   const [opened, { open, close }] = useDisclosure()
   const form = useForm<FormProps>({
@@ -102,7 +111,9 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     const { active, over } = event
     if (!over) return
     if (active.id !== over.id) {
-      const oldIndex = form.values.images.findIndex(image => image === active.id)
+      const oldIndex = form.values.images.findIndex(
+        image => image === active.id,
+      )
       const newIndex = form.values.images.findIndex(image => image === over.id)
       const newOrder = arrayMove(form.values.images, oldIndex, newIndex)
       form.setFieldValue('images', newOrder)
@@ -117,13 +128,15 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     setIsUploading(true)
     try {
       // erase deleted images
-      const extraFiles = barometerImages?.filter(img => !form.values.images.includes(img))
+      const extraFiles = barometerImages?.filter(
+        img => !form.values.images.includes(img),
+      )
       if (extraFiles)
         await Promise.all(
           extraFiles?.map(async file => {
             try {
               await deleteImage(file)
-            } catch (error) {
+            } catch {
               // don't mind if it was not possible to delete the file
             }
           }),
@@ -171,10 +184,14 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         })),
       )
       await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+        urlsDto.urls.map((urlObj, index) =>
+          uploadFileToCloud(urlObj.signed, files[index]),
+        ),
       )
 
-      const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
+      const newImages = urlsDto.urls
+        .map(url => url.public)
+        .filter(url => Boolean(url))
       form.setFieldValue('images', prev => [...prev, ...newImages])
     } catch (error) {
       const defaultErrMsg = 'Error uploading files'
@@ -193,7 +210,9 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     try {
       // if the image file was uploaded but not yet added to the barometer
       if (!barometerImages?.includes(img)) await deleteImage(img)
-      form.setFieldValue('images', old => old.filter(file => !file.includes(img)))
+      form.setFieldValue('images', old =>
+        old.filter(file => !file.includes(img)),
+      )
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Error deleting file')
     } finally {
@@ -205,9 +224,11 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     // delete unused files from storage
     try {
       setIsUploading(true)
-      const extraImages = form.values.images.filter(img => !barometerImages?.includes(img))
+      const extraImages = form.values.images.filter(
+        img => !barometerImages?.includes(img),
+      )
       await Promise.all(extraImages.map(deleteImage))
-    } catch (error) {
+    } catch {
       // do nothing
     } finally {
       setIsUploading(false)
@@ -240,11 +261,21 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
               )}
             </FileButton>
 
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={form.values.images} strategy={horizontalListSortingStrategy}>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={form.values.images}
+                strategy={horizontalListSortingStrategy}
+              >
                 <Group align="flex-start">
                   {form.getValues().images.map(img => (
-                    <SortableImage key={img} image={img} handleDelete={handleDeleteFile} />
+                    <SortableImage
+                      key={img}
+                      image={img}
+                      handleDelete={handleDeleteFile}
+                    />
                   ))}
                 </Group>
               </SortableContext>
@@ -257,7 +288,11 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
         </Box>
       </Modal>
       <Tooltip label="Edit images">
-        <UnstyledButton className="absolute right-20 top-0 z-10" {...props} onClick={open}>
+        <UnstyledButton
+          className="absolute right-20 top-0 z-10"
+          {...props}
+          onClick={open}
+        >
           <IconEdit color="brown" size={size} />
         </UnstyledButton>
       </Tooltip>

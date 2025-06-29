@@ -16,7 +16,11 @@ import {
 } from '@mantine/core'
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { IconChevronRight, IconAt, IconBrandInstagram } from '@tabler/icons-react'
+import {
+  IconChevronRight,
+  IconAt,
+  IconBrandInstagram,
+} from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { instagram, email } from '@/utils/constants'
@@ -32,7 +36,8 @@ interface Props extends DrawerProps {
 export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
   const { data: session } = useSession()
   const [opened, setOpened] = useState<Record<number, boolean>>({})
-  const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
+  const toggle = (index: number) =>
+    setOpened(old => ({ ...old, [index]: !old[index] }))
 
   return (
     <Drawer
@@ -71,7 +76,12 @@ export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
                       <List.Item py="md">
                         <UnstyledButton onClick={() => toggle(i)}>
                           <Group gap="sm">
-                            <Text size="md" tt="uppercase" lts="0.15rem" fw={500}>
+                            <Text
+                              size="md"
+                              tt="uppercase"
+                              lts="0.15rem"
+                              fw={500}
+                            >
                               {outer.label}
                             </Text>
                             <Center
@@ -94,7 +104,12 @@ export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
                                 href={FrontRoutes.Categories + name}
                                 onClick={props.onClose}
                               >
-                                <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>
+                                <Text
+                                  size="md"
+                                  tt="capitalize"
+                                  lts="0.1rem"
+                                  fw={400}
+                                >
                                   {label}
                                 </Text>
                               </Anchor>
@@ -132,12 +147,22 @@ export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
         >
           <Divider />
           <Group h="4rem" align="center" justify="space-evenly">
-            <Anchor aria-label="Instagram" target="_blank" href={instagram} lh={0}>
+            <Anchor
+              aria-label="Instagram"
+              target="_blank"
+              href={instagram}
+              lh={0}
+            >
               <ActionIcon variant="default" size="sm" bd="none">
                 <IconBrandInstagram size="100%" />
               </ActionIcon>
             </Anchor>
-            <Anchor aria-label="Email" target="_blank" href={`mailto:${email}`} lh={0}>
+            <Anchor
+              aria-label="Email"
+              target="_blank"
+              href={`mailto:${email}`}
+              lh={0}
+            >
               <ActionIcon variant="default" size="sm" bd="none">
                 <IconAt size="100%" />
               </ActionIcon>

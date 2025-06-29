@@ -17,7 +17,10 @@ const defaultComponents: Components = {
   ),
 }
 
-export const MD: FC<HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => (
+export const MD: FC<HTMLAttributes<HTMLDivElement>> = ({
+  children,
+  ...props
+}) => (
   <div {...props}>
     <ReactMarkdown components={defaultComponents} remarkPlugins={[remarkGfm]}>
       {children?.toString()}

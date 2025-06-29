@@ -45,7 +45,11 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 fill
-                src={customImageLoader({ src: image.url, quality: 90, width: 1500 })}
+                src={customImageLoader({
+                  src: image.url,
+                  quality: 90,
+                  width: 1500,
+                })}
                 alt={barometer.name}
                 component={NextImage}
                 placeholder="blur"

@@ -58,7 +58,9 @@ export function DateEdit({ size = 18, barometer, ...props }: DateEditProps) {
       close()
       window.location.href = FrontRoutes.Barometer + (slug ?? '')
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
+      showError(
+        error instanceof Error ? error.message : 'Error updating barometer',
+      )
     }
   }
 

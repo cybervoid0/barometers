@@ -24,7 +24,12 @@ export async function GET(req: NextRequest, props: Props) {
     return NextResponse.json(manufacturer, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Error querying manufacturer' },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Error querying manufacturer',
+      },
       { status: 500 },
     )
   }
@@ -36,29 +41,42 @@ export async function GET(req: NextRequest, props: Props) {
  * Delete manufacturer by ID
  */
 
-export const DELETE = withPrisma(async (prisma, req: NextRequest, props: Props) => {
-  const params = await props.params
-  const { slug } = params
-  try {
-    const manufacturer = await prisma.manufacturer.findUnique({ where: { slug } })
-    if (!manufacturer) {
-      return NextResponse.json({ message: 'Manufacturer not found' }, { status: 404 })
-    }
-    await prisma.manufacturer.delete({
-      where: {
-        id: manufacturer.id,
-      },
-    })
+export const DELETE = withPrisma(
+  async (prisma, req: NextRequest, props: Props) => {
+    const params = await props.params
+    const { slug } = params
+    try {
+      const manufacturer = await prisma.manufacturer.findUnique({
+        where: { slug },
+      })
+      if (!manufacturer) {
+        return NextResponse.json(
+          { message: 'Manufacturer not found' },
+          { status: 404 },
+        )
+      }
+      await prisma.manufacturer.delete({
+        where: {
+          id: manufacturer.id,
+        },
+      })
 
-    revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
-    revalidatePath(FrontRoutes.Brands + slug)
-    return NextResponse.json({ message: 'Manufacturer deleted successfully' }, { status: 200 })
-  } catch (error) {
-    return NextResponse.json(
-      {
-        message: error instanceof Error ? error.message : 'Cannot delete manufacturer',
-      },
-      { status: 500 },
-    )
-  }
-})
+      revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
+      revalidatePath(FrontRoutes.Brands + slug)
+      return NextResponse.json(
+        { message: 'Manufacturer deleted successfully' },
+        { status: 200 },
+      )
+    } catch (error) {
+      return NextResponse.json(
+        {
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Cannot delete manufacturer',
+        },
+        { status: 500 },
+      )
+    }
+  },
+)
