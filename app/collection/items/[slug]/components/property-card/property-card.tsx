@@ -2,7 +2,6 @@ import { Group, Center, Stack, Title, Text, GridCol } from '@mantine/core'
 import { ReactNode, FC } from 'react'
 import { type IconProps } from '@tabler/icons-react'
 import { IsAdmin } from '@/app/components/is-admin'
-import sx from './styles.module.scss'
 
 interface PropertyCardProps {
   id?: string | number
@@ -19,15 +18,13 @@ interface PropertyCardProps {
   adminOnly?: boolean
 }
 const Card: FC<PropertyCardProps> = ({ content, icon: Icon, title, edit }) => (
-  <GridCol span={{ base: 12, sm: 6, lg: 4 }} className={sx.gridCol}>
-    <Group className={sx.card}>
-      <Center className={sx.icon}>
+  <GridCol span={{ base: 12, sm: 6, lg: 4 }} className="max-w-[450px] overflow-hidden">
+    <Group className="h-full flex-nowrap justify-center rounded-sm bg-gray-50 p-3">
+      <Center className="h-[60px] w-[60px] flex-shrink-0 rounded-sm bg-gradient-to-b from-white to-gray-50">
         <Icon width={35} height={35} title={title} strokeWidth={1.2} />
       </Center>
-      <Stack className={sx.stack}>
-        <Title order={3} className={sx.title}>
-          {title}
-        </Title>
+      <Stack className="flex-grow gap-1">
+        <h3 className="text-lg font-semibold text-primary">{title}</h3>
         {typeof content === 'object' ? content : <Text size="sm">{content}</Text>}
       </Stack>
       {edit && (

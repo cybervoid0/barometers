@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
-import sx from './tabs.module.scss'
 import { menuData } from '@/utils/menudata'
 import { FrontRoutes } from '@/utils/routes-front'
 import { isAdmin } from '../../is-admin'
@@ -43,9 +42,13 @@ const WideScreenTabs = ({ className, categories = [], ...props }: Props) => {
   }, [pathname])
 
   return (
-    <Center component="nav" {...props} className={clsx(className, sx.container)}>
+    <Center
+      component="nav"
+      {...props}
+      className={clsx(className, '[&_.mantine-Tabs-list]:before:content-none')}
+    >
       <Tabs value={String(activeTab)} onChange={selectTab}>
-        <Tabs.List className={sx.list}>
+        <Tabs.List>
           {menuData
             .filter(
               ({ visibleFor }) =>
@@ -55,7 +58,7 @@ const WideScreenTabs = ({ className, categories = [], ...props }: Props) => {
             .map((menuitem, i) => {
               const renderTab = (key?: Key) => (
                 <Tabs.Tab
-                  className={sx.tab}
+                  className="!border-b border-b-transparent data-[active]:border-b-neutral-400"
                   value={String(i)}
                   key={key}
                   onClick={() => {

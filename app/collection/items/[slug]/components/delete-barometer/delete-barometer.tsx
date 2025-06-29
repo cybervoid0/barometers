@@ -8,7 +8,6 @@ import { IconTrash } from '@tabler/icons-react'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
-import sx from './styles.module.scss'
 import { FrontRoutes } from '@/utils/routes-front'
 import { IsAdmin } from '@/app/components/is-admin'
 
@@ -33,7 +32,7 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
   return (
     <IsAdmin>
       <Tooltip tt="capitalize" label={`Delete ${barometer.name}`}>
-        <ActionIcon {...props} onClick={open} className={sx.deleteButton}>
+        <ActionIcon {...props} onClick={open} className="!bg-orange-800 hover:!bg-orange-900">
           <IconTrash />
         </ActionIcon>
       </Tooltip>
@@ -46,10 +45,11 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Text className={sx.warning}>
-          Are you sure you want to completely remove {barometer.name} from the database?
-        </Text>
-        <Text className={sx.warning}>This action cannot be undone.</Text>
+        <div className="transform-none indent-4 font-medium leading-tight text-red-700">
+          <p>Are you sure you want to completely remove {barometer.name} from the database?</p>
+          <p>This action cannot be undone.</p>
+        </div>
+
         <Group mt="lg" justify="flex-end">
           <Button variant="default" onClick={close}>
             Cancel

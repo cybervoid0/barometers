@@ -6,7 +6,11 @@ import { FrontRoutes } from '@/utils/routes-front'
 export function NewArrivals() {
   return (
     <Anchor fw={600} fz="h4" href={FrontRoutes.NewArrivals} component={Link}>
-      <Button size="sm" lts="0.05rem" tt="uppercase" color="primary">
+      <Button
+        className="uppercase tracking-wider transition-all !duration-300 ease-out hover:contrast-125"
+        size="sm"
+        color="primary"
+      >
         <Text visibleFrom="xs">New Arrivals</Text>
         <Text hiddenFrom="xs">New</Text>
       </Button>

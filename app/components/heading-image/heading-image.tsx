@@ -12,9 +12,9 @@ export const HeadingImage: FC = () => {
         alt="Barograph"
         src={customImageLoader({ src: '/shared/landing-header.png', width: 1000, quality: 80 })}
         fill
-        className="z-10 animate-[fadeIn_1s_ease-in-out,scaleDown_2s_ease-out] bg-gradient-to-b from-[#e2e2e2] to-[#efefef] object-cover object-[right_55%_bottom_50%]"
+        className="z-10 animate-[fade-in_1s_ease-in-out,scale-down_2s_ease-out] bg-gradient-to-b from-[#e2e2e2] to-[#efefef] object-cover object-[right_55%_bottom_50%]"
       />
-      <Box className="absolute inset-0 z-20 flex h-full w-full animate-[slideUp_1.8s_ease-out,fadeInContent_1.8s_ease-out] items-end pb-12 pl-8 xs:items-center xs:pb-0 sm:pl-12">
+      <Box className="absolute inset-0 z-20 flex h-full w-full animate-[slide-up_1.8s_ease-out,fade-in-content_1.8s_ease-out] items-end pb-12 pl-8 xs:items-center xs:pb-0 sm:pl-12">
         <Box>
           <Title
             component="h2"

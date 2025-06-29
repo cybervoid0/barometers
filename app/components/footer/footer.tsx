@@ -1,57 +1,48 @@
-import { Anchor, Box, Container, Group, Text, Tooltip } from '@mantine/core'
+import { Container, Group, Tooltip } from '@mantine/core'
 import Link from 'next/link'
 import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
 import { instagram, email } from '@/utils/constants'
-import sx from './styles.module.scss'
 
 export function Footer() {
   return (
     <Container size="xl" py="sm" w="100%">
       <Group py={{ base: 'sm', sm: 'md' }}>
-        <Box className={sx.textBlock}>
-          <Text mb="0.5rem" size="xs">
+        <div className="flex-grow text-center">
+          <p className="mb-2 text-xs">
             By using this website, you agree to our{' '}
-            <Anchor
-              underline="hover"
-              fw="600"
-              c="dark"
-              component={Link}
-              href="/terms-and-conditions"
-            >
+            <Link className="text-sm font-semibold hover:underline" href="/terms-and-conditions">
               Terms & Conditions
-            </Anchor>
-          </Text>
+            </Link>
+          </p>
 
-          <Text size="xs">
+          <p className="text-xs">
             &copy; {new Date().getFullYear()}
             {` `} Leo Shirokov. All right reserved.
-          </Text>
-        </Box>
+          </p>
+        </div>
         {/* Social media links */}
-        <Group gap="xs" visibleFrom="sm" className={sx.container}>
+        <div className="hidden gap-2 sm:flex">
           <Tooltip label="Instagram">
-            <Anchor
-              underline="never"
+            <a
               aria-label="Instagram"
               target="_blank"
               href={instagram}
-              className={sx.smallButton}
+              className="w-6 text-neutral-800 no-underline transition-colors duration-300 ease-in-out hover:text-red-700"
             >
               <IconBrandInstagram />
-            </Anchor>
+            </a>
           </Tooltip>
           <Tooltip label="Email">
-            <Anchor
-              underline="never"
+            <a
               aria-label="Email"
               target="_blank"
               href={`mailto:${email}`}
-              className={sx.mailButton}
+              className="w-6 text-neutral-800 no-underline transition-colors duration-300 ease-in-out hover:text-blue-600"
             >
               <IconMail />
-            </Anchor>
+            </a>
           </Tooltip>
-        </Group>
+        </div>
       </Group>
     </Container>
   )
