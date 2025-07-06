@@ -10,7 +10,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 export default withBundleAnalyzer({
   reactStrictMode: false,
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -30,7 +30,14 @@ export default withBundleAnalyzer({
     return config
   },
   redirects: async () => {
-    const categories = ['miscellaneous', 'recorders', 'pocket', 'mercury', 'bourdon', 'aneroid']
+    const categories = [
+      'miscellaneous',
+      'recorders',
+      'pocket',
+      'mercury',
+      'bourdon',
+      'aneroid',
+    ]
     return categories.map(name => {
       const source = '/collection/categories/' + name
       return {
