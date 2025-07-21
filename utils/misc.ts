@@ -103,7 +103,7 @@ export async function getThumbnailBase64(
 export async function generateIcon(
   imgUrl?: string,
   size: number = 32,
-  backgroundColor: string = '#efefef',
+  backgroundColor?: string,
 ): Promise<string | null> {
   if (!imgUrl) return null
   const image = await loadImage(imgUrl)
@@ -112,8 +112,12 @@ export async function generateIcon(
   if (!ctx) throw new Error('Canvas context not available')
   canvas.width = size
   canvas.height = size
-  ctx.fillStyle = backgroundColor
-  ctx.fillRect(0, 0, size, size)
+
+  if (backgroundColor) {
+    ctx.fillStyle = backgroundColor
+    ctx.fillRect(0, 0, size, size)
+  }
+
   ctx.drawImage(image, 0, 0, size, size)
 
   return canvas.toDataURL('image/png')

@@ -50,7 +50,11 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
     const { id, slug } = await prisma.manufacturer.create({
       data: {
         ...manufData,
-        icon: iconBuffer,
+        ...(iconBuffer
+          ? {
+              icon: iconBuffer,
+            }
+          : {}),
         slug: getBrandSlug(manufData.name, manufData.firstName),
         ...(successors
           ? {
@@ -125,7 +129,11 @@ export const PUT = withPrisma(async (prisma, req: NextRequest) => {
           where: { id: manufacturer.id },
           data: {
             ...manufData,
-            icon: iconBuffer,
+            ...(iconBuffer
+              ? {
+                  icon: iconBuffer,
+                }
+              : {}),
             ...(successors
               ? {
                   successors: {
