@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 import capitalize from 'lodash/capitalize'
 import { getBarometer } from '@/app/services'
 import { imageStorage } from '@/utils/constants'
-import { title, openGraph, twitter } from '@/app/metadata'
+import { title, openGraph, twitter, keywords } from '@/app/metadata'
 import { FrontRoutes } from '@/utils/routes-front'
 
 export async function generateMetadata({
@@ -13,28 +13,39 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { description, name, images } = await getBarometer(slug)
   const barometerTitle = `${title}: ${capitalize(name)}`
-  const barometerImages =
-    images &&
-    images.slice(0, 1).map(image => ({
-      url: imageStorage + image.url,
-      alt: name,
-    }))
-  const url = FrontRoutes.Barometer + slug
+  const [image] = images
+
+  // create full image URL
+  const imageUrl = image ? `${imageStorage}${image.url}` : undefined
+  const imageData = imageUrl
+    ? {
+        url: imageUrl,
+        alt: `${name} barometer`,
+      }
+    : undefined
+
+  const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${FrontRoutes.Barometer}${slug}`
+
   return {
     title: barometerTitle,
     description,
+    keywords: [...keywords, name.toLowerCase()],
     openGraph: {
       ...openGraph,
       title: barometerTitle,
       description,
-      url,
-      images: barometerImages,
+      url: pageUrl,
+      images: imageData,
+      type: 'article',
     },
     twitter: {
       ...twitter,
-      title: name,
+      title: barometerTitle,
       description,
-      images: barometerImages,
+      images: imageData,
+    },
+    alternates: {
+      canonical: pageUrl,
     },
   }
 }
