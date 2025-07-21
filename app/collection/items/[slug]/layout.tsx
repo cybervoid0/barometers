@@ -11,42 +11,53 @@ export async function generateMetadata({
 }: {
   params: { slug: string }
 }): Promise<Metadata> {
-  const { description, name, images } = await getBarometer(slug)
-  const barometerTitle = `${title}: ${capitalize(name)}`
-  const [image] = images
+  try {
+    const { description, name, images } = await getBarometer(slug)
+    const barometerTitle = `${title}: ${capitalize(name)}`
+    const [image] = images
 
-  // create full image URL
-  const imageUrl = image ? `${imageStorage}${image.url}` : undefined
-  const imageData = imageUrl
-    ? {
-        url: imageUrl,
-        alt: `${name} barometer`,
-      }
-    : undefined
+    // create full image URL
+    const imageUrl = image ? `${imageStorage}${image.url}` : undefined
+    const imageData = imageUrl
+      ? {
+          url: imageUrl,
+          alt: `${name} barometer`,
+        }
+      : undefined
 
-  const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${FrontRoutes.Barometer}${slug}`
+    const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${FrontRoutes.Barometer}${slug}`
 
-  return {
-    title: barometerTitle,
-    description,
-    keywords: [...keywords, name.toLowerCase()],
-    openGraph: {
-      ...openGraph,
+    return {
       title: barometerTitle,
       description,
-      url: pageUrl,
-      images: imageData,
-      type: 'article',
-    },
-    twitter: {
-      ...twitter,
-      title: barometerTitle,
-      description,
-      images: imageData,
-    },
-    alternates: {
-      canonical: pageUrl,
-    },
+      keywords: [...keywords, name.toLowerCase()],
+      openGraph: {
+        ...openGraph,
+        title: barometerTitle,
+        description,
+        url: pageUrl,
+        images: imageData,
+        type: 'article',
+      },
+      twitter: {
+        ...twitter,
+        title: barometerTitle,
+        description,
+        images: imageData,
+      },
+      alternates: {
+        canonical: pageUrl,
+      },
+    }
+  } catch (error) {
+    return {
+      title: `${title}: Barometer not found`,
+      description: 'This barometer could not be found.',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
   }
 }
 
