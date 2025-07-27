@@ -12,8 +12,8 @@ export default async function HomePage() {
   return (
     <>
       <HeadingImage />
-      <div className="container mx-auto">
-        <div className="flex flex-nowrap items-center">
+      <div className="container mx-auto px-2 xs:px-0">
+        <div className="flex flex-nowrap items-center gap-2">
           <NewArrivals />
           <SearchField
             ml="auto"
