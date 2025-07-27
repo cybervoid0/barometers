@@ -57,7 +57,7 @@ export default function About() {
           </Button>
         </div>
         <p className={paragraphStyles}>
-          My collection features more than 150 rare and exceptional items, including mercury and
+          My collection features more than 200 rare and exceptional items, including mercury and
           aneroid barometers, as well as barographs, mainly from the Victorian era. Some of the most
           esteemed manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph
           Hicks, Peter Dollond, Thomas Mason, Dominicus Sala, Breguet, J.C. Vickery, Gottlieb Lufft,
