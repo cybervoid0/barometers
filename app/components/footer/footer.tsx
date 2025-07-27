@@ -2,13 +2,12 @@ import { Anchor, Box, Container, Group, Text, Tooltip } from '@mantine/core'
 import Link from 'next/link'
 import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
 import { instagram, email } from '@/utils/constants'
-import sx from './styles.module.scss'
 
 export function Footer() {
   return (
     <Container size="xl" py="sm" w="100%">
       <Group py={{ base: 'sm', sm: 'md' }}>
-        <Box className={sx.textBlock}>
+        <Box className="flex-grow text-center">
           <Text mb="0.5rem" size="xs">
             By using this website, you agree to our{' '}
             <Anchor
@@ -28,28 +27,28 @@ export function Footer() {
           </Text>
         </Box>
         {/* Social media links */}
-        <Group gap="xs" visibleFrom="sm" className={sx.container}>
+        <Group gap="xs" visibleFrom="sm">
           <Tooltip label="Instagram">
-            <Anchor
-              underline="never"
+            <a
               aria-label="Instagram"
               target="_blank"
+              rel="noopener noreferrer"
               href={instagram}
-              className={sx.smallButton}
+              className="w-6 text-gray-600 transition-colors duration-300 ease-in-out hover:text-red-900"
             >
               <IconBrandInstagram />
-            </Anchor>
+            </a>
           </Tooltip>
           <Tooltip label="Email">
-            <Anchor
-              underline="never"
+            <a
               aria-label="Email"
               target="_blank"
+              rel="noopener noreferrer"
               href={`mailto:${email}`}
-              className={sx.mailButton}
+              className="w-6 text-gray-600 transition-colors duration-300 ease-in-out hover:text-blue-700"
             >
               <IconMail />
-            </Anchor>
+            </a>
           </Tooltip>
         </Group>
       </Group>

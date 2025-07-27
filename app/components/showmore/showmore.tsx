@@ -1,6 +1,5 @@
 import { Spoiler } from '@mantine/core'
 import { PropsWithChildren } from 'react'
-import sx from './styles.module.scss'
 
 export function ShowMore({ children, height = 0 }: PropsWithChildren & { height?: number }) {
   return (
@@ -9,7 +8,7 @@ export function ShowMore({ children, height = 0 }: PropsWithChildren & { height?
       showLabel="Show more"
       hideLabel="Show less"
       classNames={{
-        control: sx.showMore,
+        control: 'text-gray-500 font-semibold z-[5]',
       }}
     >
       {children}

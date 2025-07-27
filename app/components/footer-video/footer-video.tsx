@@ -1,7 +1,6 @@
 'use client'
 
 import { imageStorage } from '@/utils/constants'
-import sx from './styles.module.scss'
 
 export function FooterVideo() {
   return (
@@ -10,7 +9,7 @@ export function FooterVideo() {
       autoPlay
       loop
       muted
-      className={sx.video}
+      className="mt-20 h-[80vw] w-full object-cover object-[30%_56%] xs:mt-12 xs:h-[180px] xs:object-[100%_56%]"
       onContextMenu={e => {
         e.preventDefault()
       }}

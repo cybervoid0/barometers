@@ -8,7 +8,6 @@ import { useForm } from '@mantine/form'
 import { isLength } from 'validator'
 import { useRouter } from 'next/navigation'
 import { IconSearch } from '@tabler/icons-react'
-import sx from './search-field.module.scss'
 
 interface SearchProps extends BoxProps {
   queryString?: string
@@ -46,7 +45,11 @@ export function SearchField({ queryString, ...props }: SearchProps) {
       <ButtonGroup>
         <TextInput
           autoComplete="off"
-          classNames={{ input: sx.input, root: sx.inputRoot }}
+          classNames={{
+            input:
+              'text-base !border-r-0 !border-gray-300 focus:!border-gray-300 focus-visible:!border-gray-300',
+            root: 'flex-grow overflow-hidden',
+          }}
           placeholder="Enter your query"
           title="Fill in any barometer related word"
           required
@@ -59,7 +62,12 @@ export function SearchField({ queryString, ...props }: SearchProps) {
             />
           }
         />
-        <ActionIcon variant="filled" size="input-sm" type="submit" className={sx.searchButton}>
+        <ActionIcon
+          variant="filled"
+          size="input-sm"
+          type="submit"
+          className="!rounded-l-none !bg-primary"
+        >
           <IconSearch />
         </ActionIcon>
       </ButtonGroup>
