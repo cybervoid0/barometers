@@ -1,4 +1,3 @@
-import { Container, Grid, GridCol, Group } from '@mantine/core'
 import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { SearchField } from './components/search-field'
@@ -13,27 +12,26 @@ export default async function HomePage() {
   return (
     <>
       <HeadingImage />
-      <Container size="xl">
-        <Group align="center" wrap="nowrap">
+      <div className="container mx-auto">
+        <div className="flex flex-nowrap items-center">
           <NewArrivals />
           <SearchField
             ml="auto"
             w={{ base: '100%', xs: 'calc(50% - 1.25rem)', lg: 'calc(33% - 1.25rem)' }}
           />
-        </Group>
-        <Grid justify="center" gutter={{ base: '2rem', sm: '2.5rem' }}>
+        </div>
+        <div className="grid grid-cols-1 gap-8 xs:grid-cols-2 sm:gap-10 lg:grid-cols-3">
           {categories.map(({ id, name, image }, i) => (
-            <GridCol key={id} span={{ base: 12, xs: 6, lg: 4 }}>
-              <CategoryCard
-                priority={i < 3}
-                image={image}
-                name={name}
-                link={FrontRoutes.Categories + name}
-              />
-            </GridCol>
+            <CategoryCard
+              key={id}
+              priority={i < 3}
+              image={image}
+              name={name}
+              link={FrontRoutes.Categories + name}
+            />
           ))}
-        </Grid>
-      </Container>
+        </div>
+      </div>
     </>
   )
 }
