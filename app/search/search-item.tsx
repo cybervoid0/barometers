@@ -1,7 +1,6 @@
 import { Text, Group, Anchor, Box, Stack, Paper } from '@mantine/core'
 import Image from 'next/image'
 import Link from 'next/link'
-import styles from './style.module.css'
 import { SearchResultsDTO } from '../types'
 import customImageLoader from '@/utils/image-loader'
 
@@ -16,10 +15,10 @@ interface ItemProps {
 export function SearchItem({ image, link, name, manufacturer, dating }: ItemProps) {
   const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
   return (
-    <Paper shadow="sm" className={styles.paper}>
+    <Paper shadow="sm" className="overflow-hidden border-r-[3px] border-r-black px-2 py-1">
       <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
         <Group gap="0.5rem" wrap="nowrap">
-          <Box className={styles.image}>
+          <Box className="relative h-20 min-h-20 w-20 min-w-20">
             {image && (
               <Image
                 unoptimized

@@ -30,14 +30,7 @@ export default withBundleAnalyzer({
     return config
   },
   redirects: async () => {
-    const categories = [
-      'miscellaneous',
-      'recorders',
-      'pocket',
-      'mercury',
-      'bourdon',
-      'aneroid',
-    ]
+    const categories = ['miscellaneous', 'recorders', 'pocket', 'mercury', 'bourdon', 'aneroid']
     return categories.map(name => {
       const source = '/collection/categories/' + name
       return {
@@ -47,4 +40,5 @@ export default withBundleAnalyzer({
       }
     })
   },
+  allowedDevOrigins: [new URL(process.env.NEXT_PUBLIC_BASE_URL).hostname],
 })

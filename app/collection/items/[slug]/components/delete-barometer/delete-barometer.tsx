@@ -1,20 +1,22 @@
 'use client'
 
-import React from 'react'
-import { Button, ActionIcon, ActionIconProps, Group, Modal, Text, Tooltip } from '@mantine/core'
+import { Button, ActionIcon, ActionIconProps, Group, Modal, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
 import { IconTrash } from '@tabler/icons-react'
+import clsx from 'clsx'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { showError, showInfo } from '@/utils/notification'
-import sx from './styles.module.scss'
 import { FrontRoutes } from '@/utils/routes-front'
 import { IsAdmin } from '@/app/components/is-admin'
 
 interface Props extends ActionIconProps {
   barometer: BarometerDTO
 }
+
+const warnStyles =
+  'font-mono leading-tight tracking-tighter transform-none indent-4 font-medium text-red-700'
 
 export function DeleteBarometer({ barometer, ...props }: Props) {
   const [opened, { open, close }] = useDisclosure(false)
@@ -33,7 +35,7 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
   return (
     <IsAdmin>
       <Tooltip tt="capitalize" label={`Delete ${barometer.name}`}>
-        <ActionIcon {...props} onClick={open} className={sx.deleteButton}>
+        <ActionIcon {...props} onClick={open} className="!bg-red-800 hover:!bg-red-900">
           <IconTrash />
         </ActionIcon>
       </Tooltip>
@@ -46,10 +48,10 @@ export function DeleteBarometer({ barometer, ...props }: Props) {
         tt="capitalize"
         styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
       >
-        <Text className={sx.warning}>
+        <p className={warnStyles}>
           Are you sure you want to completely remove {barometer.name} from the database?
-        </Text>
-        <Text className={sx.warning}>This action cannot be undone.</Text>
+        </p>
+        <p className={clsx('mt-4', warnStyles)}>This action cannot be undone.</p>
         <Group mt="lg" justify="flex-end">
           <Button variant="default" onClick={close}>
             Cancel
