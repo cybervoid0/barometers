@@ -1,6 +1,6 @@
 import NextLink from 'next/link'
 import NextImage from 'next/image'
-import { Group, Anchor, Title, Container, Box, Flex, Tooltip } from '@mantine/core'
+import { Group, Anchor, Container, Box, Flex, Tooltip } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import { Navigation } from './navigation'
 import { getCategories } from '@/app/services'
@@ -26,12 +26,9 @@ export async function Header() {
               </Group>
               <Anchor underline="never" component={NextLink} href="/">
                 <Flex align="center" gap="xs">
-                  <Title
-                    unstyled
-                    className="text-[1.3rem] font-semibold uppercase leading-none tracking-wider text-black sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem]"
-                  >
+                  <h1 className="text-[1.3rem] font-semibold uppercase leading-none tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem]">
                     Barometers Realm
-                  </Title>
+                  </h1>
                   {/* Logo image */}
                   <Box className="relative aspect-square h-10 sm:h-12">
                     <NextImage
