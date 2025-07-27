@@ -18,9 +18,7 @@ export default withBundleAnalyzer({
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
     serverComponentsExternalPackages: ['mongoose'],
   },
-  sassOptions: {
-    prependData: `@import "./_mantine.scss";`,
-  },
+
   images: {
     loader: 'custom',
     loaderFile: './utils/image-loader.ts',

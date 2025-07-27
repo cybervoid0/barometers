@@ -1,7 +1,8 @@
 import { Container, List, ListItem, Text, Title } from '@mantine/core'
-import styles from './styles.module.scss'
 
 export const dynamic = 'force-static'
+
+const paragraphStyles = 'mb-4 text-sm leading-relaxed'
 
 export default function TermsAndConditions() {
   return (
@@ -10,16 +11,17 @@ export default function TermsAndConditions() {
         Terms & Conditions for Website Use
       </Title>
 
-      <Text className={styles.paragraph}>
-        Welcome to Barometers Realm! Please carefully read these Terms & Conditions (“Terms”) before
-        accessing or using the website https://barometers.info (the “Web Site”). By accessing or
-        using the Web Site, you agree to comply with and be bound by these Terms, without
-        modification. If you do not accept any part of these Terms, you should not use the Web Site.
+      <Text className={paragraphStyles}>
+        Welcome to Barometers Realm! Please carefully read these Terms & Conditions
+        (&quot;Terms&quot;) before accessing or using the website https://barometers.info (the
+        &quot;Web Site&quot;). By accessing or using the Web Site, you agree to comply with and be
+        bound by these Terms, without modification. If you do not accept any part of these Terms,
+        you should not use the Web Site.
       </Text>
-      <Text className={styles.paragraph}>
-        The administration of Barometers Realm (the “Administration”) reserves the right to revise
-        or modify these Terms at any time by updating this page. You agree to be bound by any such
-        revisions and are encouraged to periodically review the Terms for any updates.
+      <Text className={paragraphStyles}>
+        The administration of Barometers Realm (the &quot;Administration&quot;) reserves the right
+        to revise or modify these Terms at any time by updating this page. You agree to be bound by
+        any such revisions and are encouraged to periodically review the Terms for any updates.
       </Text>
 
       <Title order={3}>1. Acceptance of the Agreement</Title>

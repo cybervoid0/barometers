@@ -8,7 +8,7 @@ export function ShowMore({ children, height = 0 }: PropsWithChildren & { height?
       showLabel="Show more"
       hideLabel="Show less"
       classNames={{
-        control: 'text-gray-500 font-semibold z-[5]',
+        control: '!font-semibold z-[5]',
       }}
     >
       {children}
