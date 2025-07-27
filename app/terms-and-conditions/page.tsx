@@ -1,117 +1,111 @@
-import { Container, List, ListItem, Text, Title } from '@mantine/core'
-
 export const dynamic = 'force-static'
 
 const paragraphStyles = 'mb-4 text-sm leading-relaxed'
 
 export default function TermsAndConditions() {
   return (
-    <Container p="xl">
-      <Title mb="md" order={2} component="h2">
-        Terms & Conditions for Website Use
-      </Title>
+    <div className="container mx-auto px-4 py-12">
+      <h2 className="mb-4 text-2xl font-bold">Terms & Conditions for Website Use</h2>
 
-      <Text className={paragraphStyles}>
+      <p className={paragraphStyles}>
         Welcome to Barometers Realm! Please carefully read these Terms & Conditions
         (&quot;Terms&quot;) before accessing or using the website https://barometers.info (the
         &quot;Web Site&quot;). By accessing or using the Web Site, you agree to comply with and be
         bound by these Terms, without modification. If you do not accept any part of these Terms,
         you should not use the Web Site.
-      </Text>
-      <Text className={paragraphStyles}>
+      </p>
+      <p className={paragraphStyles}>
         The administration of Barometers Realm (the &quot;Administration&quot;) reserves the right
         to revise or modify these Terms at any time by updating this page. You agree to be bound by
         any such revisions and are encouraged to periodically review the Terms for any updates.
-      </Text>
+      </p>
 
-      <Title order={3}>1. Acceptance of the Agreement</Title>
+      <h3 className="mt-8 text-xl font-semibold">1. Acceptance of the Agreement</h3>
 
-      <Text>
+      <p>
         By using the Web Site, you acknowledge that you have read, understood, and agree to abide by
         all the Terms, Conditions, and Notices outlined in this document or otherwise posted on the
-        Web Site (collectively referred to as the “Agreement”). If you do not accept these Terms,
-        you are prohibited from using the Web Site.
-      </Text>
-      <Text>
+        Web Site (collectively referred to as the &quot;Agreement&quot;). If you do not accept these
+        Terms, you are prohibited from using the Web Site.
+      </p>
+      <p>
         Additionally, the content on this Web Site is suitable for all ages, and there are no age
         restrictions for accessing or using the Materials provided here.
-      </Text>
+      </p>
 
-      <Title order={3}>2. Intellectual Property and Use of Materials</Title>
+      <h3 className="mt-8 text-xl font-semibold">2. Intellectual Property and Use of Materials</h3>
 
-      <Text>
+      <p>
         All content on the Web Site, including but not limited to text, graphics, images, audio,
         video, data, coding, scripts, computer programs, and other materials (collectively the
-        “Materials”), is protected under copyright laws of the Netherlands and other applicable
-        jurisdictions. The Materials are either owned or licensed by the Administration.
-      </Text>
-      <Text>
+        &quot;Materials&quot;), is protected under copyright laws of the Netherlands and other
+        applicable jurisdictions. The Materials are either owned or licensed by the Administration.
+      </p>
+      <p>
         You are granted a limited, personal, non-commercial license to view and download a single
         copy of the Materials solely for personal use. This limited license does not allow you to:
-      </Text>
-      <List>
-        <ListItem>
-          Sell, distribute, modify, or create derivative works based on the Materials.
-        </ListItem>
-        <ListItem>
+      </p>
+      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+        <li>Sell, distribute, modify, or create derivative works based on the Materials.</li>
+        <li>
           Publicly display, perform, or distribute any portion of the Materials for commercial
           purposes.
-        </ListItem>
-        <ListItem>
+        </li>
+        <li>
           Reproduce, republish, or post the Materials on any other web site, publication, or
           platform without express written permission from the Administration.
-        </ListItem>
-      </List>
-      <Text>
+        </li>
+      </ul>
+      <p>
         Unauthorized use of the Materials may result in a violation of copyright, trademark, or
         other applicable laws. Should you breach any of the Terms, your permission to access and use
         the Web Site and Materials will be automatically terminated. Upon termination, you must
         immediately destroy any copies of the Materials you may have obtained.
-      </Text>
+      </p>
 
-      <Title order={3}>3. Modification of Terms</Title>
+      <h3 className="mt-8 text-xl font-semibold">3. Modification of Terms</h3>
 
-      <Text>
+      <p>
         The Administration reserves the right to modify, revise, or update these Terms at its sole
         discretion, and such changes shall take effect immediately upon posting on this page.
         Continued use of the Web Site constitutes your agreement to any changes in the Terms. It is
         your responsibility to review this page periodically.
-      </Text>
+      </p>
 
-      <Title order={3}>4. Prohibited Activities</Title>
-      <Text>In addition to unauthorized use of the Materials, you agree not to:</Text>
-      <List>
-        <ListItem>Use the Web Site for any unlawful purpose.</ListItem>
-        <ListItem>
+      <h3 className="mt-8 text-xl font-semibold">4. Prohibited Activities</h3>
+      <p>In addition to unauthorized use of the Materials, you agree not to:</p>
+      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+        <li>Use the Web Site for any unlawful purpose.</li>
+        <li>
           Attempt to access, modify, or interfere with the Web Site’s functionality or security
           systems.
-        </ListItem>
-        <ListItem>
+        </li>
+        <li>
           Engage in any activity that could disrupt the performance or compromise the security of
           the Web Site or its users.
-        </ListItem>
-      </List>
+        </li>
+      </ul>
 
-      <Title order={3}>5. Liability Disclaimer</Title>
+      <h3 className="mt-8 text-xl font-semibold">5. Liability Disclaimer</h3>
 
-      <Text>
-        The Web Site and its Materials are provided “as is” without warranties of any kind.
-        Barometers Realm does not guarantee the accuracy, completeness, or timeliness of the
+      <p>
+        The Web Site and its Materials are provided &quot;as is&quot; without warranties of any
+        kind. Barometers Realm does not guarantee the accuracy, completeness, or timeliness of the
         information provided on the Web Site. The Administration is not liable for any damages
         resulting from your use or inability to use the Web Site or its content.
-      </Text>
+      </p>
 
-      <Title order={3}>6. Governing Law</Title>
+      <h3 className="mt-8 text-xl font-semibold">6. Governing Law</h3>
 
-      <Text>
+      <p>
         These Terms and your use of the Web Site shall be governed by and construed in accordance
         with the laws of the Netherlands. Any legal actions or disputes arising out of or related to
         these Terms shall be brought exclusively in the courts of the Netherlands.
-      </Text>
-      <Text>
+      </p>
+      <p>
         By using the Web Site, you agree to these Terms and Conditions. If you have any questions or
         concerns, feel free to contact the Administration of Barometers Realm for clarification.
-      </Text>
-    </Container>
+      </p>
+    </div>
   )
 }
