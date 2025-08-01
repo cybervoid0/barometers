@@ -38,7 +38,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               src={customImageLoader({ src: image.url, quality: 90, width: 600 })}
               alt={name}
               className={clsx(
-                'duration-5000 transition-all hover:scale-150 active:scale-150',
+                'transition-all duration-5000 hover:scale-150 active:scale-150',
                 'ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
               )}
               style={{
@@ -51,7 +51,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
           <h3
             className={clsx(
               'pointer-events-none absolute bottom-8 left-8 bg-primary px-1',
-              'text-lg uppercase leading-snug tracking-widest text-white',
+              'text-lg font-normal uppercase leading-snug tracking-widest text-white',
             )}
           >
             {name}

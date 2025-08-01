@@ -1,7 +1,6 @@
 import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { ColorSchemeScript, Box, Stack } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import './globals.css'
 import '@mantine/core/styles.css'
@@ -12,7 +11,7 @@ import { meta, jsonLd } from './metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const viewport: Viewport = {
-  colorScheme: 'only light',
+  colorScheme: 'light dark',
   themeColor: [{ color: 'white' }],
 }
 
@@ -50,7 +49,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <GoogleAnalytics gaId="G-Q8ZR89R225" />
-        <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
         <meta
@@ -63,14 +61,14 @@ export default function RootLayout({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>
+      <body className="bg-background text-foreground">
         <Providers>
           <Notifications />
-          <Stack h="100vh" gap={0}>
+          <div className="flex h-screen flex-col">
             <Header />
-            <Box className="flex-grow bg-page-bg pb-12 shadow-lg">{children}</Box>
+            <div className="grow pb-12 shadow-lg">{children}</div>
             <Footer />
-          </Stack>
+          </div>
         </Providers>
       </body>
     </html>
