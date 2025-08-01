@@ -7,14 +7,14 @@ import { cn } from '@/lib/utils'
 export const dynamic = 'force-static'
 const paragraphStyles = 'mb-4 indent-8 text-left'
 const bookTitleStyles = 'italic font-medium'
-const headerStyles = 'mb-4 text-2xl font-bold'
+
 const subheaderStyles = 'my-4 text-xl font-semibold'
 
 export default function About() {
   return (
     <div className="container mx-auto mt-8 px-2 xl:px-0">
       <div className="rounded-lg bg-white p-6 shadow-lg md:p-12">
-        <h2 className={headerStyles}>Greetings, my name is Leo.</h2>
+        <h2>Greetings, my name is Leo.</h2>
         <p className={paragraphStyles}>
           <Image
             priority
@@ -102,7 +102,7 @@ export default function About() {
           />
         </div>
         <Separator className="my-4" />
-        <h2 className={headerStyles}>Why Barometers?</h2>
+        <h2>Why Barometers?</h2>
         <p className={paragraphStyles}>
           A barometer is more than just an instrument for measuring atmospheric pressure. It is an
           artifact that unites science, art, and human ingenuity. It’s like a window into the past,

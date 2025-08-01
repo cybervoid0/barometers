@@ -1,4 +1,4 @@
-import { Container, Center, Paper } from '@mantine/core'
+import { Paper } from '@mantine/core'
 import NextImage from 'next/image'
 import { ShowMore } from '../components/showmore'
 import customImageLoader from '@/utils/image-loader'
@@ -11,7 +11,7 @@ const figureStyles = 'float-left w-full mb-4 sm:w-auto sm:mr-4 sm:mb-0'
 
 function Figure({ src }: { src: string }) {
   return (
-    <Center className={figureStyles}>
+    <div className={figureStyles}>
       <NextImage
         unoptimized
         src={customImageLoader({ src: `/history/${src}`, width: 400, quality: 80 })}
@@ -20,13 +20,13 @@ function Figure({ src }: { src: string }) {
         alt="Figure"
         className="max-h-[500px] w-fit object-contain p-4"
       />
-    </Center>
+    </div>
   )
 }
 
 export default function History() {
   return (
-    <Container className="py-8">
+    <section className="py-8">
       <h2 className="mb-6 text-3xl font-semibold sm:text-4xl">History of the Barometer</h2>
       <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
         <h3 className={headerStyles}>The Discovery of Torricelli and the First Barometer</h3>
@@ -1007,6 +1007,6 @@ export default function History() {
           </p>
         </ShowMore>
       </Paper>
-    </Container>
+    </section>
   )
 }

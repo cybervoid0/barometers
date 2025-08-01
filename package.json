@@ -9,8 +9,11 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
-    "prisma": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
+    "dev:tunnel": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
+    "dev": "next dev",
+    "prisma:tunnel": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
+    "prisma": "prisma studio",
+    "import-data": "./scripts/import-data.sh",
     "build": "next build",
     "postinstall": "prisma generate",
     "warm": "NODE_OPTIONS='--loader ts-node/esm' ts-node utils/warm-images.ts",

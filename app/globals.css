@@ -68,8 +68,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -78,4 +76,32 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  section {
+    @apply container mx-auto px-2 xs:px-0;
+  }
+
+  h2 {
+    @apply mb-5 text-2xl font-bold;
+  }
+
+  h3 {
+    @apply mb-4 text-xl font-semibold;
+  }
+
+  h4 {
+    @apply mb-3 text-lg font-medium;
+  }
+
+  /* Typography styles */
+  /*   h1 {
+    @apply text-4xl font-bold text-foreground leading-tight mb-6;
+  }
+
+
+   */
+
+  /*  p {
+    @apply text-base leading-relaxed ;
+  } */
 }
