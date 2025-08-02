@@ -49,6 +49,7 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
         border: 'hsl(var(--border))',
+        'button-border': 'hsl(var(--button-border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         chart: {
