@@ -1,14 +1,20 @@
 import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { Raleway } from 'next/font/google'
 import { Notifications } from '@mantine/notifications'
 import './globals.css'
-import '@mantine/core/styles.css'
-import '@mantine/notifications/styles.css'
 import { Footer, Header } from './components'
 import Providers from './providers'
 import { meta, jsonLd } from './metadata'
 import { withPrisma } from '@/prisma/prismaClient'
+import { cn } from '@/lib/utils'
+
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-raleway',
+})
 
 export const viewport: Viewport = {
   colorScheme: 'light dark',
@@ -61,7 +67,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-background text-foreground">
+      <body className={cn(raleway.variable, 'font-raleway bg-background text-foreground')}>
         <Providers>
           <Notifications />
           <div className="flex h-screen flex-col">

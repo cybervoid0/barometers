@@ -1,10 +1,5 @@
 import { CSSProperties } from 'react'
-import { Raleway } from 'next/font/google'
 import { alpha, Text, Tooltip } from '@mantine/core'
-
-const raleway = Raleway({
-  subsets: ['cyrillic', 'latin'],
-})
 
 interface LetterCircleProps {
   letter: string
@@ -50,7 +45,6 @@ function LetterCircle({
         fontSize="30"
         fontWeight="600"
         fill={alpha(color, 0.5)}
-        fontFamily={raleway.style.fontFamily}
       >
         {letter}
       </text>

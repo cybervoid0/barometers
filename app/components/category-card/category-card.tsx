@@ -20,7 +20,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
         <div
           className={clsx(
             'relative h-full w-full overflow-hidden rounded-md',
-            'bg-card-bg sm:bg-gradient-to-b sm:from-card-bg sm:to-page-bg',
+            'from-card-gradient-from to-card-gradient-to bg-gradient-to-t',
           )}
         >
           <CategoryIcon
@@ -51,7 +51,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
           <h3
             className={clsx(
               'pointer-events-none absolute bottom-8 left-8 bg-primary px-1',
-              'text-lg font-normal uppercase leading-snug tracking-widest text-white',
+              'text-lg font-medium uppercase leading-snug tracking-widest text-background',
             )}
           >
             {name}
