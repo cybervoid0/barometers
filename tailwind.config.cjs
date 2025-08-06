@@ -65,6 +65,12 @@ module.exports = {
         'card-gradient-to': {
           DEFAULT: 'var(--card-gradient-to)',
         },
+        'layout-gradient-from': {
+          DEFAULT: 'hsl(var(--layout-gradient-from))',
+        },
+        'layout-gradient-to': {
+          DEFAULT: 'hsl(var(--layout-gradient-to))',
+        },
       },
       fontFamily: {
         raleway: ['var(--font-raleway)', 'system-ui', 'sans-serif'],

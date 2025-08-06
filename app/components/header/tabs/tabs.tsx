@@ -1,106 +1,102 @@
 'use client'
 
-import { useState, useEffect, Key } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { Center, CenterProps, Tabs, Text, Menu, Anchor, Box } from '@mantine/core'
-import dynamic from 'next/dynamic'
+import { HTMLAttributes, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
-import { menuData } from '@/utils/menudata'
-import { FrontRoutes } from '@/utils/routes-front'
+import { IconSearch } from '@tabler/icons-react'
 import { isAdmin } from '../../is-admin'
-import { CategoryListDTO } from '@/app/types'
+import { MenuItem } from '@/app/types'
+import { cn } from '@/lib/utils'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuTrigger,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuLink,
+} from '@/components/ui/navigation-menu'
 
-interface Props extends CenterProps {
-  categories: CategoryListDTO
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  menu: MenuItem[]
 }
+const menuItemStyle =
+  'px-3 py-2 transition duration-300 hover:rounded-t-sm hover:border-b hover:bg-muted'
+const menuItemTextStyle = 'text-xs font-semibold tracking-[0.15rem] uppercase'
+const menuStyle = cn(menuItemStyle, menuItemTextStyle)
 
-const WideScreenTabs = ({ className, categories = [], ...props }: Props) => {
+export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
   const { data: session } = useSession()
-  const router = useRouter()
   const pathname = usePathname()
-  const [activeTab, setActiveTab] = useState(-1)
-  // opens menu from the tab
-  const [opened, setOpened] = useState<Record<number, boolean>>({})
-  const onMenuChange = (index: number, state: boolean) =>
-    setOpened(old => ({ ...old, [index]: state }))
 
-  const selectTab = (val: string | null) => {
-    const index = Number(val ?? 0)
-    const menuItem = menuData[index]
-    if (!menuItem) return
-    if (menuItem.label !== 'Collection') router.push(`/${menuItem.link}`)
-  }
-
-  // set active tab when the router path changes
-  useEffect(() => {
-    const rootPath: string | undefined = pathname.split('/')[1]
-    const index = menuData.findIndex(item => item.link === rootPath)
-    setActiveTab(index)
-  }, [pathname])
+  const underline = useCallback(
+    (url: string) => {
+      const rootPath: string | undefined = `/${pathname.split('/')[1]}`
+      const isActive = url === rootPath
+      return { 'border-b-[0.5px] border-b-foreground': isActive }
+    },
+    [pathname],
+  )
 
   return (
-    <Center component="nav" {...props}>
-      <Tabs value={String(activeTab)} onChange={selectTab}>
-        <Tabs.List className="before:!content-none">
+    <nav {...props}>
+      <NavigationMenu>
+        <NavigationMenuList>
           {menuData
             .filter(
               ({ visibleFor }) =>
                 typeof visibleFor === 'undefined' ||
                 (isAdmin(session) && visibleFor === AccessRole.ADMIN),
             )
-            .map((menuitem, i) => {
-              const renderTab = (key?: Key) => (
-                <Tabs.Tab
-                  className="!border-b data-[active]:!border-b-neutral-500"
-                  value={String(i)}
-                  key={key}
-                  onClick={() => {
-                    // close opened menu
-                    if (opened[i]) setOpened(old => ({ ...old, [i]: false }))
-                  }}
-                >
-                  <Text size="xs" tt="uppercase" fw={600} lts=".2rem">
-                    {menuitem.label}
-                  </Text>
-                </Tabs.Tab>
-              )
-              return menuitem.label === 'Collection' ? (
-                <Menu
-                  trigger="click-hover"
-                  menuItemTabIndex={0}
-                  shadow="xl"
-                  offset={0}
-                  loop={false}
-                  key={menuitem.id}
-                  opened={opened[i]}
-                  onChange={state => onMenuChange(i, state)}
-                >
-                  <Menu.Target>{renderTab()}</Menu.Target>
-                  <Menu.Dropdown>
-                    {categories.map(({ label, id, name }) => (
-                      <Anchor
-                        key={id}
-                        href={FrontRoutes.Categories + name.toLocaleLowerCase()}
-                        component={Link}
-                        c="inherit"
-                        underline="never"
-                      >
-                        <Menu.Item>
-                          <Box px="xs">{label}</Box>
-                        </Menu.Item>
-                      </Anchor>
-                    ))}
-                  </Menu.Dropdown>
-                </Menu>
+            .map(menuItem =>
+              'children' in menuItem ? (
+                <NavigationMenu key={menuItem.id}>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className={cn(menuStyle, underline(menuItem.link))}>
+                      <p>{menuItem.label}</p>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="flex flex-col">
+                        {menuItem.children?.map(nestedItem => (
+                          /* Nested menu items */
+                          <li
+                            key={nestedItem.id}
+                            className={cn(
+                              'px-6 py-1 [&:last-child_p]:pb-1', // padding
+                              'hover:cursor-pointer hover:bg-muted', // on hover
+                            )}
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link href={nestedItem.link}>
+                                <p className="capitalize">{nestedItem.label}</p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenu>
               ) : (
-                renderTab(menuitem.id)
-              )
-            })}
-        </Tabs.List>
-      </Tabs>
-    </Center>
+                <NavigationMenuItem key={menuItem.id}>
+                  <NavigationMenuLink asChild>
+                    <Link href={menuItem.link}>
+                      <p className={cn(menuStyle, underline(menuItem.link))}>{menuItem.label}</p>
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ),
+            )}
+          <NavigationMenuItem className={cn(menuItemStyle, underline('/search'))}>
+            <NavigationMenuLink asChild className="">
+              <Link href="/search">
+                <IconSearch size="18" />
+              </Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </nav>
   )
 }
-export default dynamic(() => Promise.resolve(WideScreenTabs), { ssr: true })

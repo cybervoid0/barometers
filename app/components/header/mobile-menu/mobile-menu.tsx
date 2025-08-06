@@ -1,150 +1,104 @@
-import React, { FC, useState, Fragment } from 'react'
-import {
-  Drawer,
-  DrawerProps,
-  Box,
-  ActionIcon,
-  Stack,
-  Anchor,
-  Collapse,
-  List,
-  UnstyledButton,
-  Text,
-  Divider,
-  Group,
-  Center,
-} from '@mantine/core'
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'motion/react'
-import { IconChevronRight, IconAt, IconBrandInstagram } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
-import { instagram, email } from '@/utils/constants'
-import { FrontRoutes } from '@/utils/routes-front'
-import { menuData } from '@/utils/menudata'
+import { Spin as Hamburger } from 'hamburger-react'
 import { isAdmin } from '../../is-admin'
-import { CategoryListDTO } from '@/app/types'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { MenuItem } from '@/app/types'
+import { cn } from '@/lib/utils'
+import { SocialButtons } from '../../footer'
 
-interface Props extends DrawerProps {
-  categories: CategoryListDTO
+interface Props {
+  menu: MenuItem[]
 }
 
-export const MobileMenu: FC<Props> = ({ categories = [], ...props }) => {
-  const { data: session } = useSession()
-  const [opened, setOpened] = useState<Record<number, boolean>>({})
-  const toggle = (index: number) => setOpened(old => ({ ...old, [index]: !old[index] }))
+const menuItemTextStyle =
+  'text-sm font-semibold tracking-[0.15rem] uppercase transition-colors hover:text-foreground/80'
 
+export function MobileMenu({ menu = [] }: Props) {
+  const { data: session } = useSession()
+  const [isOpen, setOpen] = useState(false)
+  const closeMenu = () => setOpen(false)
   return (
-    <Drawer
-      size="80%"
-      transitionProps={{
-        duration: 500,
-      }}
-      styles={{
-        content: {},
-        body: {
-          padding: 0,
-          height: 'calc(100% - 4rem)',
-        },
-      }}
-      {...props}
-    >
-      <Stack h="100%" justify="space-between">
-        {/* Menu */}
-        <Box
-          component={motion.div}
-          initial={{ x: -100 }}
-          animate={{ x: 0 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
-          <List px="xl" listStyleType="none">
-            {menuData
+    <Sheet open={isOpen} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <div className="md:hidden">
+          <Hamburger toggled={isOpen} toggle={setOpen} size={24} />
+        </div>
+      </SheetTrigger>
+      <SheetContent
+        side="left"
+        className="w-full data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both] xs:w-80"
+      >
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">Barometers website navigation menu</SheetDescription>
+        <div className="flex h-full flex-col justify-between">
+          {/* Menu content */}
+          <nav className="mt-20 space-y-6 pl-8 pr-4">
+            {menu
               .filter(
                 ({ visibleFor }) =>
                   typeof visibleFor === 'undefined' ||
                   (isAdmin(session) && visibleFor === AccessRole.ADMIN),
               )
-              .map((outer, i, arr) => (
-                <Fragment key={outer.id}>
-                  {outer.label === 'Collection' ? (
-                    <>
-                      <List.Item py="md">
-                        <UnstyledButton onClick={() => toggle(i)}>
-                          <Group gap="sm">
-                            <Text size="md" tt="uppercase" lts="0.15rem" fw={500}>
-                              {outer.label}
-                            </Text>
-                            <Center
-                              component={motion.div}
-                              animate={{ rotate: opened[i] ? 90 : 0 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <IconChevronRight />
-                            </Center>
-                          </Group>
-                        </UnstyledButton>
-                      </List.Item>
-                      <Collapse transitionDuration={500} in={opened[i]}>
-                        <List px="xl" listStyleType="none">
-                          {categories.map(({ name, label, id }) => (
-                            <List.Item pb="sm" key={id}>
-                              <Anchor
-                                c="inherit"
-                                component={Link}
-                                href={FrontRoutes.Categories + name}
-                                onClick={props.onClose}
+              .map(item =>
+                'children' in item ? (
+                  <Accordion key={item.id} type="single" collapsible className="w-full">
+                    <AccordionItem value={`${item.id}`}>
+                      <AccordionTrigger className={cn('p-0 hover:no-underline', menuItemTextStyle)}>
+                        {item.label}
+                      </AccordionTrigger>
+                      <AccordionContent className="p-0">
+                        <ul className="ml-6 space-y-3">
+                          {item.children?.map(nestedItem => (
+                            <li key={nestedItem.id}>
+                              <Link
+                                href={nestedItem.link}
+                                onClick={closeMenu}
+                                className="w-full text-xs font-medium uppercase tracking-widest hover:text-foreground/80"
                               >
-                                <Text size="md" tt="capitalize" lts="0.1rem" fw={400}>
-                                  {label}
-                                </Text>
-                              </Anchor>
-                            </List.Item>
+                                {nestedItem.label}
+                              </Link>
+                            </li>
                           ))}
-                        </List>
-                      </Collapse>
-                    </>
-                  ) : (
-                    <List.Item py="md">
-                      <Anchor
-                        c="inherit"
-                        component={Link}
-                        href={`/${outer.link}`}
-                        onClick={props.onClose}
-                      >
-                        <Text size="md" tt="uppercase" lts="0.15rem" fw={500}>
-                          {outer.label}
-                        </Text>
-                      </Anchor>
-                    </List.Item>
-                  )}
-                  {i < arr.length - 1 && <Divider />}
-                </Fragment>
-              ))}
-          </List>
-        </Box>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                ) : (
+                  <Link
+                    className={cn('block', menuItemTextStyle)}
+                    key={item.id}
+                    href={item.link}
+                    onClick={closeMenu}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
+          </nav>
 
-        {/* Footer */}
-        <Box
-          component={motion.div}
-          initial={{ y: 70 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
-          <Divider />
-          <Group h="4rem" align="center" justify="space-evenly">
-            <Anchor aria-label="Instagram" target="_blank" href={instagram} lh={0}>
-              <ActionIcon variant="default" size="sm" bd="none">
-                <IconBrandInstagram size="100%" />
-              </ActionIcon>
-            </Anchor>
-            <Anchor aria-label="Email" target="_blank" href={`mailto:${email}`} lh={0}>
-              <ActionIcon variant="default" size="sm" bd="none">
-                <IconAt size="100%" />
-              </ActionIcon>
-            </Anchor>
-          </Group>
-        </Box>
-      </Stack>
-    </Drawer>
+          {/* Footer */}
+          <div className="border-t px-6 py-4">
+            <SocialButtons className="mx-auto" />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

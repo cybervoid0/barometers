@@ -1,3 +1,5 @@
+import { AccessRole } from '@prisma/client'
+
 export type { BarometerListDTO } from './api/v2/barometers/getters'
 export type { CategoryListDTO } from './api/v2/categories/getters'
 export type { CategoryDTO } from './api/v2/categories/[name]/getters'
@@ -38,3 +40,11 @@ export const SortOptions = [
 
 export type SortValue = (typeof SortOptions)[number]['value']
 export type DynamicOptions = 'auto' | 'force-dynamic' | 'error' | 'force-static'
+
+export interface MenuItem {
+  id: number | string
+  label: string
+  link: string
+  visibleFor?: AccessRole
+  children?: MenuItem[]
+}

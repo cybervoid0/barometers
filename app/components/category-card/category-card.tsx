@@ -23,7 +23,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
         <div
           className={cn(
             'relative h-full w-full overflow-hidden rounded-md',
-            'from-card-gradient-from to-card-gradient-to bg-gradient-to-t',
+            'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
           )}
         >
           <CategoryIcon category={name} className="absolute right-4 top-4 z-10" />

@@ -1,1 +1,1 @@
-export { default as Tabs } from './tabs'
+export { WideScreenTabs } from './tabs'
