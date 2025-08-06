@@ -2,7 +2,7 @@ import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Raleway } from 'next/font/google'
-import { Notifications } from '@mantine/notifications'
+import { Toaster } from 'sonner'
 import './globals.css'
 import { Footer, Header } from './components'
 import Providers from './providers'
@@ -67,9 +67,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={cn(raleway.variable, 'font-raleway bg-background text-foreground')}>
+      <body className={cn(raleway.variable, 'bg-background font-raleway text-foreground')}>
         <Providers>
-          <Notifications />
+          <Toaster position="top-center" richColors />
           <div className="flex h-screen flex-col">
             <Header />
             <div className="grow pb-12 shadow-lg">{children}</div>
