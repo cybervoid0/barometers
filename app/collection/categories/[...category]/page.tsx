@@ -1,14 +1,13 @@
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
-import { Container, Grid, GridCol, Stack, Title } from '@mantine/core'
 import { imageStorage, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
 import { BarometerCard } from '@/app/components/barometer-card'
 import { SortValue, SortOptions, DynamicOptions } from '@/app/types'
 import Sort from './sort'
-import { DescriptionText } from '@/app/components/description-text'
+import { ShowMore } from '@/app/components/showmore'
 import { title, openGraph, twitter } from '@/app/metadata'
-import { Pagination } from './pagination'
+import { Pagination } from '@/components/ui/pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer-video'
@@ -19,7 +18,7 @@ export const dynamic: DynamicOptions = 'force-static'
 interface CollectionProps {
   params: {
     // category should include [categoryName, sortCriteria, pageNo]
-    category: string[]
+    category: [string, string, string]
   }
 }
 
@@ -66,32 +65,32 @@ export default async function Collection({ params: { category } }: CollectionPro
   )
   const { description } = await getCategory(categoryName)
   return (
-    <Container py="xl" size="xl">
-      <Stack gap="xs">
-        <Title tt="capitalize" component="h2">
-          {categoryName}
-        </Title>
-        {description && <DescriptionText description={description} />}
-        <Sort sortBy={sort as SortValue} style={{ alignSelf: 'flex-end' }} />
-        <Grid justify="center" gutter="xl">
+    <div className="container mx-auto py-8">
+      <div className="flex flex-col gap-4">
+        <h2>{categoryName}</h2>
+        <ShowMore maxHeight={60} md>
+          {description}
+        </ShowMore>
+        <div className="grid grid-cols-2 gap-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <div className="hidden sm:block md:col-span-2 lg:col-span-3" />
+          <Sort sortBy={sort as SortValue} className="col-span-2 sm:col-span-1" />
           {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
-            <GridCol span={{ base: 6, md: 4, lg: 3 }} key={id}>
-              <BarometerCard
-                priority={i < 5}
-                image={images[0]}
-                name={name}
-                link={FrontRoutes.Barometer + slug}
-                manufacturer={
-                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
-                }
-              />
-            </GridCol>
+            <BarometerCard
+              key={id}
+              priority={i < 5}
+              image={images[0]}
+              name={name}
+              link={FrontRoutes.Barometer + slug}
+              manufacturer={
+                (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+              }
+            />
           ))}
-        </Grid>
-        {totalPages > 1 && <Pagination total={totalPages} value={+page} />}
-      </Stack>
+        </div>
+        {totalPages > 1 && <Pagination total={totalPages} value={+page} className="mx-auto mt-4" />}
+      </div>
       {categoryName === 'recorders' && <FooterVideo />}
-    </Container>
+    </div>
   )
 }
 

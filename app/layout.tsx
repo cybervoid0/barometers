@@ -72,7 +72,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <Toaster position="top-center" richColors />
           <div className="flex h-screen flex-col">
             <Header />
-            <div className="grow pb-12 shadow-lg">{children}</div>
+            <div className="grow px-2 pb-12 shadow-lg xs:px-0">{children}</div>
             <Footer />
           </div>
         </Providers>

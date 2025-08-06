@@ -75,17 +75,15 @@
   * {
     @apply border-border;
   }
+  /* Typography styles */
 
-  body {
-    @apply bg-background text-foreground;
+  /* H1 is used only once in the site layout header */
+  h1 {
+    @apply text-[1.3rem] font-semibold uppercase leading-none tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
   }
-
-  section {
-    @apply container mx-auto px-2 xs:px-0;
-  }
-
+  /* H2 is used for page headers */
   h2 {
-    @apply mb-5 text-2xl font-bold;
+    @apply mb-5 text-3xl font-semibold capitalize tracking-wider;
   }
 
   h3 {
@@ -95,16 +93,4 @@
   h4 {
     @apply mb-3 text-lg font-medium;
   }
-
-  /* Typography styles */
-  /*   h1 {
-    @apply text-4xl font-bold text-foreground leading-tight mb-6;
-  }
-
-
-   */
-
-  /*  p {
-    @apply text-base leading-relaxed ;
-  } */
 }

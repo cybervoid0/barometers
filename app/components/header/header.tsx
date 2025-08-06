@@ -25,9 +25,7 @@ export async function Header() {
           </div>
           <NextLink className="no-underline" href="/">
             <div className="flex items-center gap-2">
-              <h1 className="text-[1.3rem] font-semibold uppercase leading-none tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem]">
-                Barometers Realm
-              </h1>
+              <h1>Barometers Realm</h1>
               {/* Logo image */}
               <div className="relative aspect-square h-10 sm:h-12">
                 <NextImage

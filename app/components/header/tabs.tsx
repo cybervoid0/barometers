@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { IconSearch } from '@tabler/icons-react'
-import { isAdmin } from '../../is-admin'
+import { isAdmin } from '../is-admin'
 import { MenuItem } from '@/app/types'
 import { cn } from '@/lib/utils'
 import {

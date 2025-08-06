@@ -1,1 +1,0 @@
-export { WideScreenTabs } from './tabs'

@@ -29,7 +29,7 @@ const schema = yup.object({
 
 type SearchFormData = yup.InferType<typeof schema>
 
-export function SearchField({ queryString, className, ...props }: SearchProps) {
+export function SearchField({ queryString, ...props }: SearchProps) {
   const router = useRouter()
 
   const {
@@ -76,13 +76,7 @@ export function SearchField({ queryString, className, ...props }: SearchProps) {
   }
 
   return (
-    <div
-      className={cn(
-        'my-4 ml-auto w-full xs:w-[calc(50%-1.25rem)] lg:w-[calc(33%-1.25rem)]',
-        className,
-      )}
-      {...props}
-    >
+    <div {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex w-full">
           <div className="relative flex-grow">
