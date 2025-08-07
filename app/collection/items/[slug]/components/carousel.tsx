@@ -1,10 +1,8 @@
 'use client'
 
-import { Box, Image } from '@mantine/core'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Zoom, Navigation, Pagination } from 'swiper/modules'
-import NextImage from 'next/image'
-import clsx from 'clsx'
+import Image from 'next/image'
 import { ImagesEdit } from './edit-fields/images-edit'
 import { type BarometerDTO } from '@/app/types'
 import { IsAdmin } from '@/app/components/is-admin'
@@ -21,7 +19,7 @@ interface ImageCarouselProps {
 
 export function ImageCarousel({ barometer }: ImageCarouselProps) {
   return (
-    <Box style={{ overflow: 'hidden', position: 'relative' }}>
+    <div style={{ overflow: 'hidden', position: 'relative' }}>
       <IsAdmin>
         <ImagesEdit barometer={barometer} />
       </IsAdmin>
@@ -33,13 +31,13 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
         pagination={{
           clickable: true,
           renderBullet(index, className) {
-            return `<span class="${clsx(className)}">${index + 1}</span>`
+            return `<span class="${className}">${index + 1}</span>`
           },
         }}
       >
         {barometer.images.map((image, i) => (
           <SwiperSlide key={image.id}>
-            <Box className="swiper-zoom-container relative">
+            <div className="swiper-zoom-container relative">
               <Image
                 unoptimized
                 priority={i === 0}
@@ -47,17 +45,16 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 fill
                 src={customImageLoader({ src: image.url, quality: 90, width: 1500 })}
                 alt={barometer.name}
-                component={NextImage}
                 placeholder="blur"
                 blurDataURL={image.blurData}
                 style={{
                   objectFit: 'contain',
                 }}
               />
-            </Box>
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>
-    </Box>
+    </div>
   )
 }

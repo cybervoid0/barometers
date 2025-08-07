@@ -79,18 +79,18 @@
 
   /* H1 is used only once in the site layout header */
   h1 {
-    @apply text-[1.3rem] font-semibold uppercase leading-none tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
+    @apply text-[1.3rem] font-semibold uppercase leading-loose tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
   }
   /* H2 is used for page headers */
   h2 {
-    @apply mb-5 text-3xl font-semibold capitalize tracking-wider;
+    @apply text-3xl font-semibold capitalize leading-loose tracking-wider;
   }
 
   h3 {
-    @apply mb-4 text-xl font-semibold;
+    @apply text-2xl font-semibold capitalize leading-loose tracking-wide;
   }
 
   h4 {
-    @apply mb-3 text-lg font-medium;
+    @apply text-xl font-medium capitalize leading-relaxed tracking-wide;
   }
 }

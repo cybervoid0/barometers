@@ -1,18 +1,7 @@
+import 'server-only'
+
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import {
-  Container,
-  Title,
-  Text,
-  Box,
-  Divider,
-  Anchor,
-  Grid,
-  Paper,
-  List,
-  ListItem,
-  Group,
-} from '@mantine/core'
 import {
   IconBuildingFactory2,
   IconCalendarQuestion,
@@ -29,7 +18,7 @@ import { FrontRoutes } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
-import { DescriptionText } from '@/app/components/description-text'
+import { ShowMore } from '@/app/components/showmore'
 import { Dimensions } from '@/app/types'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/app/services'
@@ -38,6 +27,8 @@ import { PropertyCard } from './components/property-card/property-card'
 import { DeleteBarometer } from './components/delete-barometer'
 import { InaccuracyReport } from './components/inaccuracy-report'
 import { MD } from '@/app/components/md'
+import { Card } from '@/components/ui/card'
+import { SeparatorWithText } from '@/components/ui/separator'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
@@ -71,168 +62,153 @@ export default async function Page({ params: { slug } }: Props) {
   const { firstName, name, city } = barometer.manufacturer
   const dimensions = (barometer.dimensions ?? []) as Dimensions
   return (
-    <Container size="xl">
-      <Box px={{ base: 'none', sm: 'xl' }} pb={{ base: 'xl', sm: '5rem' }}>
-        <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
-        <ImageCarousel barometer={barometer} />
-        <Paper p="lg">
-          <Group mb="lg" align="center" justify="space-between" wrap="nowrap">
-            <Group align="center" gap="sm">
-              <Title fw={600} order={2} tt="capitalize">
-                {barometer.name}
-              </Title>
+    <div className="container mx-auto pb-4 sm:pb-20">
+      <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
+      <ImageCarousel barometer={barometer} />
+      <Card className="p-6">
+        <div className="mb-6 flex flex-row flex-nowrap items-center justify-between">
+          <div className="flex flex-row items-center gap-2">
+            <h3>{barometer.name}</h3>
+            <IsAdmin>
+              <TextFieldEdit barometer={barometer} property="name" />
+            </IsAdmin>
+          </div>
+          <DeleteBarometer barometer={barometer} />
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <PropertyCard
+            icon={IconBuildingFactory2}
+            title="Manufacturer or Retailer"
+            edit={<ManufacturerEdit barometer={barometer} />}
+          >
+            <Link
+              className="block underline"
+              href={FrontRoutes.Brands + barometer.manufacturer.slug}
+              /* display manufacturer name and city (or country if city is not specified) */
+            >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Link>
+          </PropertyCard>
+          <PropertyCard
+            icon={IconNumber}
+            title="Serial Number"
+            edit={<TextFieldEdit barometer={barometer} property="serial" />}
+          >
+            {barometer.serial}
+          </PropertyCard>
+          <PropertyCard
+            adminOnly
+            icon={IconTopologyRing2}
+            title="Collection ID"
+            edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
+          >
+            {barometer.collectionId}
+          </PropertyCard>
+          <PropertyCard
+            adminOnly
+            icon={IconCalendarQuestion}
+            title="Year"
+            edit={<DateEdit barometer={barometer} />}
+          >
+            {dayjs(barometer.date).format('YYYY')}
+          </PropertyCard>
+          <PropertyCard
+            icon={IconTimeline}
+            title="Dating"
+            edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
+          >
+            {barometer.dateDescription}
+          </PropertyCard>
+          <PropertyCard
+            icon={IconTagStarred}
+            title="Condition"
+            edit={<ConditionEdit barometer={barometer} />}
+          >
+            <Condition condition={barometer.condition} />
+          </PropertyCard>
+          <PropertyCard
+            adminOnly={!barometer.subCategory?.name}
+            icon={IconCategory2}
+            title="Movement (Tube) Type"
+            edit={<SubcategoryEdit barometer={barometer} />}
+          >
+            <p className="text-sm capitalize">{barometer.subCategory?.name}</p>
+          </PropertyCard>
+          <PropertyCard
+            adminOnly
+            icon={IconCurrencyEuro}
+            title="Estimated Price"
+            edit={<EstimatedPriceEdit barometer={barometer} />}
+          >
+            {barometer.estimatedPrice !== null
+              ? `€${barometer.estimatedPrice.toFixed(2)}`
+              : undefined}
+          </PropertyCard>
+          <PropertyCard
+            adminOnly={dimensions.length === 0}
+            icon={IconDimensions}
+            title="Dimensions"
+            edit={<DimensionEdit barometer={barometer} />}
+          >
+            <ul className="list-none">
+              {/* For non-admins show only the first two items */}
+              {dimensions.slice(0, 2).map(({ dim, value }) => (
+                <DimListItem key={dim} name={dim} value={value} />
+              ))}
               <IsAdmin>
-                <TextFieldEdit barometer={barometer} property="name" />
+                {dimensions.slice(2).map(({ dim, value }) => (
+                  <DimListItem key={dim} name={dim} value={value} />
+                ))}
               </IsAdmin>
-            </Group>
-            <DeleteBarometer barometer={barometer} />
-          </Group>
-          <Grid justify="center" mb="xl">
-            <PropertyCard
-              icon={IconBuildingFactory2}
-              title="Manufacturer or Retailer"
-              content={
-                <Anchor
-                  underline="always"
-                  href={FrontRoutes.Brands + barometer.manufacturer.slug}
-                  component={Link}
-                  c="dark.3"
-                  fw={400}
-                  /* display manufacturer name and city (or country if city is not specified) */
-                >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Anchor>
-              }
-              edit={<ManufacturerEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              icon={IconNumber}
-              title="Serial Number"
-              content={barometer.serial}
-              edit={<TextFieldEdit barometer={barometer} property="serial" />}
-            />
-            <PropertyCard
-              adminOnly
-              icon={IconTopologyRing2}
-              title="Collection ID"
-              content={barometer.collectionId}
-              edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
-            />
-            <PropertyCard
-              adminOnly
-              icon={IconCalendarQuestion}
-              title="Year"
-              content={dayjs(barometer.date).format('YYYY')}
-              edit={<DateEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              icon={IconTimeline}
-              title="Dating"
-              content={barometer.dateDescription}
-              edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
-            />
-            <PropertyCard
-              icon={IconTagStarred}
-              title="Condition"
-              content={<Condition condition={barometer.condition} />}
-              edit={<ConditionEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              adminOnly={!barometer.subCategory?.name}
-              icon={IconCategory2}
-              title="Movement (Tube) Type"
-              content={
-                <Text size="sm" tt="capitalize">
-                  {barometer.subCategory?.name}
-                </Text>
-              }
-              edit={<SubcategoryEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              adminOnly
-              icon={IconCurrencyEuro}
-              title="Estimated Price"
-              content={
-                barometer.estimatedPrice !== null
-                  ? `€${barometer.estimatedPrice.toFixed(2)}`
-                  : undefined
-              }
-              edit={<EstimatedPriceEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              adminOnly={dimensions.length === 0}
-              icon={IconDimensions}
-              title="Dimensions"
-              content={
-                <List listStyleType="none">
-                  {/* For non-admins show only the first two items */}
-                  {dimensions.slice(0, 2).map(({ dim, value }) => (
-                    <DimListItem key={dim} name={dim} value={value} />
-                  ))}
-                  <IsAdmin>
-                    {dimensions.slice(2).map(({ dim, value }) => (
-                      <DimListItem key={dim} name={dim} value={value} />
-                    ))}
-                  </IsAdmin>
-                </List>
-              }
-              edit={<DimensionEdit barometer={barometer} />}
-            />
-            <PropertyCard
-              adminOnly={!barometer.materials || barometer.materials.length === 0}
-              icon={IconWood}
-              title="Materials"
-              content={
-                <Text size="sm">{barometer.materials.map(item => item.name).join(', ')}</Text>
-              }
-              edit={<MaterialsEdit barometer={barometer} />}
-            />
-          </Grid>
-          <Group align="center" gap="sm">
-            <Title fw={600} order={2} tt="capitalize">
-              Object Overview
-            </Title>
-            <IsAdmin>
-              <TextAreaEdit barometer={barometer} property="description" />
-            </IsAdmin>
-          </Group>
-
-          {barometer.description ? (
-            <DescriptionText mt="lg" description={barometer.description} />
-          ) : (
-            <IsAdmin>
-              <Text>Add description</Text>
-            </IsAdmin>
-          )}
-
-          <Divider
-            py="lg"
-            labelPosition="center"
-            label={<InaccuracyReport barometer={barometer} />}
-          />
-
+            </ul>
+          </PropertyCard>
+          <PropertyCard
+            adminOnly={!barometer.materials || barometer.materials.length === 0}
+            icon={IconWood}
+            title="Materials"
+            edit={<MaterialsEdit barometer={barometer} />}
+          >
+            <p className="text-sm capitalize">
+              {barometer.materials.map(item => item.name).join(', ')}
+            </p>
+          </PropertyCard>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <h3 className="capitalize">Object Overview</h3>
           <IsAdmin>
-            <Group mb="sm" align="center" gap="sm">
-              <Title fw={600} order={2} tt="capitalize">
-                Provenance
-              </Title>
-              <IsAdmin>
-                <TextAreaEdit barometer={barometer} property="provenance" />
-              </IsAdmin>
-            </Group>
-            {barometer.provenance ? <MD>{barometer.provenance}</MD> : <Text>No text</Text>}
+            <TextAreaEdit barometer={barometer} property="description" />
           </IsAdmin>
-        </Paper>
-      </Box>
-    </Container>
+        </div>
+
+        {barometer.description ? (
+          <ShowMore md maxHeight={180}>
+            {barometer.description}
+          </ShowMore>
+        ) : (
+          <IsAdmin>
+            <p>Add description</p>
+          </IsAdmin>
+        )}
+
+        <SeparatorWithText>
+          <InaccuracyReport barometer={barometer} />
+        </SeparatorWithText>
+
+        <IsAdmin>
+          <div className="flex flex-row items-center gap-2">
+            <h3>Provenance</h3>
+            <IsAdmin>
+              <TextAreaEdit barometer={barometer} property="provenance" />
+            </IsAdmin>
+          </div>
+          {barometer.provenance ? <MD>{barometer.provenance}</MD> : <p>No text</p>}
+        </IsAdmin>
+      </Card>
+    </div>
   )
 }
 
 const DimListItem = ({ name, value }: { name: string; value: string }) => (
-  <ListItem>
-    <Text size="sm" tt="capitalize" fw={500} component="span">
-      {name}:
-    </Text>{' '}
-    <Text size="sm" component="span">
-      {value}
-    </Text>
-  </ListItem>
+  <li>
+    <span className="text-sm font-medium capitalize">{name}:</span>{' '}
+    <span className="text-sm">{value}</span>
+  </li>
 )
