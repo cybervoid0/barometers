@@ -7,7 +7,7 @@ export function Footer() {
     <footer
       className={cn(
         'w-full py-4',
-        'from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to bg-gradient-to-b',
+        'bg-gradient-to-b from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to',
       )}
     >
       <div className="container relative mx-auto py-4 sm:py-6">

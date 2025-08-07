@@ -10,7 +10,7 @@ import { title, openGraph, twitter } from '@/app/metadata'
 import { Pagination } from '@/components/ui/pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
-import { FooterVideo } from '@/app/components/footer-video'
+import { FooterVideo } from '@/app/components/footer'
 
 export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
