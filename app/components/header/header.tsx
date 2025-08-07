@@ -32,7 +32,7 @@ export async function Header() {
                   unoptimized
                   fill
                   src={customImageLoader({
-                    src: '/shared/logo-arrow.png',
+                    src: '/shared/compass-logo.svg',
                     quality: 60,
                     width: 48,
                   })}

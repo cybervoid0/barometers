@@ -14,7 +14,7 @@
     --popover-foreground: 20 14.3% 4.1%;
     --primary: 30 70% 19%;
     --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 60 4.8% 95.9%;
+    --secondary: 221 58% 23%;
     --secondary-foreground: 24 9.8% 10%;
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5.3% 44.7%;
@@ -47,7 +47,7 @@
     --popover-foreground: 60 9.1% 97.8%;
     --primary: 0 0% 70%;
     --primary-foreground: 24 9.8% 10%;
-    --secondary: 12 6.5% 15.1%;
+    --secondary: 53 48% 46%;
     --secondary-foreground: 60 9.1% 97.8%;
     --muted: 12 6.5% 15.1%;
     --muted-foreground: 24 5.4% 63.9%;
@@ -79,7 +79,7 @@
 
   /* H1 is used only once in the site layout header */
   h1 {
-    @apply text-[1.3rem] font-semibold uppercase leading-loose tracking-wider text-primary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
+    @apply text-[1.3rem] font-semibold uppercase leading-loose tracking-wider text-secondary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
   }
   /* H2 is used for page headers */
   h2 {
