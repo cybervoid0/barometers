@@ -8,8 +8,7 @@ export function NewArrivals({ className, ...props }: HTMLAttributes<HTMLButtonEl
   return (
     <Button asChild size="sm" className={cn('uppercase tracking-wider', className)} {...props}>
       <Link href={FrontRoutes.NewArrivals}>
-        <p className="hidden text-base xs:block">New Arrivals</p>
-        <p className="xs:hidden">New</p>
+        <p className="text-base">New Arrivals</p>
       </Link>
     </Button>
   )

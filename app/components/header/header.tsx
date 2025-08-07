@@ -18,7 +18,7 @@ export async function Header() {
           'bg-gradient-to-t from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to',
         )}
       >
-        <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1">
+        <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-1">
           <div className="flex items-center">
             <WideScreenTabs menu={menu} className="hidden md:block" />
             <MobileMenu menu={menu} />

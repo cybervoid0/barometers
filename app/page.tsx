@@ -15,10 +15,10 @@ export default async function HomePage() {
     <>
       <HeadingImage />
       <div className="container mx-auto">
-        <div className="my-3 grid grid-cols-6 items-center gap-x-4 sm:gap-x-10">
-          <NewArrivals className="col-span-2 md:col-span-2 lg:col-span-1" />
+        <div className="my-6 grid grid-cols-6 items-center gap-x-4 sm:gap-x-10">
+          <NewArrivals className="col-span-3 md:col-span-2 lg:col-span-1" />
           <div className="hidden md:block lg:col-span-3" />
-          <SearchField className="col-span-4 md:col-span-3 lg:col-span-2" />
+          <SearchField className="col-span-3 md:col-span-3 lg:col-span-2" />
         </div>
         <div className={cn(gridStyle, 'gap-8 sm:gap-10')}>
           {categories.map(({ id, name, image }, i) => (

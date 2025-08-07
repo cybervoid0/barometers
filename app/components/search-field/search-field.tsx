@@ -104,7 +104,12 @@ export function SearchField({ queryString, ...props }: SearchProps) {
               </Button>
             )}
           </div>
-          <Button type="submit" size="icon" className="rounded-l-none" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            size="icon"
+            className="shrink-0 rounded-l-none"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? '...' : <IconSearch className="h-4 w-4" />}
           </Button>
         </div>
