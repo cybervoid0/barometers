@@ -48,7 +48,9 @@ export async function BarometerCard({
         </div>
         <p className="text-xs font-medium uppercase tracking-wider">{name}</p>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <p className="text-[8px] font-medium uppercase tracking-wider">{manufacturer}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            {manufacturer}
+          </p>
         )}
       </Link>
     </div>

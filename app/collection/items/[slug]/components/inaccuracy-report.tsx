@@ -1,124 +1,152 @@
 'use client'
 
 import React from 'react'
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Group,
-  Modal,
-  Textarea,
-  TextInput,
-  Text,
-  LoadingOverlay,
-  Tooltip,
-} from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import { useForm } from '@mantine/form'
+import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isEmail, isLength } from 'validator'
 import { showError, showInfo } from '@/utils/notification'
 import { createReport } from '@/utils/fetch'
 import { BarometerDTO } from '@/app/types'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 
-interface Props extends ButtonProps {
+interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 const maxFeedbackLen = 1000
 
 export function InaccuracyReport({ barometer, ...props }: Props) {
   const queryClient = useQueryClient()
-  const [isOpened, { open, close }] = useDisclosure(false)
-  const form = useForm({
-    initialValues: {
-      reporterName: '',
-      reporterEmail: '',
-      description: '',
-    },
-    validate: {
-      reporterEmail: (value: string) => (!isEmail(value) ? 'Invalid email' : null),
-      reporterName: (value: string) =>
-        !isLength(value, { min: 2, max: 50 }) ? 'Value must be between 2 and 50 characters' : null,
-      description: (value: string) =>
-        !isLength(value, { min: 5, max: maxFeedbackLen })
-          ? `Value must be between 5 and ${maxFeedbackLen} characters`
-          : null,
-    },
-    transformValues: values => ({
-      ...values,
-      barometerId: barometer.id,
-    }),
+  const [isOpened, setIsOpened] = React.useState<boolean>(false)
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<{ reporterName: string; reporterEmail: string; description: string }>({
+    defaultValues: { reporterName: '', reporterEmail: '', description: '' },
+    mode: 'onBlur',
   })
 
   const { mutate, isPending } = useMutation({
     mutationFn: createReport,
     onSuccess: ({ id }) => {
       queryClient.invalidateQueries({ queryKey: ['inaccuracyReport'] })
-      close()
-      form.reset()
+      setIsOpened(false)
+      reset()
       showInfo(
         `Thank you! Your report was registered with ID ${id}. We will contact you at the provided email`,
       )
     },
     onError: err => showError(err.message),
   })
+  const onSubmit = handleSubmit(values => {
+    const { reporterEmail, reporterName, description } = values
+    if (!isEmail(reporterEmail)) {
+      showError('Invalid email')
+      return
+    }
+    if (!isLength(reporterName, { min: 2, max: 50 })) {
+      showError('Value must be between 2 and 50 characters')
+      return
+    }
+    if (!isLength(description, { min: 5, max: maxFeedbackLen })) {
+      showError(`Value must be between 5 and ${maxFeedbackLen} characters`)
+      return
+    }
+    mutate({ ...values, barometerId: barometer.id })
+  })
+
+  const descriptionValue = watch('description') ?? ''
+  const symbolsLeft = maxFeedbackLen - descriptionValue.length
+
   return (
     <>
-      <Tooltip
-        multiline
-        w={210}
-        label={
-          <Text size="xs">
-            Report issues in the description of &laquo;
-            <span style={{ textTransform: 'capitalize' }}>{barometer.name}</span>&raquo;
-          </Text>
-        }
-      >
-        <Button variant="light" color="primary" {...props} onClick={open}>
-          <Text fw={400} fz="sm" size="md" lts="0.05rem" tt="uppercase">
-            Report inaccuracy
-          </Text>
-        </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            {...props}
+            type="button"
+            variant="outline"
+            onClick={() => setIsOpened(true)}
+            aria-label={`Open report inaccuracy dialog for ${barometer.name}`}
+          >
+            <span className="text-sm font-normal uppercase tracking-wider">Report inaccuracy</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          Report issues in the description of
+          <span className="ml-1 capitalize">{barometer.name}</span>
+        </TooltipContent>
       </Tooltip>
-      <Modal
-        size="xl"
-        opened={isOpened}
-        onClose={close}
-        title={`Report Inaccuracy in ${barometer.name}`}
-        centered
-        styles={{ title: { fontWeight: 500, fontSize: '1.2rem', textTransform: 'capitalize' } }}
-      >
-        <LoadingOverlay
-          visible={isPending}
-          zIndex={1000}
-          loaderProps={{ color: 'dark', type: 'oval' }}
-          overlayProps={{ blur: 2 }}
-        />
-        <Box component="form" onSubmit={form.onSubmit(values => mutate(values))}>
-          <TextInput label="Name" required {...form.getInputProps('reporterName')} />
-          <TextInput label="Email" required {...form.getInputProps('reporterEmail')} />
-          <Textarea
-            label="Feedback"
-            description={(() => {
-              const feedbackLen = form.values.description.length
-              const symbolsLeft = maxFeedbackLen - feedbackLen
-              return feedbackLen > 0 && feedbackLen <= maxFeedbackLen
-                ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`
-                : feedbackLen > maxFeedbackLen
-                  ? `Feedback is ${-symbolsLeft} character${-symbolsLeft === 1 ? '' : 's'} longer than allowed`
-                  : undefined
-            })()}
-            placeholder="Describe the inaccuracy"
-            {...form.getInputProps('description')}
-            required
-            autosize
-            minRows={2}
-          />
-          <Group justify="flex-end" mt="lg">
-            <Button type="submit">Send</Button>
-          </Group>
-        </Box>
-      </Modal>
+      <Dialog open={isOpened} onOpenChange={setIsOpened}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="capitalize">Report Inaccuracy in {barometer.name}</DialogTitle>
+            <DialogDescription>We will contact you using the provided email.</DialogDescription>
+          </DialogHeader>
+          <form className="space-y-4" onSubmit={onSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="reporterName">Name</Label>
+              <Input
+                id="reporterName"
+                aria-invalid={!!errors.reporterName}
+                aria-describedby="reporterName-error"
+                placeholder="Your name"
+                {...register('reporterName', { required: true })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reporterEmail">Email</Label>
+              <Input
+                id="reporterEmail"
+                type="email"
+                aria-invalid={!!errors.reporterEmail}
+                aria-describedby="reporterEmail-error"
+                placeholder="your@email.com"
+                {...register('reporterEmail', { required: true })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Feedback</Label>
+              <Textarea
+                id="description"
+                aria-invalid={!!errors.description}
+                aria-describedby="description-help"
+                placeholder="Describe the inaccuracy"
+                className="min-h-24"
+                {...register('description', { required: true })}
+              />
+              <p id="description-help" className="text-xs text-muted-foreground">
+                {descriptionValue.length > 0 && descriptionValue.length <= maxFeedbackLen
+                  ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`
+                  : descriptionValue.length > maxFeedbackLen
+                    ? `Feedback is ${-symbolsLeft} character${-symbolsLeft === 1 ? '' : 's'} longer than allowed`
+                    : null}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={() => setIsOpened(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting || isPending}>
+                Send
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
