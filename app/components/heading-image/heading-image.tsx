@@ -4,7 +4,7 @@ import customImageLoader from '@/utils/image-loader'
 
 export const HeadingImage = () => {
   return (
-    <div className="container relative mx-auto h-[50vh] w-full overflow-hidden xs:h-40">
+    <div className="relative h-[50vh] w-full overflow-hidden xs:h-40">
       <NextImage
         unoptimized
         priority

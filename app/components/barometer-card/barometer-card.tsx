@@ -19,10 +19,11 @@ export async function BarometerCard({
   link,
   manufacturer,
   priority,
+  className,
   ...props
 }: BarometerCardProps) {
   return (
-    <div {...props}>
+    <div className={cn('h-full', className)} {...props}>
       <Link
         className={cn(
           'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center',

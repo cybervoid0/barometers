@@ -1,9 +1,10 @@
-import React from 'react'
-import { Container, Grid, GridCol, Stack, Title, Text } from '@mantine/core'
+import 'server-only'
+
 import { fetchBarometerList } from '@/utils/fetch'
 import { BarometerCardWithIcon } from '@/app/components/barometer-card'
-import { Pagination } from '@/app/components/pagination'
+import { Pagination } from '@/components/ui/pagination'
 import { FrontRoutes } from '@/utils/routes-front'
+import { Card } from '@/components/ui/card'
 
 const itemsOnPage = 12
 
@@ -18,24 +19,23 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
     size: searchParams.size ?? itemsOnPage,
   })
   return (
-    <Container py="xl" size="xl">
-      <Stack gap="xs">
-        <Title tt="capitalize" mb="sm" component="h2">
-          Last Added
-        </Title>
+    <>
+      <div className="flex flex-col gap-2 pt-6">
+        <h2>Last Added</h2>
 
-        <Text>Discover the latest additions to the collection!</Text>
-        <Text mb="xl">
+        <p>Discover the latest additions to the collection!</p>
+        <p className="mb-6">
           This section highlights newly added barometers and weather instruments from every
           category. Whether it&apos;s a self-registering recorder, a rare Bourdon barometer, or a
           compact pocket device, each piece reflects the fascinating evolution of weather
           measurement. Explore and find inspiration in these timeless tools.
-        </Text>
+        </p>
 
-        <Grid justify="center" gutter="xl">
-          {barometers.map(({ name, id, images, manufacturer, slug, category }) => (
-            <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+        <Card className="p-4 shadow-md">
+          <div className="grid grid-cols-2 gap-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+            {barometers.map(({ name, id, images, manufacturer, slug, category }) => (
               <BarometerCardWithIcon
+                key={id}
                 barometerName={name}
                 barometerLink={FrontRoutes.Barometer + slug}
                 categoryName={category.name}
@@ -45,11 +45,11 @@ export default async function NewArrivals({ searchParams }: newArrivalsProps) {
                 }
                 image={images.at(0)!}
               />
-            </GridCol>
-          ))}
-        </Grid>
-        {totalPages > 1 && <Pagination total={totalPages} value={page} />}
-      </Stack>
-    </Container>
+            ))}
+          </div>
+          {totalPages > 1 && <Pagination total={totalPages} value={page} className="mt-4" />}
+        </Card>
+      </div>
+    </>
   )
 }

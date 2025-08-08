@@ -62,11 +62,11 @@ export default async function Page({ params: { slug } }: Props) {
   const { firstName, name, city } = barometer.manufacturer
   const dimensions = (barometer.dimensions ?? []) as Dimensions
   return (
-    <div className="container mx-auto pb-4 sm:pb-20">
+    <>
       <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
       <ImageCarousel barometer={barometer} />
-      <Card className="p-6">
-        <div className="mb-6 flex flex-row flex-nowrap items-center justify-between">
+      <Card className="p-4 shadow-md">
+        <div className="flex flex-row flex-nowrap items-center justify-between">
           <div className="flex flex-row items-center gap-2">
             <h3>{barometer.name}</h3>
             <IsAdmin>
@@ -202,7 +202,7 @@ export default async function Page({ params: { slug } }: Props) {
           {barometer.provenance ? <MD>{barometer.provenance}</MD> : <p>No text</p>}
         </IsAdmin>
       </Card>
-    </div>
+    </>
   )
 }
 

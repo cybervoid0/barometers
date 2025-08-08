@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { Metadata } from 'next'
 import capitalize from 'lodash/capitalize'
 import { imageStorage, BAROMETERS_PER_CATEGORY_PAGE } from '@/utils/constants'
@@ -11,6 +13,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getCategory, getBarometersByParams } from '@/app/services'
 import { FooterVideo } from '@/app/components/footer'
+import { Card } from '@/components/ui/card'
 
 export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
@@ -65,32 +68,33 @@ export default async function Collection({ params: { category } }: CollectionPro
   )
   const { description } = await getCategory(categoryName)
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex flex-col gap-4">
+    <>
+      <div className="flex flex-col gap-4 pt-6">
         <h2>{categoryName}</h2>
         <ShowMore maxHeight={60} md>
           {description}
         </ShowMore>
-        <div className="grid grid-cols-2 gap-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-          <div className="hidden sm:block md:col-span-2 lg:col-span-3" />
-          <Sort sortBy={sort as SortValue} className="col-span-2 sm:col-span-1" />
-          {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
-            <BarometerCard
-              key={id}
-              priority={i < 5}
-              image={images[0]}
-              name={name}
-              link={FrontRoutes.Barometer + slug}
-              manufacturer={
-                (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
-              }
-            />
-          ))}
-        </div>
-        {totalPages > 1 && <Pagination total={totalPages} value={+page} className="mx-auto mt-4" />}
+        <Sort sortBy={sort as SortValue} className="w-full self-end sm:w-[320px]" />
+        <Card className="p-4 shadow-md">
+          <div className="grid grid-cols-2 gap-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+            {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
+              <BarometerCard
+                key={id}
+                priority={i < 5}
+                image={images[0]}
+                name={name}
+                link={FrontRoutes.Barometer + slug}
+                manufacturer={
+                  (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
+                }
+              />
+            ))}
+          </div>
+          {totalPages > 1 && <Pagination total={totalPages} value={+page} className="mt-4" />}
+        </Card>
       </div>
       {categoryName === 'recorders' && <FooterVideo />}
-    </div>
+    </>
   )
 }
 
