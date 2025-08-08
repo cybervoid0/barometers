@@ -1,6 +1,6 @@
-import { Text, Group, Anchor, Box, Stack, Paper } from '@mantine/core'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Card } from '@/components/ui/card'
 import { SearchResultsDTO } from '../types'
 import customImageLoader from '@/utils/image-loader'
 
@@ -15,10 +15,10 @@ interface ItemProps {
 export function SearchItem({ image, link, name, manufacturer, dating }: ItemProps) {
   const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
   return (
-    <Paper shadow="sm" className="overflow-hidden border-r-[3px] border-r-black px-2 py-1">
-      <Anchor c="dark" w="fit-content" display="block" component={Link} href={link}>
-        <Group gap="0.5rem" wrap="nowrap">
-          <Box className="relative h-20 min-h-20 w-20 min-w-20">
+    <Card className="overflow-hidden rounded-sm border-r-[3px] border-r-primary p-2 shadow-md">
+      <Link href={link} className="block w-fit text-foreground hover:text-foreground">
+        <div className="flex items-center gap-2">
+          <div className="relative h-20 min-h-20 w-20 min-w-20 shrink-0">
             {image && (
               <Image
                 unoptimized
@@ -30,18 +30,16 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
                 blurDataURL={image.blurData}
               />
             )}
-          </Box>
-          <Stack gap="xs" justify="center" mih="70px">
-            <Text tt="capitalize" fw={500} lh="100%">
-              {name}
-            </Text>
-            <Text size="xs">
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            <p className="font-medium capitalize leading-none">{name}</p>
+            <p className="text-xs text-muted-foreground">
               {!noManufacturer && manufacturer} {!noManufacturer && dating && <>&mdash;</>}{' '}
               {dating && dating}
-            </Text>
-          </Stack>
-        </Group>
-      </Anchor>
-    </Paper>
+            </p>
+          </div>
+        </div>
+      </Link>
+    </Card>
   )
 }
