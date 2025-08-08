@@ -14,7 +14,7 @@ const subheaderStyles = 'my-4 text-xl font-semibold'
 export default function About() {
   return (
     <div className="pt-6">
-      <h2>Greetings, my name is Leo.</h2>
+      <h2 className="mb-3">Greetings, my name is Leo.</h2>
       <p className={paragraphStyles}>
         <Image
           priority
@@ -100,7 +100,7 @@ export default function About() {
         />
       </div>
       <Separator className="my-4" />
-      <h2>Why Barometers?</h2>
+      <h2 className="mb-3">Why Barometers?</h2>
       <p className={paragraphStyles}>
         A barometer is more than just an instrument for measuring atmospheric pressure. It is an
         artifact that unites science, art, and human ingenuity. It’s like a window into the past,

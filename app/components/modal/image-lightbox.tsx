@@ -1,8 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import NextImage from 'next/image'
-import { useDisclosure } from '@mantine/hooks'
-import { ZoomModal } from './zoom-modal'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import customImageLoader from '@/utils/image-loader'
 
 interface ImageLightboxProps {
@@ -12,35 +12,31 @@ interface ImageLightboxProps {
 
 export function ImageLightbox({ src, name }: ImageLightboxProps) {
   name ??= 'Image'
-  const [opened, { open, close }] = useDisclosure(false)
+  const [open, setOpen] = useState(false)
 
   return (
-    <>
-      <NextImage
-        unoptimized
-        width={250}
-        height={250}
-        src={customImageLoader({ src, width: 250, quality: 80 })}
-        alt={name}
-        className="w-2/3 cursor-zoom-in sm:w-[250px]"
-        onClick={open}
-        priority
-      />
-
-      <ZoomModal isOpened={opened} close={close}>
-        {({ onLoad }) => (
-          <NextImage
-            unoptimized
-            className="h-auto max-h-screen w-auto"
-            width={1000}
-            height={1000}
-            src={customImageLoader({ src, width: 1000, quality: 80 })}
-            alt={name}
-            loading="lazy"
-            onLoad={onLoad}
-          />
-        )}
-      </ZoomModal>
-    </>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <NextImage
+          unoptimized
+          width={250}
+          height={250}
+          src={customImageLoader({ src, width: 250, quality: 80 })}
+          alt={name}
+          className="cursor-zoom-in"
+          priority
+        />
+      </DialogTrigger>
+      <DialogContent>
+        <NextImage
+          unoptimized
+          width={1000}
+          height={1000}
+          src={customImageLoader({ src, width: 1000, quality: 80 })}
+          alt={name}
+          loading="lazy"
+        />
+      </DialogContent>
+    </Dialog>
   )
 }
