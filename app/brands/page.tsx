@@ -1,12 +1,13 @@
-import { Container, SimpleGrid, Title, Paper, Text, Box } from '@mantine/core'
 import Link from 'next/link'
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import Image from 'next/image'
 import { IconCircleArrowUp } from '@tabler/icons-react'
 import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
-import { DynamicOptions } from '../types'
+import { type DynamicOptions } from '../types'
+import { Card } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -64,9 +65,8 @@ const BrandsOfCountry = ({
   const width = 32
   return (
     <div className="mb-5 mr-4">
-      <Title order={3} className="!mb-5 border-b border-solid border-neutral-400 px-5 py-[0.1rem]">
-        {country.name}
-      </Title>
+      <h3 className="mb-3 px-5 text-xl font-semibold">{country.name}</h3>
+      <Separator className="mx-2 mb-5" />
 
       <div className="flex flex-col gap-4">
         {country.manufacturers.map(({ id, firstName, name, slug, icon }) => {
@@ -106,33 +106,29 @@ export default async function Manufacturers() {
   const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
   return (
-    <Container>
-      <Title mt="xl" mb="sm" component="h2">
-        Manufacturers
-      </Title>
-      <Text mb="1.6rem" style={{ textIndent: '2rem' }}>
+    <div className="container mx-auto py-8">
+      <h2 className="mb-4">Manufacturers</h2>
+      <p className="mb-6 indent-8">
         Discover the master craftsmen, renowned manufacturers and distinguished sellers behind these
         exceptional barometers, each reflecting timeless artistry and precision. Here is a curated
         list of barometer makers, along with detailed descriptions and iconic works by each master
         from the collection, representing the finest traditions of craftsmanship.
-      </Text>
-      <Paper shadow="lg" px={{ base: 'md', xs: 'xl' }} py={{ base: 'md', xs: 'xl' }}>
-        <SimpleGrid
-          cols={{ base: 1, sm: 2 }}
-          className="sm:[&>div:nth-child(2n)]:border-r-0 sm:[&>div]:border-r sm:[&>div]:border-neutral-400"
-        >
-          <Box>
+      </p>
+      <Card className="p-4 shadow-lg xs:p-8">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
+          <div>
             {firstColumn.map(country => (
               <BrandsOfCountry key={country.id} country={country} />
             ))}
-          </Box>
-          <Box>
+          </div>
+          <Separator orientation="vertical" className="hidden sm:block" />
+          <div>
             {secondColumn.map(country => (
               <BrandsOfCountry key={country.id} country={country} />
             ))}
-          </Box>
-        </SimpleGrid>
-      </Paper>
-    </Container>
+          </div>
+        </div>
+      </Card>
+    </div>
   )
 }
