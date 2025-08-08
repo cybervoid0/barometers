@@ -76,7 +76,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         </ShowMore>
         <Sort sortBy={sort as SortValue} className="w-full self-end sm:w-[320px]" />
         <Card className="p-4 shadow-md">
-          <div className="grid grid-cols-2 gap-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {barometers.map(({ name, id, images, manufacturer, slug }, i) => (
               <BarometerCard
                 key={id}

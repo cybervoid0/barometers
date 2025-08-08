@@ -1,3 +1,5 @@
+import 'server-only'
+
 import Link from 'next/link'
 import { type Metadata } from 'next'
 import Image from 'next/image'
@@ -106,7 +108,7 @@ export default async function Manufacturers() {
   const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
   return (
-    <div className="py-6">
+    <div className="pt-6">
       <h2 className="mb-4">Manufacturers</h2>
       <p className="mb-6 indent-8">
         Discover the master craftsmen, renowned manufacturers and distinguished sellers behind these
@@ -114,7 +116,7 @@ export default async function Manufacturers() {
         list of barometer makers, along with detailed descriptions and iconic works by each master
         from the collection, representing the finest traditions of craftsmanship.
       </p>
-      <Card className="p-4 shadow-md xs:p-8">
+      <Card className="p-4 shadow-md xs:p-4">
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
           <div>
             {firstColumn.map(country => (

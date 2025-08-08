@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
@@ -83,7 +85,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <Toaster position="top-center" richColors />
           <div className="flex h-screen flex-col">
             <Header />
-            <main className="container mx-auto grow px-2 pb-12 xs:px-0">{children}</main>
+            <main className="container mx-auto grow !px-2 pb-12 xs:px-0 sm:!px-4">{children}</main>
             <Footer />
           </div>
         </Providers>

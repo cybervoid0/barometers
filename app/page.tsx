@@ -16,12 +16,12 @@ export default async function HomePage() {
   return (
     <>
       <HeadingImage />
-      <div className="my-6 grid grid-cols-6 items-center gap-x-4 sm:gap-x-10">
+      <div className="my-6 grid grid-cols-6 items-center gap-x-4 sm:gap-x-5">
         <NewArrivals className="col-span-3 md:col-span-2 lg:col-span-1" />
         <div className="hidden md:block lg:col-span-3" />
         <SearchField className="col-span-3 md:col-span-3 lg:col-span-2" />
       </div>
-      <div className={cn(gridStyle, 'gap-8 sm:gap-10')}>
+      <div className={cn(gridStyle, 'gap-4 sm:gap-5')}>
         {categories.map(({ id, name, image }, i) => (
           <CategoryCard
             key={id}
