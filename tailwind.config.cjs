@@ -74,6 +74,7 @@ module.exports = {
       },
       fontFamily: {
         raleway: ['var(--font-raleway)', 'system-ui', 'sans-serif'],
+        'cormorant-uni': ['var(--font-cormorant-uni)', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -112,5 +113,5 @@ module.exports = {
       xl2: '1600px',
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/container-queries')],
 }

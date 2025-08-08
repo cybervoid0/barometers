@@ -1,10 +1,10 @@
 import NextLink from 'next/link'
 import NextImage from 'next/image'
 import { FC } from 'react'
-import { CategoryDTO } from '@/app/types'
 import { CategoryIcon } from '../category-icon'
 import customImageLoader from '@/utils/image-loader'
 import { cn } from '@/lib/utils'
+import { CategoryDTO } from '@/app/types'
 
 interface CategoryCardProps {
   name: string
@@ -22,7 +22,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
       <div className="aspect-square">
         <div
           className={cn(
-            'relative h-full w-full overflow-hidden rounded-md',
+            '@container relative h-full w-full overflow-hidden rounded-md',
             'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
           )}
         >
@@ -37,7 +37,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               alt={name}
               className={cn(
                 'transition-all duration-5000 hover:scale-150 active:scale-150',
-                'ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
+                'ease-out',
               )}
               style={{
                 objectFit: name === 'Recorders' ? 'cover' : 'contain',
@@ -48,8 +48,8 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
           )}
           <h3
             className={cn(
-              'pointer-events-none absolute bottom-8 left-8 bg-primary px-1',
-              'text-lg font-medium uppercase leading-snug tracking-widest text-background',
+              'text-shadow-stroke @sm:left-8 @sm:bottom-8 pointer-events-none absolute bottom-4 left-4',
+              'font-cormorant-uni @sm:text-3xl @lg:text-4xl text-2xl font-medium capitalize text-card-foreground',
             )}
           >
             {name}

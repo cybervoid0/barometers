@@ -1,7 +1,7 @@
 import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { Raleway } from 'next/font/google'
+import { Raleway, Cinzel } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
 import { Footer, Header } from './components'
@@ -14,6 +14,11 @@ const raleway = Raleway({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-raleway',
+})
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-cormorant-uni',
 })
 
 export const viewport: Viewport = {
@@ -67,7 +72,13 @@ export default function RootLayout({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={cn(raleway.variable, 'bg-background font-raleway text-foreground')}>
+      <body
+        className={cn(
+          raleway.variable,
+          cinzel.variable,
+          'bg-background font-raleway text-foreground',
+        )}
+      >
         <Providers>
           <Toaster position="top-center" richColors />
           <div className="flex h-screen flex-col">

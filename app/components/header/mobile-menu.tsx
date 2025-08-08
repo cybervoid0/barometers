@@ -64,7 +64,7 @@ export function MobileMenu({ menu = [] }: Props) {
                         {item.label}
                       </AccordionTrigger>
                       <AccordionContent className="p-0">
-                        <ul className="ml-6 space-y-3">
+                        <ul className="ml-6 mt-4 space-y-4">
                           {item.children?.map(nestedItem => (
                             <li key={nestedItem.id}>
                               <Link

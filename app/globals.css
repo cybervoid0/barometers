@@ -94,3 +94,33 @@
     @apply text-xl font-medium capitalize leading-relaxed tracking-wide;
   }
 }
+
+@layer utilities {
+  /* Readable text over images - magazine style */
+  .text-shadow-stroke {
+    text-shadow:
+      /* Ultra mega dense core - triple layers */
+      0 0 2px var(--card-gradient-to),
+      0 0 2px var(--card-gradient-to),
+      0 0 2px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      /* Super strong gradient with increased blur */ 0 0 8px var(--card-gradient-to),
+      0 0 10px var(--card-gradient-to),
+      0 0 12px var(--card-gradient-to),
+      0 0 14px var(--card-gradient-to),
+      0 0 16px var(--card-gradient-to),
+      0 0 18px color-mix(in srgb, var(--card-gradient-to) 60%, transparent),
+      0 0 22px color-mix(in srgb, var(--card-gradient-to) 40%, transparent),
+      0 0 26px color-mix(in srgb, var(--card-gradient-to) 25%, transparent),
+      0 0 32px color-mix(in srgb, var(--card-gradient-to) 15%, transparent),
+      0 0 40px color-mix(in srgb, var(--card-gradient-to) 8%, transparent);
+  }
+}
