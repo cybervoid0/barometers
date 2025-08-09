@@ -22,7 +22,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
       <div className="aspect-square">
         <div
           className={cn(
-            '@container relative h-full w-full overflow-hidden rounded-md',
+            'relative h-full w-full overflow-hidden rounded-md @container',
             'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
           )}
         >
@@ -48,8 +48,8 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
           )}
           <h3
             className={cn(
-              'text-shadow-stroke @sm:left-8 @sm:bottom-8 pointer-events-none absolute bottom-4 left-4',
-              'font-cormorant-uni @sm:text-3xl @lg:text-4xl text-2xl font-medium capitalize text-card-foreground',
+              'text-shadow-stroke pointer-events-none absolute bottom-4 left-4 @sm:bottom-8 @sm:left-8',
+              'font-cinzel text-2xl font-medium capitalize text-card-foreground @sm:text-3xl @lg:text-4xl',
             )}
           >
             {name}

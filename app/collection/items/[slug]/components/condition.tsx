@@ -1,5 +1,6 @@
-import { Box, Popover, PopoverDropdown, PopoverTarget, UnstyledButton, Text } from '@mantine/core'
-import { IconInfoSquareRounded } from '@tabler/icons-react'
+import { Info } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
 import { ConditionListDTO } from '@/app/types'
 
 interface ConditionProps {
@@ -8,22 +9,22 @@ interface ConditionProps {
 
 export function Condition({ condition }: ConditionProps) {
   return (
-    <Box w="fit-content" pos="relative">
-      <Text size="sm" display="inline">
-        {condition.name}
-      </Text>
-      <Popover width={200} position="bottom" offset={0} withArrow shadow="md">
-        <PopoverTarget>
-          <UnstyledButton pos="absolute" right={-16}>
-            <IconInfoSquareRounded color="#696969" size={16} stroke={1.3} />
-          </UnstyledButton>
-        </PopoverTarget>
-        <PopoverDropdown>
-          <Text fw={500} size="xs">
-            {condition.description}
-          </Text>
-        </PopoverDropdown>
+    <div className="relative w-fit">
+      <span className="text-sm">{condition.name}</span>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute -right-4 top-0 h-4 w-4 p-0 hover:bg-transparent"
+          >
+            <Info className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-48 p-2">
+          <p className="text-xs font-medium">{condition.description}</p>
+        </PopoverContent>
       </Popover>
-    </Box>
+    </div>
   )
 }

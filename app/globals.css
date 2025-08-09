@@ -123,4 +123,13 @@
       0 0 32px color-mix(in srgb, var(--card-gradient-to) 15%, transparent),
       0 0 40px color-mix(in srgb, var(--card-gradient-to) 8%, transparent);
   }
+
+  /* Loading animation delays */
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
 }

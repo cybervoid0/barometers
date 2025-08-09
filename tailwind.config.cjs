@@ -74,7 +74,7 @@ module.exports = {
       },
       fontFamily: {
         raleway: ['var(--font-raleway)', 'system-ui', 'sans-serif'],
-        'cormorant-uni': ['var(--font-cormorant-uni)', 'serif'],
+        cinzel: ['var(--font-cinzel)', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
