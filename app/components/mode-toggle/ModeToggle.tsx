@@ -16,9 +16,9 @@ export function ModeToggle() {
   const { setTheme } = useTheme()
 
   return (
-    <Tooltip>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Tooltip>
           <TooltipTrigger asChild>
             <Button
               className="group outline-none focus:outline-none focus-visible:ring-0"
@@ -30,14 +30,14 @@ export function ModeToggle() {
               <span className="sr-only">Toggle theme</span>
             </Button>
           </TooltipTrigger>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <TooltipContent>Change theme</TooltipContent>
-    </Tooltip>
+          <TooltipContent>Change theme</TooltipContent>
+        </Tooltip>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
