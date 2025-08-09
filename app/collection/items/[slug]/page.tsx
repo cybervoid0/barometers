@@ -207,7 +207,7 @@ export default async function Page({ params: { slug } }: Props) {
 }
 
 const DimListItem = ({ name, value }: { name: string; value: string }) => (
-  <li>
+  <li className="leading-tight">
     <span className="text-sm font-medium capitalize">{name}:</span>{' '}
     <span className="text-sm">{value}</span>
   </li>

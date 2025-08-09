@@ -1,5 +1,6 @@
 'use client'
 
+import '@mantine/core/styles.css'
 import { PropsWithChildren } from 'react'
 import { MantineProvider } from '@mantine/core'
 import { SessionProvider } from 'next-auth/react'

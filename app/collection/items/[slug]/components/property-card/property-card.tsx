@@ -37,7 +37,7 @@ function PropertyCardCore({
       <div className="m-2 flex shrink-0 items-center justify-center rounded-md bg-card px-2">
         <Icon width={35} height={35} title={title} strokeWidth={1.2} />
       </div>
-      <div className="flex grow flex-col justify-center gap-2">
+      <div className="flex grow flex-col justify-center gap-2 py-2">
         <h4 className="text-lg leading-none tracking-normal text-muted-foreground">{title}</h4>
         {typeof children === 'object' ? (
           children
