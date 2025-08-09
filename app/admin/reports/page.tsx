@@ -4,13 +4,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table'
-import { Anchor, Box, Center, Container, Title } from '@mantine/core'
 import dayjs from 'dayjs'
 import { fetchReportList } from '@/utils/fetch'
 import { InaccuracyReportListDTO } from '@/app/types'
 import { FrontRoutes } from '@/utils/routes-front'
 import { Table } from '@/app/components/table'
-import { Pagination } from '@/app/components/pagination'
+import { Pagination } from '@/components/ui/pagination'
 
 const itemsOnPage = 6
 
@@ -30,14 +29,12 @@ export default function ReportList() {
     accessor('barometer.name', {
       header: 'Barometer',
       cell: info => (
-        <Anchor
-          size="sm"
-          c="dark"
+        <Link
           href={FrontRoutes.Barometer + info.row.original.barometer.slug}
-          component={Link}
+          className="text-sm text-foreground hover:text-primary hover:underline"
         >
           {info.getValue()}
-        </Anchor>
+        </Link>
       ),
     }),
     accessor('reporterName', {
@@ -46,9 +43,12 @@ export default function ReportList() {
     accessor('reporterEmail', {
       header: 'Email',
       cell: info => (
-        <Anchor size="sm" c="dark" href={`mailto:${info.getValue()}`}>
+        <a
+          href={`mailto:${info.getValue()}`}
+          className="text-sm text-foreground hover:text-primary hover:underline"
+        >
           {info.getValue()}
-        </Anchor>
+        </a>
       ),
     }),
     accessor('createdAt', {
@@ -57,7 +57,7 @@ export default function ReportList() {
     }),
     accessor('description', {
       header: 'Description',
-      cell: info => <Box miw="20rem">{info.getValue()}</Box>,
+      cell: info => <div className="min-w-80">{info.getValue()}</div>,
     }),
     accessor('status', {
       header: 'Status',
@@ -69,14 +69,10 @@ export default function ReportList() {
     getCoreRowModel: getCoreRowModel(),
   })
   return (
-    <Container size="xl">
-      <Title my="lg">Inaccuracy Reports</Title>
-      <Box style={{ overflow: 'scroll' }}>
-        <Table table={table} />
-      </Box>
-      <Center>
-        <Pagination value={+page} total={data?.totalPages ?? 1} />
-      </Center>
-    </Container>
+    <>
+      <h3 className="my-4">Inaccuracy Reports</h3>
+      <Table table={table} />
+      <Pagination className="mx-auto mt-4" value={+page} total={data?.totalPages ?? 1} />
+    </>
   )
 }

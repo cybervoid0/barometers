@@ -37,9 +37,13 @@ function PropertyCardCore({
       <div className="m-2 flex shrink-0 items-center justify-center rounded-md bg-card px-2">
         <Icon width={35} height={35} title={title} strokeWidth={1.2} />
       </div>
-      <div className="flex grow flex-col justify-center gap-1">
-        <h4 className="text-lg font-semibold">{title}</h4>
-        {typeof children === 'object' ? children : <p className="text-sm">{children}</p>}
+      <div className="flex grow flex-col justify-center gap-2">
+        <h4 className="text-lg leading-none tracking-normal text-muted-foreground">{title}</h4>
+        {typeof children === 'object' ? (
+          children
+        ) : (
+          <p className="text-sm leading-none">{children}</p>
+        )}
       </div>
       {edit && (
         <IsAdmin>
