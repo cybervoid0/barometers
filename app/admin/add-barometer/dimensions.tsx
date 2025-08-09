@@ -1,46 +1,74 @@
-import { Fieldset, TextInput, Group, ActionIcon, Tooltip, Stack } from '@mantine/core'
-import { IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
-import { UseFormReturnType } from '@mantine/form'
-import { type BarometerFormProps } from '@/app/types'
+import { useFormContext, useFieldArray } from 'react-hook-form'
+import { Trash2, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-interface DimensionsProps {
-  form: UseFormReturnType<BarometerFormProps>
-}
+export function Dimensions() {
+  const { control, register } = useFormContext()
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'dimensions',
+  })
 
-export function Dimensions({ form }: DimensionsProps) {
   const addDimension = () => {
-    if (form.values.dimensions.length > 6) return
-    form.insertListItem('dimensions', { dim: '', value: '' })
+    if (fields.length > 6) return
+    append({ dim: '', value: '' })
   }
 
   const removeDimension = (index: number) => {
-    form.removeListItem('dimensions', index)
+    remove(index)
   }
 
   return (
-    <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Dimensions">
-      <Stack gap="xs" align="flex-start">
-        {form.values.dimensions?.map((_, i) => (
-          <Group w="100%" wrap="nowrap" gap="xs" key={form.key(`dimensions.${i}`)}>
-            <Tooltip color="dark.3" withArrow label="Delete parameter">
-              <ActionIcon variant="default" onClick={() => removeDimension(i)}>
-                <IconTrash color="grey" size={20} />
-              </ActionIcon>
+    <div className="space-y-4">
+      <Label>Dimensions</Label>
+      <div className="space-y-3">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeDimension(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete parameter</p>
+              </TooltipContent>
             </Tooltip>
-            <TextInput flex={1} placeholder="Unit" {...form.getInputProps(`dimensions.${i}.dim`)} />
-            <TextInput
-              flex={1}
+
+            <Input placeholder="Unit" {...register(`dimensions.${index}.dim`)} className="flex-1" />
+            <Input
               placeholder="Value"
-              {...form.getInputProps(`dimensions.${i}.value`)}
+              {...register(`dimensions.${index}.value`)}
+              className="flex-1"
             />
-          </Group>
+          </div>
         ))}
-        <Tooltip color="dark.3" withArrow label="Add parameter">
-          <ActionIcon variant="default" onClick={addDimension}>
-            <IconSquareRoundedPlus color="grey" />
-          </ActionIcon>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={addDimension}
+              disabled={fields.length > 6}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Add parameter</p>
+          </TooltipContent>
         </Tooltip>
-      </Stack>
-    </Fieldset>
+      </div>
+    </div>
   )
 }
