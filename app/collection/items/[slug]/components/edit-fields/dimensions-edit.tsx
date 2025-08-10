@@ -1,133 +1,179 @@
 'use client'
 
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import { isEqual } from 'lodash'
-import { useEffect } from 'react'
-import { useForm } from '@mantine/form'
-import { useDisclosure } from '@mantine/hooks'
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  Modal,
-  Stack,
-  TextInput,
-  Tooltip,
-  UnstyledButton,
-} from '@mantine/core'
-import { IconEdit, IconTrash, IconSquareRoundedPlus } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
+import { useForm, useFieldArray } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit, Trash2, Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { BarometerDTO, Dimensions } from '@/app/types'
 import { FrontRoutes } from '@/utils/routes-front'
-import { showError, showInfo } from '@/utils/notification'
 import { updateBarometer } from '@/utils/fetch'
+import { cn } from '@/lib/utils'
 
-interface DimFormProps {
-  dimensions: Dimensions
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+
+interface DimensionsForm {
+  dimensions: Array<{ dim: string; value: string }>
 }
-interface DimensionEditProps {
+
+interface DimensionEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-export function DimensionEdit({ barometer }: DimensionEditProps) {
-  const [opened, { open, close }] = useDisclosure(false)
-  const form = useForm<DimFormProps>({
-    initialValues: {
-      dimensions: [],
+const validationSchema: yup.ObjectSchema<DimensionsForm> = yup.object({
+  dimensions: yup
+    .array()
+    .of(
+      yup.object({
+        dim: yup.string().required('Unit is required'),
+        value: yup.string().required('Value is required'),
+      }),
+    )
+    .defined()
+    .default([]),
+})
+
+export function DimensionEdit({ barometer, className, ...props }: DimensionEditProps) {
+  const form = useForm<DimensionsForm>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      dimensions: (barometer.dimensions as Dimensions) || [],
     },
   })
-  // set initial form values on modal open
-  useEffect(() => {
-    const dimensions = barometer.dimensions as Dimensions | undefined
-    if (!dimensions) return
-    form.setValues({ dimensions })
-    form.resetDirty({ dimensions })
-  }, [barometer])
-  // Reset form when modal is reopened
-  useEffect(() => {
-    if (opened) form.reset()
-  }, [opened])
 
-  const handleUpdateBarometer = async ({ dimensions }: DimFormProps) => {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'dimensions',
+  })
+
+  const handleUpdateBarometer = async (values: DimensionsForm) => {
     try {
-      if (isEqual(dimensions, barometer.dimensions)) {
-        close()
+      // Filter out empty entries
+      const filteredDimensions = values.dimensions.filter(({ dim }) => dim.trim())
+
+      if (isEqual(filteredDimensions, barometer.dimensions)) {
         return
       }
-      const updatedBarometer = {
+
+      const { slug } = await updateBarometer({
         id: barometer.id,
-        // keep non-empty entries
-        dimensions: dimensions?.filter(({ dim }) => dim),
-      }
-      const { slug } = await updateBarometer(updatedBarometer)
-      showInfo(`${barometer.name} updated`, 'Success')
-      close()
-      window.location.href = FrontRoutes.Barometer + (slug ?? '')
+        dimensions: filteredDimensions,
+      })
+
+      toast.success(`${barometer.name} updated`)
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      }, 1000)
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
+      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
     }
   }
 
   const addDimension = () => {
-    if ((form.values.dimensions?.length ?? 0) > 6) return
-    form.insertListItem('dimensions', { dim: '', value: '' })
-  }
-
-  const removeDimension = (index: number) => {
-    form.removeListItem('dimensions', index)
+    if (fields.length >= 7) return
+    append({ dim: '', value: '' })
   }
 
   return (
-    <>
-      <Tooltip label="Edit dimensions">
-        <UnstyledButton onClick={open}>
-          <IconEdit color="brown" size={18} />
-        </UnstyledButton>
-      </Tooltip>
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title="Edit dimensions"
-        size="md"
-        tt="capitalize"
-        styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
-      >
-        <Box component="form" onSubmit={form.onSubmit(handleUpdateBarometer)}>
-          <Stack>
-            <Stack gap="xs" align="flex-start">
-              {form.values.dimensions?.map((_, i) => (
-                <Group w="100%" wrap="nowrap" gap="xs" key={form.key(`dimensions.${i}`)}>
-                  <Tooltip color="dark.3" withArrow label="Delete parameter">
-                    <ActionIcon variant="default" onClick={() => removeDimension(i)}>
-                      <IconTrash color="grey" size={20} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <TextInput
-                    flex={1}
-                    placeholder="Unit"
-                    {...form.getInputProps(`dimensions.${i}.dim`)}
-                  />
-                  <TextInput
-                    flex={1}
-                    placeholder="Value"
-                    {...form.getInputProps(`dimensions.${i}.value`)}
-                  />
-                </Group>
-              ))}
-              <Tooltip color="dark.3" withArrow label="Add parameter">
-                <ActionIcon variant="default" onClick={addDimension}>
-                  <IconSquareRoundedPlus color="grey" />
-                </ActionIcon>
-              </Tooltip>
-            </Stack>
-            <Button fullWidth color="dark.4" variant="outline" type="submit">
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
+    <Dialog
+      onOpenChange={isOpen => {
+        if (isOpen) {
+          form.reset({
+            dimensions: (barometer.dimensions as Dimensions) || [],
+          })
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          aria-label="Edit dimensions"
+          className={cn('h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
+            <DialogHeader>
+              <DialogTitle>Edit Dimensions</DialogTitle>
+              <DialogDescription>Update the dimensions for this barometer.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <div className="space-y-3">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      aria-label="Delete parameter"
+                      onClick={() => remove(index)}
+                      className="shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <FormField
+                      control={form.control}
+                      name={`dimensions.${index}.dim`}
+                      render={({ field: dimField }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input {...dimField} placeholder="Unit (e.g., Height)" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`dimensions.${index}.value`}
+                      render={({ field: valueField }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input {...valueField} placeholder="Value (e.g., 25cm)" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addDimension}
+                  disabled={fields.length >= 7}
+                  className="w-fit"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Parameter
+                </Button>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Button type="submit" variant="outline" className="w-full">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
