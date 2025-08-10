@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { showError, showInfo } from '@/utils/notification'
+import { toast } from 'sonner'
 import {
   fetchCategoryList,
   fetchConditions,
@@ -69,10 +69,10 @@ export const useBarometers = () => {
       queryClient.invalidateQueries({
         queryKey: ['manufacturers'],
       })
-      showInfo('Manufacturer deleted', 'Success')
+      toast.success('Manufacturer deleted')
     },
     onError: error => {
-      showError(error.message || 'Error deleting manufacturer')
+      toast.error(error.message || 'Error deleting manufacturer')
     },
   })
 
@@ -85,7 +85,7 @@ export const useBarometers = () => {
       materialsError,
       countriesError,
     ].forEach(err => {
-      if (err instanceof Error) showError(err.message)
+      if (err instanceof Error) toast.error(err.message)
     })
   }, [
     typesError,

@@ -4,7 +4,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isEmail, isLength } from 'validator'
-import { showError, showInfo } from '@/utils/notification'
+import { toast } from 'sonner'
 import { createReport } from '@/utils/fetch'
 import { BarometerDTO } from '@/app/types'
 import {
@@ -45,24 +45,24 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
       queryClient.invalidateQueries({ queryKey: ['inaccuracyReport'] })
       setIsOpened(false)
       reset()
-      showInfo(
+      toast.success(
         `Thank you! Your report was registered with ID ${id}. We will contact you at the provided email`,
       )
     },
-    onError: err => showError(err.message),
+    onError: err => toast.error(err.message),
   })
   const onSubmit = handleSubmit(values => {
     const { reporterEmail, reporterName, description } = values
     if (!isEmail(reporterEmail)) {
-      showError('Invalid email')
+      toast.error('Invalid email')
       return
     }
     if (!isLength(reporterName, { min: 2, max: 50 })) {
-      showError('Value must be between 2 and 50 characters')
+      toast.error('Value must be between 2 and 50 characters')
       return
     }
     if (!isLength(description, { min: 5, max: maxFeedbackLen })) {
-      showError(`Value must be between 5 and ${maxFeedbackLen} characters`)
+      toast.error(`Value must be between 5 and ${maxFeedbackLen} characters`)
       return
     }
     mutate({ ...values, barometerId: barometer.id })
