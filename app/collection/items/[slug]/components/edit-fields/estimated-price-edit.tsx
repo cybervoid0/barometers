@@ -1,108 +1,144 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client'
 
-import {
-  Modal,
-  UnstyledButton,
-  UnstyledButtonProps,
-  TextInput,
-  Button,
-  Stack,
-  Tooltip,
-  Box,
-  Center,
-} from '@mantine/core'
-import { isDecimal } from 'validator'
-import { IconEdit } from '@tabler/icons-react'
-import { useForm } from '@mantine/form'
-import { useDisclosure } from '@mantine/hooks'
-import { useCallback, useEffect } from 'react'
+import type { ComponentProps } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit } from 'lucide-react'
+import { toast } from 'sonner'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
-import { showError, showInfo } from '@/utils/notification'
 import { FrontRoutes } from '@/utils/routes-front'
+import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 
-interface Props extends UnstyledButtonProps {
+interface EstimatedPriceEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-const property: keyof BarometerDTO = 'estimatedPrice'
+interface EstimatedPriceForm {
+  estimatedPrice: string
+}
 
-export function EstimatedPriceEdit({ size = 18, barometer, ...props }: Props) {
-  const form = useForm({
-    initialValues: { estimatedPrice: '' },
-    validate: {
-      estimatedPrice: (value: string) => (isDecimal(value) ? null : 'Wrong decimal number'),
+const validationSchema: yup.ObjectSchema<EstimatedPriceForm> = yup.object({
+  estimatedPrice: yup
+    .string()
+    .required('Price is required')
+    .test('is-decimal', 'Must be a valid decimal number', value => {
+      if (!value) return false
+      return /^\d+(\.\d{1,2})?$/.test(value)
+    }),
+})
+
+export function EstimatedPriceEdit({
+  size = 18,
+  barometer,
+  className,
+  ...props
+}: EstimatedPriceEditProps) {
+  const form = useForm<EstimatedPriceForm>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '',
     },
   })
-  const [opened, { open, close }] = useDisclosure(false)
 
-  const update = useCallback(
-    async ({ estimatedPrice }: typeof form.values) => {
-      const newEstimatedPrice = Number(estimatedPrice)
-      try {
-        if (newEstimatedPrice === barometer.estimatedPrice) {
-          close()
-          return
-        }
+  const update = async (values: EstimatedPriceForm) => {
+    try {
+      const newEstimatedPrice = Number(values.estimatedPrice)
 
-        const { slug } = await updateBarometer({
-          id: barometer.id,
-          estimatedPrice: newEstimatedPrice,
-        })
-
-        showInfo(`${barometer.name} updated`, 'Success')
-        close()
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      } catch (error) {
-        showError(error instanceof Error ? error.message : 'Error updating barometer')
+      // Don't update if value hasn't changed
+      if (newEstimatedPrice === barometer.estimatedPrice) {
+        return
       }
-    },
-    [barometer.estimatedPrice, barometer.id, barometer.name, close, form],
-  )
 
-  // set initial form values on modal open
-  useEffect(() => {
-    const estimatedPriceValue = barometer.estimatedPrice
-    if (estimatedPriceValue !== null && estimatedPriceValue !== undefined) {
-      form.setValues({ estimatedPrice: String(estimatedPriceValue) })
-      form.resetDirty({ estimatedPrice: String(estimatedPriceValue) })
+      const { slug } = await updateBarometer({
+        id: barometer.id,
+        estimatedPrice: newEstimatedPrice,
+      })
+
+      toast.success(`${barometer.name} updated`)
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      }, 1000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
     }
-  }, [barometer])
+  }
 
-  // Reset form when modal is reopened
-  useEffect(() => {
-    if (opened) form.reset()
-  }, [opened])
   return (
-    <>
-      <Tooltip label="Edit Estimated Price">
-        <UnstyledButton {...props} onClick={open}>
-          <Center>
-            <IconEdit color="brown" size={size} />
-          </Center>
-        </UnstyledButton>
-      </Tooltip>
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title="Edit Estimated Price"
-        size="md"
-        tt="capitalize"
-        styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
-      >
-        <Box component="form" onSubmit={form.onSubmit(update)}>
-          <Stack>
-            <TextInput leftSection="€" required {...form.getInputProps(property)} />
-            <Button fullWidth color="dark" variant="outline" type="submit">
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
+    <Dialog
+      onOpenChange={isOpen => {
+        if (isOpen) {
+          form.reset({
+            estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '',
+          })
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          aria-label="Edit estimated price"
+          className={cn('h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={Number(size) || 18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(update)} noValidate>
+            <DialogHeader>
+              <DialogTitle>Edit Estimated Price</DialogTitle>
+              <DialogDescription>Update the estimated price for this barometer.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <FormField
+                control={form.control}
+                name="estimatedPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estimated Price</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                          €
+                        </span>
+                        <Input {...field} className="pl-8" placeholder="0.00" autoFocus />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mt-6">
+              <Button type="submit" variant="outline" className="w-full">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
