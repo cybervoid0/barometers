@@ -65,7 +65,7 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
       toast.success(`${barometer.name} updated`)
       setOpen(false)
       setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + slug
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
       }, 1000)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error updating barometer')
