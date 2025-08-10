@@ -74,7 +74,7 @@ export default async function Collection({ params: { category } }: CollectionPro
         <ShowMore maxHeight={60} md>
           {description}
         </ShowMore>
-        <Sort sortBy={sort as SortValue} className="w-full self-end sm:w-[320px]" />
+        <Sort sortBy={sort as SortValue} className="w-[200px] self-end sm:w-[320px]" />
         <Card className="p-4 shadow-md">
           <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {barometers.map(({ name, id, images, manufacturer, slug }, i) => (

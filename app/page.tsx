@@ -1,6 +1,5 @@
 import 'server-only'
 
-import { HeadingImage } from './components/heading-image'
 import { CategoryCard } from './components/category-card'
 import { SearchField } from './components/search-field'
 import { NewArrivals } from './components/new-arrivals'
@@ -15,11 +14,10 @@ export default async function HomePage() {
   const categories = await getCategories()
   return (
     <>
-      <HeadingImage />
       <div className="my-6 grid grid-cols-6 items-center gap-x-4 sm:gap-x-5">
-        <NewArrivals className="col-span-3 md:col-span-2 lg:col-span-1" />
+        <NewArrivals className="col-span-2 md:col-span-2 lg:col-span-1" />
         <div className="hidden md:block lg:col-span-3" />
-        <SearchField className="col-span-3 md:col-span-3 lg:col-span-2" />
+        <SearchField className="col-span-4 md:col-span-3 lg:col-span-2" />
       </div>
       <div className={cn(gridStyle, 'gap-4 sm:gap-5')}>
         {categories.map(({ id, name, image }, i) => (
