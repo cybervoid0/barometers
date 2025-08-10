@@ -100,13 +100,13 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input {...field} />
+                    <Input autoFocus {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="ghost" className="w-full" disabled={isUpdating}>
+            <Button type="submit" variant="outline" className="w-full" disabled={isUpdating}>
               {isUpdating ? 'Saving...' : 'Save'}
             </Button>
           </form>
