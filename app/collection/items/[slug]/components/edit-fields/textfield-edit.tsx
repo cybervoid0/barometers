@@ -20,6 +20,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
+import { FrontRoutes } from '@/utils/routes-front'
 
 interface TextFieldEditProps {
   size?: number
@@ -63,7 +64,9 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
 
       toast.success(`${barometer.name} updated`)
       setOpen(false)
-      window.location.href = `/collection/items/${slug}`
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + slug
+      }, 1000)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error updating barometer')
     } finally {

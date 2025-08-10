@@ -1,102 +1,137 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client'
 
-import {
-  Modal,
-  UnstyledButton,
-  UnstyledButtonProps,
-  TextInput,
-  Button,
-  Stack,
-  Tooltip,
-  Box,
-} from '@mantine/core'
-import { IconEdit } from '@tabler/icons-react'
-import { useForm } from '@mantine/form'
-import { useDisclosure } from '@mantine/hooks'
-import { useEffect } from 'react'
+import type { ComponentProps } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit } from 'lucide-react'
+import { toast } from 'sonner'
 import dayjs from 'dayjs'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
 import { FrontRoutes } from '@/utils/routes-front'
-import { showInfo, showError } from '@/utils/notification'
+import { cn } from '@/lib/utils'
 
-interface DateEditProps extends UnstyledButtonProps {
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+interface DateEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-export function DateEdit({ size = 18, barometer, ...props }: DateEditProps) {
-  const [opened, { open, close }] = useDisclosure(false)
-  const form = useForm({
-    initialValues: {
-      date: '',
+interface DateForm {
+  date: string
+}
+
+const validationSchema = yup.object({
+  date: yup
+    .string()
+    .required('Year is required')
+    .matches(/^\d{4}$/, 'Must be a 4-digit year')
+    .test('year-range', 'Year must be between 1000 and 2099', value => {
+      if (!value) return false
+      const year = parseInt(value, 10)
+      return year >= 1000 && year <= 2099
+    }),
+})
+
+export function DateEdit({ size = 18, barometer, className, ...props }: DateEditProps) {
+  const form = useForm<DateForm>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      date: dayjs(barometer.date).format('YYYY'),
     },
   })
-  // set initial form values on modal open
-  useEffect(() => {
-    const value = dayjs(barometer.date).format('YYYY')
-    if (barometer) {
-      form.setValues({ date: value })
-      form.resetDirty({ date: value })
-    }
-  }, [barometer])
 
-  // Reset form when modal is reopened
-  useEffect(() => {
-    if (opened) form.reset()
-  }, [opened])
-
-  const update = async ({ date }: typeof form.values) => {
+  const update = async (values: DateForm) => {
     try {
       const { slug } = await updateBarometer({
         id: barometer.id,
-        date: dayjs(`${date}-01-01`).toISOString(),
+        date: dayjs(`${values.date}-01-01`).toISOString(),
       })
-      showInfo(`${barometer.name} updated`, 'Success')
-      close()
-      window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      toast.success(`${barometer.name} updated`)
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      }, 1000)
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error updating barometer')
+      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
     }
   }
 
   return (
-    <>
-      <Tooltip label="Edit year">
-        <UnstyledButton {...props} onClick={open}>
-          <IconEdit color="brown" size={size} />
-        </UnstyledButton>
-      </Tooltip>
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title="Edit year"
-        size="md"
-        tt="capitalize"
-        styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
-      >
-        <Box component="form" onSubmit={form.onSubmit(update)}>
-          <Stack>
-            <TextInput
-              required
-              placeholder="YYYY"
-              maxLength={4}
-              value={form.values.date}
-              onChange={e => {
-                const year = e.target.value.replace(/\D/g, '').slice(0, 4)
-                form.setFieldValue('date', year)
-              }}
-              error={form.errors.date}
-            />
-            <Button fullWidth color="dark" variant="outline" type="submit">
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
+    <Dialog
+      onOpenChange={isOpen => {
+        if (isOpen) {
+          form.reset({ date: dayjs(barometer.date).format('YYYY') })
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          aria-label="Edit year"
+          className={cn('h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={Number(size) || 18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(update)} noValidate>
+            <DialogHeader>
+              <DialogTitle>Edit Year</DialogTitle>
+              <DialogDescription>Update the year for this barometer.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Year</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="YYYY"
+                        maxLength={4}
+                        autoFocus
+                        onChange={e => {
+                          const year = e.target.value.replace(/\D/g, '').slice(0, 4)
+                          field.onChange(year)
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mt-6">
+              <Button type="submit" variant="outline" className="w-full">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
