@@ -1,19 +1,12 @@
+'use client'
+
 import { isEqual } from 'lodash'
-import {
-  Box,
-  Button,
-  CloseButton,
-  FileButton,
-  Group,
-  LoadingOverlay,
-  Modal,
-  Stack,
-  Tooltip,
-  UnstyledButton,
-  UnstyledButtonProps,
-} from '@mantine/core'
-import { IconEdit, IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
-import { useForm } from '@mantine/form'
+import type { ComponentProps } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit, ImagePlus, X, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import {
@@ -22,23 +15,45 @@ import {
   arrayMove,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useEffect, useMemo, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
+import { useMemo, useState, useRef } from 'react'
 import { BarometerDTO } from '@/app/types'
 import { imageStorage } from '@/utils/constants'
 import { FrontRoutes } from '@/utils/routes-front'
-import { showError, showInfo } from '@/utils/notification'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
 import { getThumbnailBase64 } from '@/utils/misc'
 import customImageLoader from '@/utils/image-loader'
+import { cn } from '@/lib/utils'
 
-interface ImagesEditProps extends UnstyledButtonProps {
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+interface ImagesForm {
+  images: string[]
+}
+
+interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
-interface FormProps {
-  images: string[]
-}
+
+const validationSchema: yup.ObjectSchema<ImagesForm> = yup.object({
+  images: yup.array().of(yup.string().required()).defined().default([]),
+})
 
 function SortableImage({
   image,
@@ -52,72 +67,66 @@ function SortableImage({
   })
 
   return (
-    <Box
-      pos="relative"
+    <div
       ref={setNodeRef}
+      className="relative"
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
       }}
       {...attributes}
     >
-      <CloseButton
-        p={0}
-        c="dark.3"
-        radius={100}
-        size="1rem"
-        right={1}
-        top={1}
-        pos="absolute"
-        icon={<IconXboxX />}
-        bg="white"
+      <button
+        type="button"
+        className="absolute right-1 top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-muted-foreground shadow"
+        aria-label="Remove image"
         onClick={() => handleDelete(image)}
-      />
-      <Box {...listeners}>
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <div {...listeners} className="cursor-move">
         <img
           src={customImageLoader({ src: image, quality: 85, width: 100 })}
           alt="Barometer"
-          className="min-h-[100px] w-[100px] object-contain"
+          className="min-h-[100px] w-[100px] rounded border object-contain"
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
-export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
+export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
   const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer])
   const [isUploading, setIsUploading] = useState(false)
-  const [opened, { open, close }] = useDisclosure()
-  const form = useForm<FormProps>({
-    initialValues: {
-      images: [],
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const form = useForm<ImagesForm>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      images: barometerImages,
     },
   })
-  useEffect(() => {
-    if (!barometerImages || !opened) return
-    form.setFieldValue('images', barometerImages)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [barometerImages, opened])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over) return
     if (active.id !== over.id) {
-      const oldIndex = form.values.images.findIndex(image => image === active.id)
-      const newIndex = form.values.images.findIndex(image => image === over.id)
-      const newOrder = arrayMove(form.values.images, oldIndex, newIndex)
-      form.setFieldValue('images', newOrder)
+      const currentImages = form.getValues('images')
+      const oldIndex = currentImages.findIndex(image => image === active.id)
+      const newIndex = currentImages.findIndex(image => image === over.id)
+      const newOrder = arrayMove(currentImages, oldIndex, newIndex)
+      form.setValue('images', newOrder)
     }
   }
-  const update = async (values: FormProps) => {
+
+  const update = async (values: ImagesForm) => {
     // exit if no image was changed
-    if (isEqual(values.images, barometer.images)) {
-      close()
+    if (isEqual(values.images, barometerImages)) {
       return
     }
     setIsUploading(true)
     try {
       // erase deleted images
-      const extraFiles = barometerImages?.filter(img => !form.values.images.includes(img))
+      const extraFiles = barometerImages?.filter(img => !values.images.includes(img))
       if (extraFiles)
         await Promise.all(
           extraFiles?.map(async file => {
@@ -145,18 +154,18 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       }
 
       const { slug } = await updateBarometer(updatedBarometer)
-      showInfo(`${barometer.name} updated`, 'Success')
-      close()
-      window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      toast.success(`${barometer.name} updated`)
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      }, 1000)
     } catch (error) {
       console.error(error)
-      if (error instanceof Error) {
-        showError(error.message || 'editImages: Error updating barometer')
-      }
+      toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
     } finally {
       setIsUploading(false)
     }
   }
+
   /**
    * Upload images to storage
    */
@@ -175,14 +184,11 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
       )
 
       const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
-      form.setFieldValue('images', prev => [...prev, ...newImages])
+      const currentImages = form.getValues('images')
+      form.setValue('images', [...currentImages, ...newImages])
     } catch (error) {
       const defaultErrMsg = 'Error uploading files'
-      if (error instanceof Error) {
-        showError(error.message || defaultErrMsg)
-        return
-      }
-      showError(error instanceof Error ? error.message : defaultErrMsg)
+      toast.error(error instanceof Error ? error.message : defaultErrMsg)
     } finally {
       setIsUploading(false)
     }
@@ -193,11 +199,22 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     try {
       // if the image file was uploaded but not yet added to the barometer
       if (!barometerImages?.includes(img)) await deleteImage(img)
-      form.setFieldValue('images', old => old.filter(file => !file.includes(img)))
+      const currentImages = form.getValues('images')
+      form.setValue(
+        'images',
+        currentImages.filter(file => !file.includes(img)),
+      )
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error deleting file')
+      toast.error(error instanceof Error ? error.message : 'Error deleting file')
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target
+    if (files) {
+      uploadImages(Array.from(files))
     }
   }
 
@@ -205,62 +222,111 @@ export function ImagesEdit({ barometer, size, ...props }: ImagesEditProps) {
     // delete unused files from storage
     try {
       setIsUploading(true)
-      const extraImages = form.values.images.filter(img => !barometerImages?.includes(img))
+      const currentImages = form.getValues('images')
+      const extraImages = currentImages.filter(img => !barometerImages?.includes(img))
       await Promise.all(extraImages.map(deleteImage))
     } catch (error) {
       // do nothing
     } finally {
       setIsUploading(false)
-      close()
     }
   }
+
   return (
-    <>
-      <Modal
-        size="auto"
-        title="Edit images"
-        centered
-        opened={opened}
-        onClose={onClose}
-        styles={{ title: { fontWeight: 500, fontSize: '22px' } }}
-      >
-        <Box pos="relative" component="form" onSubmit={form.onSubmit(update)}>
-          <LoadingOverlay visible={isUploading} zIndex={100} />
-          <Stack>
-            <FileButton multiple onChange={uploadImages} accept="image/**">
-              {fbProps => (
-                <Button
-                  color="dark.4"
-                  className="self-start"
-                  leftSection={<IconPhotoPlus />}
-                  {...fbProps}
-                >
-                  Add images
-                </Button>
+    <Dialog
+      onOpenChange={async isOpen => {
+        if (isOpen) {
+          form.reset({ images: barometerImages })
+        } else {
+          await onClose()
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          aria-label="Edit images"
+          className={cn('absolute right-20 top-0 z-10 h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={Number(size) || 18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-4xl">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(update)} noValidate>
+            <div className="relative">
+              {isUploading && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
               )}
-            </FileButton>
+              <DialogHeader>
+                <DialogTitle>Edit Images</DialogTitle>
+                <DialogDescription>
+                  Add, remove, or reorder images for this barometer.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-fit"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    <ImagePlus className="mr-2 h-4 w-4" />
+                    Add Images
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
 
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={form.values.images} strategy={horizontalListSortingStrategy}>
-                <Group align="flex-start">
-                  {form.getValues().images.map(img => (
-                    <SortableImage key={img} image={img} handleDelete={handleDeleteFile} />
-                  ))}
-                </Group>
-              </SortableContext>
-            </DndContext>
-
-            <Button type="submit" fullWidth variant="outline" color="dark.4">
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-      <Tooltip label="Edit images">
-        <UnstyledButton className="absolute right-20 top-0 z-10" {...props} onClick={open}>
-          <IconEdit color="brown" size={size} />
-        </UnstyledButton>
-      </Tooltip>
-    </>
+                  <FormField
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Images</FormLabel>
+                        <FormControl>
+                          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                            <SortableContext
+                              items={field.value}
+                              strategy={horizontalListSortingStrategy}
+                            >
+                              <div className="flex flex-wrap gap-4">
+                                {field.value.map(img => (
+                                  <SortableImage
+                                    key={img}
+                                    image={img}
+                                    handleDelete={handleDeleteFile}
+                                  />
+                                ))}
+                              </div>
+                            </SortableContext>
+                          </DndContext>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="mt-6">
+                <Button type="submit" variant="outline" className="w-full" disabled={isUploading}>
+                  Save
+                </Button>
+              </div>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
