@@ -46,6 +46,10 @@ type AsyncFunction<T, Args extends any[]> = {
 export function withPrisma<T, Args extends any[]>(fn: AsyncFunction<T, Args>) {
   return async function wrappedWithParams(...args: Args): Promise<T> {
     const prisma = getPrismaClient()
-    return fn(prisma, ...args)
+    try {
+      return await fn(prisma, ...args)
+    } finally {
+      await prisma.$disconnect()
+    }
   }
 }
