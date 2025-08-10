@@ -2,8 +2,9 @@
 
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { isEmail, isLength } from 'validator'
 import { toast } from 'sonner'
 import { createReport } from '@/utils/fetch'
 import { BarometerDTO } from '@/app/types'
@@ -23,7 +24,31 @@ import { Label } from '@/components/ui/label'
 interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO
 }
+
+interface ReportForm {
+  reporterName: string
+  reporterEmail: string
+  description: string
+}
+
 const maxFeedbackLen = 1000
+
+const validationSchema: yup.ObjectSchema<ReportForm> = yup.object({
+  reporterName: yup
+    .string()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be less than 50 characters'),
+  reporterEmail: yup
+    .string()
+    .required('Email is required')
+    .email('Please enter a valid email address'),
+  description: yup
+    .string()
+    .required('Description is required')
+    .min(5, 'Description must be at least 5 characters')
+    .max(maxFeedbackLen, `Description must be less than ${maxFeedbackLen} characters`),
+})
 
 export function InaccuracyReport({ barometer, ...props }: Props) {
   const queryClient = useQueryClient()
@@ -34,7 +59,8 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
     watch,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<{ reporterName: string; reporterEmail: string; description: string }>({
+  } = useForm<ReportForm>({
+    resolver: yupResolver(validationSchema),
     defaultValues: { reporterName: '', reporterEmail: '', description: '' },
     mode: 'onBlur',
   })
@@ -52,19 +78,6 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
     onError: err => toast.error(err.message),
   })
   const onSubmit = handleSubmit(values => {
-    const { reporterEmail, reporterName, description } = values
-    if (!isEmail(reporterEmail)) {
-      toast.error('Invalid email')
-      return
-    }
-    if (!isLength(reporterName, { min: 2, max: 50 })) {
-      toast.error('Value must be between 2 and 50 characters')
-      return
-    }
-    if (!isLength(description, { min: 5, max: maxFeedbackLen })) {
-      toast.error(`Value must be between 5 and ${maxFeedbackLen} characters`)
-      return
-    }
     mutate({ ...values, barometerId: barometer.id })
   })
 
@@ -104,8 +117,13 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
                 aria-invalid={!!errors.reporterName}
                 aria-describedby="reporterName-error"
                 placeholder="Your name"
-                {...register('reporterName', { required: true })}
+                {...register('reporterName')}
               />
+              {errors.reporterName && (
+                <p id="reporterName-error" className="text-xs text-red-500">
+                  {errors.reporterName.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="reporterEmail">Email</Label>
@@ -115,8 +133,13 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
                 aria-invalid={!!errors.reporterEmail}
                 aria-describedby="reporterEmail-error"
                 placeholder="your@email.com"
-                {...register('reporterEmail', { required: true })}
+                {...register('reporterEmail')}
               />
+              {errors.reporterEmail && (
+                <p id="reporterEmail-error" className="text-xs text-red-500">
+                  {errors.reporterEmail.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Feedback</Label>
@@ -126,8 +149,11 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
                 aria-describedby="description-help"
                 placeholder="Describe the inaccuracy"
                 className="min-h-24"
-                {...register('description', { required: true })}
+                {...register('description')}
               />
+              {errors.description && (
+                <p className="text-xs text-red-500">{errors.description.message}</p>
+              )}
               <p id="description-help" className="text-xs text-muted-foreground">
                 {descriptionValue.length > 0 && descriptionValue.length <= maxFeedbackLen
                   ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`

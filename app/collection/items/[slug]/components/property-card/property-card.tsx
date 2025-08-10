@@ -1,11 +1,11 @@
 import { ReactNode, FC, ComponentProps } from 'react'
-import { type IconProps } from '@tabler/icons-react'
+import { type LucideProps } from 'lucide-react'
 import { IsAdmin } from '@/app/components/is-admin'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 interface PropertyCardProps extends ComponentProps<'div'> {
-  icon: FC<IconProps>
+  icon: FC<LucideProps>
   title: string
   /**
    * Button which invokes editing dialog windows. Shown only to admins
@@ -35,7 +35,7 @@ function PropertyCardCore({
       {...props}
     >
       <div className="m-2 flex shrink-0 items-center justify-center rounded-md bg-card px-2">
-        <Icon width={35} height={35} title={title} strokeWidth={1.2} />
+        <Icon width={35} height={35} aria-label={title} strokeWidth={1.2} />
       </div>
       <div className="flex grow flex-col justify-center gap-2 py-2">
         <h4 className="text-lg leading-none tracking-normal text-muted-foreground">{title}</h4>

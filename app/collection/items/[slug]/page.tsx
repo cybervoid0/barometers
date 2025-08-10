@@ -3,17 +3,17 @@ import 'server-only'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import {
-  IconBuildingFactory2,
-  IconCalendarQuestion,
-  IconTimeline,
-  IconNumber,
-  IconTopologyRing2,
-  IconDimensions,
-  IconTagStarred,
-  IconCategory2,
-  IconCurrencyEuro,
-  IconWood,
-} from '@tabler/icons-react'
+  Factory,
+  Calendar,
+  Clock,
+  Hash,
+  Network,
+  Ruler,
+  Star,
+  FolderOpen,
+  Euro,
+  TreePine,
+} from 'lucide-react'
 import { FrontRoutes } from '@/utils/routes-front'
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
@@ -77,7 +77,7 @@ export default async function Page({ params: { slug } }: Props) {
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <PropertyCard
-            icon={IconBuildingFactory2}
+            icon={Factory}
             title="Manufacturer or Retailer"
             edit={<ManufacturerEdit barometer={barometer} />}
           >
@@ -88,7 +88,7 @@ export default async function Page({ params: { slug } }: Props) {
             >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Link>
           </PropertyCard>
           <PropertyCard
-            icon={IconNumber}
+            icon={Hash}
             title="Serial Number"
             edit={<TextFieldEdit barometer={barometer} property="serial" />}
           >
@@ -96,7 +96,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly
-            icon={IconTopologyRing2}
+            icon={Network}
             title="Collection ID"
             edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
           >
@@ -104,21 +104,21 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly
-            icon={IconCalendarQuestion}
+            icon={Calendar}
             title="Year"
             edit={<DateEdit barometer={barometer} />}
           >
             {dayjs(barometer.date).format('YYYY')}
           </PropertyCard>
           <PropertyCard
-            icon={IconTimeline}
+            icon={Clock}
             title="Dating"
             edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
           >
             {barometer.dateDescription}
           </PropertyCard>
           <PropertyCard
-            icon={IconTagStarred}
+            icon={Star}
             title="Condition"
             edit={<ConditionEdit barometer={barometer} />}
           >
@@ -126,7 +126,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly={!barometer.subCategory?.name}
-            icon={IconCategory2}
+            icon={FolderOpen}
             title="Movement (Tube) Type"
             edit={<SubcategoryEdit barometer={barometer} />}
           >
@@ -134,7 +134,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly
-            icon={IconCurrencyEuro}
+            icon={Euro}
             title="Estimated Price"
             edit={<EstimatedPriceEdit barometer={barometer} />}
           >
@@ -144,7 +144,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly={dimensions.length === 0}
-            icon={IconDimensions}
+            icon={Ruler}
             title="Dimensions"
             edit={<DimensionEdit barometer={barometer} />}
           >
@@ -162,7 +162,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly={!barometer.materials || barometer.materials.length === 0}
-            icon={IconWood}
+            icon={TreePine}
             title="Materials"
             edit={<MaterialsEdit barometer={barometer} />}
           >

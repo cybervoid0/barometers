@@ -1,5 +1,5 @@
 import { type HTMLAttributes } from 'react'
-import { IconBrandInstagram, IconMail } from '@tabler/icons-react'
+import { Instagram, Mail } from 'lucide-react'
 import { instagram, email } from '@/utils/constants'
 import { ModeToggle } from '../mode-toggle'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -25,7 +25,7 @@ export function SocialButtons({ className, ...props }: HTMLAttributes<HTMLDivEle
               variant="outline"
               className={cn(buttonStyle, 'group-hover:text-red-800')}
             >
-              <IconBrandInstagram />
+              <Instagram />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Instagram</TooltipContent>
@@ -46,7 +46,7 @@ export function SocialButtons({ className, ...props }: HTMLAttributes<HTMLDivEle
               variant="outline"
               className={cn(buttonStyle, 'group-hover:text-blue-800')}
             >
-              <IconMail />
+              <Mail />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Email</TooltipContent>

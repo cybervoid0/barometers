@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
-import { IconSearch } from '@tabler/icons-react'
+import { Search } from 'lucide-react'
 import { isAdmin } from '../is-admin'
 import { MenuItem } from '@/app/types'
 import { cn } from '@/lib/utils'
@@ -91,7 +91,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
           <NavigationMenuItem className={cn(menuItemStyle, underline('/search'))}>
             <NavigationMenuLink asChild className="">
               <Link href="/search">
-                <IconSearch size="18" />
+                <Search size="18" />
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>

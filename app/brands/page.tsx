@@ -3,7 +3,7 @@ import 'server-only'
 import Link from 'next/link'
 import { type Metadata } from 'next'
 import Image from 'next/image'
-import { IconCircleArrowUp } from '@tabler/icons-react'
+import { ArrowUp } from 'lucide-react'
 import { withPrisma } from '@/prisma/prismaClient'
 import { FrontRoutes } from '@/utils/routes-front'
 import { title } from '../metadata'
@@ -88,7 +88,7 @@ const BrandsOfCountry = ({
                     className="h-8 w-8 object-contain"
                   />
                 ) : (
-                  <IconCircleArrowUp size={32} />
+                  <ArrowUp size={32} />
                 )}
                 <p className="w-fit font-medium capitalize">
                   {name + (firstName ? `, ${firstName}` : '')}

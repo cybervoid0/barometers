@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'sonner'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { Search, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -100,7 +100,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
                 className="absolute right-0 top-0 h-full w-8 px-0 hover:bg-transparent"
                 aria-label="Clear input"
               >
-                <IconX className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </Button>
             )}
           </div>
@@ -110,7 +110,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
             className="shrink-0 rounded-l-none"
             disabled={isSubmitting}
           >
-            {isSubmitting ? '...' : <IconSearch className="h-4 w-4" />}
+            {isSubmitting ? '...' : <Search className="h-4 w-4" />}
           </Button>
         </div>
       </form>
