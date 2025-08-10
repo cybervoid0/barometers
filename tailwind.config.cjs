@@ -49,6 +49,7 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
         border: 'hsl(var(--border))',
+        'button-border': 'hsl(var(--button-border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         chart: {
@@ -58,11 +59,49 @@ module.exports = {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        'card-gradient-from': {
+          DEFAULT: 'var(--card-gradient-from)',
+        },
+        'card-gradient-to': {
+          DEFAULT: 'var(--card-gradient-to)',
+        },
+        'layout-gradient-from': {
+          DEFAULT: 'hsl(var(--layout-gradient-from))',
+        },
+        'layout-gradient-to': {
+          DEFAULT: 'hsl(var(--layout-gradient-to))',
+        },
+      },
+      fontFamily: {
+        raleway: ['var(--font-raleway)', 'system-ui', 'sans-serif'],
+        cinzel: ['var(--font-cinzel)', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      keyframes: {
+        'accordion-down': {
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+        },
+        'accordion-up': {
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
     screens: {
@@ -74,5 +113,5 @@ module.exports = {
       xl2: '1600px',
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/container-queries')],
 }

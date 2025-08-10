@@ -1,5 +1,6 @@
+import 'server-only'
+
 import { type Metadata } from 'next'
-import { Anchor, Box, Container, Grid, GridCol, Title } from '@mantine/core'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { getManufacturer } from '@/app/services'
@@ -9,6 +10,7 @@ import { BarometerCardWithIcon } from '@/app/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
 import { MD } from '@/app/components/md'
 import { ImageLightbox } from '@/app/components/modal'
+import { Card } from '@/components/ui/card'
 
 interface Props {
   params: {
@@ -55,14 +57,12 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
   return (
-    <Container size="xl">
-      <Box className="mb-4">
-        <Title tt="capitalize" mt="xl" mb="sm" component="h2">
-          {fullName}
-        </Title>
+    <>
+      <div className="mb-4 mt-6">
+        <h2>{fullName}</h2>
         <Connections label="Successor" brands={manufacturer.successors} />
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
-      </Box>
+      </div>
       <div className="my-8 flex flex-col items-center gap-8 sm:flex-row">
         {manufacturer.images.map(image => (
           <ImageLightbox src={image.url} name={image.name} key={image.id} />
@@ -70,14 +70,11 @@ export default async function Manufacturer({ params: { slug } }: Props) {
       </div>
       <MD className="my-8">{manufacturer.description}</MD>
       {barometers.length > 0 && (
-        <>
-          <Title
-            className="!mb-8"
-            order={2}
-          >{`Instruments by ${fullName} in the collection`}</Title>
-          <Grid justify="center" gutter="xl">
+        <Card className="p-4 shadow-md">
+          <h3>{`Instruments by ${fullName} in the collection`}</h3>
+          <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
-              <GridCol span={{ base: 6, xs: 3, lg: 3 }} key={id}>
+              <div key={id}>
                 <BarometerCardWithIcon
                   barometerName={name}
                   barometerLink={FrontRoutes.Barometer + barometerSlug}
@@ -85,12 +82,12 @@ export default async function Manufacturer({ params: { slug } }: Props) {
                   categoryName={category.name}
                   image={images[0]}
                 />
-              </GridCol>
+              </div>
             ))}
-          </Grid>
-        </>
+          </div>
+        </Card>
       )}
-    </Container>
+    </>
   )
 }
 
@@ -107,14 +104,12 @@ const Connections = ({
 }) =>
   brands.length > 0 && (
     <div>
-      <Title fz="1.2rem" fw={500} display="inline" order={3}>
-        {`${label}${brands.length > 1 ? 's' : ''}: `}
-      </Title>
+      <span className="text-xl font-medium">{`${label}${brands.length > 1 ? 's' : ''}: `}</span>
       {brands.map(({ id, name, firstName, slug }, i, arr) => (
         <Fragment key={id}>
-          <Anchor underline="always" href={FrontRoutes.Brands + slug} component={Link}>
+          <Link href={FrontRoutes.Brands + slug} className="underline">
             {firstName} {name}
-          </Anchor>
+          </Link>
           {i < arr.length - 1 && `, `}
         </Fragment>
       ))}

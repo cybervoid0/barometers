@@ -1,5 +1,3 @@
-const baseConfig = require('eslint-config-mantine/.prettierrc.js');
-
 /** @type {import('prettier').Options} */
 module.exports = {
   ...baseConfig,

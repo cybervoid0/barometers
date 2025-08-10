@@ -1,18 +1,30 @@
+import 'server-only'
+
 import { type PropsWithChildren } from 'react'
 import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { ColorSchemeScript, Box, Stack } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
+import { Raleway, Cinzel } from 'next/font/google'
+import { Toaster } from 'sonner'
 import './globals.css'
-import '@mantine/core/styles.css'
-import '@mantine/notifications/styles.css'
 import { Footer, Header } from './components'
 import Providers from './providers'
 import { meta, jsonLd } from './metadata'
 import { withPrisma } from '@/prisma/prismaClient'
+import { cn } from '@/lib/utils'
+
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-raleway',
+})
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-cinzel',
+})
 
 export const viewport: Viewport = {
-  colorScheme: 'only light',
+  colorScheme: 'light dark',
   themeColor: [{ color: 'white' }],
 }
 
@@ -50,7 +62,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <GoogleAnalytics gaId="G-Q8ZR89R225" />
-        <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
         <meta
@@ -63,14 +74,20 @@ export default function RootLayout({ children }: PropsWithChildren) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>
+      <body
+        className={cn(
+          raleway.variable,
+          cinzel.variable,
+          'bg-background font-raleway text-foreground',
+        )}
+      >
         <Providers>
-          <Notifications />
-          <Stack h="100vh" gap={0}>
+          <Toaster position="top-center" richColors />
+          <div className="flex h-screen flex-col">
             <Header />
-            <Box className="flex-grow bg-page-bg pb-12 shadow-lg">{children}</Box>
+            <main className="container mx-auto grow !px-2 pb-12 xs:px-0 sm:!px-4">{children}</main>
             <Footer />
-          </Stack>
+          </div>
         </Providers>
       </body>
     </html>

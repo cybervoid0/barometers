@@ -1,9 +1,5 @@
 {
-  "cssVariables.lookupFiles": [
-    "**/*.css",
-    "**/*.less",
-    "node_modules/@mantine/core/styles.css"
-  ],
+  "cssVariables.lookupFiles": ["**/*.css", "**/*.less"],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

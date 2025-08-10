@@ -1,10 +1,10 @@
-import { Box, BoxProps } from '@mantine/core'
 import Link from 'next/link'
 import { CategoryIcon } from '../category-icon'
 import { BarometerCard } from './barometer-card'
 import { BarometerListDTO } from '@/app/types'
+import { cn } from '@/lib/utils'
 
-interface Props extends BoxProps {
+interface Props extends React.ComponentProps<'div'> {
   barometerName: string
   barometerLink: string
   categoryName: string
@@ -20,16 +20,13 @@ export function BarometerCardWithIcon({
   categoryLink,
   manufacturer,
   image,
+  className,
   ...props
 }: Props) {
   return (
-    <Box pos="relative" {...props}>
+    <div className={cn('relative h-full', className)} {...props}>
       <Link href={categoryLink ?? barometerLink}>
-        <CategoryIcon
-          category={categoryName}
-          bgColor="white"
-          style={{ position: 'absolute', zIndex: 1, right: 0, top: '3px' }}
-        />
+        <CategoryIcon category={categoryName} className="absolute right-2 top-2 z-[1]" />
       </Link>
       <BarometerCard
         manufacturer={manufacturer}
@@ -38,6 +35,6 @@ export function BarometerCardWithIcon({
         name={barometerName}
         link={barometerLink}
       />
-    </Box>
+    </div>
   )
 }

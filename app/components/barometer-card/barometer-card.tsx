@@ -1,10 +1,11 @@
-import { Box, Anchor, BoxProps } from '@mantine/core'
+import { type HTMLAttributes } from 'react'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import customImageLoader from '@/utils/image-loader'
 import { BarometerListDTO } from '@/app/types'
+import { cn } from '@/lib/utils'
 
-interface BarometerCardProps extends BoxProps {
+interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {
   image?: BarometerListDTO['barometers'][number]['images'][number]
   name: string
   link: string
@@ -18,12 +19,19 @@ export async function BarometerCard({
   link,
   manufacturer,
   priority,
+  className,
   ...props
 }: BarometerCardProps) {
   return (
-    <Box {...props}>
-      <Anchor underline="never" c="dark" className="block" component={Link} href={link}>
-        <div className="relative flex h-60 w-full items-center justify-center rounded-md bg-[linear-gradient(180deg,_#fbfbfb,_#efefef)] bg-contain bg-center bg-no-repeat">
+    <div className={cn('h-full', className)} {...props}>
+      <Link
+        className={cn(
+          'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center',
+          'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
+        )}
+        href={link}
+      >
+        <div className="relative h-60 w-full bg-contain bg-center bg-no-repeat">
           {image ? (
             <NextImage
               unoptimized
@@ -31,7 +39,7 @@ export async function BarometerCard({
               src={customImageLoader({ src: image.url, quality: 95, width: 300 })}
               alt={name}
               fill
-              style={{ objectFit: 'contain' }}
+              className="object-contain"
               placeholder="blur"
               blurDataURL={image.blurData ?? undefined}
             />
@@ -39,15 +47,13 @@ export async function BarometerCard({
             <p>No image</p>
           )}
         </div>
-        <p className="mb-1 text-center text-xs font-medium uppercase tracking-wider text-inherit">
-          {name}
-        </p>
+        <p className="text-xs font-medium uppercase tracking-wider">{name}</p>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <p className="text-center text-[8px] font-medium uppercase leading-none tracking-wider text-inherit">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             {manufacturer}
           </p>
         )}
-      </Anchor>
-    </Box>
+      </Link>
+    </div>
   )
 }

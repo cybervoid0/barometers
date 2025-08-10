@@ -1,51 +1,53 @@
-import {
-  Table as MantineTable,
-  TableTbody,
-  TableThead,
-  TableTd,
-  TableTr,
-  type TableProps,
-} from '@mantine/core'
 import { flexRender, type Table as ReactTable } from '@tanstack/react-table'
+import {
+  Table as TableCore,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
-interface Props<T> extends TableProps {
+interface Props<T> {
   table: ReactTable<T>
+  className?: string
 }
-export function Table<T>({ table, ...props }: Props<T>) {
+
+export function Table<T>({ table, className }: Props<T>) {
   return (
-    <MantineTable {...props}>
-      <TableThead fw={600} style={{ whiteSpace: 'nowrap' }}>
-        <TableTr>
-          {table
-            .getHeaderGroups()
-            .map(headerGroup =>
-              headerGroup.headers.map(header => (
-                <TableTd key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableTd>
-              )),
-            )}
-        </TableTr>
-      </TableThead>
-      <TableTbody>
+    <TableCore className={className}>
+      <TableHeader>
+        {table.getHeaderGroups().map(headerGroup => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map(header => (
+              <TableHead key={header.id} className="whitespace-nowrap font-semibold">
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
         {table.getRowModel().rows.length === 0 ? (
-          <TableTr>
-            <TableTd colSpan={table.getAllColumns().length}>No data available</TableTd>
-          </TableTr>
+          <TableRow>
+            <TableCell colSpan={table.getAllColumns().length} className="text-center">
+              No data available
+            </TableCell>
+          </TableRow>
         ) : (
           table.getRowModel().rows.map(row => (
-            <TableTr key={row.id}>
+            <TableRow key={row.id}>
               {row.getVisibleCells().map(cell => (
-                <TableTd key={cell.id}>
+                <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableTd>
+                </TableCell>
               ))}
-            </TableTr>
+            </TableRow>
           ))
         )}
-      </TableTbody>
-    </MantineTable>
+      </TableBody>
+    </TableCore>
   )
 }

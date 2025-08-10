@@ -1,54 +1,54 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
-import {
-  CloseButton,
-  Fieldset,
-  FileButton,
-  Image,
-  ActionIcon,
-  Stack,
-  Group,
-  Paper,
-  Tooltip,
-  Text,
-} from '@mantine/core'
-import { IconPhotoPlus, IconXboxX } from '@tabler/icons-react'
-import { showError } from '@/utils/notification'
+import { useRef, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { Upload, X } from 'lucide-react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { deleteImage, uploadFileToCloud, createImageUrls } from '@/utils/fetch'
 import { imageStorage } from '@/utils/constants'
 
 interface FileUploadProps {
-  fileNames: string[]
-  setFileNames: (names: string[]) => void
-  validateError?: ReactNode
-  clearValidateError?: () => void
+  name: string
 }
-export function FileUpload({
-  setFileNames,
-  fileNames,
-  validateError,
-  clearValidateError,
-}: FileUploadProps) {
-  const [isUploading, setIsUploading] = useState(false)
 
-  const uploadImages = async (files: File[] | null) => {
-    if (clearValidateError) clearValidateError()
-    if (!files || !Array.isArray(files) || files.length === 0) return
+export function FileUpload({ name }: FileUploadProps) {
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { control, watch, setValue } = useFormContext()
+
+  const fileNames: string[] = watch(name) || []
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click()
+  }
+
+  const uploadImages = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    const filesArray = Array.from(files)
     setIsUploading(true)
+
     try {
       const urlsDto = await createImageUrls(
-        files.map(file => ({
+        filesArray.map(file => ({
           fileName: file.name,
           contentType: file.type,
         })),
       )
+
       await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, filesArray[index])),
       )
-      setFileNames([...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)])
+
+      const newFileNames = [...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)]
+      setValue(name, newFileNames)
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error uploading files')
+      toast.error(error instanceof Error ? error.message : 'Error uploading files')
     } finally {
       setIsUploading(false)
     }
@@ -57,53 +57,78 @@ export function FileUpload({
   const handleDeleteFile = async (index: number) => {
     const fileName = fileNames.at(index)
     if (!fileName) return
+
     try {
       await deleteImage(fileName)
-      setFileNames(fileNames.filter((_, i) => i !== index))
+      const updatedFileNames = fileNames.filter((_, i) => i !== index)
+      setValue(name, updatedFileNames)
     } catch (error) {
-      showError(error instanceof Error ? error.message : 'Error deleting file')
+      toast.error(error instanceof Error ? error.message : 'Error deleting file')
     }
   }
 
   return (
-    <Fieldset m={0} mt="0.2rem" p="sm" pt="0.3rem" legend="Images">
-      <Stack gap="xs" align="flex-start">
-        <Group w="100%" justify="space-between">
-          <FileButton onChange={uploadImages} accept="image/*" multiple>
-            {props => (
-              <Tooltip color="dark.3" withArrow label="Add image">
-                <ActionIcon loading={isUploading} variant="default" {...props}>
-                  <IconPhotoPlus color="grey" />
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </FileButton>
-          <Group gap="0.4rem" wrap="wrap">
-            {fileNames.map((fileName, i) => (
-              <Paper key={fileName} withBorder pos="relative">
-                <CloseButton
-                  p={0}
-                  c="dark.3"
-                  radius={100}
-                  size="1rem"
-                  right={1}
-                  top={1}
-                  pos="absolute"
-                  icon={<IconXboxX />}
-                  bg="white"
-                  onClick={() => handleDeleteFile(i)}
-                />
-                <Image h="3rem" w="3rem" src={imageStorage + fileName} />
-              </Paper>
-            ))}
-          </Group>
-        </Group>
-      </Stack>
-      {validateError && (
-        <Text mt="xs" size="xs" c="red">
-          {validateError}
-        </Text>
+    <FormField
+      control={control}
+      name={name}
+      render={() => (
+        <FormItem>
+          <FormLabel>Images</FormLabel>
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleFileSelect}
+                      disabled={isUploading}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add image</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <div className="flex flex-wrap gap-2">
+                {fileNames.map((fileName, i) => (
+                  <Card key={fileName} className="relative">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -right-2 -top-2 h-6 w-6 rounded-full"
+                      onClick={() => handleDeleteFile(i)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                    <img
+                      src={imageStorage + fileName}
+                      alt={`Upload ${i + 1}`}
+                      className="h-12 w-12 rounded object-contain p-1"
+                    />
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={e => uploadImages(e.target.files)}
+            />
+          </div>
+          <FormMessage />
+        </FormItem>
       )}
-    </Fieldset>
+    />
   )
 }

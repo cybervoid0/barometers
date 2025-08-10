@@ -1,66 +1,139 @@
 'use client'
 
-import {
-  Modal,
-  UnstyledButton,
-  UnstyledButtonProps,
-  Button,
-  Stack,
-  Select,
-  Tooltip,
-  Box,
-} from '@mantine/core'
-import { IconEdit } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit } from 'lucide-react'
+import { toast } from 'sonner'
 import { BarometerDTO } from '@/app/types'
-import { useEditField } from './useEditField'
+import { updateBarometer } from '@/utils/fetch'
+import { FrontRoutes } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
+import { cn } from '@/lib/utils'
 
-interface TextFieldEditProps extends UnstyledButtonProps {
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+interface ConditionEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-const property = 'conditionId'
+interface ConditionForm {
+  conditionId: string
+}
 
-export function ConditionEdit({ size = 18, barometer, ...props }: TextFieldEditProps) {
+const validationSchema = yup.object({
+  conditionId: yup.string().required('Condition is required'),
+})
+
+export function ConditionEdit({ size = 18, barometer, className, ...props }: ConditionEditProps) {
   const { condition } = useBarometers()
-  const { open, close, opened, form, update } = useEditField({ property, barometer })
+
+  const form = useForm<ConditionForm>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      conditionId: barometer.condition?.id ?? '',
+    },
+  })
+
+  const update = async (values: ConditionForm) => {
+    try {
+      const { slug } = await updateBarometer({
+        id: barometer.id,
+        conditionId: values.conditionId,
+      })
+      toast.success(`${barometer.name} updated`)
+      setTimeout(() => {
+        window.location.href = FrontRoutes.Barometer + (slug ?? '')
+      }, 1000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+    }
+  }
+
   return (
-    <>
-      <Tooltip label="Edit condition">
-        <UnstyledButton {...props} onClick={open}>
-          <IconEdit color="brown" size={size} />
-        </UnstyledButton>
-      </Tooltip>
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title="Edit condition"
-        size="md"
-        tt="capitalize"
-        styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
-      >
-        <Box component="form" onSubmit={form.onSubmit(update)}>
-          <Stack>
-            <Select
-              data={condition.data.map(({ name, id }) => ({
-                label: name,
-                value: id,
-              }))}
-              value={form.values.conditionId}
-              onChange={id => {
-                const newCondition = condition.data.find(c => c.id === id)
-                form.setValues({ conditionId: newCondition?.id })
-              }}
-              allowDeselect={false}
-            />
-            <Button fullWidth color="dark" variant="outline" type="submit">
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
+    <Dialog
+      onOpenChange={isOpen => {
+        if (isOpen) {
+          form.reset({ conditionId: barometer.condition?.id ?? '' })
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          aria-label="Edit condition"
+          className={cn('h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={Number(size) || 18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(update)} noValidate>
+            <DialogHeader>
+              <DialogTitle>Edit Condition</DialogTitle>
+              <DialogDescription>Update the condition for this barometer.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <FormField
+                control={form.control}
+                name="conditionId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Condition</FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select condition" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {condition.data.map(({ name, id }) => (
+                            <SelectItem key={id} value={id}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mt-6">
+              <Button type="submit" variant="outline" className="w-full">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

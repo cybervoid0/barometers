@@ -2,14 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --mantine-color-primary: #473e36;
-}
-
-html,
-body {
-  font-family: var(--mantine-font-family);
-}
+/* Font configured in layout.tsx via next/font */
 
 @layer base {
   :root {
@@ -19,9 +12,9 @@ body {
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
-    --primary: 13 32% 23%;
+    --primary: 30 70% 19%;
     --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 60 4.8% 95.9%;
+    --secondary: 221 58% 23%;
     --secondary-foreground: 24 9.8% 10%;
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5.3% 44.7%;
@@ -30,6 +23,7 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
     --border: 20 5.9% 90%;
+    --button-border: 0 0% 75%;
     --input: 20 5.9% 90%;
     --ring: 20 14.3% 4.1%;
     --chart-1: 12 76% 61%;
@@ -38,6 +32,10 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --card-gradient-from: theme('colors.neutral.200');
+    --card-gradient-to: theme('colors.neutral.50');
+    --layout-gradient-from: 0 0% 90%;
+    --layout-gradient-to: 0 0% 100%;
   }
 
   .dark {
@@ -47,9 +45,9 @@ body {
     --card-foreground: 60 9.1% 97.8%;
     --popover: 20 14.3% 4.1%;
     --popover-foreground: 60 9.1% 97.8%;
-    --primary: 60 9.1% 97.8%;
+    --primary: 0 0% 70%;
     --primary-foreground: 24 9.8% 10%;
-    --secondary: 12 6.5% 15.1%;
+    --secondary: 53 48% 46%;
     --secondary-foreground: 60 9.1% 97.8%;
     --muted: 12 6.5% 15.1%;
     --muted-foreground: 24 5.4% 63.9%;
@@ -58,6 +56,7 @@ body {
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 60 9.1% 97.8%;
     --border: 12 6.5% 15.1%;
+    --button-border: 0 0% 20%;
     --input: 12 6.5% 15.1%;
     --ring: 24 5.7% 82.9%;
     --chart-1: 220 70% 50%;
@@ -65,17 +64,72 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --card-gradient-from: theme('colors.neutral.700');
+    --card-gradient-to: theme('colors.neutral.900');
+    --layout-gradient-from: 20 14.3% 11%;
+    --layout-gradient-to: 20 14.3% 4.1%;
   }
 }
-
-
 
 @layer base {
   * {
     @apply border-border;
   }
+  /* Typography styles */
 
-  body {
-    @apply bg-background text-foreground;
+  /* H1 is used only once in the site layout header */
+  h1 {
+    @apply text-[1.3rem] font-semibold uppercase leading-tight tracking-wider text-secondary sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
+  }
+  /* H2 is used for page headers */
+  h2 {
+    @apply text-3xl font-semibold capitalize leading-tight tracking-wider;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold capitalize leading-tight tracking-wide;
+  }
+
+  h4 {
+    @apply text-xl font-medium leading-tight tracking-wide;
+  }
+}
+
+@layer utilities {
+  /* Readable text over images - magazine style */
+  .text-shadow-stroke {
+    text-shadow:
+      /* Ultra mega dense core - triple layers */
+      0 0 2px var(--card-gradient-to),
+      0 0 2px var(--card-gradient-to),
+      0 0 2px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 3px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 5px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      0 0 6px var(--card-gradient-to),
+      /* Super strong gradient with increased blur */ 0 0 8px var(--card-gradient-to),
+      0 0 10px var(--card-gradient-to),
+      0 0 12px var(--card-gradient-to),
+      0 0 14px var(--card-gradient-to),
+      0 0 16px var(--card-gradient-to),
+      0 0 18px color-mix(in srgb, var(--card-gradient-to) 60%, transparent),
+      0 0 22px color-mix(in srgb, var(--card-gradient-to) 40%, transparent),
+      0 0 26px color-mix(in srgb, var(--card-gradient-to) 25%, transparent),
+      0 0 32px color-mix(in srgb, var(--card-gradient-to) 15%, transparent),
+      0 0 40px color-mix(in srgb, var(--card-gradient-to) 8%, transparent);
+  }
+
+  /* Loading animation delays */
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
   }
 }

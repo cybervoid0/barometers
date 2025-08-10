@@ -1,48 +1,51 @@
 import Link from 'next/link'
-import { Breadcrumbs, Anchor, Text } from '@mantine/core'
 import { FrontRoutes } from '@/utils/routes-front'
+import { cn } from '@/lib/utils'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 
 interface BreadcrumbsComponentProps {
   type: string
   catId: string
+  className?: string
 }
 
-export function BreadcrumbsComponent({ type, catId, ...props }: BreadcrumbsComponentProps) {
-  const breadcrumbs = [
-    { title: 'Home', href: '/' },
-    {
-      title: type.toLowerCase(),
-      href: FrontRoutes.Categories + type.toLowerCase(),
-    },
-    { title: catId },
-  ]
+const bcTextStyle = 'text-base font-medium capitalize'
+
+export function BreadcrumbsComponent({ type, catId, className }: BreadcrumbsComponentProps) {
+  const categorySlug = type.toLowerCase()
 
   return (
-    <Breadcrumbs
-      separator="→"
-      {...props}
-      mt={{ base: 'sm', sm: 'xl' }}
-      mb={{ base: 'none', sm: '2rem' }}
-    >
-      {breadcrumbs.map(({ href, title }, i) =>
-        href ? (
-          <Anchor
-            size="lg"
-            fw={{ base: 500, sm: 400 }}
-            c="dark.4"
-            key={i}
-            component={Link}
-            href={href}
-            underline="hover"
-          >
-            {title}
-          </Anchor>
-        ) : (
-          <Text key={i} fw={600}>
-            {title}
-          </Text>
-        ),
-      )}
-    </Breadcrumbs>
+    <Breadcrumb className={cn('my-4 sm:my-8', className)}>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link className={bcTextStyle} href="/">
+              Home
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link className={bcTextStyle} href={FrontRoutes.Categories + categorySlug}>
+              {categorySlug}
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>
+            <p className={bcTextStyle}>{catId}</p>
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Stack, Title } from '@mantine/core'
 import { SearchField } from '../components/search-field'
 
 interface SearchInfoProps {
@@ -16,8 +15,8 @@ const message = {
 } as const satisfies Record<string, string>
 
 const titleClasses = {
-  welcome: 'block text-gray-600',
-  notFound: 'block text-red-900',
+  welcome: 'block text-muted-foreground',
+  notFound: 'block text-destructive',
   hidden: 'hidden',
 } as const
 
@@ -29,16 +28,9 @@ export function SearchInfo({ isEmptyResult, queryString }: SearchInfoProps) {
   }, [queryString, isEmptyResult])
 
   return (
-    <Stack>
-      <SearchField px={{ base: 'lg', xs: 0 }} queryString={queryString} />
-      <Title
-        className={titleClasses[msg]}
-        fw={400}
-        fz={{ base: '0.8rem', sm: '1rem' }}
-        component="p"
-      >
-        {message[msg]}
-      </Title>
-    </Stack>
+    <div className="flex flex-col space-y-4">
+      <SearchField queryString={queryString} className="px-4 md:px-0" />
+      <p className={`${titleClasses[msg]} text-sm font-normal md:text-base`}>{message[msg]}</p>
+    </div>
   )
 }

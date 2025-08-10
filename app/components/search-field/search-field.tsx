@@ -1,76 +1,119 @@
 'use client'
 
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import { useEffect } from 'react'
-import { Box, TextInput, BoxProps, CloseButton, ActionIcon, ButtonGroup } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { isLength } from 'validator'
 import { useRouter } from 'next/navigation'
-import { IconSearch } from '@tabler/icons-react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { toast } from 'sonner'
+import { Search, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
-interface SearchProps extends BoxProps {
+interface SearchProps extends React.HTMLAttributes<HTMLDivElement> {
   queryString?: string
 }
 
-interface QueryForm extends Record<string, string> {
-  q: string
-}
+const schema = yup.object({
+  query: yup
+    .string()
+    .required('Search query is required')
+    .min(1, 'Allowed length 1-100 symbols')
+    .max(100, 'Allowed length 1-100 symbols')
+    .test('trimmed-length', 'Allowed length 1-100 symbols', value => {
+      const trimmed = value?.trim() || ''
+      return trimmed.length >= 1 && trimmed.length <= 100
+    }),
+})
+
+type SearchFormData = yup.InferType<typeof schema>
 
 export function SearchField({ queryString, ...props }: SearchProps) {
   const router = useRouter()
-  const form = useForm<QueryForm>({
-    initialValues: {
-      q: '',
-    },
-    validate: {
-      q: value =>
-        isLength(value.trim(), { min: 1, max: 100 }) ? null : 'Allowed length 1-100 symbols',
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<SearchFormData>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      query: '',
     },
   })
 
-  // fill querystring from the page to the form
-  useEffect(() => {
-    if (!queryString) return
-    form.setValues({ q: queryString })
-  }, [queryString])
+  const queryValue = watch('query')
 
-  const handleSearch = async ({ q }: QueryForm) => {
-    const qs = q.trim()
-    const query = new URLSearchParams({ q: qs })
-    router.push(`/search?${query}`, { scroll: true })
+  // Fill querystring from the page to the form
+  useEffect(() => {
+    if (queryString) {
+      setValue('query', queryString)
+    }
+  }, [queryString, setValue])
+
+  const onSubmit = async (data: SearchFormData) => {
+    try {
+      const qs = data.query.trim()
+      const searchParams = new URLSearchParams({ q: qs })
+      router.push(`/search?${searchParams}`, { scroll: true })
+    } catch (error) {
+      toast.error('Search failed')
+    }
   }
+
+  // Show toast on validation error
+  useEffect(() => {
+    if (errors.query?.message) {
+      toast.error(errors.query.message)
+    }
+  }, [errors.query?.message])
+
+  const handleClear = () => {
+    setValue('query', '', { shouldValidate: false })
+  }
+
   return (
-    <Box {...props} my="md" component="form" onSubmit={form.onSubmit(handleSearch)}>
-      <ButtonGroup>
-        <TextInput
-          autoComplete="off"
-          classNames={{
-            input:
-              'text-base !border-r-0 !border-gray-300 focus:!border-gray-300 focus-visible:!border-gray-300',
-            root: 'flex-grow overflow-hidden',
-          }}
-          placeholder="Enter your query"
-          title="Fill in any barometer related word"
-          required
-          {...form.getInputProps('q')}
-          rightSection={
-            <CloseButton
-              aria-label="Clear input"
-              onClick={form.reset}
-              style={{ display: form.values.q ? undefined : 'none' }}
+    <div {...props}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex w-full">
+          <div className="relative flex-grow">
+            <Input
+              type="text"
+              autoComplete="off"
+              placeholder="Enter your query"
+              title="Fill in any barometer related word"
+              className={cn(
+                'rounded-r-none border-r-0 pr-8',
+                errors.query && 'border-destructive focus-visible:ring-destructive',
+              )}
+              {...register('query')}
             />
-          }
-        />
-        <ActionIcon
-          variant="filled"
-          size="input-sm"
-          type="submit"
-          className="!rounded-l-none !bg-primary"
-        >
-          <IconSearch />
-        </ActionIcon>
-      </ButtonGroup>
-    </Box>
+            {queryValue && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleClear}
+                className="absolute right-0 top-0 h-full w-8 px-0 hover:bg-transparent"
+                aria-label="Clear input"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <Button
+            type="submit"
+            size="icon"
+            className="shrink-0 rounded-l-none"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? '...' : <Search className="h-4 w-4" />}
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }

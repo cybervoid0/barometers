@@ -1,8 +1,5 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
+import bundleAnalyzer from '@next/bundle-analyzer'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -14,10 +11,7 @@ export default withBundleAnalyzer({
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
-    serverComponentsExternalPackages: ['mongoose'],
-  },
+  experimental: {},
 
   images: {
     loader: 'custom',
