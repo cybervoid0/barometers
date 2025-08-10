@@ -52,6 +52,7 @@ export async function Header() {
           </div>
         </div>
       </header>
+      {/* Visible only on the landing page */}
       <Subheader />
     </>
   )
