@@ -49,7 +49,10 @@ export function withPrisma<T, Args extends any[]>(fn: AsyncFunction<T, Args>) {
     try {
       return await fn(prisma, ...args)
     } finally {
-      await prisma.$disconnect()
+      // Only disconnect in development to avoid connection issues during build
+      if (process.env.NODE_ENV === 'development') {
+        await prisma.$disconnect()
+      }
     }
   }
 }
