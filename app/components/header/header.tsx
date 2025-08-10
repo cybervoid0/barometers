@@ -26,7 +26,7 @@ export async function Header() {
               <MobileMenu menu={menu} />
             </div>
             <NextLink className="no-underline" href="/">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 <div className="flex flex-col gap-[0.32rem]">
                   <h1 className="font-cinzel leading-none">Barometers Realm</h1>
                   <p className="text-xs leading-none lg:text-[0.875rem]">

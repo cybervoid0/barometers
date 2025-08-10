@@ -3,15 +3,15 @@ import 'server-only'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import {
+  BadgeEuro,
+  CalendarRange,
+  Wrench,
   Factory,
   Calendar,
-  Clock,
   Hash,
   Network,
   Ruler,
   Star,
-  FolderOpen,
-  Euro,
   TreePine,
 } from 'lucide-react'
 import { FrontRoutes } from '@/utils/routes-front'
@@ -111,7 +111,7 @@ export default async function Page({ params: { slug } }: Props) {
             {dayjs(barometer.date).format('YYYY')}
           </PropertyCard>
           <PropertyCard
-            icon={Clock}
+            icon={CalendarRange}
             title="Dating"
             edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
           >
@@ -126,7 +126,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly={!barometer.subCategory?.name}
-            icon={FolderOpen}
+            icon={Wrench}
             title="Movement (Tube) Type"
             edit={<SubcategoryEdit barometer={barometer} />}
           >
@@ -134,7 +134,7 @@ export default async function Page({ params: { slug } }: Props) {
           </PropertyCard>
           <PropertyCard
             adminOnly
-            icon={Euro}
+            icon={BadgeEuro}
             title="Estimated Price"
             edit={<EstimatedPriceEdit barometer={barometer} />}
           >
