@@ -9,11 +9,11 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { FrontRoutes } from '@/utils/routes-front'
@@ -48,21 +48,14 @@ export function DeleteBarometer({ barometer, className }: Props) {
   return (
     <IsAdmin>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className={cn('text-destructive hover:text-destructive', className)}
-              >
-                <Trash2 />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="capitalize">Delete {barometer.name}</p>
-            </TooltipContent>
-          </Tooltip>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className={cn('text-destructive hover:text-destructive', className)}
+          >
+            <Trash2 />
+          </Button>
         </DialogTrigger>
 
         <DialogContent className="max-w-md">
@@ -70,6 +63,9 @@ export function DeleteBarometer({ barometer, className }: Props) {
             <DialogTitle className="text-xl font-medium capitalize">
               Delete {barometer.name}
             </DialogTitle>
+            <DialogDescription>
+              This action will permanently remove the barometer from the database.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">

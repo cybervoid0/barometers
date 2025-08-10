@@ -1,60 +1,114 @@
 'use client'
 
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { Edit } from 'lucide-react'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-  Modal,
-  UnstyledButton,
-  UnstyledButtonProps,
-  TextInput,
-  Button,
-  Stack,
-  Tooltip,
-  Box,
-  Center,
-} from '@mantine/core'
-import { isLength } from 'validator'
-import { IconEdit } from '@tabler/icons-react'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { BarometerDTO } from '@/app/types'
-import { useEditField } from './useEditField'
+import { updateBarometer } from '@/utils/fetch'
 
-interface TextFieldEditProps extends UnstyledButtonProps {
-  size?: string | number | undefined
+interface TextFieldEditProps {
+  size?: number
   barometer: BarometerDTO
   property: keyof BarometerDTO
+  className?: string
 }
 
-export function TextFieldEdit({ size = 18, barometer, property, ...props }: TextFieldEditProps) {
-  const { open, close, opened, form, update } = useEditField({
-    property,
-    barometer,
-    validate: val => (isLength(String(val), { max: 200 }) ? null : 'Incorrect length (<200)'),
+interface FormData {
+  value: string
+}
+
+const textFieldSchema = yup.object().shape({
+  value: yup.string().required('Field is required').max(200, 'Must be less than 200 characters'),
+})
+
+export function TextFieldEdit({ size = 18, barometer, property, className }: TextFieldEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+
+  const form = useForm<FormData>({
+    resolver: yupResolver(textFieldSchema),
+    defaultValues: {
+      value: String(barometer[property] || ''),
+    },
   })
+
+  const onSubmit = async (values: FormData) => {
+    setIsUpdating(true)
+    try {
+      // Check if value actually changed
+      if (values.value === String(barometer[property] || '')) {
+        setOpen(false)
+        return
+      }
+
+      const { slug } = await updateBarometer({
+        id: barometer.id,
+        [property]: values.value,
+      })
+
+      toast.success(`${barometer.name} updated`)
+      setOpen(false)
+      window.location.href = `/collection/items/${slug}`
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
   return (
-    <>
-      <Tooltip label={`Edit ${property}`}>
-        <UnstyledButton {...props} onClick={open}>
-          <Center>
-            <IconEdit color="brown" size={size} />
-          </Center>
-        </UnstyledButton>
-      </Tooltip>
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title={`Edit ${property}`}
-        size="md"
-        tt="capitalize"
-        styles={{ title: { fontSize: '1.5rem', fontWeight: 500 } }}
-      >
-        <Box component="form" onSubmit={form.onSubmit(update)}>
-          <Stack>
-            <TextInput required {...form.getInputProps(property)} />
-            <Button fullWidth color="dark" variant="outline" type="submit">
-              Save
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className={cn('h-fit w-fit p-1', className)}>
+          <Edit size={size} className="text-destructive" />
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-medium capitalize">
+            Edit {String(property)}
+          </DialogTitle>
+          <DialogDescription>
+            Update the {String(property)} field for this barometer.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" variant="ghost" className="w-full" disabled={isUpdating}>
+              {isUpdating ? 'Saving...' : 'Save'}
             </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
