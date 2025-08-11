@@ -100,6 +100,7 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "^18.3.5",
     "@types/traverse": "^0.6.37",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "dotenv-cli": "^8.0.0",

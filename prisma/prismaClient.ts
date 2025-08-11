@@ -22,7 +22,7 @@ function getPrismaClient(): PrismaClient {
  * This type is used to define functions that need access to a PrismaClient instance and
  * additional arguments.
  */
-type AsyncFunction<T, Args extends any[]> = {
+type AsyncFunction<T, Args extends unknown[]> = {
   (prisma: PrismaClient, ...args: Args): Promise<T>
 }
 
@@ -43,7 +43,7 @@ type AsyncFunction<T, Args extends any[]> = {
  * });
  * ```
  */
-export function withPrisma<T, Args extends any[]>(fn: AsyncFunction<T, Args>) {
+export function withPrisma<T, Args extends unknown[]>(fn: AsyncFunction<T, Args>) {
   return async function wrappedWithParams(...args: Args): Promise<T> {
     const prisma = getPrismaClient()
     try {
