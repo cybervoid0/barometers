@@ -13,9 +13,9 @@ import { ImageLightbox } from '@/app/components/modal'
 import { Card } from '@/components/ui/card'
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export const dynamic = 'force-static'
@@ -39,7 +39,10 @@ const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
   }),
 )
 
-export async function generateMetadata({ params: { slug } }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const { slug } = params
+
   const manufacturer = await getManufacturer(slug)
   return {
     title: `${title} - Manufacturer: ${manufacturer.name}`,
@@ -52,7 +55,10 @@ export const generateStaticParams = withPrisma(async prisma =>
   }),
 )
 
-export default async function Manufacturer({ params: { slug } }: Props) {
+export default async function Manufacturer(props: Props) {
+  const params = await props.params
+  const { slug } = params
+
   const manufacturer = await getManufacturer(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`

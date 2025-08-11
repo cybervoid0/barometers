@@ -2,15 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCategory } from './getters'
 
 interface Props {
-  params: {
+  params: Promise<{
     name: string
-  }
+  }>
 }
 
 /**
  * Get Category details
  */
-export async function GET(_req: NextRequest, { params: { name } }: Props) {
+export async function GET(_req: NextRequest, props: Props) {
+  const params = await props.params
+  const { name } = params
+
   try {
     const category = await getCategory(name)
     return NextResponse.json(category, { status: 200 })

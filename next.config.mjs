@@ -6,12 +6,17 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 export default withBundleAnalyzer({
-  reactStrictMode: false,
+  reactStrictMode: true,
   productionBrowserSourceMaps: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {},
+
+  turbopack: {
+    resolveAlias: {
+      '@': path.resolve('./'),
+    },
+  },
 
   images: {
     loader: 'custom',

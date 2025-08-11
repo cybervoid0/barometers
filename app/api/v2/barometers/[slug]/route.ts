@@ -9,15 +9,18 @@ import { deleteImagesFromStorage } from './deleteFromStorage'
 import { trimTrailingSlash } from '@/utils/misc'
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 /**
  * Get Barometer details by slug
  */
-export async function GET(_req: NextRequest, { params: { slug } }: Props) {
+export async function GET(_req: NextRequest, props: Props) {
+  const params = await props.params
+  const { slug } = params
+
   try {
     const barometer = await getBarometer(slug)
     return NextResponse.json(barometer, { status: 200 })
@@ -36,7 +39,9 @@ export async function GET(_req: NextRequest, { params: { slug } }: Props) {
  * Delete Barometer by slug
  */
 /* eslint-disable prettier/prettier */
-export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Props) => {
+export const DELETE = withPrisma(async (prisma, _req: NextRequest, props: Props) => {
+  const params = await props.params
+  const { slug } = params
   try {
     const barometer = await prisma.barometer.findFirst({
       where: {
