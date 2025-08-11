@@ -1,7 +1,7 @@
 import { ReactNode, FC, ComponentProps } from 'react'
 import { type LucideProps } from 'lucide-react'
-import { IsAdmin } from '@/app/components/is-admin'
-import { Card } from '@/components/ui/card'
+import { IsAdmin } from '@/components/is-admin'
+import { Card } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 interface PropertyCardProps extends ComponentProps<'div'> {

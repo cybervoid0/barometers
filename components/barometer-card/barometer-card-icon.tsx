@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CategoryIcon } from '../category-icon'
+import { CategoryIcon } from '@/components/category-icon'
 import { BarometerCard } from './barometer-card'
 import { BarometerListDTO } from '@/app/types'
 import { cn } from '@/lib/utils'

@@ -1,8 +1,8 @@
 import 'server-only'
 
-import { CategoryCard } from './components/category-card'
-import { SearchField } from './components/search-field'
-import { NewArrivals } from './components/new-arrivals'
+import { CategoryCard } from '@/components/category-card'
+import { SearchField } from '@/components/search-field'
+import { NewArrivals } from '@/components/new-arrivals'
 import { FrontRoutes } from '@/utils/routes-front'
 import { getCategories } from './services'
 import { cn } from '@/lib/utils'

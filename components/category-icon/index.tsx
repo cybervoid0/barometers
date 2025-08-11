@@ -1,5 +1,5 @@
 import { type HTMLAttributes } from 'react'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 interface CategoryLetterProps extends HTMLAttributes<HTMLDivElement> {

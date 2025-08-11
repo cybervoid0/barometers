@@ -5,23 +5,21 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { Spin as Hamburger } from 'hamburger-react'
-import { isAdmin } from '../is-admin'
+import { isAdmin } from '@/components/is-admin'
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
   SheetTitle,
   SheetDescription,
-} from '@/components/ui/sheet'
-import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '@/components/ui'
 import { MenuItem } from '@/app/types'
 import { cn } from '@/lib/utils'
-import { SocialButtons } from '../footer'
+import { SocialButtons } from '@/components/footer'
 
 interface Props {
   menu: MenuItem[]

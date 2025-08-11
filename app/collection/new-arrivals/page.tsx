@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { fetchBarometerList } from '@/utils/fetch'
-import { BarometerCardWithIcon } from '@/app/components/barometer-card'
+import { BarometerCardWithIcon } from '@/components/barometer-card'
 import { Pagination } from '@/components/ui/pagination'
 import { FrontRoutes } from '@/utils/routes-front'
 import { Card } from '@/components/ui/card'

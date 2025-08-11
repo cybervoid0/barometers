@@ -7,8 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'sonner'
 import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Input, Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 interface SearchProps extends React.HTMLAttributes<HTMLDivElement> {

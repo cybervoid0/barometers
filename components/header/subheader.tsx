@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { HeadingImage } from '../heading-image'
+import { HeadingImage } from '@/components/heading-image'
 
 export function Subheader() {
   const pathname = usePathname()

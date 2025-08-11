@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
-import { MD } from '@/app/components/md'
+import { MD } from '@/components/md'
 
 interface ShowMoreProps extends React.HTMLAttributes<HTMLDivElement> {
   md?: boolean // if true, renders content as markdown

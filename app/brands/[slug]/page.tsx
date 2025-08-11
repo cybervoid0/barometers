@@ -6,11 +6,11 @@ import { Fragment } from 'react'
 import { getManufacturer } from '@/app/services'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '@/app/metadata'
-import { BarometerCardWithIcon } from '@/app/components/barometer-card'
+import { BarometerCardWithIcon } from '@/components/barometer-card'
 import { FrontRoutes } from '@/utils/routes-front'
-import { MD } from '@/app/components/md'
-import { ImageLightbox } from '@/app/components/modal'
-import { Card } from '@/components/ui/card'
+import { MD } from '@/components/md'
+import { ImageLightbox } from '@/components/modal'
+import { Card } from '@/components/ui'
 
 interface Props {
   params: {

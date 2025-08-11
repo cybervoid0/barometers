@@ -8,8 +8,8 @@ import dayjs from 'dayjs'
 import { fetchReportList } from '@/utils/fetch'
 import { InaccuracyReportListDTO } from '@/app/types'
 import { FrontRoutes } from '@/utils/routes-front'
-import { Table } from '@/app/components/table'
-import { Pagination } from '@/components/ui/pagination'
+import { Table } from '@/components/table'
+import { Pagination } from '@/components/ui'
 
 const itemsOnPage = 6
 

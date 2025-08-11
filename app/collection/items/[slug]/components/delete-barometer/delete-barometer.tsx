@@ -5,19 +5,19 @@ import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/components/ui'
 import { BarometerDTO } from '@/app/types'
 import { deleteBarometer } from '@/utils/fetch'
 import { FrontRoutes } from '@/utils/routes-front'
-import { IsAdmin } from '@/app/components/is-admin'
+import { IsAdmin } from '@/components/is-admin'
 
 interface Props {
   barometer: BarometerDTO

@@ -3,7 +3,7 @@ import 'server-only'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ShowMore } from '../components/showmore'
+import { ShowMore } from '../../components/showmore'
 import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-static'

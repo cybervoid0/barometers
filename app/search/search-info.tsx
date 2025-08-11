@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SearchField } from '../components/search-field'
+import { SearchField } from '../../components/search-field'
 
 interface SearchInfoProps {
   isEmptyResult: boolean
