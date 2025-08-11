@@ -1,3 +1,5 @@
+@reference "../../../../globals.css";
+
 /* This file contains the styles necessary for Swiper Pagination */
 .swiper {
   width: 100%;
@@ -25,7 +27,7 @@
 }
 
 .swiper-pagination-bullet {
-  @apply h-5 w-5 translate-y-[150%] bg-input text-xs leading-normal opacity-100 shadow-[0_0_1px_.5px_hsl(var(--muted-foreground))];
+  @apply bg-input h-5 w-5 translate-y-[150%] text-xs leading-normal opacity-100 shadow-[0_0_1px_.5px_hsl(var(--muted-foreground))];
 }
 
 .swiper-pagination-bullet-active {

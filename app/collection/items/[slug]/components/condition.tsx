@@ -16,9 +16,9 @@ export function Condition({ condition }: ConditionProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute -right-4 top-0 h-4 w-4 p-0 hover:bg-transparent"
+            className="absolute top-0 -right-4 h-4 w-4 p-0 hover:bg-transparent"
           >
-            <Info className="h-4 w-4 text-muted-foreground" />
+            <Info className="text-muted-foreground h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-48 p-2">

@@ -27,7 +27,7 @@ export async function BarometerCard({
       <Link
         className={cn(
           'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center',
-          'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
+          'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
         )}
         href={link}
       >
@@ -47,9 +47,9 @@ export async function BarometerCard({
             <p>No image</p>
           )}
         </div>
-        <p className="text-xs font-medium uppercase tracking-wider">{name}</p>
+        <p className="text-xs font-medium tracking-wider uppercase">{name}</p>
         {manufacturer && manufacturer.toLowerCase() !== 'unknown' && (
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
             {manufacturer}
           </p>
         )}

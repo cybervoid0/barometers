@@ -15,8 +15,8 @@ export function CategoryIcon({ category, className, ...props }: CategoryLetterPr
       <TooltipTrigger asChild>
         <div
           className={cn(
-            'h-[25px] w-[25px] rounded-sm border-[1.1px] border-primary',
-            'whitespace-nowrap text-sm font-semibold capitalize text-primary',
+            'border-primary h-[25px] w-[25px] rounded-sm border-[1.1px]',
+            'text-primary text-sm font-semibold whitespace-nowrap capitalize',
             'flex items-center justify-center',
             className,
           )}

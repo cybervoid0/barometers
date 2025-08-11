@@ -31,7 +31,7 @@ export default function ReportList() {
       cell: info => (
         <Link
           href={FrontRoutes.Barometer + info.row.original.barometer.slug}
-          className="text-sm text-foreground hover:text-primary hover:underline"
+          className="text-foreground hover:text-primary text-sm hover:underline"
         >
           {info.getValue()}
         </Link>
@@ -45,7 +45,7 @@ export default function ReportList() {
       cell: info => (
         <a
           href={`mailto:${info.getValue()}`}
-          className="text-sm text-foreground hover:text-primary hover:underline"
+          className="text-foreground hover:text-primary text-sm hover:underline"
         >
           {info.getValue()}
         </a>

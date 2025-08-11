@@ -120,7 +120,7 @@ export function EstimatedPriceEdit({
                     <FormLabel>Estimated Price</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                           €
                         </span>
                         <Input {...field} className="pl-8" placeholder="0.00" autoFocus />

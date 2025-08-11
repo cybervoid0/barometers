@@ -26,7 +26,7 @@ export function BarometerCardWithIcon({
   return (
     <div className={cn('relative h-full', className)} {...props}>
       <Link href={categoryLink ?? barometerLink}>
-        <CategoryIcon category={categoryName} className="absolute right-2 top-2 z-[1]" />
+        <CategoryIcon category={categoryName} className="absolute top-2 right-2 z-1" />
       </Link>
       <BarometerCard
         manufacturer={manufacturer}

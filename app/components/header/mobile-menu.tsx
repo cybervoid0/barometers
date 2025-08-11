@@ -43,13 +43,13 @@ export function MobileMenu({ menu = [] }: Props) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[17rem] data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
+        className="w-68 data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">Barometers website navigation menu</SheetDescription>
         <div className="flex h-full flex-col justify-between">
           {/* Menu content */}
-          <nav className="mt-20 space-y-6 pl-8 pr-4">
+          <nav className="mt-20 space-y-6 pr-4 pl-8">
             {menu
               .filter(
                 ({ visibleFor }) =>
@@ -64,13 +64,13 @@ export function MobileMenu({ menu = [] }: Props) {
                         {item.label}
                       </AccordionTrigger>
                       <AccordionContent className="p-0">
-                        <ul className="ml-6 mt-4 space-y-4">
+                        <ul className="mt-4 ml-6 space-y-4">
                           {item.children?.map(nestedItem => (
                             <li key={nestedItem.id}>
                               <Link
                                 href={nestedItem.link}
                                 onClick={closeMenu}
-                                className="w-full text-xs font-medium uppercase tracking-widest hover:text-foreground/80"
+                                className="hover:text-foreground/80 w-full text-xs font-medium tracking-widest uppercase"
                               >
                                 {nestedItem.label}
                               </Link>

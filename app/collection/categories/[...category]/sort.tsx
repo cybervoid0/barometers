@@ -28,7 +28,7 @@ export default function Sort({ sortBy, className }: SortProps) {
 
   return (
     <div className={cn('space-y-1', className)}>
-      <label className="text-xs font-medium text-muted-foreground">Sort by</label>
+      <label className="text-muted-foreground text-xs font-medium">Sort by</label>
       <Select value={sortBy} onValueChange={handleSortChange}>
         <SelectTrigger className="w-full text-xs capitalize">
           <SelectValue placeholder="Sort by" />

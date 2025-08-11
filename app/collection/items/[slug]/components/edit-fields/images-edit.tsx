@@ -78,7 +78,7 @@ function SortableImage({
     >
       <button
         type="button"
-        className="absolute right-1 top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-muted-foreground shadow"
+        className="text-muted-foreground absolute top-1 right-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm"
         aria-label="Remove image"
         onClick={() => handleDelete(image)}
       >
@@ -246,7 +246,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         <Button
           variant="ghost"
           aria-label="Edit images"
-          className={cn('absolute right-20 top-0 z-10 h-fit w-fit p-1', className)}
+          className={cn('absolute top-0 right-20 z-10 h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
@@ -257,7 +257,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <div className="relative">
               {isUploading && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80">
+                <div className="bg-background/80 absolute inset-0 z-50 flex items-center justify-center">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               )}

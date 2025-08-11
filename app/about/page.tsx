@@ -23,7 +23,7 @@ export default function About() {
           height={125}
           sizes="(max-width: 768px) 100vw, 50vw"
           src="/shared/leo-shirokov.png"
-          className="float-left h-[300px] w-full object-contain xs:w-fit sm:h-[400px]"
+          className="xs:w-fit float-left h-[300px] w-full object-contain sm:h-[400px]"
         />
         I am a collector and restorer of antique barometers, a member of the Society for the History
         of Technology (SHOT), European Society for Environmental History (ESEH) and the
@@ -35,7 +35,7 @@ export default function About() {
         has also inspired me to write <span className={bookTitleStyles}>Barometer Odyssey*</span>, a
         book that explores the evolution of barometers over time.
       </p>
-      <div className="mb-3 flex justify-center gap-2 py-3 xs:justify-start">
+      <div className="xs:justify-start mb-3 flex justify-center gap-2 py-3">
         <Button variant="outline" asChild>
           <a
             href="https://www.ozon.ru/product/barometr-odisseya-1918748239/?at=mqtkyRVAEhMBgPkoc8x4EGrHK39QKWiopqMgXhv53xWD&keywords=%D0%B1%D0%B0%D1%80%D0%BE%D0%BC%D0%B5%D1%82%D1%80+%D0%BE%D0%B4%D0%B8%D1%81%D1%81%D0%B5%D1%8F"
@@ -80,7 +80,7 @@ export default function About() {
         always happy to answer any questions you may have about the barometers or their history.
       </p>
       <Separator className="my-4" />
-      <div className="flex flex-col flex-nowrap items-center gap-4 pt-2 xs:flex-row">
+      <div className="xs:flex-row flex flex-col flex-nowrap items-center gap-4 pt-2">
         <p className={paragraphStyles}>
           <span className={bookTitleStyles}>*Barometer Odyssey</span> immerses the reader in the
           world of one of the most fascinating scientific instruments. This book explores centuries
@@ -96,7 +96,7 @@ export default function About() {
           height={160}
           sizes="(max-width: 576px) 70vw, 160px"
           src="/shared/about-circle.png"
-          className="mb-4 w-[70%] xs:w-auto"
+          className="xs:w-auto mb-4 w-[70%]"
         />
       </div>
       <Separator className="my-4" />

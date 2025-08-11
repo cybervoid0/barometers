@@ -8,14 +8,14 @@ export default function Admin() {
       <div className="space-y-4">
         <Link
           href={FrontRoutes.AddBarometer}
-          className="flex w-fit items-center gap-2 text-foreground transition-colors hover:text-primary"
+          className="text-foreground hover:text-primary flex w-fit items-center gap-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add new barometer
         </Link>
         <Link
           href={FrontRoutes.Reports}
-          className="flex w-fit items-center gap-2 text-foreground transition-colors hover:text-primary"
+          className="text-foreground hover:text-primary flex w-fit items-center gap-2 transition-colors"
         >
           <AlertTriangle className="h-4 w-4" />
           View Inaccuracy Reports

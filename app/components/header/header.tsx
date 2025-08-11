@@ -13,11 +13,11 @@ export async function Header() {
   const menu = await getMenuData()
   return (
     <>
-      <header className="h-[4.6rem] min-h-[4.6rem] sm:h-[6rem] sm:min-h-[6rem]">
+      <header className="h-[4.6rem] min-h-[4.6rem] sm:h-24 sm:min-h-24">
         <div
           className={cn(
-            'fixed top-0 z-50 h-[4.6rem] min-h-[4.6rem] w-full sm:h-[6rem] sm:min-h-[6rem]',
-            'bg-gradient-to-t from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to',
+            'fixed top-0 z-50 h-[4.6rem] min-h-[4.6rem] w-full sm:h-24 sm:min-h-24',
+            'from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to bg-linear-to-t',
           )}
         >
           <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">

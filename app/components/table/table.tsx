@@ -20,7 +20,7 @@ export function Table<T>({ table, className }: Props<T>) {
         {table.getHeaderGroups().map(headerGroup => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map(header => (
-              <TableHead key={header.id} className="whitespace-nowrap font-semibold">
+              <TableHead key={header.id} className="font-semibold whitespace-nowrap">
                 {header.isPlaceholder
                   ? null
                   : flexRender(header.column.columnDef.header, header.getContext())}

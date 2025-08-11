@@ -12,7 +12,7 @@ const headerStyles = 'mt-12 first-of-type:mt-6 mb-4'
 
 function Figure({ src, className, ...props }: { src: string } & React.ComponentProps<'div'>) {
   return (
-    <div className={cn('float-left mb-4 w-full sm:mb-0 sm:mr-4 sm:w-auto', className)} {...props}>
+    <div className={cn('float-left mb-4 w-full sm:mr-4 sm:mb-0 sm:w-auto', className)} {...props}>
       <NextImage
         unoptimized
         src={customImageLoader({ src: `/history/${src}`, width: 400, quality: 80 })}
