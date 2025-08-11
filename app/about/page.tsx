@@ -1,8 +1,7 @@
 import 'server-only'
 
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { Button, Separator } from '@/components/ui'
 import { ShowMore } from '../../components/showmore'
 import { cn } from '@/lib/utils'
 

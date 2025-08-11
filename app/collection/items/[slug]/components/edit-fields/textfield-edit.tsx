@@ -7,17 +7,7 @@ import * as yup from 'yup'
 import { Edit } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import * as UI from '@/components/ui'
 import { BarometerDTO } from '@/app/types'
 import { updateBarometer } from '@/utils/fetch'
 import { FrontRoutes } from '@/utils/routes-front'
@@ -75,43 +65,43 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn('h-fit w-fit p-1', className)}>
+    <UI.Dialog open={open} onOpenChange={setOpen}>
+      <UI.DialogTrigger asChild>
+        <UI.Button variant="ghost" size="icon" className={cn('h-fit w-fit p-1', className)}>
           <Edit size={size} className="text-destructive" />
-        </Button>
-      </DialogTrigger>
+        </UI.Button>
+      </UI.DialogTrigger>
 
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-medium capitalize">
+      <UI.DialogContent className="max-w-md">
+        <UI.DialogHeader>
+          <UI.DialogTitle className="text-xl font-medium capitalize">
             Edit {String(property)}
-          </DialogTitle>
-          <DialogDescription>
+          </UI.DialogTitle>
+          <UI.DialogDescription>
             Update the {String(property)} field for this barometer.
-          </DialogDescription>
-        </DialogHeader>
+          </UI.DialogDescription>
+        </UI.DialogHeader>
 
-        <Form {...form}>
+        <UI.Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
+            <UI.FormField
               control={form.control}
               name="value"
               render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input autoFocus {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <UI.FormItem>
+                  <UI.FormControl>
+                    <UI.Input autoFocus {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
-            <Button type="submit" variant="outline" className="w-full" disabled={isUpdating}>
+            <UI.Button type="submit" variant="outline" className="w-full" disabled={isUpdating}>
               {isUpdating ? 'Saving...' : 'Save'}
-            </Button>
+            </UI.Button>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }

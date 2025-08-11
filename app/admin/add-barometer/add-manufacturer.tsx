@@ -7,35 +7,7 @@ import * as yup from 'yup'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Badge } from '@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command'
+import * as UI from '@/components/ui'
 import { addManufacturer } from '@/utils/fetch'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { generateIcon } from '@/utils/misc'
@@ -135,52 +107,52 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="icon">
+    <UI.Dialog open={open} onOpenChange={setOpen}>
+      <UI.Tooltip>
+        <UI.TooltipTrigger asChild>
+          <UI.DialogTrigger asChild>
+            <UI.Button variant="outline" size="icon">
               <Plus className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
+            </UI.Button>
+          </UI.DialogTrigger>
+        </UI.TooltipTrigger>
+        <UI.TooltipContent>
           <p>Add manufacturer</p>
-        </TooltipContent>
-      </Tooltip>
+        </UI.TooltipContent>
+      </UI.Tooltip>
 
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add Manufacturer</DialogTitle>
-        </DialogHeader>
+      <UI.DialogContent className="max-w-md">
+        <UI.DialogHeader>
+          <UI.DialogTitle>Add Manufacturer</UI.DialogTitle>
+        </UI.DialogHeader>
 
-        <Form {...form}>
+        <UI.Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
+            <UI.FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <UI.FormItem>
+                  <UI.FormLabel>First name</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name *</FormLabel>
-                  <FormControl>
-                    <Input {...field} id="manufacturer-name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <UI.FormItem>
+                  <UI.FormLabel>Name *</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} id="manufacturer-name" />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
@@ -190,44 +162,44 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
               onCountriesChange={selected => setValue('countries', selected)}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="city"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <UI.FormItem>
+                  <UI.FormLabel>City</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={2} autoResize />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <UI.FormItem>
+                  <UI.FormLabel>Description</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Textarea {...field} rows={2} autoResize />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
             <div className="flex items-end justify-between">
-              <Button type="submit" variant="outline" disabled={isPending}>
+              <UI.Button type="submit" variant="outline" disabled={isPending}>
                 {isPending ? 'Adding...' : 'Add Manufacturer'}
-              </Button>
+              </UI.Button>
               <IconUpload onFileChange={handleIconChange} />
             </div>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }
 
@@ -263,10 +235,10 @@ function CountryMultiSelect({
 
   return (
     <div className="space-y-2">
-      <Label>Countries</Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
+      <UI.Label>Countries</UI.Label>
+      <UI.Popover open={open} onOpenChange={setOpen}>
+        <UI.PopoverTrigger asChild>
+          <UI.Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
@@ -275,15 +247,15 @@ function CountryMultiSelect({
             {selectedCountries.length > 0
               ? `${selectedCountries.length} countries selected`
               : 'Select countries'}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search countries..." />
-            <CommandEmpty>No country found.</CommandEmpty>
-            <CommandGroup className="max-h-60 overflow-auto">
+          </UI.Button>
+        </UI.PopoverTrigger>
+        <UI.PopoverContent className="w-full p-0">
+          <UI.Command>
+            <UI.CommandInput placeholder="Search countries..." />
+            <UI.CommandEmpty>No country found.</UI.CommandEmpty>
+            <UI.CommandGroup className="max-h-60 overflow-auto">
               {countries.map(country => (
-                <CommandItem
+                <UI.CommandItem
                   key={country.id}
                   value={country.name}
                   onSelect={() => handleSelect(country.id)}
@@ -297,19 +269,19 @@ function CountryMultiSelect({
                     />
                     <span>{country.name}</span>
                   </div>
-                </CommandItem>
+                </UI.CommandItem>
               ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
+            </UI.CommandGroup>
+          </UI.Command>
+        </UI.PopoverContent>
+      </UI.Popover>
 
       {selectedCountryNames.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {selectedCountryNames.map(name => (
-            <Badge key={name} variant="secondary" className="text-xs">
+            <UI.Badge key={name} variant="secondary" className="text-xs">
               {name}
-              <Button
+              <UI.Button
                 variant="ghost"
                 size="sm"
                 className="ml-1 h-auto p-0"
@@ -319,8 +291,8 @@ function CountryMultiSelect({
                 }}
               >
                 <X className="h-3 w-3" />
-              </Button>
-            </Badge>
+              </UI.Button>
+            </UI.Badge>
           ))}
         </div>
       )}
@@ -368,7 +340,7 @@ const IconUpload = ({ onFileChange }: IconUploadProps) => {
     <div className="flex flex-col items-end gap-2">
       {previewUrl && (
         <div className="relative w-fit">
-          <Button
+          <UI.Button
             variant="destructive"
             size="icon"
             className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
@@ -376,7 +348,7 @@ const IconUpload = ({ onFileChange }: IconUploadProps) => {
             aria-label="Remove icon"
           >
             <X className="h-3 w-3" />
-          </Button>
+          </UI.Button>
           <img
             src={previewUrl}
             alt="Icon preview"
@@ -385,7 +357,7 @@ const IconUpload = ({ onFileChange }: IconUploadProps) => {
         </div>
       )}
 
-      <Button
+      <UI.Button
         type="button"
         variant="outline"
         size="sm"
@@ -394,7 +366,7 @@ const IconUpload = ({ onFileChange }: IconUploadProps) => {
       >
         <Upload className="h-4 w-4" />
         Select Icon
-      </Button>
+      </UI.Button>
 
       <input
         ref={fileInputRef}

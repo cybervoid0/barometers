@@ -11,31 +11,7 @@ import { updateBarometer } from '@/utils/fetch'
 import { FrontRoutes } from '@/utils/routes-front'
 import { useBarometers } from '@/app/hooks/useBarometers'
 import { cn } from '@/lib/utils'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import * as UI from '@/components/ui'
 
 interface ConditionEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -76,64 +52,64 @@ export function ConditionEdit({ size = 18, barometer, className, ...props }: Con
   }
 
   return (
-    <Dialog
+    <UI.Dialog
       onOpenChange={isOpen => {
         if (isOpen) {
           form.reset({ conditionId: barometer.condition?.id ?? '' })
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button
+      <UI.DialogTrigger asChild>
+        <UI.Button
           variant="ghost"
           aria-label="Edit condition"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <Form {...form}>
+        </UI.Button>
+      </UI.DialogTrigger>
+      <UI.DialogContent className="sm:max-w-md">
+        <UI.Form {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
-            <DialogHeader>
-              <DialogTitle>Edit Condition</DialogTitle>
-              <DialogDescription>Update the condition for this barometer.</DialogDescription>
-            </DialogHeader>
+            <UI.DialogHeader>
+              <UI.DialogTitle>Edit Condition</UI.DialogTitle>
+              <UI.DialogDescription>Update the condition for this barometer.</UI.DialogDescription>
+            </UI.DialogHeader>
             <div className="mt-4 space-y-4">
-              <FormField
+              <UI.FormField
                 control={form.control}
                 name="conditionId"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Condition</FormLabel>
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select condition" />
-                        </SelectTrigger>
-                        <SelectContent>
+                  <UI.FormItem>
+                    <UI.FormLabel>Condition</UI.FormLabel>
+                    <UI.FormControl>
+                      <UI.Select value={field.value} onValueChange={field.onChange}>
+                        <UI.SelectTrigger className="w-full">
+                          <UI.SelectValue placeholder="Select condition" />
+                        </UI.SelectTrigger>
+                        <UI.SelectContent>
                           {condition.data.map(({ name, id }) => (
-                            <SelectItem key={id} value={id}>
+                            <UI.SelectItem key={id} value={id}>
                               {name}
-                            </SelectItem>
+                            </UI.SelectItem>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                        </UI.SelectContent>
+                      </UI.Select>
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
                 )}
               />
             </div>
             <div className="mt-6">
-              <Button type="submit" variant="outline" className="w-full">
+              <UI.Button type="submit" variant="outline" className="w-full">
                 Save
-              </Button>
+              </UI.Button>
             </div>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }

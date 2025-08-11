@@ -16,44 +16,7 @@ import { type ManufacturerForm } from './types'
 import { getThumbnailBase64 } from '@/utils/misc'
 import { imageStorage } from '@/utils/constants'
 import { cn } from '@/lib/utils'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select as UiSelect,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-// no tooltips, no shadcn form wrapper here
+import * as UI from '@/components/ui'
 
 interface ManufacturerEditProps extends ComponentProps<'button'> {
   size?: string | number
@@ -221,7 +184,7 @@ export function ManufacturerEdit({
   )
   return (
     <>
-      <Dialog
+      <UI.Dialog
         onOpenChange={async isOpen => {
           if (isOpen) {
             resetManufacturerIndex()
@@ -231,28 +194,28 @@ export function ManufacturerEdit({
           await cleanupOnClose()
         }}
       >
-        <DialogTrigger asChild>
-          <Button
+        <UI.DialogTrigger asChild>
+          <UI.Button
             variant="ghost"
             aria-label="Edit manufacturer"
             className={cn('h-fit w-fit p-1', className)}
             {...props}
           >
             <Edit className="text-destructive" size={Number(size) || 18} />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
+          </UI.Button>
+        </UI.DialogTrigger>
+        <UI.DialogContent>
           {isLoading ? (
             <div className="bg-background/60 absolute inset-0 z-50 flex items-center justify-center">
               <div className="border-muted-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           ) : null}
-          <Form {...form}>
+          <UI.Form {...form}>
             <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(update)} noValidate>
-              <DialogHeader className="mt-6 mb-2">
+              <UI.DialogHeader className="mt-6 mb-2">
                 <div className="flex items-center justify-between">
-                  <DialogTitle>Edit Manufacturer</DialogTitle>
-                  <Button
+                  <UI.DialogTitle>Edit Manufacturer</UI.DialogTitle>
+                  <UI.Button
                     type="button"
                     variant="destructive"
                     size="icon"
@@ -260,72 +223,72 @@ export function ManufacturerEdit({
                     onClick={() => manufacturers.delete(currentBrand?.slug)}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </UI.Button>
                 </div>
-                <DialogDescription>
+                <UI.DialogDescription>
                   Edit manufacturer information and update barometer details.
-                </DialogDescription>
-              </DialogHeader>
+                </UI.DialogDescription>
+              </UI.DialogHeader>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="manufacturer-select">Manufacturer</Label>
-                <UiSelect
+                <UI.Label htmlFor="manufacturer-select">Manufacturer</UI.Label>
+                <UI.Select
                   value={String(selectedManufacturerIndex)}
                   onValueChange={val => setSelectedManufacturerIndex(Number(val))}
                 >
-                  <SelectTrigger
+                  <UI.SelectTrigger
                     id="manufacturer-select"
                     aria-label="Manufacturer"
                     className="w-full"
                   >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[500px]">
+                    <UI.SelectValue />
+                  </UI.SelectTrigger>
+                  <UI.SelectContent className="max-h-[500px]">
                     {manufacturers.data.map(({ name }, i) => (
-                      <SelectItem key={i} value={String(i)}>
+                      <UI.SelectItem key={i} value={String(i)}>
                         {name}
-                      </SelectItem>
+                      </UI.SelectItem>
                     ))}
-                  </SelectContent>
-                </UiSelect>
+                  </UI.SelectContent>
+                </UI.Select>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField
+                <UI.FormField
                   control={form.control}
                   name="firstName"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First name</FormLabel>
-                      <FormControl>
-                        <Input id="firstName" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <UI.FormItem>
+                      <UI.FormLabel>First name</UI.FormLabel>
+                      <UI.FormControl>
+                        <UI.Input id="firstName" {...field} />
+                      </UI.FormControl>
+                      <UI.FormMessage />
+                    </UI.FormItem>
                   )}
                 />
-                <FormField
+                <UI.FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name / Company name</FormLabel>
-                      <FormControl>
-                        <Input id="manufacturer-name" autoFocus {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <UI.FormItem>
+                      <UI.FormLabel>Name / Company name</UI.FormLabel>
+                      <UI.FormControl>
+                        <UI.Input id="manufacturer-name" autoFocus {...field} />
+                      </UI.FormControl>
+                      <UI.FormMessage />
+                    </UI.FormItem>
                   )}
                 />
               </div>
 
-              <FormField
+              <UI.FormField
                 control={form.control}
                 name="countries"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Countries</FormLabel>
-                    <FormControl>
+                  <UI.FormItem>
+                    <UI.FormLabel>Countries</UI.FormLabel>
+                    <UI.FormControl>
                       <CountriesMultiSelect
                         selected={(field.value as number[]) ?? []}
                         options={countries.data?.map(({ id, name }) => ({ id, name })) ?? []}
@@ -336,56 +299,56 @@ export function ManufacturerEdit({
                             : undefined
                         }
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
                 )}
               />
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField
+                <UI.FormField
                   control={form.control}
                   name="city"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City</FormLabel>
-                      <FormControl>
-                        <Input id="city" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <UI.FormItem>
+                      <UI.FormLabel>City</UI.FormLabel>
+                      <UI.FormControl>
+                        <UI.Input id="city" {...field} />
+                      </UI.FormControl>
+                      <UI.FormMessage />
+                    </UI.FormItem>
                   )}
                 />
-                <FormField
+                <UI.FormField
                   control={form.control}
                   name="url"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>External URL</FormLabel>
-                      <FormControl>
-                        <Input id="url" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <UI.FormItem>
+                      <UI.FormLabel>External URL</UI.FormLabel>
+                      <UI.FormControl>
+                        <UI.Input id="url" {...field} />
+                      </UI.FormControl>
+                      <UI.FormMessage />
+                    </UI.FormItem>
                   )}
                 />
               </div>
 
-              <FormField
+              <UI.FormField
                 control={form.control}
                 name="successors"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Successors</FormLabel>
-                    <FormControl>
+                  <UI.FormItem>
+                    <UI.FormLabel>Successors</UI.FormLabel>
+                    <UI.FormControl>
                       <SuccessorsMultiSelect
                         selected={(field.value as string[]) ?? []}
                         options={manufacturers.data.map(({ id, name }) => ({ id, name }))}
                         onChange={vals => field.onChange(vals)}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
                 )}
               />
 
@@ -395,27 +358,27 @@ export function ManufacturerEdit({
                 setLoading={setIsLoading}
               />
 
-              <FormField
+              <UI.FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea id="description" autoResize {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <UI.FormItem>
+                    <UI.FormLabel>Description</UI.FormLabel>
+                    <UI.FormControl>
+                      <UI.Textarea id="description" autoResize {...field} />
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
                 )}
               />
 
-              <Button type="submit" variant="outline" className="w-full">
+              <UI.Button type="submit" variant="outline" className="w-full">
                 Update
-              </Button>
+              </UI.Button>
             </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+          </UI.Form>
+        </UI.DialogContent>
+      </UI.Dialog>
     </>
   )
 }
@@ -434,9 +397,9 @@ function CountriesMultiSelect({
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
-        <Button
+    <UI.Popover open={open} onOpenChange={setOpen} modal>
+      <UI.PopoverTrigger asChild>
+        <UI.Button
           type="button"
           variant="outline"
           role="combobox"
@@ -446,18 +409,18 @@ function CountriesMultiSelect({
           {selected.length === 0
             ? placeholder || 'Select countries'
             : `${selected.length} selected`}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-        <Command>
-          <CommandInput placeholder="Search country..." />
-          <CommandList className="max-h-[200px]">
-            <CommandEmpty>No country found.</CommandEmpty>
-            <CommandGroup>
+        </UI.Button>
+      </UI.PopoverTrigger>
+      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <UI.Command>
+          <UI.CommandInput placeholder="Search country..." />
+          <UI.CommandList className="max-h-[200px]">
+            <UI.CommandEmpty>No country found.</UI.CommandEmpty>
+            <UI.CommandGroup>
               {options.map(opt => {
                 const isActive = selected.includes(opt.id)
                 return (
-                  <CommandItem
+                  <UI.CommandItem
                     key={opt.id}
                     value={opt.name}
                     onSelect={() => {
@@ -476,14 +439,14 @@ function CountriesMultiSelect({
                       {isActive ? '✓' : ''}
                     </div>
                     {opt.name}
-                  </CommandItem>
+                  </UI.CommandItem>
                 )
               })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+            </UI.CommandGroup>
+          </UI.CommandList>
+        </UI.Command>
+      </UI.PopoverContent>
+    </UI.Popover>
   )
 }
 
@@ -499,9 +462,9 @@ function SuccessorsMultiSelect({
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
-        <Button
+    <UI.Popover open={open} onOpenChange={setOpen} modal>
+      <UI.PopoverTrigger asChild>
+        <UI.Button
           type="button"
           variant="outline"
           role="combobox"
@@ -509,18 +472,18 @@ function SuccessorsMultiSelect({
           className="w-full justify-between"
         >
           {selected.length === 0 ? 'Select brands' : `${selected.length} selected`}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-        <Command>
-          <CommandInput placeholder="Search brand..." />
-          <CommandList className="max-h-[200px]">
-            <CommandEmpty>No brand found.</CommandEmpty>
-            <CommandGroup>
+        </UI.Button>
+      </UI.PopoverTrigger>
+      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <UI.Command>
+          <UI.CommandInput placeholder="Search brand..." />
+          <UI.CommandList className="max-h-[200px]">
+            <UI.CommandEmpty>No brand found.</UI.CommandEmpty>
+            <UI.CommandGroup>
               {options.map(opt => {
                 const isActive = selected.includes(opt.id)
                 return (
-                  <CommandItem
+                  <UI.CommandItem
                     key={opt.id}
                     value={opt.name}
                     onSelect={() => {
@@ -539,13 +502,13 @@ function SuccessorsMultiSelect({
                       {isActive ? '✓' : ''}
                     </div>
                     {opt.name}
-                  </CommandItem>
+                  </UI.CommandItem>
                 )
               })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+            </UI.CommandGroup>
+          </UI.CommandList>
+        </UI.Command>
+      </UI.PopoverContent>
+    </UI.Popover>
   )
 }

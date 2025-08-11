@@ -8,18 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createReport } from '@/utils/fetch'
 import { BarometerDTO } from '@/app/types'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
+import * as UI from '@/components/ui'
 
 interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO
@@ -86,9 +75,9 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
+      <UI.Tooltip>
+        <UI.TooltipTrigger asChild>
+          <UI.Button
             {...props}
             type="button"
             variant="outline"
@@ -96,23 +85,27 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
             aria-label={`Open report inaccuracy dialog for ${barometer.name}`}
           >
             <span className="text-sm font-normal tracking-wider uppercase">Report inaccuracy</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
+          </UI.Button>
+        </UI.TooltipTrigger>
+        <UI.TooltipContent>
           Report issues in the description of
           <span className="ml-1 capitalize">{barometer.name}</span>
-        </TooltipContent>
-      </Tooltip>
-      <Dialog open={isOpened} onOpenChange={setIsOpened}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="capitalize">Report Inaccuracy in {barometer.name}</DialogTitle>
-            <DialogDescription>We will contact you using the provided email.</DialogDescription>
-          </DialogHeader>
+        </UI.TooltipContent>
+      </UI.Tooltip>
+      <UI.Dialog open={isOpened} onOpenChange={setIsOpened}>
+        <UI.DialogContent>
+          <UI.DialogHeader>
+            <UI.DialogTitle className="capitalize">
+              Report Inaccuracy in {barometer.name}
+            </UI.DialogTitle>
+            <UI.DialogDescription>
+              We will contact you using the provided email.
+            </UI.DialogDescription>
+          </UI.DialogHeader>
           <form className="space-y-4" onSubmit={onSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="reporterName">Name</Label>
-              <Input
+              <UI.Label htmlFor="reporterName">Name</UI.Label>
+              <UI.Input
                 id="reporterName"
                 aria-invalid={!!errors.reporterName}
                 aria-describedby="reporterName-error"
@@ -126,8 +119,8 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reporterEmail">Email</Label>
-              <Input
+              <UI.Label htmlFor="reporterEmail">Email</UI.Label>
+              <UI.Input
                 id="reporterEmail"
                 type="email"
                 aria-invalid={!!errors.reporterEmail}
@@ -142,8 +135,8 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Feedback</Label>
-              <Textarea
+              <UI.Label htmlFor="description">Feedback</UI.Label>
+              <UI.Textarea
                 id="description"
                 aria-invalid={!!errors.description}
                 aria-describedby="description-help"
@@ -163,16 +156,16 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
               </p>
             </div>
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="ghost" onClick={() => setIsOpened(false)}>
+              <UI.Button type="button" variant="ghost" onClick={() => setIsOpened(false)}>
                 Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting || isPending}>
+              </UI.Button>
+              <UI.Button type="submit" disabled={isSubmitting || isPending}>
                 Send
-              </Button>
+              </UI.Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </UI.DialogContent>
+      </UI.Dialog>
     </>
   )
 }

@@ -8,18 +8,7 @@ import * as yup from 'yup'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { AtSign, Eye, EyeOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import * as UI from '@/components/ui'
 
 interface SignInFormData {
   email: string
@@ -73,41 +62,41 @@ export function SignInForm() {
   }
 
   return (
-    <Form {...form}>
+    <UI.Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <div className="space-y-4">
-          <FormField
+          <UI.FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>E-mail</FormLabel>
-                <FormControl>
+              <UI.FormItem>
+                <UI.FormLabel>E-mail</UI.FormLabel>
+                <UI.FormControl>
                   <div className="relative">
-                    <Input {...field} type="email" id="email" className="pr-10" />
+                    <UI.Input {...field} type="email" id="email" className="pr-10" />
                     <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                   </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                </UI.FormControl>
+                <UI.FormMessage />
+              </UI.FormItem>
             )}
           />
 
-          <FormField
+          <UI.FormField
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
+              <UI.FormItem>
+                <UI.FormLabel>Password</UI.FormLabel>
+                <UI.FormControl>
                   <div className="relative">
-                    <Input
+                    <UI.Input
                       {...field}
                       type={showPassword ? 'text' : 'password'}
                       id="password"
                       className="pr-10"
                     />
-                    <Button
+                    <UI.Button
                       type="button"
                       variant="ghost"
                       size="icon"
@@ -120,20 +109,20 @@ export function SignInForm() {
                       ) : (
                         <Eye className="text-muted-foreground h-4 w-4" />
                       )}
-                    </Button>
+                    </UI.Button>
                   </div>
-                </FormControl>
-                <FormDescription>Min 8 symbols</FormDescription>
-                <FormMessage />
-              </FormItem>
+                </UI.FormControl>
+                <UI.FormDescription>Min 8 symbols</UI.FormDescription>
+                <UI.FormMessage />
+              </UI.FormItem>
             )}
           />
         </div>
 
-        <Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
+        <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
           {isLoading ? 'Signing in...' : 'Sign In'}
-        </Button>
+        </UI.Button>
       </form>
-    </Form>
+    </UI.Form>
   )
 }

@@ -11,18 +11,7 @@ import { BarometerDTO, Dimensions } from '@/app/types'
 import { FrontRoutes } from '@/utils/routes-front'
 import { updateBarometer } from '@/utils/fetch'
 import { cn } from '@/lib/utils'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import * as UI from '@/components/ui'
 
 interface DimensionsForm {
   dimensions: Array<{ dim: string; value: string }>
@@ -87,7 +76,7 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
   }
 
   return (
-    <Dialog
+    <UI.Dialog
       onOpenChange={isOpen => {
         if (isOpen) {
           form.reset({
@@ -96,28 +85,28 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button
+      <UI.DialogTrigger asChild>
+        <UI.Button
           variant="ghost"
           aria-label="Edit dimensions"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={18} />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
-        <Form {...form}>
+        </UI.Button>
+      </UI.DialogTrigger>
+      <UI.DialogContent className="sm:max-w-2xl">
+        <UI.Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
-            <DialogHeader>
-              <DialogTitle>Edit Dimensions</DialogTitle>
-              <DialogDescription>Update the dimensions for this barometer.</DialogDescription>
-            </DialogHeader>
+            <UI.DialogHeader>
+              <UI.DialogTitle>Edit Dimensions</UI.DialogTitle>
+              <UI.DialogDescription>Update the dimensions for this barometer.</UI.DialogDescription>
+            </UI.DialogHeader>
             <div className="mt-4 space-y-4">
               <div className="space-y-3">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
-                    <Button
+                    <UI.Button
                       type="button"
                       variant="outline"
                       size="icon"
@@ -126,34 +115,34 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                       className="shrink-0"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <FormField
+                    </UI.Button>
+                    <UI.FormField
                       control={form.control}
                       name={`dimensions.${index}.dim`}
                       render={({ field: dimField }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input {...dimField} placeholder="Unit (e.g., Height)" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                        <UI.FormItem className="flex-1">
+                          <UI.FormControl>
+                            <UI.Input {...dimField} placeholder="Unit (e.g., Height)" />
+                          </UI.FormControl>
+                          <UI.FormMessage />
+                        </UI.FormItem>
                       )}
                     />
-                    <FormField
+                    <UI.FormField
                       control={form.control}
                       name={`dimensions.${index}.value`}
                       render={({ field: valueField }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input {...valueField} placeholder="Value (e.g., 25cm)" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                        <UI.FormItem className="flex-1">
+                          <UI.FormControl>
+                            <UI.Input {...valueField} placeholder="Value (e.g., 25cm)" />
+                          </UI.FormControl>
+                          <UI.FormMessage />
+                        </UI.FormItem>
                       )}
                     />
                   </div>
                 ))}
-                <Button
+                <UI.Button
                   type="button"
                   variant="outline"
                   size="sm"
@@ -163,17 +152,17 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Parameter
-                </Button>
+                </UI.Button>
               </div>
             </div>
             <div className="mt-6">
-              <Button type="submit" variant="outline" className="w-full">
+              <UI.Button type="submit" variant="outline" className="w-full">
                 Save
-              </Button>
+              </UI.Button>
             </div>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }

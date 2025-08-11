@@ -7,17 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'sonner'
 import { AtSign, User, Eye, EyeOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import * as UI from '@/components/ui'
 import { register } from '@/actions/register'
 
 interface RegisterFormData {
@@ -75,60 +65,60 @@ export default function Register() {
 
   return (
     <div className="flex justify-center">
-      <Form {...form}>
+      <UI.Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
           <div className="w-80 space-y-4">
             <h2 className="mb-2 text-center text-2xl">Registration</h2>
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
+                <UI.FormItem>
+                  <UI.FormLabel>Name</UI.FormLabel>
+                  <UI.FormControl>
                     <div className="relative">
-                      <Input {...field} id="name" className="pr-10" />
+                      <UI.Input {...field} id="name" className="pr-10" />
                       <User className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
+                <UI.FormItem>
+                  <UI.FormLabel>E-mail</UI.FormLabel>
+                  <UI.FormControl>
                     <div className="relative">
-                      <Input {...field} type="email" id="email" className="pr-10" />
+                      <UI.Input {...field} type="email" id="email" className="pr-10" />
                       <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
+                <UI.FormItem>
+                  <UI.FormLabel>Password</UI.FormLabel>
+                  <UI.FormControl>
                     <div className="relative">
-                      <Input
+                      <UI.Input
                         {...field}
                         type={showPassword ? 'text' : 'password'}
                         id="password"
                         className="pr-10"
                       />
-                      <Button
+                      <UI.Button
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -141,30 +131,30 @@ export default function Register() {
                         ) : (
                           <Eye className="text-muted-foreground h-4 w-4" />
                         )}
-                      </Button>
+                      </UI.Button>
                     </div>
-                  </FormControl>
-                  <FormDescription>Min 8 symbols</FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </UI.FormControl>
+                  <UI.FormDescription>Min 8 symbols</UI.FormDescription>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
 
-            <FormField
+            <UI.FormField
               control={form.control}
               name="repeatPassword"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Repeat password</FormLabel>
-                  <FormControl>
+                <UI.FormItem>
+                  <UI.FormLabel>Repeat password</UI.FormLabel>
+                  <UI.FormControl>
                     <div className="relative">
-                      <Input
+                      <UI.Input
                         {...field}
                         type={showRepeatPassword ? 'text' : 'password'}
                         id="repeat-password"
                         className="pr-10"
                       />
-                      <Button
+                      <UI.Button
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -177,20 +167,20 @@ export default function Register() {
                         ) : (
                           <Eye className="text-muted-foreground h-4 w-4" />
                         )}
-                      </Button>
+                      </UI.Button>
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
               )}
             />
           </div>
 
-          <Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
+          <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
             {isLoading ? 'Signing up...' : 'Sign up'}
-          </Button>
+          </UI.Button>
         </form>
-      </Form>
+      </UI.Form>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { Info } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui'
 import { ConditionListDTO } from '@/app/types'
 
 interface ConditionProps {

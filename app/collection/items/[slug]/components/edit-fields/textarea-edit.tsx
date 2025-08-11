@@ -11,25 +11,7 @@ import { BarometerDTO } from '@/app/types'
 import { FrontRoutes } from '@/utils/routes-front'
 import { updateBarometer } from '@/utils/fetch'
 import { cn } from '@/lib/utils'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import * as UI from '@/components/ui'
 
 interface TextAreaForm {
   value: string
@@ -84,7 +66,7 @@ export function TextAreaEdit({
   const displayLabel = label || String(property).charAt(0).toUpperCase() + String(property).slice(1)
 
   return (
-    <Dialog
+    <UI.Dialog
       onOpenChange={isOpen => {
         if (isOpen) {
           form.reset({
@@ -93,48 +75,48 @@ export function TextAreaEdit({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button
+      <UI.DialogTrigger asChild>
+        <UI.Button
           variant="ghost"
           aria-label={`Edit ${property}`}
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
-        <Form {...form}>
+        </UI.Button>
+      </UI.DialogTrigger>
+      <UI.DialogContent className="sm:max-w-2xl">
+        <UI.Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)} noValidate>
-            <DialogHeader>
-              <DialogTitle>Edit {displayLabel}</DialogTitle>
-              <DialogDescription>
+            <UI.DialogHeader>
+              <UI.DialogTitle>Edit {displayLabel}</UI.DialogTitle>
+              <UI.DialogDescription>
                 Update the {String(property).toLowerCase()} for this barometer.
-              </DialogDescription>
-            </DialogHeader>
+              </UI.DialogDescription>
+            </UI.DialogHeader>
             <div className="mt-4 space-y-4">
-              <FormField
+              <UI.FormField
                 control={form.control}
                 name="value"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{displayLabel}</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} autoResize rows={4} autoFocus />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <UI.FormItem>
+                    <UI.FormLabel>{displayLabel}</UI.FormLabel>
+                    <UI.FormControl>
+                      <UI.Textarea {...field} autoResize rows={4} autoFocus />
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
                 )}
               />
             </div>
             <div className="mt-6">
-              <Button type="submit" variant="outline" className="w-full">
+              <UI.Button type="submit" variant="outline" className="w-full">
                 Save
-              </Button>
+              </UI.Button>
             </div>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }
