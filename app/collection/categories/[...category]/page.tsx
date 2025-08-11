@@ -18,15 +18,16 @@ export const dynamicParams = true
 export const dynamic: DynamicOptions = 'force-static'
 
 interface CollectionProps {
-  params: {
+  params: Promise<{
     // category should include [categoryName, sortCriteria, pageNo]
     category: [string, string, string]
-  }
+  }>
 }
 
-export async function generateMetadata({
-  params: { category },
-}: CollectionProps): Promise<Metadata> {
+export async function generateMetadata(props: CollectionProps): Promise<Metadata> {
+  const params = await props.params
+  const { category } = params
+
   const [categoryName] = category
   const { description } = await getCategory(categoryName)
   const { barometers } = await getBarometersByParams(categoryName, 1, 5, 'date')
@@ -57,7 +58,11 @@ export async function generateMetadata({
   }
 }
 
-export default async function Collection({ params: { category } }: CollectionProps) {
+export default async function Collection(props: CollectionProps) {
+  const params = await props.params
+
+  const { category } = params
+
   const [categoryName, sort, page] = category
   const { barometers, totalPages } = await getBarometersByParams(
     categoryName,

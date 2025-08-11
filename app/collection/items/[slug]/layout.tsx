@@ -6,11 +6,12 @@ import { imageStorage } from '@/utils/constants'
 import { title, openGraph, twitter, keywords } from '@/app/metadata'
 import { FrontRoutes } from '@/utils/routes-front'
 
-export async function generateMetadata({
-  params: { slug },
-}: {
-  params: { slug: string }
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
+  const params = await props.params
+  const { slug } = params
+
   try {
     const { description, name, images } = await getBarometer(slug)
     const barometerTitle = `${title}: ${capitalize(name)}`

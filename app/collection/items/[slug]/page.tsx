@@ -43,9 +43,9 @@ export const dynamic = 'force-static'
 export const dynamicParams = true
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 /**
@@ -56,7 +56,10 @@ export const generateStaticParams = withPrisma(prisma =>
   prisma.barometer.findMany({ select: { slug: true } }),
 )
 
-export default async function Page({ params: { slug } }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params
+  const { slug } = params
+
   const barometer = await getBarometer(slug)
   const { firstName, name, city } = barometer.manufacturer
   const dimensions = (barometer.dimensions ?? []) as Dimensions
