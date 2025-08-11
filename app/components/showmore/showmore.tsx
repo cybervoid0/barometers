@@ -45,13 +45,13 @@ export function ShowMore({
 
         {/* Gradient overlay when collapsed - only over content */}
         {!isExpanded && (
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background via-background/80 to-transparent" />
+          <div className="from-background via-background/80 pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-linear-to-t to-transparent" />
         )}
       </motion.div>
       <Button
         variant="ghost"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="h-auto p-0 font-semibold text-foreground hover:bg-transparent"
+        className="text-foreground h-auto p-0 font-semibold hover:bg-transparent"
       >
         {isExpanded ? hideLabel : showLabel}
         <ChevronDown

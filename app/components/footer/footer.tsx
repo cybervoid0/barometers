@@ -7,10 +7,10 @@ export function Footer() {
     <footer
       className={cn(
         'w-full py-4',
-        'bg-gradient-to-b from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to',
+        'from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to bg-linear-to-b',
       )}
     >
-      <div className="container relative mx-auto py-4 sm:py-6">
+      <div className="relative container mx-auto py-4 sm:py-6">
         <div className="grow text-center">
           <p className="mb-2 text-xs">
             By using this website, you agree to our{' '}

@@ -66,7 +66,7 @@ const BrandsOfCountry = ({
 }) => {
   const width = 32
   return (
-    <div className="mb-5 mr-4">
+    <div className="mr-4 mb-5">
       <h3 className="mb-3 px-5 text-xl font-semibold">{country.name}</h3>
       <Separator className="mx-2 mb-5" />
 
@@ -116,7 +116,7 @@ export default async function Manufacturers() {
         list of barometer makers, along with detailed descriptions and iconic works by each master
         from the collection, representing the finest traditions of craftsmanship.
       </p>
-      <Card className="p-4 shadow-md xs:p-4">
+      <Card className="xs:p-4 p-4 shadow-md">
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
           <div>
             {firstColumn.map(country => (

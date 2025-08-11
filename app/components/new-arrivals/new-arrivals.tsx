@@ -6,9 +6,9 @@ import { cn } from '@/lib/utils'
 
 export function NewArrivals({ className, ...props }: HTMLAttributes<HTMLButtonElement>) {
   return (
-    <Button asChild size="sm" className={cn('uppercase tracking-wider', className)} {...props}>
+    <Button asChild size="sm" className={cn('tracking-wider uppercase', className)} {...props}>
       <Link href={FrontRoutes.NewArrivals}>
-        <p className="text-[3vw] xs:text-sm sm:text-base">New Arrivals</p>
+        <p className="xs:text-sm text-[3vw] sm:text-base">New Arrivals</p>
       </Link>
     </Button>
   )

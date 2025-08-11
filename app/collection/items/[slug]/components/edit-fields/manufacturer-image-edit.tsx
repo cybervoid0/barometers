@@ -45,7 +45,7 @@ function SortableImage({
     >
       <button
         type="button"
-        className="absolute right-1 top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-muted-foreground shadow"
+        className="text-muted-foreground absolute top-1 right-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm"
         aria-label="Remove image"
         onClick={() => handleDelete(image)}
       >

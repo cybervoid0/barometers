@@ -243,13 +243,13 @@ export function ManufacturerEdit({
         </DialogTrigger>
         <DialogContent>
           {isLoading ? (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/60">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+            <div className="bg-background/60 absolute inset-0 z-50 flex items-center justify-center">
+              <div className="border-muted-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           ) : null}
           <Form {...form}>
             <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(update)} noValidate>
-              <DialogHeader className="mb-2 mt-6">
+              <DialogHeader className="mt-6 mb-2">
                 <div className="flex items-center justify-between">
                   <DialogTitle>Edit Manufacturer</DialogTitle>
                   <Button
@@ -448,7 +448,7 @@ function CountriesMultiSelect({
             : `${selected.length} selected`}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
         <Command>
           <CommandInput placeholder="Search country..." />
           <CommandList className="max-h-[200px]">
@@ -511,7 +511,7 @@ function SuccessorsMultiSelect({
           {selected.length === 0 ? 'Select brands' : `${selected.length} selected`}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
         <Command>
           <CommandInput placeholder="Search brand..." />
           <CommandList className="max-h-[200px]">

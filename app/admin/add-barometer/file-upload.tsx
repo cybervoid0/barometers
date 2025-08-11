@@ -102,7 +102,7 @@ export function FileUpload({ name }: FileUploadProps) {
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="absolute -right-2 -top-2 h-6 w-6 rounded-full"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
                       onClick={() => handleDeleteFile(i)}
                     >
                       <X className="h-3 w-3" />

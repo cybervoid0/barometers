@@ -85,7 +85,7 @@ export function SignInForm() {
                 <FormControl>
                   <div className="relative">
                     <Input {...field} type="email" id="email" className="pr-10" />
-                    <AtSign className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                   </div>
                 </FormControl>
                 <FormMessage />
@@ -111,14 +111,14 @@ export function SignInForm() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full w-10 px-0 hover:bg-transparent"
+                      className="absolute top-0 right-0 h-full w-10 px-0 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="text-muted-foreground h-4 w-4" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="text-muted-foreground h-4 w-4" />
                       )}
                     </Button>
                   </div>

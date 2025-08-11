@@ -57,7 +57,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                       <p>{menuItem.label}</p>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="flex flex-col pb-2 pl-1.5 pr-2 pt-1.5">
+                      <ul className="flex flex-col pt-1.5 pr-2 pb-2 pl-1.5">
                         {menuItem.children?.map(nestedItem => (
                           /* Nested menu items */
                           <li
@@ -65,7 +65,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                             className={cn(
                               'rounded-sm',
                               'px-3 py-1 [&:last-child_p]:pb-1', // padding
-                              'hover:cursor-pointer hover:bg-muted', // on hover
+                              'hover:bg-muted hover:cursor-pointer', // on hover
                             )}
                           >
                             <NavigationMenuLink asChild>

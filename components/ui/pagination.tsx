@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { ButtonProps, buttonVariants } from '@/components/ui/button'
+import { ButtonProps, buttonVariants, type ButtonVariants } from '@/components/ui/button'
 
 const PaginationCore = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav
@@ -39,7 +39,7 @@ const PaginationLink = ({ className, isActive, size = 'icon', ...props }: Pagina
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({
-        variant: isActive ? 'outline' : 'ghost',
+        variant: (isActive ? 'outline-solid' : 'ghost') as ButtonVariants['variant'],
         size,
       }),
       className,

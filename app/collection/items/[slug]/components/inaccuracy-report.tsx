@@ -95,7 +95,7 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
             onClick={() => setIsOpened(true)}
             aria-label={`Open report inaccuracy dialog for ${barometer.name}`}
           >
-            <span className="text-sm font-normal uppercase tracking-wider">Report inaccuracy</span>
+            <span className="text-sm font-normal tracking-wider uppercase">Report inaccuracy</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -154,7 +154,7 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
               {errors.description && (
                 <p className="text-xs text-red-500">{errors.description.message}</p>
               )}
-              <p id="description-help" className="text-xs text-muted-foreground">
+              <p id="description-help" className="text-muted-foreground text-xs">
                 {descriptionValue.length > 0 && descriptionValue.length <= maxFeedbackLen
                   ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`
                   : descriptionValue.length > maxFeedbackLen

@@ -79,7 +79,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
     <div {...props}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex w-full">
-          <div className="relative flex-grow">
+          <div className="relative grow">
             <Input
               type="text"
               autoComplete="off"
@@ -97,7 +97,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
                 variant="ghost"
                 size="icon"
                 onClick={handleClear}
-                className="absolute right-0 top-0 h-full w-8 px-0 hover:bg-transparent"
+                className="absolute top-0 right-0 h-full w-8 px-0 hover:bg-transparent"
                 aria-label="Clear input"
               >
                 <X className="h-4 w-4" />

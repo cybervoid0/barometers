@@ -29,16 +29,16 @@ function PropertyCardCore({
     <Card
       className={cn(
         className,
-        'flex h-full min-h-20 flex-row flex-nowrap justify-center gap-0 overflow-hidden bg-secondary py-0',
-        'bg-gradient-to-b from-card-gradient-from to-card-gradient-to',
+        'bg-secondary flex h-full min-h-20 flex-row flex-nowrap justify-center gap-0 overflow-hidden py-0',
+        'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
       )}
       {...props}
     >
-      <div className="m-2 flex shrink-0 items-center justify-center rounded-md bg-card px-2">
+      <div className="bg-card m-2 flex shrink-0 items-center justify-center rounded-md px-2">
         <Icon width={35} height={35} aria-label={title} strokeWidth={1.2} />
       </div>
       <div className="flex grow flex-col justify-center gap-2 py-2">
-        <h4 className="text-lg leading-none tracking-normal text-muted-foreground">{title}</h4>
+        <h4 className="text-muted-foreground text-lg leading-none tracking-normal">{title}</h4>
         {typeof children === 'object' ? (
           children
         ) : (

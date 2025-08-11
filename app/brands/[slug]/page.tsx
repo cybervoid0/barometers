@@ -58,7 +58,7 @@ export default async function Manufacturer({ params: { slug } }: Props) {
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
   return (
     <>
-      <div className="mb-4 mt-6">
+      <div className="mt-6 mb-4">
         <h2>{fullName}</h2>
         <Connections label="Successor" brands={manufacturer.successors} />
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
