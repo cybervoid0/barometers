@@ -8,7 +8,9 @@ const defaultComponents: Components = {
   li: props => <li className="ml-8 list-disc" {...props} />,
   a: props => (
     <a
-      className="underline transition-colors duration-400 ease-out hover:text-amber-800"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-foreground hover:text-foreground/60 hover:decoration-foreground/50 underline transition-colors duration-400 ease-out"
       {...props}
     />
   ),

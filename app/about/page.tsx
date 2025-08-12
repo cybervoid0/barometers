@@ -3,7 +3,7 @@ import 'server-only'
 import Image from 'next/image'
 import { Button, Separator } from '@/components/ui'
 import { ShowMore } from '../../components/showmore'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 export const dynamic = 'force-static'
 const paragraphStyles = 'mb-4 indent-8 text-left'

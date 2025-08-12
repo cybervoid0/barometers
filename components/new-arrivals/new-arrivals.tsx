@@ -1,8 +1,8 @@
 import { type HTMLAttributes } from 'react'
 import Link from 'next/link'
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 import { Button } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 export function NewArrivals({ className, ...props }: HTMLAttributes<HTMLButtonElement>) {
   return (

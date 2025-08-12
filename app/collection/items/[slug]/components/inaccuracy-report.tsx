@@ -6,8 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { createReport } from '@/utils/fetch'
-import { BarometerDTO } from '@/app/types'
+import { createReport } from '@/services/fetch'
+import { BarometerDTO } from '@/types'
 import * as UI from '@/components/ui'
 
 interface Props extends React.ComponentProps<'button'> {

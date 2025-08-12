@@ -6,12 +6,11 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import { Raleway, Cinzel } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
-import { Footer } from '@/components/footer'
-import { Header } from '@/components/header'
-import Providers from './providers'
-import { meta, jsonLd } from './metadata'
+import { Footer, Header } from '@/components/containers'
+import Providers from '../providers'
+import { meta, jsonLd } from '../constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 const raleway = Raleway({
   subsets: ['latin'],

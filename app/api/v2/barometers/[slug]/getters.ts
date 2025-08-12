@@ -1,5 +1,4 @@
 import { withPrisma } from '@/prisma/prismaClient'
-import { NotFoundError } from '@/app/errors'
 
 export const getBarometer = withPrisma(async (prisma, slug: string) => {
   const barometer = await prisma.barometer.findFirst({
@@ -56,7 +55,7 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
       },
     },
   })
-  if (barometer === null) throw new NotFoundError()
+  if (barometer === null) throw new Error('Barometer not found')
   return barometer
 })
 

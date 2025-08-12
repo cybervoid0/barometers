@@ -4,9 +4,9 @@ import { InaccuracyReport } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { getInaccuracyReportList } from './getters'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { cleanObject, trimTrailingSlash } from '@/utils/misc'
+import { cleanObject, trimTrailingSlash } from '@/utils'
 import { createReport } from './setters'
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 
 // inaccuracy report TTL, minutes
 const REPORT_COOL_DOWN = 10

@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache'
 import traverse from 'traverse'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturers } from './getters'
-import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils/misc'
+import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 
 interface ManufacturerDTO extends Omit<Manufacturer, 'icon'> {
   successors?: { id: string }[]

@@ -8,9 +8,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import * as UI from '@/components/ui'
-import { addManufacturer } from '@/utils/fetch'
-import { useBarometers } from '@/app/hooks/useBarometers'
-import { generateIcon } from '@/utils/misc'
+import { addManufacturer } from '@/services/fetch'
+import { useBarometers } from '@/hooks/useBarometers'
+import { generateIcon } from '@/utils'
 
 interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void

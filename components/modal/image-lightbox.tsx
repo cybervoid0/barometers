@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import NextImage from 'next/image'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import customImageLoader from '@/utils/image-loader'
+import { customImageLoader } from '@/utils'
 
 interface ImageLightboxProps {
   src: string

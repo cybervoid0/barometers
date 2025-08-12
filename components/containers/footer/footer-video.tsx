@@ -1,6 +1,6 @@
 'use client'
 
-import { imageStorage } from '@/utils/constants'
+import { imageStorage } from '@/constants/globals'
 
 export function FooterVideo() {
   return (

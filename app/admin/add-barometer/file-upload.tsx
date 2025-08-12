@@ -9,8 +9,8 @@ import { Card } from '@/components/ui/card'
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { deleteImage, uploadFileToCloud, createImageUrls } from '@/utils/fetch'
-import { imageStorage } from '@/utils/constants'
+import { deleteImage, uploadFileToCloud, createImageUrls } from '@/services/fetch'
+import { imageStorage } from '@/constants/globals'
 
 interface FileUploadProps {
   name: string

@@ -17,9 +17,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui'
-import { MenuItem } from '@/app/types'
-import { cn } from '@/lib/utils'
-import { SocialButtons } from '@/components/footer'
+import { MenuItem } from '@/types'
+import { cn } from '@/utils'
+import { SocialButtons } from '@/components/containers/footer'
 
 interface Props {
   menu: MenuItem[]

@@ -1,10 +1,10 @@
 import { Metadata } from 'next/types'
 import { PropsWithChildren } from 'react'
 import capitalize from 'lodash/capitalize'
-import { getBarometer } from '@/app/services'
-import { imageStorage } from '@/utils/constants'
-import { title, openGraph, twitter, keywords } from '@/app/metadata'
-import { FrontRoutes } from '@/utils/routes-front'
+import { getBarometer } from '@/services'
+import { imageStorage } from '@/constants/globals'
+import { title, openGraph, twitter, keywords } from '@/constants/metadata'
+import { FrontRoutes } from '@/constants/routes-front'
 
 export async function generateMetadata({
   params: { slug },

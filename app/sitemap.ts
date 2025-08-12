@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

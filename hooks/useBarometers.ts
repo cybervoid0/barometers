@@ -9,7 +9,7 @@ import {
   fetchSubcategoryList,
   fetchMaterialList,
   fetchCountryList,
-} from '@/utils/fetch'
+} from '@/services/fetch'
 
 export const useBarometers = () => {
   const queryClient = useQueryClient()

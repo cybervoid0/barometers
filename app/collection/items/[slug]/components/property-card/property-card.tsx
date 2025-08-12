@@ -2,7 +2,7 @@ import { ReactNode, FC, ComponentProps } from 'react'
 import { type LucideProps } from 'lucide-react'
 import { IsAdmin } from '@/components/is-admin'
 import { Card } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 interface PropertyCardProps extends ComponentProps<'div'> {
   icon: FC<LucideProps>

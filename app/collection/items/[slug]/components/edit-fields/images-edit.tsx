@@ -16,13 +16,12 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useMemo, useState, useRef } from 'react'
-import { BarometerDTO } from '@/app/types'
-import { imageStorage } from '@/utils/constants'
-import { FrontRoutes } from '@/utils/routes-front'
-import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/utils/fetch'
-import { getThumbnailBase64 } from '@/utils/misc'
-import customImageLoader from '@/utils/image-loader'
-import { cn } from '@/lib/utils'
+import { BarometerDTO } from '@/types'
+import { imageStorage } from '@/constants/globals'
+import { FrontRoutes } from '@/constants/routes-front'
+import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/services/fetch'
+import { customImageLoader } from '@/utils'
+import { cn, getThumbnailBase64 } from '@/utils'
 import * as UI from '@/components/ui'
 
 interface ImagesForm {

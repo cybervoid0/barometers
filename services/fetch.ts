@@ -1,5 +1,5 @@
 import { InaccuracyReport, Manufacturer } from '@prisma/client'
-import { ApiRoutes } from '@/utils/routes-back'
+import { ApiRoutes } from '@/constants/routes-back'
 import type {
   CategoryDTO,
   CategoryListDTO,
@@ -15,8 +15,23 @@ import type {
   CountryListDTO,
   UrlDto,
   FileProps,
-} from '@/app/types'
-import { handleApiError } from './misc'
+} from '@/types'
+
+/**
+ * Handles API response errors by extracting a detailed error message from the response body.
+ * Falls back to the default statusText if no message is provided or parsing fails.
+ * @param res - The Response object from the fetch call.
+ * @throws {Error} Throws an error with the extracted or default error message.
+ */
+export async function handleApiError(res: Response): Promise<void> {
+  try {
+    const errorData = await res.json()
+    const errorMessage = errorData.message || res.statusText
+    throw new Error(errorMessage)
+  } catch (error) {
+    throw new Error(res.statusText ?? res.text ?? 'handleApiError: unknown error')
+  }
+}
 
 /******* Barometers ********/
 export async function fetchBarometer(slug: string): Promise<BarometerDTO> {

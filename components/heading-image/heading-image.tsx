@@ -1,6 +1,6 @@
 import NextImage from 'next/image'
 import './animations.css'
-import customImageLoader from '@/utils/image-loader'
+import { customImageLoader } from '@/utils'
 
 export const HeadingImage = () => {
   return (

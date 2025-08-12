@@ -3,7 +3,7 @@
 import { PropsWithChildren } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ThemeProvider } from '@/theme/ThemeProvider'
+import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 const queryClient = new QueryClient()

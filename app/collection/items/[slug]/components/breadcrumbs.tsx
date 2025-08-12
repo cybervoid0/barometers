@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { FrontRoutes } from '@/utils/routes-front'
-import { cn } from '@/lib/utils'
+import { FrontRoutes } from '@/constants/routes-front'
+import { cn } from '@/utils'
 import {
   Breadcrumb,
   BreadcrumbItem,

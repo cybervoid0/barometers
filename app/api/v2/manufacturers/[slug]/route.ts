@@ -2,8 +2,8 @@ import { NextResponse, NextRequest } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getManufacturer } from './getters'
-import { FrontRoutes } from '@/utils/routes-front'
-import { trimTrailingSlash } from '@/utils/misc'
+import { FrontRoutes } from '@/constants/routes-front'
+import { trimTrailingSlash } from '@/utils'
 
 interface Props {
   params: {

@@ -1,6 +1,6 @@
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 import { SearchItem } from './search-item'
-import { searchBarometers } from '@/utils/fetch'
+import { searchBarometers } from '@/services/fetch'
 import { SearchInfo } from './search-info'
 import { Pagination } from '@/components/ui/pagination'
 

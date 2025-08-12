@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
-import { SearchResultsDTO } from '../types'
-import customImageLoader from '@/utils/image-loader'
+import { SearchResultsDTO } from '../../types'
+import { customImageLoader } from '@/utils'
 
 interface ItemProps {
   image: SearchResultsDTO['barometers'][number]['image']

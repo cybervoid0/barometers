@@ -25,14 +25,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { useBarometers } from '@/app/hooks/useBarometers'
+import { useBarometers } from '@/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
 
-import { createBarometer } from '@/utils/fetch'
-import { slug, getThumbnailBase64 } from '@/utils/misc'
-import { imageStorage } from '@/utils/constants'
+import { createBarometer } from '@/services/fetch'
+import { getThumbnailBase64, slug } from '@/utils'
+import { imageStorage } from '@/constants/globals'
 
 // Form data interface
 interface BarometerFormData {

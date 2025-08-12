@@ -12,7 +12,7 @@ import {
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { ImagePlus, X } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
-import { createImageUrls, deleteImage, uploadFileToCloud } from '@/utils/fetch'
+import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
 import { ManufacturerForm } from './types'
 import { Button } from '@/components/ui/button'
 

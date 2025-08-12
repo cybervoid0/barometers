@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { getBarometer } from './getters'
 import { withPrisma } from '@/prisma/prismaClient'
-import { NotFoundError } from '@/app/errors'
 import { revalidateCategory } from '../revalidate'
-import { FrontRoutes } from '@/utils/routes-front'
+import { FrontRoutes } from '@/constants/routes-front'
 import { deleteImagesFromStorage } from './deleteFromStorage'
-import { trimTrailingSlash } from '@/utils/misc'
+import { trimTrailingSlash } from '@/utils'
 
 interface Props {
   params: {
@@ -22,7 +21,7 @@ export async function GET(_req: NextRequest, { params: { slug } }: Props) {
     const barometer = await getBarometer(slug)
     return NextResponse.json(barometer, { status: 200 })
   } catch (error) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 404 })
     }
     return NextResponse.json(

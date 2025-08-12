@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 import {
   Button,
   Dialog,
@@ -14,9 +14,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui'
-import { BarometerDTO } from '@/app/types'
-import { deleteBarometer } from '@/utils/fetch'
-import { FrontRoutes } from '@/utils/routes-front'
+import { BarometerDTO } from '@/types'
+import { deleteBarometer } from '@/services/fetch'
+import { FrontRoutes } from '@/constants/routes-front'
 import { IsAdmin } from '@/components/is-admin'
 
 interface Props {

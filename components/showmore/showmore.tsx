@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 import { MD } from '@/components/md'
 
 interface ShowMoreProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -1,9 +1,7 @@
-import 'server-only'
-
 import { AccessRole } from '@prisma/client'
-import { getCategories } from '@/app/services'
+import { getCategories } from '@/services'
 import { FrontRoutes } from './routes-front'
-import type { MenuItem } from '@/app/types'
+import type { MenuItem } from '@/types'
 
 export async function getMenuData(): Promise<MenuItem[]> {
   const categories = await getCategories()

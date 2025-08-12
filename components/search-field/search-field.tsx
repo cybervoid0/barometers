@@ -8,7 +8,7 @@ import * as yup from 'yup'
 import { toast } from 'sonner'
 import { Search, X } from 'lucide-react'
 import { Input, Button } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 interface SearchProps extends React.HTMLAttributes<HTMLDivElement> {
   queryString?: string

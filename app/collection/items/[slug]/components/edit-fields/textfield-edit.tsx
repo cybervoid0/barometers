@@ -6,11 +6,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Edit } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 import * as UI from '@/components/ui'
-import { BarometerDTO } from '@/app/types'
-import { updateBarometer } from '@/utils/fetch'
-import { FrontRoutes } from '@/utils/routes-front'
+import { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/services/fetch'
+import { FrontRoutes } from '@/constants/routes-front'
 
 interface TextFieldEditProps {
   size?: number
