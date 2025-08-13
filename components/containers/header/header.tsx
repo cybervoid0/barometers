@@ -29,8 +29,8 @@ export async function Header() {
               <div className="flex items-center gap-4">
                 <div className="flex flex-col gap-[0.32rem]">
                   <h1 className="font-cinzel leading-none">Barometers Realm</h1>
-                  <p className="text-xs leading-none lg:text-[0.875rem]">
-                    Europe's richest visual archive of barometers
+                  <p className="xs:text-xs text-[10px] leading-none lg:text-[0.875rem]">
+                    Europe's richest online collection of barometers
                   </p>
                 </div>
                 {/* Logo image */}
