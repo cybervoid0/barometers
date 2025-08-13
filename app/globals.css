@@ -230,14 +230,14 @@
   }
   /* H2 is used for page headers */
   h2 {
-    @apply text-3xl leading-tight font-semibold tracking-wider capitalize;
+    @apply text-2xl leading-tight font-semibold tracking-wider capitalize;
   }
 
   h3 {
-    @apply text-2xl leading-tight font-semibold tracking-wide capitalize;
+    @apply text-xl leading-tight font-semibold tracking-wide capitalize;
   }
 
   h4 {
-    @apply text-xl leading-tight font-medium tracking-wide;
+    @apply text-lg leading-tight font-medium tracking-wide;
   }
 }

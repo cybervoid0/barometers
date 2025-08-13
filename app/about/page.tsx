@@ -9,11 +9,12 @@ export const dynamic = 'force-static'
 const paragraphStyles = 'mb-4 indent-8 text-left'
 const bookTitleStyles = 'italic font-medium'
 const subheaderStyles = 'my-4 text-xl font-semibold'
+const headerStyles = 'mt-12 mb-6'
 
 export default function About() {
   return (
     <div className="pt-6">
-      <h2 className="mb-3">Greetings, my name is Leo.</h2>
+      <h2 className="mb-3">Founder's Statement</h2>
       <p className={paragraphStyles}>
         <Image
           priority
@@ -24,17 +25,87 @@ export default function About() {
           src="/shared/leo-shirokov.png"
           className="xs:w-fit float-left h-[300px] w-full object-contain sm:h-[400px]"
         />
-        I am a collector and restorer of antique barometers, a member of the Society for the History
-        of Technology (SHOT), European Society for Environmental History (ESEH) and the
-        International Meteorological Artifact Preservation Program (IMAPP). I have dedicated myself
-        to assembling a unique collection of weather instruments that represent masterpieces of the
-        industrial era, spanning from the late 18th to the mid 20th century. For the past five
-        years, I have passionately curated a diverse collection of barometers and other weather
-        instruments, driven by a deep fascination with the history of meteorology. This dedication
-        has also inspired me to write <span className={bookTitleStyles}>Barometer Odyssey*</span>, a
-        book that explores the evolution of barometers over time.
+        My name is Leo Shirokov — collector and restorer of antique barometers and other
+        meteorological artefacts; Founder & Chair of The Art of Weather Instruments Foundation.
       </p>
-      <div className="xs:justify-start mb-3 flex justify-center gap-2 py-3">
+
+      <p className={paragraphStyles}>
+        I have dedicated myself to assembling a unique collection of weather instruments that
+        represent masterpieces of the industrial era, spanning from the late 18th to the mid 20th
+        century. Since 2020, I have passionately curated a diverse collection of barometers and
+        other weather instruments, driven by a deep fascination with the history of meteorology.
+        This dedication has also inspired me to write Barometer Odyssey*, a book that explores the
+        evolution of barometers over time.
+      </p>
+
+      <p className={paragraphStyles}>
+        In 2025, I established The Art of Weather Instruments Foundation, a non-profit organisation
+        based in the Netherlands, with the purpose of preserving and expanding this remarkable
+        collection for the benefit of future generations. The foundation is committed to
+        safeguarding this cultural and scientific heritage, ensuring its accessibility to the
+        public, and fostering an appreciation of the decorative, applied, and artisanal arts
+        associated with meteorology. Through research, exhibitions, and educational initiatives, the
+        foundation seeks to inspire curiosity, promote knowledge, and contribute to the shared
+        legacy of humanity.
+      </p>
+
+      <p className={paragraphStyles}>
+        I see barometers not merely as instruments, but as works of art — timeless creations where
+        science and beauty meet. Each one carries the touch of its maker, the spirit of its age, and
+        the universal human desire to measure, predict, and understand the world. By opening this
+        collection to the public, I hope to spark curiosity, preserve craftsmanship, and share the
+        quiet elegance of these objects. This is why I invite you to explore barometers.info and to
+        engage with the work of The Art of Weather Instruments Foundation. By learning, sharing, or
+        supporting our mission, you help ensure that these instruments — and the values they
+        represent — continue to inspire, educate, and connect people across generations and
+        cultures.
+      </p>
+
+      <h3 className={headerStyles}>Inside the Collection </h3>
+
+      <p className={paragraphStyles}>
+        The collection features more than 200 rare and exceptional items, including varied mercury
+        barometers — Wheel barometers in banjo cases, Stick barometers, Double-fluid barometers,
+        Marine barometers, and precision Standard barometers (notably Kew-pattern barometers) — as
+        well as aneroid barometers, including among others watch-size barometers, surveying
+        barometers, military barometers, altimetric barometers, and traveller`s sets. It also
+        comprises sympiesometers, thermometers, hygrometers, anemometers, thunder glasses, storm
+        glasses, weather houses, and a range of recording instruments (barographs, thermographs,
+        thermohygrographs, hygrographs, and their combinations).
+      </p>
+
+      <p className={paragraphStyles}>
+        The collection includes wall-mounted, tabletop, pocket, floor-standing, and automobile
+        barometers, along with various forecasters and original documents from historical
+        manufacturers (including period advertisements), further enriching its historical value.
+      </p>
+
+      <p className={paragraphStyles}>
+        The items in the collection are crafted either from carved solid wood or finished with
+        veneers of premium hardwoods, and may also be made of brass, bronze, nickel-plated brass,
+        copper, ivory, silver, gilt bronze, steel, zinc, aluminum, plexiglass, Bakelite, celluloid,
+        leather, glass, paper, or cardboard. In addition, they may be accompanied by a stand, a
+        protective case, or a carrying box for transport.
+      </p>
+
+      <p className={paragraphStyles}>
+        The pieces in the collection were created by some of the most renowned and skilled craftsmen
+        of their time (from the late 18th to the mid 20th century), hailing from the United Kingdom,
+        France, Germany, Belgium, the Netherlands, Switzerland, Sweden, Ireland, Spain, Italy, the
+        United States, Australia, Japan, Russian Empire and the former Soviet Union.
+      </p>
+
+      <Separator className="my-4" />
+      <p className={paragraphStyles}>
+        <span className={bookTitleStyles}>*Barometer Odyssey</span> immerses the reader in the world
+        of one of the most fascinating scientific instruments. This book explores centuries of
+        experiments, discoveries, and inventions connected to the barometer, as well as its
+        aesthetic and functional significance. From ancient studies of the vacuum to modern aneroid
+        mechanisms, each chapter unveils the captivating story of the barometer. Featuring vivid
+        examples from the author's collection, this book will inspire you to discover the incredible
+        world of weather forecasters. Currently available in Russian.
+      </p>
+      <div className="xs:justify-start mb-3 flex justify-center gap-4">
         <Button variant="outline" asChild>
           <a
             href="https://www.ozon.ru/product/barometr-odisseya-1918748239/?at=mqtkyRVAEhMBgPkoc8x4EGrHK39QKWiopqMgXhv53xWD&keywords=%D0%B1%D0%B0%D1%80%D0%BE%D0%BC%D0%B5%D1%82%D1%80+%D0%BE%D0%B4%D0%B8%D1%81%D1%81%D0%B5%D1%8F"
@@ -54,63 +125,19 @@ export default function About() {
           </a>
         </Button>
       </div>
-      <p className={paragraphStyles}>
-        My collection features more than 200 rare and exceptional items, including mercury and
-        aneroid barometers, as well as barographs, mainly from the Victorian era. Some of the most
-        esteemed manufacturers in my collection include Negretti & Zambra, Short & Mason, Joseph
-        Hicks, Peter Dollond, Thomas Mason, Dominicus Sala, Breguet, J.C. Vickery, Gottlieb Lufft,
-        Richard Frères, Jules Richard, Bourdon, Naudet (PNHB), Onorato Comitti, Massiot & Cie, Maple
-        & Co, to name a few.
-      </p>
-      <p className={paragraphStyles}>
-        The range of barometers in my collection is vast and varied, comprising wheel barometers in
-        banjo cases, Stick barometers, Double-fluid barometers, Marine mercury and aneroid
-        barometers, Sympiesometers, Fitzroy barometers, Thunder glasses, Storm glasses, and even
-        Pocket barometers, including military aviation models. My collection also includes wall,
-        tabletop, and floor-standing barometers, as well as barographs, thermographs,
-        thermohygrographs, hygrographs, and classic weather houses. Moreover, I possess original
-        documents from historical manufacturers and period advertisements, further enriching the
-        collection’s historical value.
-      </p>
-      <p className={cn('pb-4', paragraphStyles)}>
-        I am very excited to be able to share my collection online with enthusiasts around the
-        world. Each barometer is accompanied by high-quality photographs and a detailed description,
-        ensuring that the beauty and craftsmanship of these instruments are fully appreciated. I am
-        always happy to answer any questions you may have about the barometers or their history.
-      </p>
       <Separator className="my-4" />
-      <div className="xs:flex-row flex flex-col flex-nowrap items-center gap-4 pt-2">
-        <p className={paragraphStyles}>
-          <span className={bookTitleStyles}>*Barometer Odyssey</span> immerses the reader in the
-          world of one of the most fascinating scientific instruments. This book explores centuries
-          of experiments, discoveries, and inventions connected to the barometer, as well as its
-          aesthetic and functional significance. From ancient studies of the vacuum to modern
-          aneroid mechanisms, each chapter unveils the captivating story of the barometer. Featuring
-          vivid examples from the author’s collection, this book will inspire you to discover the
-          incredible world of weather forecasters. Currently available in Russian.
-        </p>
-        <Image
-          alt="Book"
-          width={160}
-          height={160}
-          sizes="(max-width: 576px) 70vw, 160px"
-          src="/shared/about-circle.png"
-          className="xs:w-auto mb-4 w-[70%]"
-        />
-      </div>
-      <Separator className="my-4" />
-      <h2 className="mb-3">Why Barometers?</h2>
-      <p className={paragraphStyles}>
-        A barometer is more than just an instrument for measuring atmospheric pressure. It is an
-        artifact that unites science, art, and human ingenuity. It’s like a window into the past,
-        filled with mysteries and captivating stories. Barometers played a pivotal role in the
-        development of meteorology and navigation. Without them, 18th- and 19th-century ships could
-        not foresee storms, and farmers couldn’t prepare for changes in the weather. These devices
-        became symbols of humanity’s quest to understand nature. Today, each antique barometer
-        represents a meeting with an era of great discoveries.
-      </p>
+      <h3 className={headerStyles}>Why Barometers?</h3>
 
-      <ShowMore>
+      <ShowMore maxHeight={140}>
+        <p className={paragraphStyles}>
+          A barometer is more than just an instrument for measuring atmospheric pressure. It is an
+          artifact that unites science, art, and human ingenuity. It’s like a window into the past,
+          filled with mysteries and captivating stories. Barometers played a pivotal role in the
+          development of meteorology and navigation. Without them, 18th- and 19th-century ships
+          could not foresee storms, and farmers couldn’t prepare for changes in the weather. These
+          devices became symbols of humanity’s quest to understand nature. Today, each antique
+          barometer represents a meeting with an era of great discoveries.
+        </p>
         <p className={paragraphStyles}>
           In our digital age, where devices blend into an indistinguishable uniformity, timeless
           barometers stand out as rare tools that are delightful to see and intriguing to interact
