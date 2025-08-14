@@ -1,6 +1,8 @@
 export const FrontRoutes = {
   Home: '/',
   History: '/history/',
+  Foundation: '/foundation/',
+  Donators: '/foundation/donators/',
   About: '/about/',
   Brands: '/brands/',
   Terms: '/terms-and-conditions/',
