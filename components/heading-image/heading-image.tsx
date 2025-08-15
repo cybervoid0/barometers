@@ -1,6 +1,8 @@
 import NextImage from 'next/image'
 import './animations.css'
 import { customImageLoader } from '@/utils'
+import Link from 'next/link'
+import { FrontRoutes } from '@/constants'
 
 export const HeadingImage = () => {
   return (
@@ -15,9 +17,11 @@ export const HeadingImage = () => {
       />
       <div className="xs:items-center xs:pb-0 absolute top-0 left-0 z-2 flex h-full w-full animate-[heading-slide-up_1.8s_ease-out,heading-fade-in-content_1.8s_ease-out] items-end pb-12 pl-8 sm:pl-12">
         <div>
-          <h2 className="bg-primary text-background inline px-1 text-[1.375rem] leading-relaxed font-normal tracking-wider uppercase">
-            Industrial Era Barometer Collection
-          </h2>
+          <Link href={FrontRoutes.Foundation}>
+            <h2 className="bg-primary text-background inline px-1 text-[1.375rem] leading-relaxed font-normal tracking-wider uppercase">
+              Art of weather instruments foundation
+            </h2>
+          </Link>
         </div>
       </div>
     </div>

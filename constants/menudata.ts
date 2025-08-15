@@ -9,10 +9,27 @@ export async function getMenuData(): Promise<MenuItem[]> {
     {
       id: 0,
       label: 'Home',
-      link: '/',
+      link: FrontRoutes.Home,
     },
     {
       id: 1,
+      label: 'Foundation',
+      link: FrontRoutes.Foundation,
+      children: [
+        {
+          id: 6,
+          label: 'About Us',
+          link: FrontRoutes.Foundation,
+        },
+        {
+          id: 7,
+          label: 'Donate',
+          link: FrontRoutes.Donate,
+        },
+      ],
+    },
+    {
+      id: 2,
       label: 'Collection',
       link: '/collection',
       children: categories.map(cat => ({
@@ -22,24 +39,19 @@ export async function getMenuData(): Promise<MenuItem[]> {
       })),
     },
     {
-      id: 2,
-      label: 'Brands',
-      link: '/brands',
-    },
-    {
       id: 3,
-      label: 'History',
-      link: '/history',
+      label: 'Brands',
+      link: FrontRoutes.Brands,
     },
     {
       id: 4,
       label: 'About',
-      link: '/about',
+      link: FrontRoutes.About,
     },
     {
-      id: 10,
+      id: 5,
       label: 'Admin',
-      link: '/admin',
+      link: FrontRoutes.Admin,
       visibleFor: AccessRole.ADMIN,
     },
   ]
