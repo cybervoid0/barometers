@@ -18,17 +18,6 @@ const contactTxSx = 'text-sm text-muted-foreground'
 export default function Foundation() {
   return (
     <>
-      <section className="my-10">
-        <h2 id="foundation-header">The Art of Weather Instruments Foundation</h2>
-        <p
-          aria-label="Subheader"
-          aria-labelledby="foundation-header"
-          className="text-muted-foreground xs:text-base text-sm"
-        >
-          Preserving the Beauty and Function of Historical Weather Instruments
-        </p>
-      </section>
-
       <section className={sectionSx}>
         <h3 className={header3Sx}>Mission</h3>
         <Image

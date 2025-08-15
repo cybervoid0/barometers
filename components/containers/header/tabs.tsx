@@ -70,7 +70,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                           >
                             <NavigationMenuLink asChild>
                               <Link href={nestedItem.link}>
-                                <p className="capitalize">{nestedItem.label}</p>
+                                <p className="w-max">{nestedItem.label}</p>
                               </Link>
                             </NavigationMenuLink>
                           </li>

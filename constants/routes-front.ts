@@ -2,7 +2,7 @@ export const FrontRoutes = {
   Home: '/',
   History: '/history/',
   Foundation: '/foundation/',
-  Donators: '/foundation/donators/',
+  Donate: '/foundation/donate/',
   About: '/about/',
   Brands: '/brands/',
   Terms: '/terms-and-conditions/',

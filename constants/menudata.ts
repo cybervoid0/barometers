@@ -18,13 +18,13 @@ export async function getMenuData(): Promise<MenuItem[]> {
       children: [
         {
           id: 6,
-          label: 'Foundation',
+          label: 'About Us',
           link: FrontRoutes.Foundation,
         },
         {
           id: 7,
-          label: 'Donators',
-          link: FrontRoutes.Donators,
+          label: 'Donate',
+          link: FrontRoutes.Donate,
         },
       ],
     },
