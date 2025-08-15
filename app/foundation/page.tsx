@@ -13,6 +13,7 @@ const listSx = cn(
   '[&>li]:after:content-[";"] [&>li]:last-of-type:after:content-["."]', // colons and full stop
 )
 const linkSx = 'decoration-muted-foreground hover:decoration-foreground underline'
+const contactTxSx = 'text-sm text-muted-foreground'
 
 export default function Foundation() {
   return (
@@ -98,7 +99,7 @@ export default function Foundation() {
           artisans, artists, engineers, historians, and all who value the meeting of science and
           beauty.'
         </p>
-        <p className="text-right italic">Leo Shirokov</p>
+        <p className="text-right italic">L. Shirokov</p>
         <Separator className="my-10" />
         <section className={sectionSx}>
           <h3 className={cn(header3Sx, 'mb-8')}>Founding Board</h3>
@@ -111,7 +112,7 @@ export default function Foundation() {
                 className="rounded-sm shadow-lg"
                 alt="Leo Shirokov"
               />
-              <p className="grow text-center text-xs">Leo Shirokov — Chair & Co-Founder</p>
+              <p className="grow text-center text-xs">Leonid Shirokov — Chair & Co-Founder</p>
             </div>
             <div className="flex h-full w-[240px] flex-col gap-4">
               <Image
@@ -122,7 +123,7 @@ export default function Foundation() {
                 alt="Alex Shenshin"
               />
               <p className="grow text-center text-xs">
-                Alex Shenshin — Treasurer/Secretary & Co-Founder
+                Aleksandr Shenshin — Treasurer/Secretary & Co-Founder
               </p>
             </div>
           </div>
@@ -224,6 +225,32 @@ export default function Foundation() {
               Foundation at relevant scientific and cultural forums
             </li>
           </ul>
+        </section>
+        <section className="mt-16">
+          <div className="flex flex-col gap-8 sm:flex-row">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <img src="/favicon.svg" alt="Logo" className="h-[100px] w-[100px]" />
+              <p className="text-muted-foreground text-4xl font-medium tracking-wide uppercase">
+                awif
+              </p>
+            </div>
+            <div className="grid grid-cols-[1fr_2fr] gap-1">
+              <p className={contactTxSx}>Reg. name</p>
+              <p className={contactTxSx}>Stichting Art of Weather Instruments</p>
+              <p className={contactTxSx}>Trade name</p>
+              <p className={contactTxSx}>The Art of Weather Instruments Foundation</p>
+              <p className={contactTxSx}>KVK</p>
+              <p className={contactTxSx}>98055216</p>
+              <p className={contactTxSx}>RSIN</p>
+              <p className={contactTxSx}>868340911</p>
+              <p className={contactTxSx}>Reg. address</p>
+              <p className={contactTxSx}>Jonker Florislaan 64 Nuenen 5673ML Netherlands </p>
+              <p className={contactTxSx}>E-mail</p>
+              <a className={contactTxSx} href="mailto:post@barometers.info">
+                post@barometers.info
+              </a>
+            </div>
+          </div>
         </section>
       </section>
     </>
