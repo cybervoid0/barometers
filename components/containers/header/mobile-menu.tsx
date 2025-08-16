@@ -41,7 +41,7 @@ export function MobileMenu({ menu = [] }: Props) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-68 data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
+        className="z-[100] w-68 data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">Barometers website navigation menu</SheetDescription>
@@ -58,7 +58,9 @@ export function MobileMenu({ menu = [] }: Props) {
                 'children' in item ? (
                   <Accordion key={item.id} type="single" collapsible className="w-full">
                     <AccordionItem value={`${item.id}`}>
-                      <AccordionTrigger className={cn('p-0 hover:no-underline', menuItemTextStyle)}>
+                      <AccordionTrigger
+                        className={cn('cursor-pointer p-0 hover:no-underline', menuItemTextStyle)}
+                      >
                         {item.label}
                       </AccordionTrigger>
                       <AccordionContent className="p-0">
@@ -68,7 +70,7 @@ export function MobileMenu({ menu = [] }: Props) {
                               <Link
                                 href={nestedItem.link}
                                 onClick={closeMenu}
-                                className="hover:text-foreground/80 w-full text-xs font-medium tracking-widest uppercase"
+                                className="hover:text-foreground/80 w-full text-xs font-medium tracking-widest uppercase no-underline"
                               >
                                 {nestedItem.label}
                               </Link>
@@ -80,7 +82,7 @@ export function MobileMenu({ menu = [] }: Props) {
                   </Accordion>
                 ) : (
                   <Link
-                    className={cn('block', menuItemTextStyle)}
+                    className={cn('block no-underline', menuItemTextStyle)}
                     key={item.id}
                     href={item.link}
                     onClick={closeMenu}
