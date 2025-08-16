@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/utils'
-import { SocialButtons } from './social-buttons'
 import { FrontRoutes } from '@/constants'
+import { SocialButtons } from './social-buttons'
 
 export function Footer() {
   return (

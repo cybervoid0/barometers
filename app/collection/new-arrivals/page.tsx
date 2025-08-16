@@ -1,10 +1,9 @@
 import 'server-only'
 
-import { fetchBarometerList } from '@/services/fetch'
-import { BarometerCardWithIcon } from '@/components/barometer-card'
-import { Pagination } from '@/components/ui/pagination'
-import { FrontRoutes } from '@/constants/routes-front'
-import { Card } from '@/components/ui/card'
+import { fetchBarometerList } from '@/services'
+import { Card, Pagination } from '@/components/ui'
+import { BarometerCardWithIcon } from '@/components/elements'
+import { FrontRoutes } from '@/constants'
 
 const itemsOnPage = 12
 

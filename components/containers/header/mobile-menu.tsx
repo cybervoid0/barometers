@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { Spin as Hamburger } from 'hamburger-react'
-import { isAdmin } from '@/components/is-admin'
+import { isAdmin } from '@/components/elements'
 import {
   Sheet,
   SheetContent,
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui'
 import { MenuItem } from '@/types'
 import { cn } from '@/utils'
-import { SocialButtons } from '@/components/containers/footer'
+import { SocialButtons } from '../footer'
 
 interface Props {
   menu: MenuItem[]

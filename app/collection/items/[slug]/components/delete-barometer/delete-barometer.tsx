@@ -15,9 +15,9 @@ import {
   DialogTrigger,
 } from '@/components/ui'
 import { BarometerDTO } from '@/types'
-import { deleteBarometer } from '@/services/fetch'
-import { FrontRoutes } from '@/constants/routes-front'
-import { IsAdmin } from '@/components/is-admin'
+import { deleteBarometer } from '@/services'
+import { FrontRoutes } from '@/constants'
+import { IsAdmin } from '@/components/elements'
 
 interface Props {
   barometer: BarometerDTO

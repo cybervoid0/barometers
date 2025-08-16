@@ -1,10 +1,10 @@
 import 'server-only'
 
 import Image from 'next/image'
-import { Button, Separator } from '@/components/ui'
-import { ShowMore } from '@/components/showmore'
-import { cn } from '@/utils'
 import Link from 'next/link'
+import { Button, Separator } from '@/components/ui'
+import { ShowMore } from '@/components/elements'
+import { cn } from '@/utils'
 import { FrontRoutes } from '@/constants'
 
 export const dynamic = 'force-static'

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { Search } from 'lucide-react'
-import { isAdmin } from '@/components/is-admin'
+import { isAdmin } from '@/components/elements'
 import { MenuItem } from '@/types'
 import { cn } from '@/utils'
 import {

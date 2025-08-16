@@ -1,6 +1,6 @@
 import { ReactNode, FC, ComponentProps } from 'react'
 import { type LucideProps } from 'lucide-react'
-import { IsAdmin } from '@/components/is-admin'
+import { IsAdmin } from '@/components/elements'
 import { Card } from '@/components/ui'
 import { cn } from '@/utils'
 

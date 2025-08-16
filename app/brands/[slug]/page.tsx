@@ -6,10 +6,8 @@ import { Fragment } from 'react'
 import { getManufacturer } from '@/services'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '@/constants/metadata'
-import { BarometerCardWithIcon } from '@/components/barometer-card'
-import { FrontRoutes } from '@/constants/routes-front'
-import { MD } from '@/components/md'
-import { ImageLightbox } from '@/components/modal'
+import { BarometerCardWithIcon, MD, ImageLightbox } from '@/components/elements'
+import { FrontRoutes } from '@/constants'
 import { Card } from '@/components/ui'
 
 interface Props {

@@ -1,10 +1,8 @@
 import 'server-only'
 
-import { CategoryCard } from '@/components/category-card'
-import { SearchField } from '@/components/search-field'
-import { NewArrivals } from '@/components/new-arrivals'
-import { FrontRoutes } from '@/constants/routes-front'
-import { getCategories } from '../services'
+import { CategoryCard, SearchField, NewArrivals } from '@/components/elements'
+import { FrontRoutes } from '@/constants'
+import { getCategories } from '@/services'
 import { cn } from '@/utils'
 
 export const dynamic = 'force-static'

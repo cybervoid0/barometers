@@ -5,10 +5,10 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { fetchReportList } from '@/services/fetch'
+import { fetchReportList } from '@/services'
 import { InaccuracyReportListDTO } from '@/types'
-import { FrontRoutes } from '@/constants/routes-front'
-import { Table } from '@/components/table'
+import { FrontRoutes } from '@/constants'
+import { Table } from '@/components/elements'
 import { Pagination } from '@/components/ui'
 
 const itemsOnPage = 6

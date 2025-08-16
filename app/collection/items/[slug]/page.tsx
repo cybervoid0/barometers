@@ -14,19 +14,18 @@ import {
   Star,
   TreePine,
 } from 'lucide-react'
-import { FrontRoutes } from '@/constants/routes-front'
-import { ImageCarousel } from './components/carousel'
-import { Condition } from './components/condition'
-import { ShowMore } from '@/components/showmore'
+import { FrontRoutes } from '@/constants'
+import { Card, SeparatorWithText } from '@/components/ui'
+import { ShowMore, MD, IsAdmin } from '@/components/elements'
 import { Dimensions } from '@/types'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/services'
-import { IsAdmin } from '@/components/is-admin'
+// local components
+import { ImageCarousel } from './components/carousel'
+import { Condition } from './components/condition'
 import { PropertyCard } from './components/property-card/property-card'
 import { DeleteBarometer } from './components/delete-barometer'
 import { InaccuracyReport } from './components/inaccuracy-report'
-import { MD } from '@/components/md'
-import { Card, SeparatorWithText } from '@/components/ui'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'

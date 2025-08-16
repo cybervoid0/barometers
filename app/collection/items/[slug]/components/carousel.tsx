@@ -3,15 +3,15 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Zoom, Navigation, Pagination } from 'swiper/modules'
 import Image from 'next/image'
-import { ImagesEdit } from './edit-fields/images-edit'
+import { customImageLoader } from '@/utils'
 import { type BarometerDTO } from '@/types'
-import { IsAdmin } from '@/components/is-admin'
+import { IsAdmin } from '@/components/elements'
+import { ImagesEdit } from './edit-fields/images-edit'
 import 'swiper/css'
 import 'swiper/css/zoom'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import './swiper-styles.css'
-import { customImageLoader } from '@/utils'
 
 interface ImageCarouselProps {
   barometer: BarometerDTO

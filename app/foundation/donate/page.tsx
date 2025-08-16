@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { cn } from '@/utils'
-import { PayPalStackedButton } from '@/components/paypal-button'
-import { CopyButton } from '@/components/ui/copy-button'
+import { PayPalStackedButton } from '@/components/elements'
+import { CopyButton } from '@/components/ui'
 import { bitcoinAddress, ethereumAddress } from '@/constants'
 
 const paragraphSx = 'mb-4 indent-8 text-left'

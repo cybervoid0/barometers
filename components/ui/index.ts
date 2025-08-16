@@ -127,3 +127,4 @@ export {
 } from './table'
 export { Textarea } from './textarea'
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip'
+export { CopyButton } from './copy-button'
