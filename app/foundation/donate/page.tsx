@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { cn } from '@/utils'
 import { PayPalStackedButton } from '@/components/paypal-button'
+import { CopyButton } from '@/components/ui/copy-button'
+import { bitcoinAddress, ethereumAddress } from '@/constants'
 
 const paragraphSx = 'mb-4 indent-8 text-left'
 const listSx = cn(
@@ -32,7 +34,7 @@ export default function Donate() {
         </li>
       </ul>
 
-      <div className="mt-20 flex flex-col items-center justify-evenly gap-6 sm:flex-row sm:items-start">
+      <div className="mt-20 flex flex-col items-center justify-evenly gap-6 md:flex-row md:items-start">
         <div className="flex h-full w-[240px] flex-col items-center gap-4">
           <Image
             src="shared/bitcoin_qr-code_black.png"
@@ -48,7 +50,13 @@ export default function Donate() {
             className="block rounded-sm shadow-lg dark:hidden"
             alt="Bitcoin"
           />
-          <p className="text-center text-xs">bc1q6g0etsc0pu2s2zjk8t3rdej9624stxzq0hlm5f</p>
+          <CopyButton
+            text={bitcoinAddress}
+            tooltipMsg="Copy Bitcoin address"
+            successMsg="Bitcoin address copied"
+          >
+            <p className="bg-input px-1 font-mono">{bitcoinAddress}</p>
+          </CopyButton>
         </div>
         <div className="flex h-full w-[240px] flex-col items-center gap-4">
           <Image
@@ -65,8 +73,14 @@ export default function Donate() {
             className="block rounded-sm shadow-lg dark:hidden"
             alt="Ethereum"
           />
-          {/* TODO: add copy button */}
-          <p className="text-center text-xs">0x29B67cDAd027266Ed497b66a0c708e750d4436FA</p>
+
+          <CopyButton
+            text={ethereumAddress}
+            successMsg="Ethereum address copied"
+            tooltipMsg="Copy Ethereum address"
+          >
+            <p className="bg-input px-1 font-mono">{ethereumAddress}</p>
+          </CopyButton>
         </div>
       </div>
       <PayPalStackedButton className="mt-20" />
