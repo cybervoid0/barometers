@@ -1,9 +1,8 @@
 import { type HTMLAttributes } from 'react'
-import NextImage from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
-import { customImageLoader } from '@/utils'
+import { customImageLoader, cn } from '@/utils'
 import { BarometerListDTO } from '@/types'
-import { cn } from '@/utils'
 
 interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {
   image?: BarometerListDTO['barometers'][number]['images'][number]
@@ -26,14 +25,14 @@ export async function BarometerCard({
     <div className={cn('h-full', className)} {...props}>
       <Link
         className={cn(
-          'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center',
+          'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center no-underline',
           'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
         )}
         href={link}
       >
         <div className="relative h-60 w-full bg-contain bg-center bg-no-repeat">
           {image ? (
-            <NextImage
+            <Image
               unoptimized
               priority={priority}
               src={customImageLoader({ src: image.url, quality: 95, width: 300 })}

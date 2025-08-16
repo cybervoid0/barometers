@@ -12,7 +12,6 @@ const listSx = cn(
   "[&>li]:before:mr-2 [&>li]:before:content-['—']", // dash-bullets
   '[&>li]:after:content-[";"] [&>li]:last-of-type:after:content-["."]', // colons and full stop
 )
-const linkSx = 'decoration-muted-foreground hover:decoration-foreground underline'
 const contactTxSx = 'text-sm text-muted-foreground'
 
 export default function Foundation() {
@@ -155,10 +154,8 @@ export default function Foundation() {
             </li>
             <li>
               Provide digital access to the collection via the website{' '}
-              <Link className={linkSx} href={FrontRoutes.Home}>
-                www.barometers.info
-              </Link>
-              , including imagery and descriptions
+              <Link href={FrontRoutes.Home}>www.barometers.info</Link>, including imagery and
+              descriptions
             </li>
             <li>
               Collaborate with museums, archives, private collectors, scientific institutions,

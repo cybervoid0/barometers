@@ -17,7 +17,7 @@ export const HeadingImage = () => {
       />
       <div className="xs:items-center xs:pb-0 absolute top-0 left-0 z-2 flex h-full w-full animate-[heading-slide-up_1.8s_ease-out,heading-fade-in-content_1.8s_ease-out] items-end pb-12 pl-8 sm:pl-12">
         <div>
-          <Link href={FrontRoutes.Foundation}>
+          <Link href={FrontRoutes.Foundation} className="no-underline">
             <h2 className="bg-primary text-background inline px-1 text-[1.375rem] leading-relaxed font-normal tracking-wider uppercase">
               Art of weather instruments foundation
             </h2>

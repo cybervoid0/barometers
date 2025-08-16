@@ -81,7 +81,7 @@ export default async function Page({ params: { slug } }: Props) {
             edit={<ManufacturerEdit barometer={barometer} />}
           >
             <Link
-              className="block text-sm underline decoration-[0.1px]"
+              className="block text-sm"
               href={FrontRoutes.Brands + barometer.manufacturer.slug}
               /* display manufacturer name and city (or country if city is not specified) */
             >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Link>

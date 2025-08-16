@@ -2,8 +2,10 @@ import 'server-only'
 
 import Image from 'next/image'
 import { Button, Separator } from '@/components/ui'
-import { ShowMore } from '../../components/showmore'
+import { ShowMore } from '@/components/showmore'
 import { cn } from '@/utils'
+import Link from 'next/link'
+import { FrontRoutes } from '@/constants'
 
 export const dynamic = 'force-static'
 const paragraphStyles = 'mb-4 indent-8 text-left'
@@ -34,8 +36,9 @@ export default function About() {
         represent masterpieces of the industrial era, spanning from the late 18th to the mid 20th
         century. Since 2020, I have passionately curated a diverse collection of barometers and
         other weather instruments, driven by a deep fascination with the history of meteorology.
-        This dedication has also inspired me to write Barometer Odyssey*, a book that explores the
-        evolution of barometers over time.
+        This dedication has also inspired me to write Barometer Odyssey*, a book offering a detailed
+        account of <Link href={FrontRoutes.History}>the major stages in the evolution</Link> of the
+        barometers.
       </p>
 
       <p className={paragraphStyles}>

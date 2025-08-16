@@ -16,7 +16,7 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuLink,
-} from '@/components/ui/navigation-menu'
+} from '@/components/ui'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   menu: MenuItem[]
@@ -69,7 +69,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                             )}
                           >
                             <NavigationMenuLink asChild>
-                              <Link href={nestedItem.link}>
+                              <Link href={nestedItem.link} className="no-underline">
                                 <p className="w-max">{nestedItem.label}</p>
                               </Link>
                             </NavigationMenuLink>
@@ -82,7 +82,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
               ) : (
                 <NavigationMenuItem key={menuItem.id}>
                   <NavigationMenuLink asChild>
-                    <Link href={menuItem.link}>
+                    <Link href={menuItem.link} className="no-underline">
                       <p className={cn(menuStyle, underline(menuItem.link))}>{menuItem.label}</p>
                     </Link>
                   </NavigationMenuLink>

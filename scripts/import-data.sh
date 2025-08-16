@@ -2,12 +2,7 @@
 
 # Simple script to import data from remote database to local PostgreSQL
 
-set -e
-
 echo "🗄️  Importing data from remote database..."
-
-# Source environment variables
-source .env.local
 
 LOCAL_DB="barometers_local"
 

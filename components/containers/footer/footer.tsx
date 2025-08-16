@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/utils'
 import { SocialButtons } from './social-buttons'
+import { FrontRoutes } from '@/constants'
 
 export function Footer() {
   return (
@@ -14,14 +15,19 @@ export function Footer() {
         <div className="grow text-center">
           <p className="mb-2 text-xs">
             By using this website, you agree to our{' '}
-            <Link href="/terms-and-conditions" className="font-semibold hover:underline">
-              Terms & Conditions
-            </Link>
+            <Link href="/terms-and-conditions">Terms & Conditions</Link>
           </p>
 
           <p className="text-xs">
             &copy; {new Date().getFullYear()}
-            {` `} Leo Shirokov. All right reserved.
+            {` `}{' '}
+            <Link className="xs:inline-block hidden" href={FrontRoutes.Foundation}>
+              The Art of Weather Instruments Foundation
+            </Link>
+            <Link className="xs:hidden" href={FrontRoutes.Foundation}>
+              AWIF
+            </Link>
+            . All right reserved.
           </p>
         </div>
         {/* Buttons */}

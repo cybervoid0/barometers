@@ -75,7 +75,11 @@ const BrandsOfCountry = ({
           const base64 = icon ? Buffer.from(icon).toString('base64') : null
           const image = base64 ? `data:image/png;base64,${base64}` : null
           return (
-            <Link className="w-fit" key={id} href={FrontRoutes.Brands + slug}>
+            <Link
+              className="w-fit no-underline hover:underline"
+              key={id}
+              href={FrontRoutes.Brands + slug}
+            >
               <div className="flex flex-nowrap items-center gap-3">
                 {image ? (
                   <Image

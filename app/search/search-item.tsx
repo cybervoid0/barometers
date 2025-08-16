@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card } from '@/components/ui/card'
-import { SearchResultsDTO } from '../../types'
+import { Card } from '@/components/ui'
+import { SearchResultsDTO } from '@/types'
 import { customImageLoader } from '@/utils'
 
 interface ItemProps {
@@ -16,7 +16,7 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
   const noManufacturer = !manufacturer || manufacturer.toLowerCase() === 'unsigned'
   return (
     <Card className="border-r-primary overflow-hidden rounded-sm border-r-[3px] p-2 shadow-md">
-      <Link href={link} className="text-foreground hover:text-foreground block w-fit">
+      <Link href={link} className="block w-fit no-underline">
         <div className="flex items-center gap-2">
           <div className="relative h-20 min-h-20 w-20 min-w-20 shrink-0">
             {image && (

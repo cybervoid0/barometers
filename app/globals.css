@@ -240,4 +240,8 @@
   h4 {
     @apply text-lg leading-tight font-medium tracking-wide;
   }
+
+  a {
+    @apply decoration-muted-foreground hover:decoration-foreground underline;
+  }
 }
