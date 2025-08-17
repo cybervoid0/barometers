@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { cn } from '@/utils'
-import { FrontRoutes } from '@/constants'
 import { SocialButtons } from './social-buttons'
 
 export function Footer() {
@@ -19,15 +18,11 @@ export function Footer() {
           </p>
 
           <p className="text-xs">
-            &copy; {new Date().getFullYear()}
-            {` `}{' '}
-            <Link className="xs:inline-block hidden" href={FrontRoutes.Foundation}>
+            &copy; {new Date().getFullYear()}{' '}
+            <span className="xs:inline-block hidden">
               The Art of Weather Instruments Foundation
-            </Link>
-            <Link className="xs:hidden" href={FrontRoutes.Foundation}>
-              AWIF
-            </Link>
-            . All right reserved.
+            </span>
+            <span className="xs:hidden">AWIF</span>. All right reserved.
           </p>
         </div>
         {/* Buttons */}

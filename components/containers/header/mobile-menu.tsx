@@ -41,7 +41,7 @@ export function MobileMenu({ menu = [] }: Props) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="z-[100] w-68 data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
+        className="z-[100] w-68 overflow-y-auto data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">Barometers website navigation menu</SheetDescription>

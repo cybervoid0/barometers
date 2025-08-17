@@ -212,6 +212,21 @@ export default function Foundation() {
             </li>
           </ul>
         </section>
+        <section>
+          <h4 className={cn('mt-6', header3Sx)}>Funding</h4>
+          <p className={paragraphSx}>
+            The foundation is supported through donations and sponsorships, public and private
+            grants, as well as other sources. All funds are used solely to advance the foundation's
+            mission. The foundation is a non-profit organization and does not pursue profit as its
+            objective. Our work is carried out with the help of dedicated volunteers and, when
+            needed, external experts engaged on a project basis. Members of the board serve on an
+            unpaid basis. They are, however, entitled to reimbursement for expenses actually
+            incurred.
+          </p>
+          <Link className="block text-center text-3xl" href={FrontRoutes.Donate}>
+            Support us!
+          </Link>
+        </section>
         <section className="mt-16">
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="flex flex-col items-center justify-center gap-2">
