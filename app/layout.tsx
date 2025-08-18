@@ -5,12 +5,14 @@ import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Raleway, Cinzel } from 'next/font/google'
 import { Toaster } from 'sonner'
+import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
 import { Footer, Header } from '@/components/containers'
 import Providers from '../providers'
 import { meta, jsonLd } from '../constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cn } from '@/utils'
+import { CookieConsent, CheckConsent } from '@/components/elements'
 
 const raleway = Raleway({
   subsets: ['latin'],
@@ -27,6 +29,7 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
   themeColor: [{ color: 'white' }],
 }
+const gtag = process.env.NEXT_PUBLIC_GTAG ?? ''
 
 export const generateMetadata = withPrisma(async prisma => {
   const images = (
@@ -61,7 +64,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <GoogleAnalytics gaId="G-Q8ZR89R225" />
+        <CheckConsent service="googleAnalytics" category="analytics">
+          <GoogleAnalytics gaId={gtag} />
+        </CheckConsent>
         <link rel="shortcut icon" href="/favicon.svg" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
         <meta
@@ -82,6 +87,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         )}
       >
         <Providers>
+          <CookieConsent />
           <Toaster position="top-center" richColors />
           <div className="flex h-screen flex-col">
             <Header />
