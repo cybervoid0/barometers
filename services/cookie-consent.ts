@@ -10,6 +10,7 @@ import { CookieConsentConfig } from 'vanilla-cookieconsent'
  * - Sets up automatic cookie clearing for rejected services
  * - Provides user interface text and descriptions
  * - Ensures GDPR compliance with detailed cookie information
+ * - Only shows to EU users (GDPR compliance)
  */
 const cookieConsentConfig = {
   autoShow: true,

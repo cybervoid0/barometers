@@ -6,6 +6,7 @@ import { type ComponentProps, useState, useEffect } from 'react'
 import * as VanillaCookieConsent from 'vanilla-cookieconsent'
 import { Check, LockKeyhole } from 'lucide-react'
 import { ManageCookies } from './manage-cookies'
+import { useCountry } from '@/providers/CountryProvider'
 
 interface Props extends ComponentProps<'div'> {
   /** Service name (e.g., "googleAnalytics", "payPal") */
@@ -24,9 +25,17 @@ interface Props extends ComponentProps<'div'> {
  * Automatically updates when consent changes.
  */
 function CheckConsent({ service, category, placeholder = false, className, children }: Props) {
-  const [hasConsent, setHasConsent] = useState(false)
+  const { isEU } = useCountry()
+  const [hasConsent, setHasConsent] = useState(!isEU) // Non-EU users have consent by default
 
   useEffect(() => {
+    // Non-EU users always have consent
+    if (!isEU) {
+      setHasConsent(true)
+      return
+    }
+
+    // EU users need to check vanilla-cookieconsent
     const checkConsent = () => {
       const isAccepted = VanillaCookieConsent.acceptedService(service, category)
       setHasConsent(isAccepted)
@@ -44,7 +53,7 @@ function CheckConsent({ service, category, placeholder = false, className, child
       window.removeEventListener('cc:onConsent', checkConsent)
       window.removeEventListener('cc:onChange', checkConsent)
     }
-  }, [category, service])
+  }, [category, service, isEU])
 
   return hasConsent ? (
     children
