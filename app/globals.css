@@ -242,6 +242,6 @@
   }
 
   a {
-    @apply decoration-muted-foreground hover:decoration-foreground underline;
+    @apply decoration-muted-foreground hover:decoration-foreground cursor-pointer underline;
   }
 }

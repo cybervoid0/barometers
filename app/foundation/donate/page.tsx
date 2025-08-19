@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { cn } from '@/utils'
-import { PayPalStackedButton } from '@/components/elements'
+import { PayPalStackedButton, CheckConsent } from '@/components/elements'
 import { CopyButton } from '@/components/ui'
 import { bitcoinAddress, ethereumAddress } from '@/constants'
 
@@ -83,7 +83,9 @@ export default function Donate() {
           </CopyButton>
         </div>
       </div>
-      <PayPalStackedButton className="mt-20" />
+      <CheckConsent service="payPal" category="functional" placeholder>
+        <PayPalStackedButton className="mt-20" />
+      </CheckConsent>
     </>
   )
 }

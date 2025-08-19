@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/utils'
 import { SocialButtons } from './social-buttons'
+import { ManageCookies } from '@/components/elements'
 
 export function Footer() {
   return (
@@ -24,6 +25,8 @@ export function Footer() {
             </span>
             <span className="xs:hidden">AWIF</span>. All right reserved.
           </p>
+
+          <ManageCookies />
         </div>
         {/* Buttons */}
         <SocialButtons className="absolute inset-y-0 right-8 hidden sm:flex" />
