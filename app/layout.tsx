@@ -14,7 +14,6 @@ import { meta, jsonLd } from '../constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cn } from '@/utils'
 import { CookieConsent, CheckConsent } from '@/components/elements'
-import { getGeoFromHeaders } from '@/utils/geo'
 
 const raleway = Raleway({
   subsets: ['latin'],
@@ -63,10 +62,9 @@ export const generateMetadata = withPrisma(async prisma => {
 })
 
 export default function RootLayout({ children }: PropsWithChildren) {
-  const { isEU, country } = getGeoFromHeaders()
   return (
     <html lang="en" suppressHydrationWarning>
-      <CountryProvider country={country} isEU={isEU}>
+      <CountryProvider>
         <head>
           <CheckConsent service="googleAnalytics" category="analytics">
             <GoogleAnalytics gaId={gtag} />
