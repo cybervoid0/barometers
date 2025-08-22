@@ -10,7 +10,7 @@ REMOTE_DB_IP="${REMOTE_DB_IP:?REMOTE_DB_IP not set}"
 
 if ! pgrep -f "ssh.*$REMOTE_DB_IP:5432" > /dev/null; then
   echo "⏳ Opening SSH tunnel to $REMOTE_HOST..."
-  ssh -fN -L 5432:$REMOTE_DB_IP:5432 $REMOTE_USER@$REMOTE_HOST
+  ssh -fN -L 5433:$REMOTE_DB_IP:5432 $REMOTE_USER@$REMOTE_HOST
   export TUNNEL_CREATED_BY_THIS_SCRIPT=1
 else
   echo "✅ SSH tunnel already running"

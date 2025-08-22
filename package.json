@@ -9,10 +9,10 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev:tunnel": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
     "dev": "next dev",
-    "prisma:tunnel": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
-    "prisma": "prisma studio",
+    "dev:remote": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
+    "prisma": "dotenv -e .env.local prisma studio",
+    "prisma:remote": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
     "import-data": "./scripts/import-data.sh",
     "build": "next build",
     "postinstall": "prisma generate",
