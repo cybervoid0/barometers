@@ -2,6 +2,7 @@ import 'server-only'
 
 import Link from 'next/link'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import {
   BadgeEuro,
   CalendarRange,
@@ -42,6 +43,7 @@ import { MaterialsEdit } from './components/edit-fields/materials-edit'
 
 export const dynamic = 'force-static'
 export const dynamicParams = true
+dayjs.extend(utc)
 
 interface Props {
   params: {
@@ -117,7 +119,7 @@ export default async function Page({ params: { slug } }: Props) {
             edit={<PurchasedAtEdit barometer={barometer} />}
           >
             {barometer.purchasedAt
-              ? dayjs(barometer.purchasedAt).format('DD/MM/YYYY')
+              ? dayjs.utc(barometer.purchasedAt).format('DD/MM/YYYY')
               : 'Not specified'}
           </PropertyCard>
           <PropertyCard

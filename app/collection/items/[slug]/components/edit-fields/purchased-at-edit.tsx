@@ -7,12 +7,14 @@ import * as yup from 'yup'
 import { Edit } from 'lucide-react'
 import { toast } from 'sonner'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { BarometerDTO } from '@/types'
 import { updateBarometer } from '@/services/fetch'
 import { FrontRoutes } from '@/constants/routes-front'
 import { cn } from '@/utils'
 import * as UI from '@/components/ui'
 
+dayjs.extend(utc)
 interface PurchasedAtEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
@@ -45,7 +47,9 @@ export function PurchasedAtEdit({
   const form = useForm<PurchasedAtForm>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      purchasedAt: barometer.purchasedAt ? dayjs(barometer.purchasedAt).format('YYYY-MM-DD') : '',
+      purchasedAt: barometer.purchasedAt
+        ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
+        : '',
     },
   })
 
@@ -53,7 +57,7 @@ export function PurchasedAtEdit({
     try {
       const { slug } = await updateBarometer({
         id: barometer.id,
-        purchasedAt: values.purchasedAt ? dayjs(values.purchasedAt).toISOString() : null,
+        purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
       })
       toast.success(`${barometer.name} updated`)
       setTimeout(() => {
@@ -74,7 +78,7 @@ export function PurchasedAtEdit({
         if (isOpen) {
           form.reset({
             purchasedAt: barometer.purchasedAt
-              ? dayjs(barometer.purchasedAt).format('YYYY-MM-DD')
+              ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
               : '',
           })
         }
