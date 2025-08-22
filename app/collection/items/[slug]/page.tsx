@@ -80,7 +80,7 @@ export default async function Page({ params: { slug } }: Props) {
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <PropertyCard
             icon={Factory}
-            title="Manufacturer or Retailer"
+            title="Manufacturer | Retailer"
             edit={<ManufacturerEdit barometer={barometer} />}
           >
             <Link
@@ -139,7 +139,7 @@ export default async function Page({ params: { slug } }: Props) {
           <PropertyCard
             adminOnly={!barometer.subCategory?.name}
             icon={Wrench}
-            title="Movement (Tube) Type"
+            title="Movement Type"
             edit={<SubcategoryEdit barometer={barometer} />}
           >
             <p className="text-sm capitalize">{barometer.subCategory?.name}</p>

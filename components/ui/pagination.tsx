@@ -39,7 +39,7 @@ const PaginationLink = ({ className, isActive, size = 'icon', ...props }: Pagina
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({
-        variant: (isActive ? 'outline-solid' : 'ghost') as ButtonVariants['variant'],
+        variant: (isActive ? 'outline' : 'ghost') as ButtonVariants['variant'],
         size,
       }),
       className,
@@ -109,9 +109,10 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
     }
   }
 
-  const renderPages = () => {
+  const renderMobilePages = () => {
     const pages = []
 
+    // Mobile: show ellipsis for better space usage
     // Always show first page
     pages.push(1)
 
@@ -138,11 +139,21 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
     return pages
   }
 
+  const renderDesktopPages = () => {
+    const pages = []
+    // Desktop: show all pages without ellipsis
+    for (let i = 1; i <= total; i += 1) {
+      pages.push(i)
+    }
+    return pages
+  }
+
   if (total <= 1) return null
 
   return (
     <PaginationCore className={className}>
-      <PaginationContent>
+      {/* Mobile version - visible on mobile, hidden on desktop */}
+      <PaginationContent className="md:hidden">
         <PaginationItem>
           <PaginationPrevious
             onClick={() => handlePageChange(Math.max(1, value - 1))}
@@ -150,8 +161,8 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
           />
         </PaginationItem>
 
-        {renderPages().map((page, index) => (
-          <PaginationItem key={index}>
+        {renderMobilePages().map((page, index) => (
+          <PaginationItem key={`mobile-${index}`}>
             {page === 'ellipsis' ? (
               <PaginationEllipsis />
             ) : (
@@ -163,6 +174,35 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
                 {page}
               </PaginationLink>
             )}
+          </PaginationItem>
+        ))}
+
+        <PaginationItem>
+          <PaginationNext
+            onClick={() => handlePageChange(Math.min(total, value + 1))}
+            className={value >= total ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+          />
+        </PaginationItem>
+      </PaginationContent>
+
+      {/* Desktop version - hidden on mobile, visible on desktop */}
+      <PaginationContent className="hidden md:flex">
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => handlePageChange(Math.max(1, value - 1))}
+            className={value <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+          />
+        </PaginationItem>
+
+        {renderDesktopPages().map((page, index) => (
+          <PaginationItem key={`desktop-${index}`}>
+            <PaginationLink
+              onClick={() => handlePageChange(page)}
+              isActive={page === value}
+              className="cursor-pointer"
+            >
+              {page}
+            </PaginationLink>
           </PaginationItem>
         ))}
 
