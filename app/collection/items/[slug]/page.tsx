@@ -13,6 +13,7 @@ import {
   Ruler,
   Star,
   TreePine,
+  ShoppingCart,
 } from 'lucide-react'
 import { FrontRoutes } from '@/constants'
 import { Card, SeparatorWithText } from '@/components/ui'
@@ -34,6 +35,7 @@ import { TextAreaEdit } from './components/edit-fields/textarea-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
+import { PurchasedAtEdit } from './components/edit-fields/purchased-at-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
@@ -107,6 +109,16 @@ export default async function Page({ params: { slug } }: Props) {
             edit={<DateEdit barometer={barometer} />}
           >
             {dayjs(barometer.date).format('YYYY')}
+          </PropertyCard>
+          <PropertyCard
+            adminOnly
+            icon={ShoppingCart}
+            title="Purchased"
+            edit={<PurchasedAtEdit barometer={barometer} />}
+          >
+            {barometer.purchasedAt
+              ? dayjs(barometer.purchasedAt).format('DD/MM/YYYY')
+              : 'Not specified'}
           </PropertyCard>
           <PropertyCard
             icon={CalendarRange}
