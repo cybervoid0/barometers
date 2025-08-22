@@ -20,4 +20,5 @@ fi
 trap 'if [[ $TUNNEL_CREATED_BY_THIS_SCRIPT == 1 ]]; then echo "🧹 Cleaning up SSH tunnel..."; pkill -f "ssh.*$REMOTE_DB_IP:5432"; fi' EXIT
 
 echo "🚀 Executing: $@"
+export DATABASE_URL="${REMOTE_DATABASE_URL}"
 "$@"
