@@ -120,6 +120,13 @@ const cookieConsentConfig = {
                     description: 'Stores your cookie preferences and consent choices.',
                     expiration: '1 year',
                   },
+                  {
+                    name: 'geo_country',
+                    domain: 'Geolocation',
+                    description:
+                      'Stores your country code (e.g., "DE", "US") to determine if cookie consent is required for EU users.',
+                    expiration: '1 day',
+                  },
                 ],
               },
             },
