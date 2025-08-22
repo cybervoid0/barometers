@@ -1,6 +1,13 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from 'react'
 import { EU_ALPHA2 } from '@/constants'
 import Cookies from 'js-cookie'
 
@@ -20,15 +27,16 @@ const CountryContext = createContext<CountryContextType | undefined>(undefined)
  * Used by cookie consent components to determine behavior.
  */
 export function CountryProvider({ children }: PropsWithChildren) {
-  const [country, setCountry] = useState<string>('??')
+  const [country, setCountry] = useState<string>('US')
   const [isEU, setIsEU] = useState<boolean>(false)
   useEffect(() => {
-    const country = Cookies.get('geo_country') ?? '!!'
-    const isEU = EU_ALPHA2.has(country)
-    setCountry(country)
-    setIsEU(isEU)
+    const geoCountry = Cookies.get('geo_country') ?? 'US'
+    const isEurope = EU_ALPHA2.has(geoCountry)
+    setCountry(geoCountry)
+    setIsEU(isEurope)
   }, [])
-  return <CountryContext.Provider value={{ country, isEU }}>{children}</CountryContext.Provider>
+  const value = useMemo(() => ({ country, isEU }), [country, isEU])
+  return <CountryContext.Provider value={value}>{children}</CountryContext.Provider>
 }
 
 /**

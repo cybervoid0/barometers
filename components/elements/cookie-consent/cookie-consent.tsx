@@ -10,11 +10,8 @@ import { useCountry } from '@/providers/CountryProvider'
  * Main component that initializes the cookie consent system and syncs theme with the app.
  */
 function CookieConsent() {
-  const { country, isEU } = useCountry()
+  const { isEU } = useCountry()
   const { theme } = useTheme()
-
-  // eslint-disable-next-line no-console
-  console.log('🚀 ~ Visitor is from:', country, 'EU:', isEU)
 
   useEffect(() => {
     if (!isEU) return

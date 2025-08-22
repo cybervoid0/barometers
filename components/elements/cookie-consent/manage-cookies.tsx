@@ -1,5 +1,6 @@
 'use client'
 
+import { useCountry } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
 import { type ComponentProps } from 'react'
 import { showPreferences } from 'vanilla-cookieconsent'
@@ -12,6 +13,8 @@ function ManageCookies({
   children = 'Manage cookies',
   ...props
 }: ComponentProps<'button'>) {
+  const { isEU } = useCountry()
+  if (!isEU) return null
   return (
     <button
       onClick={showPreferences}
