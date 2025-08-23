@@ -16,15 +16,6 @@ interface AddManufacturerProps {
   onAddManufacturer: (newId: string) => void
 }
 
-interface ManufacturerFormData {
-  firstName: string
-  name: string
-  city: string
-  countries: number[]
-  description: string
-  icon: string | null
-}
-
 // Yup validation schema
 const manufacturerSchema = yup.object().shape({
   firstName: yup.string().max(100, 'First name should be shorter than 100 characters').default(''),
@@ -38,6 +29,8 @@ const manufacturerSchema = yup.object().shape({
   description: yup.string().default(''),
   icon: yup.string().nullable().default(null),
 })
+
+type ManufacturerFormData = yup.InferType<typeof manufacturerSchema>
 
 export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
   const { countries } = useBarometers()

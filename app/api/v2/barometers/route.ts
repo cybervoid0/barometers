@@ -39,7 +39,8 @@ export async function GET(req: NextRequest) {
  */
 export const POST = withPrisma(async (prisma, req: NextRequest) => {
   try {
-    const barometerData = await req.json()
+    // extracting materials before cleaning object to keep empty array
+    const { materials, ...barometerData } = await req.json()
     const { images, ...barometer } = cleanObject(barometerData)
     const { id, categoryId } = await prisma.barometer.create({
       data: {
@@ -47,6 +48,13 @@ export const POST = withPrisma(async (prisma, req: NextRequest) => {
         images: {
           create: images,
         },
+        ...(materials && Array.isArray(materials)
+          ? {
+              materials: {
+                connect: materials.map((materialId: number) => ({ id: materialId })),
+              },
+            }
+          : {}),
         createdAt: new Date(),
         updatedAt: new Date(),
       },

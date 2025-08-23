@@ -19,7 +19,7 @@ interface FileUploadProps {
 export function FileUpload({ name }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { control, watch, setValue } = useFormContext()
+  const { control, watch, setValue, clearErrors } = useFormContext()
 
   const fileNames: string[] = watch(name) || []
 
@@ -47,6 +47,7 @@ export function FileUpload({ name }: FileUploadProps) {
 
       const newFileNames = [...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)]
       setValue(name, newFileNames)
+      clearErrors(name) // Clear any validation errors after successful upload
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error uploading files')
     } finally {
@@ -62,6 +63,10 @@ export function FileUpload({ name }: FileUploadProps) {
       await deleteImage(fileName)
       const updatedFileNames = fileNames.filter((_, i) => i !== index)
       setValue(name, updatedFileNames)
+      // Clear errors if we still have images after deletion
+      if (updatedFileNames.length > 0) {
+        clearErrors(name)
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error deleting file')
     }
