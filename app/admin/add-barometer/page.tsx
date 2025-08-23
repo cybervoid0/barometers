@@ -5,6 +5,7 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -29,10 +30,11 @@ import { useBarometers } from '@/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
-
 import { createBarometer } from '@/services/fetch'
 import { getThumbnailBase64, slug } from '@/utils'
 import { imageStorage } from '@/constants/globals'
+
+dayjs.extend(utc)
 
 // Form data interface
 interface BarometerFormData {
@@ -46,6 +48,7 @@ interface BarometerFormData {
   description: string
   dimensions: Array<{ dim: string; value: string }>
   images: string[]
+  purchasedAt: string
 }
 
 // Yup validation schema
@@ -81,6 +84,17 @@ const barometerSchema = yup.object().shape({
     .of(yup.string().required())
     .min(1, 'At least one image is required')
     .default([]),
+  purchasedAt: yup
+    .string()
+    .test('valid-date', 'Must be a valid date', value => {
+      if (!value) return true // Allow empty string
+      return dayjs(value).isValid()
+    })
+    .test('not-future', 'Purchase date cannot be in the future', value => {
+      if (!value) return true
+      return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
+    })
+    .default(''),
 })
 
 export default function AddCard() {
@@ -99,6 +113,7 @@ export default function AddCard() {
       description: '',
       dimensions: [],
       images: [],
+      purchasedAt: '',
     },
   })
 
@@ -110,6 +125,7 @@ export default function AddCard() {
       const barometerWithImages = {
         ...values,
         date: dayjs(`${values.date}-01-01`).toISOString(),
+        purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
         images: await Promise.all(
           (values.images || []).map(async (url, i) => ({
             url,
@@ -322,6 +338,37 @@ export default function AddCard() {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={3} autoResize />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="purchasedAt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Purchase Date</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input
+                        {...field}
+                        value={field.value || ''}
+                        type="date"
+                        placeholder="YYYY-MM-DD"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setValue('purchasedAt', '')}
+                        className="shrink-0"
+                      >
+                        Clear
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
