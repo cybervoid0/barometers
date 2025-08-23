@@ -51,6 +51,7 @@ interface BarometerFormData {
   purchasedAt: string
   serial: string
   estimatedPrice: string
+  subCategoryId: string
 }
 
 // Yup validation schema
@@ -106,10 +107,11 @@ const barometerSchema = yup.object().shape({
       return !isNaN(num) && num > 0
     })
     .default(''),
+  subCategoryId: yup.string().default(''),
 })
 
 export default function AddCard() {
-  const { condition, categories, manufacturers } = useBarometers()
+  const { condition, categories, subcategories, manufacturers } = useBarometers()
 
   const methods = useForm<BarometerFormData>({
     resolver: yupResolver(barometerSchema),
@@ -127,10 +129,11 @@ export default function AddCard() {
       purchasedAt: '',
       serial: '',
       estimatedPrice: '',
+      subCategoryId: '',
     },
   })
 
-  const { handleSubmit, setValue, watch, reset } = methods
+  const { handleSubmit, setValue, reset } = methods
 
   const queryClient = useQueryClient()
   const { mutate, isPending } = useMutation({
@@ -140,6 +143,7 @@ export default function AddCard() {
         date: dayjs(`${values.date}-01-01`).toISOString(),
         purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
         estimatedPrice: values.estimatedPrice ? parseFloat(values.estimatedPrice) : null,
+        subCategoryId: values.subCategoryId ? parseInt(values.subCategoryId) : null,
         images: await Promise.all(
           (values.images || []).map(async (url, i) => ({
             url,
@@ -178,10 +182,16 @@ export default function AddCard() {
   }, [condition.data, setValue])
 
   useEffect(() => {
-    if (manufacturers.data.length > 0 && !watch('manufacturerId')) {
+    if (manufacturers.data.length > 0) {
       setValue('manufacturerId', String(manufacturers.data[0].id))
     }
-  }, [manufacturers.data, setValue, watch])
+  }, [manufacturers.data, setValue])
+
+  useEffect(() => {
+    if (subcategories.data.length > 0) {
+      setValue('subCategoryId', String(subcategories.data[0].id))
+    }
+  }, [subcategories.data, setValue])
 
   const handleAddManufacturer = (id: string) => {
     setValue('manufacturerId', id)
@@ -197,7 +207,7 @@ export default function AddCard() {
 
       <FormProvider {...methods}>
         <Form {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
             <FormField
               control={methods.control}
               name="collectionId"
@@ -333,7 +343,13 @@ export default function AddCard() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={
+                      field.value ||
+                      (categories.data.length > 0 ? String(categories.data[0].id) : '')
+                    }
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select category" />
@@ -354,12 +370,49 @@ export default function AddCard() {
 
             <FormField
               control={methods.control}
+              name="subCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Movement Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={
+                      field.value ||
+                      (subcategories.data.length > 0 ? String(subcategories.data[0].id) : '')
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select movement type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="max-h-60">
+                      {subcategories.data.map(({ name, id }) => (
+                        <SelectItem key={id} value={String(id)}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
               name="manufacturerId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Manufacturer *</FormLabel>
                   <div className="flex gap-2">
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={
+                        field.value ||
+                        (manufacturers.data.length > 0 ? String(manufacturers.data[0].id) : '')
+                      }
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select manufacturer" />
@@ -386,7 +439,13 @@ export default function AddCard() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Condition *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={
+                      field.value ||
+                      (condition.data.length > 0 ? String(condition.data.at(-1)?.id) : '')
+                    }
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select condition" />
