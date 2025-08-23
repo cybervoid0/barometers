@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, AlertTriangle } from 'lucide-react'
+import { Plus, AlertTriangle, FileText } from 'lucide-react'
 import { FrontRoutes } from '@/constants/routes-front'
 
 export default function Admin() {
@@ -12,6 +12,13 @@ export default function Admin() {
         >
           <Plus className="h-4 w-4" />
           Add new barometer
+        </Link>
+        <Link
+          href={FrontRoutes.AddDocument}
+          className="text-foreground hover:text-primary flex w-fit items-center gap-2 transition-colors"
+        >
+          <FileText className="h-4 w-4" />
+          Add new document
         </Link>
         <Link
           href={FrontRoutes.Reports}
