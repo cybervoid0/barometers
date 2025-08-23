@@ -10,11 +10,6 @@ import { toast } from 'sonner'
 import { AtSign, Eye, EyeOff } from 'lucide-react'
 import * as UI from '@/components/ui'
 
-interface SignInFormData {
-  email: string
-  password: string
-}
-
 // Yup validation schema
 const signInSchema = yup.object().shape({
   email: yup.string().required('Email is required').email('Invalid email address'),
@@ -23,6 +18,8 @@ const signInSchema = yup.object().shape({
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters'),
 })
+
+type SignInFormData = yup.InferType<typeof signInSchema>
 
 export function SignInForm() {
   const router = useRouter()

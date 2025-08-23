@@ -20,11 +20,7 @@ interface PurchasedAtEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-interface PurchasedAtForm {
-  purchasedAt: string
-}
-
-const validationSchema: yup.ObjectSchema<PurchasedAtForm> = yup.object({
+const validationSchema = yup.object({
   purchasedAt: yup
     .string()
     .test('valid-date', 'Must be a valid date', value => {
@@ -37,6 +33,8 @@ const validationSchema: yup.ObjectSchema<PurchasedAtForm> = yup.object({
     })
     .defined(),
 })
+
+type PurchasedAtForm = yup.InferType<typeof validationSchema>
 
 export function PurchasedAtEdit({
   size = 18,

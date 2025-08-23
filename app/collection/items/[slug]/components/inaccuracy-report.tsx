@@ -14,15 +14,9 @@ interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-interface ReportForm {
-  reporterName: string
-  reporterEmail: string
-  description: string
-}
-
 const maxFeedbackLen = 1000
 
-const validationSchema: yup.ObjectSchema<ReportForm> = yup.object({
+const validationSchema = yup.object({
   reporterName: yup
     .string()
     .required('Name is required')
@@ -38,6 +32,8 @@ const validationSchema: yup.ObjectSchema<ReportForm> = yup.object({
     .min(5, 'Description must be at least 5 characters')
     .max(maxFeedbackLen, `Description must be less than ${maxFeedbackLen} characters`),
 })
+
+type ReportForm = yup.InferType<typeof validationSchema>
 
 export function InaccuracyReport({ barometer, ...props }: Props) {
   const queryClient = useQueryClient()

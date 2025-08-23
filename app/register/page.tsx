@@ -10,13 +10,6 @@ import { AtSign, User, Eye, EyeOff } from 'lucide-react'
 import * as UI from '@/components/ui'
 import { register } from '@/actions/register'
 
-interface RegisterFormData {
-  name: string
-  email: string
-  password: string
-  repeatPassword: string
-}
-
 const registerSchema = yup.object().shape({
   name: yup
     .string()
@@ -33,6 +26,8 @@ const registerSchema = yup.object().shape({
     .required('Please repeat password')
     .oneOf([yup.ref('password')], 'Passwords are not identical'),
 })
+
+type RegisterFormData = yup.InferType<typeof registerSchema>
 
 export default function Register() {
   const router = useRouter()

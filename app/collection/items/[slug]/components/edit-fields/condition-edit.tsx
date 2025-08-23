@@ -18,13 +18,11 @@ interface ConditionEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-interface ConditionForm {
-  conditionId: string
-}
-
 const validationSchema = yup.object({
   conditionId: yup.string().required('Condition is required'),
 })
+
+type ConditionForm = yup.InferType<typeof validationSchema>
 
 export function ConditionEdit({ size = 18, barometer, className, ...props }: ConditionEditProps) {
   const { condition } = useBarometers()
