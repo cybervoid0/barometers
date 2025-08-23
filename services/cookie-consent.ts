@@ -1,4 +1,4 @@
-import { FrontRoutes } from '@/constants'
+import { email, FrontRoutes } from '@/constants'
 import { CookieConsentConfig } from 'vanilla-cookieconsent'
 
 /**
@@ -86,8 +86,7 @@ const cookieConsentConfig = {
           sections: [
             {
               title: 'Cookie Usage',
-              description:
-                'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="${FrontRoutes.Terms}" class="cc__link">terms and conditions</a>.',
+              description: `I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="${FrontRoutes.Terms}" class="cc__link">terms and conditions</a>.`,
             },
             {
               title: 'Strictly necessary cookies',
@@ -264,7 +263,7 @@ const cookieConsentConfig = {
             },
             {
               title: 'More information',
-              description: `For any queries in relation to my policy on cookies and your choices, please <a class="cc__link" href="${FrontRoutes.Terms}">contact me</a>.`,
+              description: `For any queries in relation to our policy on cookies and your choices, please <a class="cc__link" href="mailto:${email}">contact us</a>.`,
             },
           ],
         },
