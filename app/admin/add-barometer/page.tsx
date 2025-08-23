@@ -30,29 +30,12 @@ import { useBarometers } from '@/hooks/useBarometers'
 import { FileUpload } from './file-upload'
 import { AddManufacturer } from './add-manufacturer'
 import { Dimensions } from './dimensions'
+import { MaterialsMultiSelect } from './add-materials'
 import { createBarometer } from '@/services/fetch'
 import { getThumbnailBase64, slug } from '@/utils'
 import { imageStorage } from '@/constants/globals'
 
 dayjs.extend(utc)
-
-// Form data interface
-interface BarometerFormData {
-  collectionId: string
-  name: string
-  categoryId: string
-  date: string
-  dateDescription: string
-  manufacturerId: string
-  conditionId: string
-  description: string
-  dimensions: Array<{ dim: string; value: string }>
-  images: string[]
-  purchasedAt: string
-  serial: string
-  estimatedPrice: string
-  subCategoryId: string
-}
 
 // Yup validation schema
 const barometerSchema = yup.object().shape({
@@ -108,10 +91,14 @@ const barometerSchema = yup.object().shape({
     })
     .default(''),
   subCategoryId: yup.string().default(''),
+  materials: yup.array().of(yup.number().required()).default([]),
 })
 
+// Auto-generated TypeScript type from Yup schema
+type BarometerFormData = yup.InferType<typeof barometerSchema>
+
 export default function AddCard() {
-  const { condition, categories, subcategories, manufacturers } = useBarometers()
+  const { condition, categories, subcategories, manufacturers, materials } = useBarometers()
 
   const methods = useForm<BarometerFormData>({
     resolver: yupResolver(barometerSchema),
@@ -130,6 +117,7 @@ export default function AddCard() {
       serial: '',
       estimatedPrice: '',
       subCategoryId: '',
+      materials: [],
     },
   })
 
@@ -330,6 +318,24 @@ export default function AddCard() {
                       step="100"
                       min="0"
                       placeholder="Enter estimated price in Euro"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="materials"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Materials</FormLabel>
+                  <FormControl>
+                    <MaterialsMultiSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      materials={materials.data ?? []}
                     />
                   </FormControl>
                   <FormMessage />
