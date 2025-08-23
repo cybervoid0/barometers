@@ -50,6 +50,7 @@ interface BarometerFormData {
   images: string[]
   purchasedAt: string
   serial: string
+  estimatedPrice: string
 }
 
 // Yup validation schema
@@ -97,6 +98,14 @@ const barometerSchema = yup.object().shape({
     })
     .default(''),
   serial: yup.string().max(100, 'Serial number must be less than 100 characters').default(''),
+  estimatedPrice: yup
+    .string()
+    .test('is-positive-number', 'Must be a positive number', value => {
+      if (!value) return true // Allow empty string
+      const num = parseFloat(value)
+      return !isNaN(num) && num > 0
+    })
+    .default(''),
 })
 
 export default function AddCard() {
@@ -117,6 +126,7 @@ export default function AddCard() {
       images: [],
       purchasedAt: '',
       serial: '',
+      estimatedPrice: '',
     },
   })
 
@@ -129,6 +139,7 @@ export default function AddCard() {
         ...values,
         date: dayjs(`${values.date}-01-01`).toISOString(),
         purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
+        estimatedPrice: values.estimatedPrice ? parseFloat(values.estimatedPrice) : null,
         images: await Promise.all(
           (values.images || []).map(async (url, i) => ({
             url,
@@ -290,6 +301,26 @@ export default function AddCard() {
                         Clear
                       </Button>
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="estimatedPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estimated Price, €</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      step="100"
+                      min="0"
+                      placeholder="Enter estimated price in Euro"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
