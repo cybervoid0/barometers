@@ -212,3 +212,28 @@ export async function fetchCountryList(): Promise<CountryListDTO> {
   const res = await fetch(ApiRoutes.Countries)
   return res.json()
 }
+
+/******* Documents ********/
+export async function createDocument<T>(document: T): Promise<{ id: string }> {
+  const res = await fetch(ApiRoutes.Documents, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(document),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}
+
+export async function updateDocument<T>(document: T): Promise<{ id: string }> {
+  const res = await fetch(ApiRoutes.Documents, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(document),
+  })
+  if (!res.ok) await handleApiError(res)
+  return res.json()
+}

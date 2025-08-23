@@ -8,6 +8,7 @@ export const ApiRoutes = {
   ImageUpload: `${base}upload/images/`,
   BarometerSearch: `${base}search/`,
   Reports: `${base}report/`,
+  Documents: `${base}documents/`,
   Subcategories: `${base}subcategories/`,
   Materials: `${base}materials/`,
   Countries: `${base}countries/`,
