@@ -49,6 +49,7 @@ interface BarometerFormData {
   dimensions: Array<{ dim: string; value: string }>
   images: string[]
   purchasedAt: string
+  serial: string
 }
 
 // Yup validation schema
@@ -95,6 +96,7 @@ const barometerSchema = yup.object().shape({
       return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
     })
     .default(''),
+  serial: yup.string().max(100, 'Serial number must be less than 100 characters').default(''),
 })
 
 export default function AddCard() {
@@ -106,7 +108,7 @@ export default function AddCard() {
       collectionId: '',
       name: '',
       categoryId: '',
-      date: '',
+      date: '1900',
       dateDescription: '',
       manufacturerId: '',
       conditionId: '',
@@ -114,6 +116,7 @@ export default function AddCard() {
       dimensions: [],
       images: [],
       purchasedAt: '',
+      serial: '',
     },
   })
 
@@ -179,7 +182,7 @@ export default function AddCard() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h3 className="mt-6">Add new barometer</h3>
+      <h3 className="mt-6 mb-10">Add new barometer</h3>
 
       <FormProvider {...methods}>
         <Form {...methods}>
@@ -191,7 +194,21 @@ export default function AddCard() {
                 <FormItem>
                   <FormLabel>Catalogue No. *</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Enter AWIF catalogue #" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="serial"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Serial Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter serial number" maxLength={100} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,7 +222,7 @@ export default function AddCard() {
                 <FormItem>
                   <FormLabel>Title *</FormLabel>
                   <FormControl>
-                    <Input {...field} id="barometer-name" />
+                    <Input {...field} id="barometer-name" placeholder="Enter barometer name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -221,7 +238,7 @@ export default function AddCard() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="YYYY"
+                      type="number"
                       maxLength={4}
                       onChange={e => {
                         const year = e.target.value.replace(/\D/g, '').slice(0, 4)
@@ -241,7 +258,38 @@ export default function AddCard() {
                 <FormItem>
                   <FormLabel>Date description *</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Enter date description" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="purchasedAt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Purchase Date</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input
+                        {...field}
+                        value={field.value || ''}
+                        type="date"
+                        placeholder="YYYY-MM-DD"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setValue('purchasedAt', '')}
+                        className="shrink-0"
+                      >
+                        Clear
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -337,38 +385,12 @@ export default function AddCard() {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={3} autoResize />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={methods.control}
-              name="purchasedAt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Purchase Date</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Input
-                        {...field}
-                        value={field.value || ''}
-                        type="date"
-                        placeholder="YYYY-MM-DD"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setValue('purchasedAt', '')}
-                        className="shrink-0"
-                      >
-                        Clear
-                      </Button>
-                    </div>
+                    <Textarea
+                      {...field}
+                      rows={3}
+                      autoResize
+                      placeholder="Enter barometer description"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
