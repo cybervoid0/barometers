@@ -24,18 +24,16 @@ import { customImageLoader } from '@/utils'
 import { cn, getThumbnailBase64 } from '@/utils'
 import * as UI from '@/components/ui'
 
-interface ImagesForm {
-  images: string[]
-}
-
 interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
 }
 
-const validationSchema: yup.ObjectSchema<ImagesForm> = yup.object({
+const validationSchema = yup.object({
   images: yup.array().of(yup.string().required()).defined().default([]),
 })
+
+type ImagesForm = yup.InferType<typeof validationSchema>
 
 function SortableImage({
   image,

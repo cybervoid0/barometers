@@ -19,13 +19,11 @@ interface TextFieldEditProps {
   className?: string
 }
 
-interface FormData {
-  value: string
-}
-
 const textFieldSchema = yup.object().shape({
   value: yup.string().required('Field is required').max(200, 'Must be less than 200 characters'),
 })
+
+type FormData = yup.InferType<typeof textFieldSchema>
 
 export function TextFieldEdit({ size = 18, barometer, property, className }: TextFieldEditProps) {
   const [open, setOpen] = useState(false)

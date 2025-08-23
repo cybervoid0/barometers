@@ -15,17 +15,15 @@ import { useBarometers } from '@/hooks/useBarometers'
 import { cn } from '@/utils'
 import * as UI from '@/components/ui'
 
-interface MaterialsForm {
-  materials: number[]
-}
-
 interface MaterialsEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-const validationSchema: yup.ObjectSchema<MaterialsForm> = yup.object({
+const validationSchema = yup.object({
   materials: yup.array().of(yup.number().required()).defined().default([]),
 })
+
+type MaterialsForm = yup.InferType<typeof validationSchema>
 
 export function MaterialsEdit({ barometer, className, ...props }: MaterialsEditProps) {
   const { materials: materialList } = useBarometers()

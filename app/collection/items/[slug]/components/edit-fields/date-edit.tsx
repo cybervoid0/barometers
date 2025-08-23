@@ -18,10 +18,6 @@ interface DateEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-interface DateForm {
-  date: string
-}
-
 const validationSchema = yup.object({
   date: yup
     .string()
@@ -33,6 +29,8 @@ const validationSchema = yup.object({
       return year >= 1000 && year <= 2099
     }),
 })
+
+type DateForm = yup.InferType<typeof validationSchema>
 
 export function DateEdit({ size = 18, barometer, className, ...props }: DateEditProps) {
   const form = useForm<DateForm>({

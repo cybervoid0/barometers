@@ -13,15 +13,11 @@ import { updateBarometer } from '@/services/fetch'
 import { cn } from '@/utils'
 import * as UI from '@/components/ui'
 
-interface DimensionsForm {
-  dimensions: Array<{ dim: string; value: string }>
-}
-
 interface DimensionEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-const validationSchema: yup.ObjectSchema<DimensionsForm> = yup.object({
+const validationSchema = yup.object({
   dimensions: yup
     .array()
     .of(
@@ -33,6 +29,8 @@ const validationSchema: yup.ObjectSchema<DimensionsForm> = yup.object({
     .defined()
     .default([]),
 })
+
+type DimensionsForm = yup.InferType<typeof validationSchema>
 
 export function DimensionEdit({ barometer, className, ...props }: DimensionEditProps) {
   const form = useForm<DimensionsForm>({

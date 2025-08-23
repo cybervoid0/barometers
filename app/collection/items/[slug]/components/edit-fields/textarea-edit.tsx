@@ -13,10 +13,6 @@ import { updateBarometer } from '@/services/fetch'
 import { cn } from '@/utils'
 import * as UI from '@/components/ui'
 
-interface TextAreaForm {
-  value: string
-}
-
 interface TextAreaEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: BarometerDTO
@@ -24,9 +20,11 @@ interface TextAreaEditProps extends ComponentProps<'button'> {
   label?: string
 }
 
-const validationSchema: yup.ObjectSchema<TextAreaForm> = yup.object({
+const validationSchema = yup.object({
   value: yup.string().required('This field is required'),
 })
+
+type TextAreaForm = yup.InferType<typeof validationSchema>
 
 export function TextAreaEdit({
   size = 18,

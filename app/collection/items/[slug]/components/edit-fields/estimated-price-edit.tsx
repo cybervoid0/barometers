@@ -17,11 +17,7 @@ interface EstimatedPriceEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO
 }
 
-interface EstimatedPriceForm {
-  estimatedPrice: string
-}
-
-const validationSchema: yup.ObjectSchema<EstimatedPriceForm> = yup.object({
+const validationSchema = yup.object({
   estimatedPrice: yup
     .string()
     .required('Price is required')
@@ -30,6 +26,8 @@ const validationSchema: yup.ObjectSchema<EstimatedPriceForm> = yup.object({
       return /^\d+(\.\d{1,2})?$/.test(value)
     }),
 })
+
+type EstimatedPriceForm = yup.InferType<typeof validationSchema>
 
 export function EstimatedPriceEdit({
   size = 18,
