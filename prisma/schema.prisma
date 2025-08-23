@@ -20,6 +20,7 @@ model Image {
   categories    Category[]     @relation("CategoryImages")
   barometers    Barometer[]    @relation("BarometerImages")
   manufacturers Manufacturer[] @relation("ManufacturerImages")
+  documents     Document[]     @relation("DocumentImages")
 }
 
 model Category {
@@ -82,6 +83,7 @@ model Barometer {
   images         Image[]            @relation("BarometerImages")
   reports        InaccuracyReport[]
   materials      Material[]         @relation("BarometerMaterials")
+  documents      Document[]         @relation("DocumentBarometers")
 }
 
 model Material {
@@ -143,6 +145,7 @@ model Condition {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   barometers  Barometer[]
+  documents   Document[]
 }
 
 model User {
@@ -154,6 +157,36 @@ model User {
   avatarURL String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+}
+
+model Document {
+  id                  String    @id @default(uuid())
+  title               String
+  catalogueNumber     String    @unique
+  documentType        String
+  subject             String?
+  creator             String?
+  /// Date for documents sorting
+  date                DateTime?
+  /// Date to display on pages, e.g. "c.1870", "mid 19th century"
+  dateDescription     String?
+  placeOfOrigin       String?
+  language            String?
+  physicalDescription String?
+  /// List of inscriptions, stamps, etc.
+  annotations         String[]
+  provenance          String?
+  acquisitionDate     DateTime?
+  description         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  conditionId       String?
+  condition         Condition?  @relation(fields: [conditionId], references: [id])
+  images            Image[]     @relation("DocumentImages")
+  relatedBarometers Barometer[] @relation("DocumentBarometers")
 }
 
 enum AccessRole {
