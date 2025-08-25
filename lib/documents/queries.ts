@@ -12,8 +12,10 @@ const getDocuments = withPrisma(async prisma => {
   })
 })
 
-const getDocument = withPrisma(async (prisma, id: string) => {
-  return prisma.document.findUnique({ where: { id } })
-})
+const getDocument = cache(
+  withPrisma(async (prisma, id: string) => {
+    return prisma.document.findUnique({ where: { id } })
+  }),
+)
 
 export { getDocuments, getDocument }

@@ -1,7 +1,6 @@
 'use server'
 
 import { Document, Prisma } from '@prisma/client'
-import { revalidatePath } from 'next/cache'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject } from '@/utils'
 

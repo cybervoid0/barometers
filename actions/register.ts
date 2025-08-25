@@ -1,7 +1,7 @@
 'use server'
 
-import { hash } from 'bcrypt'
 import type { User } from '@prisma/client'
+import { hash } from 'bcrypt'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const register = withPrisma(async (prisma, values: Partial<User>) => {

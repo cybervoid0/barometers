@@ -1,6 +1,6 @@
-import sharp from 'sharp'
-import pLimit from 'p-limit'
 import dotenv from 'dotenv'
+import pLimit from 'p-limit'
+import sharp from 'sharp'
 import { withPrisma } from '@/prisma/prismaClient'
 
 dotenv.config()
@@ -43,14 +43,14 @@ const main = withPrisma(async prisma => {
     .filter(image => image.image)
     .map(image => ({ ...image, image: `${baseUrl}/${bucket}/${image.image}` }))
 
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`Processing ${images.length} brand icons...`)
 
   const processedImages = await Promise.all(
     images.map(image =>
       limit(async () => {
         try {
-          // eslint-disable-next-line no-console
+          // biome-ignore lint/suspicious/noConsole: output in script
           console.log(`Processing ${image.name}...`)
 
           const response = await fetch(image.image)
@@ -79,7 +79,7 @@ const main = withPrisma(async prisma => {
             data: { icon: resizedBuffer },
           })
 
-          // eslint-disable-next-line no-console
+          // biome-ignore lint/suspicious/noConsole: output in script
           console.log(
             `✓ Saved icon for ${image.name}`,
             `${Math.round(resizedBuffer.length / 1024)}KB`,
@@ -87,7 +87,6 @@ const main = withPrisma(async prisma => {
           return { name: image.name, success: true }
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error)
-          // eslint-disable-next-line no-console
           console.error(`✗ Failed to process ${image.name}:`, error)
           return { name: image.name, success: false, error: errorMessage }
         }
@@ -98,21 +97,20 @@ const main = withPrisma(async prisma => {
   const successful = processedImages.filter(result => result.success)
   const failed = processedImages.filter(result => !result.success)
 
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`\n✅ Successfully processed: ${successful.length}`)
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`❌ Failed: ${failed.length}`)
 
   if (failed.length > 0) {
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsole: output in script
     console.log('\nFailed brands:')
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsole: output in script
     failed.forEach(result => console.log(`- ${result.name}: ${result.error}`))
   }
 })
 
 main().catch(err => {
-  // eslint-disable-next-line no-console
   console.error(err)
   process.exit(1)
 })

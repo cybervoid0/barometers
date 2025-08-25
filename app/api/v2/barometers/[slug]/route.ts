@@ -34,7 +34,6 @@ export async function GET(_req: NextRequest, { params: { slug } }: Props) {
 /**
  * Delete Barometer by slug
  */
-/* eslint-disable prettier/prettier */
 export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Props) => {
   try {
     const barometer = await prisma.barometer.findFirst({

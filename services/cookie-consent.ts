@@ -1,5 +1,5 @@
-import { email, FrontRoutes } from '@/constants'
 import { CookieConsentConfig } from 'vanilla-cookieconsent'
+import { email, FrontRoutes } from '@/constants'
 
 /**
  * Cookie consent configuration for the application.

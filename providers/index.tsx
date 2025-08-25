@@ -1,10 +1,10 @@
 'use client'
 
-import { PropsWithChildren } from 'react'
-import { SessionProvider } from 'next-auth/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ThemeProvider } from '@/providers/ThemeProvider'
+import { SessionProvider } from 'next-auth/react'
+import { PropsWithChildren } from 'react'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ThemeProvider } from '@/providers/ThemeProvider'
 
 const queryClient = new QueryClient()
 

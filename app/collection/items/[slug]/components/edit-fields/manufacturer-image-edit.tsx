@@ -88,12 +88,10 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
         const prev = form.getValues('images') || []
         form.setValue('images', [...prev, ...newImages], { shouldDirty: true })
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error(error instanceof Error ? error.message : 'Error uploading files')
       } finally {
         setLoading(false)
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [form.getValues, form.setValue, setLoading],
   )
@@ -111,13 +109,11 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
           { shouldDirty: true },
         )
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error(error instanceof Error ? error.message : 'Error deleting file')
       } finally {
         setLoading(false)
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [imageUrls, form.getValues, form.setValue, setLoading],
   )
 
@@ -133,7 +129,6 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
         const newOrder = arrayMove(images, oldIndex, newIndex)
         form.setValue('images', newOrder, { shouldDirty: true })
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [form.getValues, form.setValue],
   )

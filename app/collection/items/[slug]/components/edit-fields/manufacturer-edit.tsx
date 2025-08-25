@@ -124,7 +124,6 @@ export function ManufacturerEdit({
     if (currentBrand) {
       form.reset(currentBrandFormData)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentBrandFormData, currentBrand, form.reset])
 
   const update = useCallback(

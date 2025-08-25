@@ -1,15 +1,15 @@
 'use client'
 
+import Cookies from 'js-cookie'
 import {
   createContext,
+  type PropsWithChildren,
   useContext,
   useEffect,
   useMemo,
   useState,
-  type PropsWithChildren,
 } from 'react'
 import { EU_ALPHA2 } from '@/constants'
-import Cookies from 'js-cookie'
 
 interface CountryContextType {
   /** User's country code (e.g., "DE", "US") */

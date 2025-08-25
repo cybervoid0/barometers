@@ -1,8 +1,9 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
+  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": true },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**/*", "!**/.next/**", "!**/node_modules/**", "!**/dist/**", "!**/*.css"]
   },
   "formatter": {
     "enabled": true,
@@ -15,8 +16,7 @@
     "bracketSameLine": false,
     "bracketSpacing": true,
     "expand": "auto",
-    "useEditorconfig": true,
-    "includes": ["**", "!**/.next/**", "!**/node_modules/**", "!**/dist/**", "!**/*.css"]
+    "useEditorconfig": true
   },
   "linter": {
     "enabled": true,
@@ -27,6 +27,7 @@
       "correctness": {
         "noPrecisionLoss": "error",
         "noUnusedVariables": "error",
+        "noUnusedImports": "error",
         "useExhaustiveDependencies": "warn",
         "useHookAtTopLevel": "error"
       },
@@ -44,16 +45,7 @@
         "noMisleadingInstantiator": "error",
         "noUnsafeDeclarationMerging": "error"
       }
-    },
-    "includes": [
-      "**",
-      "!**/*.cjs",
-      "!**/*.mjs",
-      "!**/*.js",
-      "!**/.next/**",
-      "!**/node_modules/**",
-      "!**/*.css"
-    ]
+    }
   },
   "javascript": {
     "formatter": {
@@ -70,7 +62,16 @@
   },
   "html": { "formatter": { "selfCloseVoidElements": "always" } },
   "overrides": [
-    {},
+    {
+      "includes": ["*.d.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNamespace": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["*.ts", "*.tsx", "*.mts", "*.cts"],
       "linter": {

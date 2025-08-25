@@ -1,6 +1,6 @@
+import bcrypt from 'bcrypt'
 import type { AuthOptions, User } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import bcrypt from 'bcrypt'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const getUserByEmail = withPrisma((prisma, email?: string | null | undefined) =>
