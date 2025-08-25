@@ -1,15 +1,17 @@
 'use client'
 
+import Script from 'next/script'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/utils'
-import Script from 'next/script'
 
 interface PayPalHostedButton {
   hostedButtonId: string
 }
 
 interface PayPalHostedButtons {
-  (config: PayPalHostedButton): {
+  (
+    config: PayPalHostedButton,
+  ): {
     render: (container: HTMLElement) => void
   }
 }

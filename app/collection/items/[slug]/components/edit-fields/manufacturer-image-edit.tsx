@@ -1,20 +1,20 @@
 'use client'
 
-import { useCallback } from 'react'
-import NextImage from 'next/image'
-import { CSS } from '@dnd-kit/utilities'
+import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core'
 import {
   arrayMove,
-  useSortable,
-  SortableContext,
   horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
 } from '@dnd-kit/sortable'
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import { ImagePlus, X } from 'lucide-react'
+import NextImage from 'next/image'
+import { useCallback } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
 import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
 import { ManufacturerForm } from './types'
-import { Button } from '@/components/ui/button'
 
 interface Props {
   imageUrls: string[]
@@ -69,31 +69,34 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
   /**
    * Upload images to storage
    */
-  const uploadImages = useCallback(async (files: File[]) => {
-    if (!files || !Array.isArray(files) || files.length === 0) return
-    setLoading(true)
-    try {
-      const urlsDto = await createImageUrls(
-        files.map(file => ({
-          fileName: file.name,
-          contentType: file.type,
-        })),
-      )
-      await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
-      )
+  const uploadImages = useCallback(
+    async (files: File[]) => {
+      if (!files || !Array.isArray(files) || files.length === 0) return
+      setLoading(true)
+      try {
+        const urlsDto = await createImageUrls(
+          files.map(file => ({
+            fileName: file.name,
+            contentType: file.type,
+          })),
+        )
+        await Promise.all(
+          urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+        )
 
-      const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
-      const prev = form.getValues('images') || []
-      form.setValue('images', [...prev, ...newImages], { shouldDirty: true })
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error instanceof Error ? error.message : 'Error uploading files')
-    } finally {
-      setLoading(false)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+        const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
+        const prev = form.getValues('images') || []
+        form.setValue('images', [...prev, ...newImages], { shouldDirty: true })
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error instanceof Error ? error.message : 'Error uploading files')
+      } finally {
+        setLoading(false)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [form.getValues, form.setValue, setLoading],
+  )
 
   const handleDeleteFile = useCallback(
     async (img: string) => {
@@ -115,22 +118,25 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [imageUrls],
+    [imageUrls, form.getValues, form.setValue, setLoading],
   )
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over) return
-    if (active.id !== over.id) {
-      const images = form.getValues('images') || []
-      const oldIndex = images.findIndex(image => image === active.id)
-      const newIndex = images.findIndex(image => image === over.id)
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over) return
+      if (active.id !== over.id) {
+        const images = form.getValues('images') || []
+        const oldIndex = images.findIndex(image => image === active.id)
+        const newIndex = images.findIndex(image => image === over.id)
 
-      const newOrder = arrayMove(images, oldIndex, newIndex)
-      form.setValue('images', newOrder, { shouldDirty: true })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+        const newOrder = arrayMove(images, oldIndex, newIndex)
+        form.setValue('images', newOrder, { shouldDirty: true })
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [form.getValues, form.setValue],
+  )
 
   return (
     <div className="relative">

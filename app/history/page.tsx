@@ -2,7 +2,7 @@ import 'server-only'
 
 import NextImage from 'next/image'
 import { ShowMore } from '@/components/elements'
-import { customImageLoader, cn } from '@/utils'
+import { cn, customImageLoader } from '@/utils'
 
 export const dynamic = 'force-static'
 

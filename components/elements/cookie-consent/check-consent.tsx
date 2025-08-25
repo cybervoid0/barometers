@@ -1,12 +1,12 @@
 'use client'
 
-import { Button, Card } from '@/components/ui'
-import { cn } from '@/utils'
-import { type ComponentProps, useState, useEffect } from 'react'
-import * as VanillaCookieConsent from 'vanilla-cookieconsent'
 import { Check, LockKeyhole } from 'lucide-react'
-import { ManageCookies } from './manage-cookies'
+import { type ComponentProps, useEffect, useState } from 'react'
+import * as VanillaCookieConsent from 'vanilla-cookieconsent'
+import { Button, Card } from '@/components/ui'
 import { useCountry } from '@/providers/CountryProvider'
+import { cn } from '@/utils'
+import { ManageCookies } from './manage-cookies'
 
 interface Props extends ComponentProps<'div'> {
   /** Service name (e.g., "googleAnalytics", "payPal") */

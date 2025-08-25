@@ -1,20 +1,20 @@
 import { InaccuracyReport, Manufacturer } from '@prisma/client'
 import { ApiRoutes } from '@/constants/routes-back'
 import type {
-  CategoryDTO,
-  CategoryListDTO,
   BarometerDTO,
   BarometerListDTO,
+  CategoryDTO,
+  CategoryListDTO,
   ConditionListDTO,
-  ManufacturerListDTO,
-  ManufacturerDTO,
-  SearchResultsDTO,
-  InaccuracyReportListDTO,
-  SubcategoryListDTO,
-  MaterialListDTO,
   CountryListDTO,
-  UrlDto,
   FileProps,
+  InaccuracyReportListDTO,
+  ManufacturerDTO,
+  ManufacturerListDTO,
+  MaterialListDTO,
+  SearchResultsDTO,
+  SubcategoryListDTO,
+  UrlDto,
 } from '@/types'
 
 /**
@@ -28,7 +28,7 @@ export async function handleApiError(res: Response): Promise<void> {
     const errorData = await res.json()
     const errorMessage = errorData.message || res.statusText
     throw new Error(errorMessage)
-  } catch (error) {
+  } catch (_error) {
     throw new Error(res.statusText ?? res.text ?? 'handleApiError: unknown error')
   }
 }
@@ -214,17 +214,7 @@ export async function fetchCountryList(): Promise<CountryListDTO> {
 }
 
 /******* Documents ********/
-export async function createDocument<T>(document: T): Promise<{ id: string }> {
-  const res = await fetch(ApiRoutes.Documents, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(document),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
+// Document creation moved to Server Action: lib/documents/actions.ts
 
 export async function updateDocument<T>(document: T): Promise<{ id: string }> {
   const res = await fetch(ApiRoutes.Documents, {

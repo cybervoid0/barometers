@@ -1,16 +1,16 @@
 'use client'
 
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Edit } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { Edit } from 'lucide-react'
 import { toast } from 'sonner'
-import { BarometerDTO } from '@/types'
-import { updateBarometer } from '@/services/fetch'
-import { FrontRoutes } from '@/constants/routes-front'
-import { cn } from '@/utils'
+import * as yup from 'yup'
 import * as UI from '@/components/ui'
+import { FrontRoutes } from '@/constants/routes-front'
+import { updateBarometer } from '@/services/fetch'
+import { BarometerDTO } from '@/types'
+import { cn } from '@/utils'
 
 interface EstimatedPriceEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined

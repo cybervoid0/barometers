@@ -1,9 +1,9 @@
 'use client'
 
-import { useCountry } from '@/providers/CountryProvider'
-import { cn } from '@/utils'
 import { type ComponentProps } from 'react'
 import { showPreferences } from 'vanilla-cookieconsent'
+import { useCountry } from '@/providers/CountryProvider'
+import { cn } from '@/utils'
 
 /**
  * Styled link that opens cookie preferences modal.

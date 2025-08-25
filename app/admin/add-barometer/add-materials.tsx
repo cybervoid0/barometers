@@ -1,9 +1,8 @@
 'use client'
 
 import { Check, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -12,6 +11,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface MaterialsMultiSelectProps {
   value: number[]

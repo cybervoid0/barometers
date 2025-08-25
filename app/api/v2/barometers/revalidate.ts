@@ -1,8 +1,8 @@
-import { revalidatePath } from 'next/cache'
 import { PrismaClient } from '@prisma/client'
-import { SortOptions } from '@/types'
+import { revalidatePath } from 'next/cache'
 import { BAROMETERS_PER_CATEGORY_PAGE } from '@/constants/globals'
 import { FrontRoutes } from '@/constants/routes-front'
+import { SortOptions } from '@/types'
 
 /**
  * Revalidates the cache for a specific category by recalculating the paths that need to be revalidated.

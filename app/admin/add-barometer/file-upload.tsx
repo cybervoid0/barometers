@@ -1,16 +1,15 @@
 'use client'
 
+import { Upload, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { deleteImage, uploadFileToCloud, createImageUrls } from '@/services/fetch'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { imageStorage } from '@/constants/globals'
+import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
 
 interface FileUploadProps {
   name: string

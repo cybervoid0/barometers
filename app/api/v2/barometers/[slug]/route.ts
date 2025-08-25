@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { getBarometer } from './getters'
-import { withPrisma } from '@/prisma/prismaClient'
-import { revalidateCategory } from '../revalidate'
+import { NextRequest, NextResponse } from 'next/server'
 import { FrontRoutes } from '@/constants/routes-front'
-import { deleteImagesFromStorage } from './deleteFromStorage'
+import { withPrisma } from '@/prisma/prismaClient'
 import { trimTrailingSlash } from '@/utils'
+import { revalidateCategory } from '../revalidate'
+import { deleteImagesFromStorage } from './deleteFromStorage'
+import { getBarometer } from './getters'
 
 interface Props {
   params: {

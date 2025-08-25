@@ -1,19 +1,19 @@
 'use client'
 
+import { yupResolver } from '@hookform/resolvers/yup'
 import { isEqual } from 'lodash'
+import { Check, Edit, X } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { Edit, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { BarometerDTO } from '@/types'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import { useBarometers } from '@/hooks/useBarometers'
-import { cn } from '@/utils'
+import * as yup from 'yup'
 import * as UI from '@/components/ui'
+import { FrontRoutes } from '@/constants/routes-front'
+import { useBarometers } from '@/hooks/useBarometers'
+import { updateBarometer } from '@/services/fetch'
+import { BarometerDTO } from '@/types'
+import { cn } from '@/utils'
 
 interface MaterialsEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO

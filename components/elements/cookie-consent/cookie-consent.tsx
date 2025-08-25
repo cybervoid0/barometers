@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
+import { useEffect } from 'react'
 import * as VanillaCookieConsent from 'vanilla-cookieconsent'
-import { cookieConsentConfig } from '@/services/cookie-consent'
 import { useCountry } from '@/providers/CountryProvider'
+import { cookieConsentConfig } from '@/services/cookie-consent'
 
 /**
  * Main component that initializes the cookie consent system and syncs theme with the app.

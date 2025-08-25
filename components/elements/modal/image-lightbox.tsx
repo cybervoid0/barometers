@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import NextImage from 'next/image'
+import { useState } from 'react'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { customImageLoader } from '@/utils'
 

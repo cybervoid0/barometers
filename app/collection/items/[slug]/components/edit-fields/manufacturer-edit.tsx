@@ -1,21 +1,21 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ComponentProps } from 'react'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
 import { Edit, Trash2 } from 'lucide-react'
+import type { ComponentProps } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { BarometerDTO } from '@/types'
+import * as yup from 'yup'
+import * as UI from '@/components/ui'
+import { imageStorage } from '@/constants/globals'
 import { FrontRoutes } from '@/constants/routes-front'
 import { useBarometers } from '@/hooks/useBarometers'
 import { deleteImage, updateBarometer, updateManufacturer } from '@/services/fetch'
+import type { BarometerDTO } from '@/types'
+import { cn, getThumbnailBase64 } from '@/utils'
 import { ManufacturerImageEdit } from './manufacturer-image-edit'
 import { type ManufacturerForm } from './types'
-import { imageStorage } from '@/constants/globals'
-import { cn, getThumbnailBase64 } from '@/utils'
-import * as UI from '@/components/ui'
 
 interface ManufacturerEditProps extends ComponentProps<'button'> {
   size?: string | number
@@ -102,7 +102,7 @@ export function ManufacturerEdit({
       const currentImages = form.getValues('images')
       const extraImages = currentImages.filter(img => !brandImages?.includes(img))
       await Promise.all(extraImages.map(deleteImage))
-    } catch (error) {
+    } catch (_error) {
       // do nothing
     } finally {
       setIsLoading(false)
@@ -125,7 +125,7 @@ export function ManufacturerEdit({
       form.reset(currentBrandFormData)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedManufacturerIndex, currentBrandFormData])
+  }, [currentBrandFormData, currentBrand, form.reset])
 
   const update = useCallback(
     async (formValues: ManufacturerForm) => {
@@ -138,7 +138,7 @@ export function ManufacturerEdit({
             extraFiles?.map(async file => {
               try {
                 await deleteImage(file)
-              } catch (error) {
+              } catch (_error) {
                 // don't mind if it was not possible to delete the file
               }
             }),

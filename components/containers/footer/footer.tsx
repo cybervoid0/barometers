@@ -1,7 +1,7 @@
 import Link from 'next/link'
+import { ManageCookies } from '@/components/elements'
 import { cn } from '@/utils'
 import { SocialButtons } from './social-buttons'
-import { ManageCookies } from '@/components/elements'
 
 export function Footer() {
   return (

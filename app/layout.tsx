@@ -1,19 +1,19 @@
 import 'server-only'
 
-import { type PropsWithChildren } from 'react'
-import { type Viewport } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { Raleway, Cinzel } from 'next/font/google'
+import { type Viewport } from 'next'
+import { Cinzel, Raleway } from 'next/font/google'
+import { type PropsWithChildren } from 'react'
 import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
 import { Footer, Header } from '@/components/containers'
-import Providers from '../providers'
-import { CountryProvider } from '@/providers/CountryProvider'
-import { meta, jsonLd } from '../constants/metadata'
+import { CheckConsent, CookieConsent } from '@/components/elements'
 import { withPrisma } from '@/prisma/prismaClient'
+import { CountryProvider } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
-import { CookieConsent, CheckConsent } from '@/components/elements'
+import { jsonLd, meta } from '../constants/metadata'
+import Providers from '../providers'
 
 const raleway = Raleway({
   subsets: ['latin'],

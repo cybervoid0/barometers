@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
 import { Prisma } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
+import { NextRequest, NextResponse } from 'next/server'
+import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
-import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils'
 import { SortValue } from '@/types'
+import { cleanObject, slug as slugify, trimTrailingSlash } from '@/utils'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
 import { getBarometersByParams } from './getters'
-import { FrontRoutes } from '@/constants/routes-front'
 import { revalidateCategory } from './revalidate'
 
 /**

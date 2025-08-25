@@ -1,23 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useTransition } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as yup from 'yup'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Form,
   FormControl,
@@ -26,11 +16,20 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { useBarometers } from '@/hooks/useBarometers'
-import { FileUpload } from '../add-barometer/file-upload'
-import { createDocument } from '@/services/fetch'
-import { getThumbnailBase64 } from '@/utils'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { imageStorage } from '@/constants/globals'
+import { useBarometers } from '@/hooks/useBarometers'
+import { createDocument } from '@/lib/documents/actions'
+import { getThumbnailBase64 } from '@/utils'
+import { FileUpload } from '../add-barometer/file-upload'
 
 dayjs.extend(utc)
 
@@ -121,41 +120,44 @@ export default function AddDocument() {
 
   const { handleSubmit, setValue, reset } = methods
 
-  const queryClient = useQueryClient()
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: DocumentFormData) => {
-      const documentWithImages = {
-        ...values,
-        date: values.date ? dayjs.utc(values.date).toISOString() : null,
-        acquisitionDate: values.acquisitionDate
-          ? dayjs.utc(values.acquisitionDate).toISOString()
-          : null,
-        conditionId: values.conditionId || null,
-        annotations: values.annotations
-          ? values.annotations.split('\n').filter(line => line.trim())
-          : [],
-        images: await Promise.all(
-          (values.images || []).map(async (url, i) => ({
-            url,
-            order: i,
-            name: values.title,
-            blurData: await getThumbnailBase64(imageStorage + url),
-          })),
-        ),
+  const [isPending, startTransition] = useTransition()
+
+  const handleFormSubmit = async (values: DocumentFormData) => {
+    startTransition(async () => {
+      try {
+        const documentWithImages = {
+          ...values,
+          date: values.date ? dayjs.utc(values.date).toISOString() : null,
+          acquisitionDate: values.acquisitionDate
+            ? dayjs.utc(values.acquisitionDate).toISOString()
+            : null,
+          conditionId: values.conditionId || null,
+          annotations: values.annotations
+            ? values.annotations.split('\n').filter(line => line.trim())
+            : [],
+          images: await Promise.all(
+            (values.images || []).map(async (url, i) => ({
+              url,
+              order: i,
+              name: values.title,
+              blurData: await getThumbnailBase64(imageStorage + url),
+            })),
+          ),
+        }
+
+        const result = await createDocument(documentWithImages)
+
+        if (result.success) {
+          reset()
+          toast.success(`Added document ${result.id} to the database`)
+        } else {
+          toast.error(result.error || 'Error adding document')
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error adding document')
       }
-      return createDocument(documentWithImages)
-    },
-    onSuccess: ({ id }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['documents'],
-      })
-      reset()
-      toast.success(`Added document ${id} to the database`)
-    },
-    onError: error => {
-      toast.error(error.message || 'Error adding document')
-    },
-  })
+    })
+  }
 
   // Set default condition when data loads
   useEffect(() => {
@@ -164,9 +166,7 @@ export default function AddDocument() {
     }
   }, [condition.data, setValue])
 
-  const onSubmit = (data: DocumentFormData) => {
-    mutate(data)
-  }
+  const onSubmit = (data: DocumentFormData) => handleFormSubmit(data)
 
   return (
     <div className="mx-auto max-w-lg">

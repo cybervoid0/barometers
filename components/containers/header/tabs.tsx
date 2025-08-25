@@ -1,22 +1,22 @@
 'use client'
 
-import { HTMLAttributes, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { Search } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { HTMLAttributes, useCallback } from 'react'
 import { isAdmin } from '@/components/elements'
-import { MenuItem } from '@/types'
-import { cn } from '@/utils'
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuTrigger,
   NavigationMenuItem,
-  NavigationMenuList,
   NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
 } from '@/components/ui'
+import { MenuItem } from '@/types'
+import { cn } from '@/utils'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   menu: MenuItem[]

@@ -1,5 +1,5 @@
 import { Image } from '@prisma/client'
-import { minioClient, minioBucket } from '@/services/minio'
+import { minioBucket, minioClient } from '@/services/minio'
 
 /**
  * Deletes selected images from storage

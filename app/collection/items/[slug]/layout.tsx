@@ -1,10 +1,10 @@
+import capitalize from 'lodash/capitalize'
 import { Metadata } from 'next/types'
 import { PropsWithChildren } from 'react'
-import capitalize from 'lodash/capitalize'
-import { getBarometer } from '@/services'
 import { imageStorage } from '@/constants/globals'
-import { title, openGraph, twitter, keywords } from '@/constants/metadata'
+import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
+import { getBarometer } from '@/services'
 
 export async function generateMetadata({
   params: { slug },
@@ -49,7 +49,7 @@ export async function generateMetadata({
         canonical: pageUrl,
       },
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       title: `${title}: Barometer not found`,
       description: 'This barometer could not be found.',

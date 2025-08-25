@@ -1,17 +1,17 @@
 'use client'
 
-import { isEqual } from 'lodash'
-import type { ComponentProps } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { Edit, Trash2, Plus } from 'lucide-react'
+import { isEqual } from 'lodash'
+import { Edit, Plus, Trash2 } from 'lucide-react'
+import type { ComponentProps } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { BarometerDTO, Dimensions } from '@/types'
+import * as yup from 'yup'
+import * as UI from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
 import { updateBarometer } from '@/services/fetch'
+import { BarometerDTO, Dimensions } from '@/types'
 import { cn } from '@/utils'
-import * as UI from '@/components/ui'
 
 interface DimensionEditProps extends ComponentProps<'button'> {
   barometer: BarometerDTO

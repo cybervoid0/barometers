@@ -1,8 +1,8 @@
 import NextImage from 'next/image'
 import './animations.css'
-import { customImageLoader } from '@/utils'
 import Link from 'next/link'
 import { FrontRoutes } from '@/constants'
+import { customImageLoader } from '@/utils'
 
 export const HeadingImage = () => {
   return (

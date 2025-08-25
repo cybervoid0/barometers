@@ -1,8 +1,8 @@
+import { Pagination } from '@/components/ui/pagination'
 import { FrontRoutes } from '@/constants/routes-front'
-import { SearchItem } from './search-item'
 import { searchBarometers } from '@/services/fetch'
 import { SearchInfo } from './search-info'
-import { Pagination } from '@/components/ui/pagination'
+import { SearchItem } from './search-item'
 
 interface SearchProps {
   searchParams: Record<string, string>

@@ -1,6 +1,4 @@
 import Link from 'next/link'
-import { FrontRoutes } from '@/constants/routes-front'
-import { cn } from '@/utils'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +7,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui'
+import { FrontRoutes } from '@/constants/routes-front'
+import { cn } from '@/utils'
 
 interface BreadcrumbsComponentProps {
   type: string

@@ -1,12 +1,12 @@
-import Redis from 'ioredis'
-import { NextRequest, NextResponse } from 'next/server'
 import { InaccuracyReport } from '@prisma/client'
+import Redis from 'ioredis'
 import { revalidatePath } from 'next/cache'
-import { getInaccuracyReportList } from './getters'
-import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { cleanObject, trimTrailingSlash } from '@/utils'
-import { createReport } from './setters'
+import { NextRequest, NextResponse } from 'next/server'
 import { FrontRoutes } from '@/constants/routes-front'
+import { cleanObject, trimTrailingSlash } from '@/utils'
+import { DEFAULT_PAGE_SIZE } from '../parameters'
+import { getInaccuracyReportList } from './getters'
+import { createReport } from './setters'
 
 // inaccuracy report TTL, minutes
 const REPORT_COOL_DOWN = 10

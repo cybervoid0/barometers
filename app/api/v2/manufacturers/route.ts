@@ -1,12 +1,12 @@
-import { NextResponse, NextRequest } from 'next/server'
 import { Manufacturer } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+import { NextRequest, NextResponse } from 'next/server'
 import traverse from 'traverse'
+import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getManufacturers } from './getters'
 import { cleanObject, getBrandSlug, trimTrailingSlash } from '@/utils'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
-import { FrontRoutes } from '@/constants/routes-front'
+import { getManufacturers } from './getters'
 
 interface ManufacturerDTO extends Omit<Manufacturer, 'icon'> {
   successors?: { id: string }[]

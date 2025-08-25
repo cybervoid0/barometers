@@ -1,45 +1,45 @@
 import 'server-only'
 
-import Link from 'next/link'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import {
   BadgeEuro,
-  CalendarRange,
-  Wrench,
-  Factory,
   Calendar,
+  CalendarRange,
+  Factory,
   Hash,
   Network,
   Ruler,
+  ShoppingCart,
   Star,
   TreePine,
-  ShoppingCart,
+  Wrench,
 } from 'lucide-react'
-import { FrontRoutes } from '@/constants'
+import Link from 'next/link'
+import { IsAdmin, MD, ShowMore } from '@/components/elements'
 import { Card, SeparatorWithText } from '@/components/ui'
-import { ShowMore, MD, IsAdmin } from '@/components/elements'
-import { Dimensions } from '@/types'
+import { FrontRoutes } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/services'
+import { Dimensions } from '@/types'
+import { BreadcrumbsComponent } from './components/breadcrumbs'
 // local components
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
-import { PropertyCard } from './components/property-card/property-card'
 import { DeleteBarometer } from './components/delete-barometer'
-import { InaccuracyReport } from './components/inaccuracy-report'
-import { BreadcrumbsComponent } from './components/breadcrumbs'
+import { ConditionEdit } from './components/edit-fields/condition-edit'
+import { DateEdit } from './components/edit-fields/date-edit'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
-import { TextFieldEdit } from './components/edit-fields/textfield-edit'
-import { TextAreaEdit } from './components/edit-fields/textarea-edit'
-import { ConditionEdit } from './components/edit-fields/condition-edit'
-import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
-import { DateEdit } from './components/edit-fields/date-edit'
-import { PurchasedAtEdit } from './components/edit-fields/purchased-at-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
-import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
+import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
+import { PurchasedAtEdit } from './components/edit-fields/purchased-at-edit'
+import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
+import { TextAreaEdit } from './components/edit-fields/textarea-edit'
+import { TextFieldEdit } from './components/edit-fields/textfield-edit'
+import { InaccuracyReport } from './components/inaccuracy-report'
+import { PropertyCard } from './components/property-card/property-card'
 
 export const dynamic = 'force-static'
 export const dynamicParams = true

@@ -1,15 +1,15 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table'
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { fetchReportList } from '@/services'
-import { InaccuracyReportListDTO } from '@/types'
-import { FrontRoutes } from '@/constants'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Table } from '@/components/elements'
 import { Pagination } from '@/components/ui'
+import { FrontRoutes } from '@/constants'
+import { fetchReportList } from '@/services'
+import { InaccuracyReportListDTO } from '@/types'
 
 const itemsOnPage = 6
 

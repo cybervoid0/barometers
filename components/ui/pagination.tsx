@@ -1,11 +1,10 @@
 'use client'
 
-import * as React from 'react'
-import { usePathname, useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
-
+import { usePathname, useRouter } from 'next/navigation'
+import * as React from 'react'
+import { ButtonProps, type ButtonVariants, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils'
-import { ButtonProps, buttonVariants, type ButtonVariants } from '@/components/ui/button'
 
 const PaginationCore = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav

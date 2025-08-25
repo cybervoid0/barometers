@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from '@/utils'
+import { IsAdmin } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -14,10 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui'
-import { BarometerDTO } from '@/types'
-import { deleteBarometer } from '@/services'
 import { FrontRoutes } from '@/constants'
-import { IsAdmin } from '@/components/elements'
+import { deleteBarometer } from '@/services'
+import { BarometerDTO } from '@/types'
+import { cn } from '@/utils'
 
 interface Props {
   barometer: BarometerDTO

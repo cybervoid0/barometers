@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SortValue, SortOptions } from '@/types'
+import { SortOptions, SortValue } from '@/types'
 import { cn } from '@/utils'
 
 interface SortProps {

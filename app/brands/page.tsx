@@ -1,15 +1,15 @@
 import 'server-only'
 
-import Link from 'next/link'
+import { ArrowUp } from 'lucide-react'
 import { type Metadata } from 'next'
 import Image from 'next/image'
-import { ArrowUp } from 'lucide-react'
-import { withPrisma } from '@/prisma/prismaClient'
-import { FrontRoutes } from '@/constants/routes-front'
-import { title } from '../../constants/metadata'
-import { type DynamicOptions } from '../../types'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { FrontRoutes } from '@/constants/routes-front'
+import { withPrisma } from '@/prisma/prismaClient'
+import { title } from '../../constants/metadata'
+import { type DynamicOptions } from '../../types'
 
 export const dynamic: DynamicOptions = 'force-static'
 

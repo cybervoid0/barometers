@@ -1,23 +1,14 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as yup from 'yup'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Form,
   FormControl,
@@ -26,14 +17,23 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { imageStorage } from '@/constants/globals'
 import { useBarometers } from '@/hooks/useBarometers'
-import { FileUpload } from './file-upload'
-import { AddManufacturer } from './add-manufacturer'
-import { Dimensions } from './dimensions'
-import { MaterialsMultiSelect } from './add-materials'
 import { createBarometer } from '@/services/fetch'
 import { getThumbnailBase64, slug } from '@/utils'
-import { imageStorage } from '@/constants/globals'
+import { AddManufacturer } from './add-manufacturer'
+import { MaterialsMultiSelect } from './add-materials'
+import { Dimensions } from './dimensions'
+import { FileUpload } from './file-upload'
 
 dayjs.extend(utc)
 

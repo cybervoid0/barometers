@@ -1,13 +1,12 @@
 import 'server-only'
 
-import NextLink from 'next/link'
 import NextImage from 'next/image'
-import { customImageLoader } from '@/utils'
-import { cn } from '@/utils'
+import NextLink from 'next/link'
 import { getMenuData } from '@/constants'
-import { WideScreenTabs } from './tabs'
+import { cn, customImageLoader } from '@/utils'
 import { MobileMenu } from './mobile-menu'
 import { Subheader } from './subheader'
+import { WideScreenTabs } from './tabs'
 
 export async function Header() {
   const menu = await getMenuData()

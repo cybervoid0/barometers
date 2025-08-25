@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { toast } from 'sonner'
 import { Search, X } from 'lucide-react'
-import { Input, Button } from '@/components/ui'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as yup from 'yup'
+import { Button, Input } from '@/components/ui'
 import { cn } from '@/utils'
 
 interface SearchProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -58,7 +58,7 @@ export function SearchField({ queryString, ...props }: SearchProps) {
       const qs = data.query.trim()
       const searchParams = new URLSearchParams({ q: qs })
       router.push(`/search?${searchParams}`, { scroll: true })
-    } catch (error) {
+    } catch (_error) {
       toast.error('Search failed')
     }
   }

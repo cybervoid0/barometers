@@ -1,9 +1,9 @@
 'use client'
 
+import { Copy, CopyCheck, CopyX } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Copy, CopyCheck, CopyX } from 'lucide-react'
-import { Button, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { cn } from '@/utils'
 
 interface CopyButtonProps extends React.ComponentProps<typeof Button> {

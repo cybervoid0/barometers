@@ -1,14 +1,14 @@
 'use client'
 
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import * as yup from 'yup'
+import * as UI from '@/components/ui'
 import { createReport } from '@/services/fetch'
 import { BarometerDTO } from '@/types'
-import * as UI from '@/components/ui'
 
 interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO

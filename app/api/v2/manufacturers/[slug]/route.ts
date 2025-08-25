@@ -1,9 +1,9 @@
-import { NextResponse, NextRequest } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { withPrisma } from '@/prisma/prismaClient'
-import { getManufacturer } from './getters'
+import { NextRequest, NextResponse } from 'next/server'
 import { FrontRoutes } from '@/constants/routes-front'
+import { withPrisma } from '@/prisma/prismaClient'
 import { trimTrailingSlash } from '@/utils'
+import { getManufacturer } from './getters'
 
 interface Props {
   params: {

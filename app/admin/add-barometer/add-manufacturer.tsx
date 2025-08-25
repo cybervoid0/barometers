@@ -1,15 +1,15 @@
 'use client'
 
-import { useEffect, useCallback, useState, useRef } from 'react'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Upload, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as yup from 'yup'
 import * as UI from '@/components/ui'
-import { addManufacturer } from '@/services/fetch'
 import { useBarometers } from '@/hooks/useBarometers'
+import { addManufacturer } from '@/services/fetch'
 import { generateIcon } from '@/utils'
 
 interface AddManufacturerProps {

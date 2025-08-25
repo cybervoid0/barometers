@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'motion/react'
 import { ChevronDown } from 'lucide-react'
+import { motion } from 'motion/react'
+import { useState } from 'react'
+import { MD } from '@/components/elements'
 import { Button } from '@/components/ui'
 import { cn } from '@/utils'
-import { MD } from '@/components/elements'
 
 interface ShowMoreProps extends React.HTMLAttributes<HTMLDivElement> {
   md?: boolean // if true, renders content as markdown

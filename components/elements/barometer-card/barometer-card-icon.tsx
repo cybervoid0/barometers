@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { CategoryIcon } from '@/components/elements'
-import { BarometerCard } from './barometer-card'
 import { BarometerListDTO } from '@/types'
 import { cn } from '@/utils'
+import { BarometerCard } from './barometer-card'
 
 interface Props extends React.ComponentProps<'div'> {
   barometerName: string

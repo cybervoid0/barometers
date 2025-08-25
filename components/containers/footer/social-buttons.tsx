@@ -1,8 +1,8 @@
-import { type HTMLAttributes } from 'react'
 import { Instagram, Mail } from 'lucide-react'
-import { instagram, email } from '@/constants'
-import { Tooltip, TooltipContent, TooltipTrigger, Button } from '@/components/ui'
+import { type HTMLAttributes } from 'react'
 import { ModeToggle } from '@/components/elements'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
+import { email, instagram } from '@/constants'
 import { cn } from '@/utils'
 
 const buttonStyle = 'transition-colors duration-300 ease-in-out dark:text-slate-600'

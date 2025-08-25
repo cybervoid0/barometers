@@ -3,12 +3,12 @@ import 'server-only'
 import { type Metadata } from 'next'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { getManufacturer } from '@/services'
-import { withPrisma } from '@/prisma/prismaClient'
-import { title } from '@/constants/metadata'
-import { BarometerCardWithIcon, MD, ImageLightbox } from '@/components/elements'
-import { FrontRoutes } from '@/constants'
+import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
 import { Card } from '@/components/ui'
+import { FrontRoutes } from '@/constants'
+import { title } from '@/constants/metadata'
+import { withPrisma } from '@/prisma/prismaClient'
+import { getManufacturer } from '@/services'
 
 interface Props {
   params: {

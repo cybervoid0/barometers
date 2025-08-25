@@ -1,9 +1,9 @@
 'use client'
 
-import { type PropsWithChildren } from 'react'
-import { useSession } from 'next-auth/react'
 import { AccessRole } from '@prisma/client'
 import { Session } from 'next-auth'
+import { useSession } from 'next-auth/react'
+import { type PropsWithChildren } from 'react'
 
 export function isAdmin(session: Session | null): boolean {
   const user = session?.user

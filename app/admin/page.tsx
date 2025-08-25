@@ -1,5 +1,5 @@
+import { AlertTriangle, FileText, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { Plus, AlertTriangle, FileText } from 'lucide-react'
 import { FrontRoutes } from '@/constants/routes-front'
 
 export default function Admin() {

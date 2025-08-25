@@ -1,8 +1,8 @@
 import { flexRender, type Table as ReactTable } from '@tanstack/react-table'
 import {
-  Table as TableCore,
   TableBody,
   TableCell,
+  Table as TableCore,
   TableHead,
   TableHeader,
   TableRow,

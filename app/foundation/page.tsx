@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from '@/utils'
 import { Separator } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
+import { cn } from '@/utils'
 
 const paragraphSx = 'mb-4 indent-8 text-left'
 const sectionSx = 'mt-10'

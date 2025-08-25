@@ -1,10 +1,9 @@
-import NextLink from 'next/link'
 import NextImage from 'next/image'
+import NextLink from 'next/link'
 import { FC } from 'react'
-import { CategoryIcon } from '../category-icon'
-import { customImageLoader } from '@/utils'
-import { cn } from '@/utils'
 import { CategoryDTO } from '@/types'
+import { cn, customImageLoader } from '@/utils'
+import { CategoryIcon } from '../category-icon'
 
 interface CategoryCardProps {
   name: string

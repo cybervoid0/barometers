@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import { v4 as uuid } from 'uuid'
-import { minioClient, minioBucket } from '@/services/minio'
+import { minioBucket, minioClient } from '@/services/minio'
 import { FileDto, UrlDto, UrlProps } from './types'
 
 export async function POST(req: NextRequest) {
@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest) {
     // delete file from Minio storage
     await minioClient.removeObject(minioBucket, fileName)
     return NextResponse.json({ message: `${fileName} was deleted` }, { status: 200 })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { message: `${fileName ?? 'Your file'} is already deleted` },
       { status: 200 },

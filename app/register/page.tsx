@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { AtSign, Eye, EyeOff, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { AtSign, User, Eye, EyeOff } from 'lucide-react'
-import * as UI from '@/components/ui'
+import * as yup from 'yup'
 import { register } from '@/actions/register'
+import * as UI from '@/components/ui'
 
 const registerSchema = yup.object().shape({
   name: yup

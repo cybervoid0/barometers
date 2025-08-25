@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 import { AtSign, Eye, EyeOff } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as yup from 'yup'
 import * as UI from '@/components/ui'
 
 // Yup validation schema
@@ -51,7 +51,7 @@ export function SignInForm() {
       if (res?.error) {
         toast.error(res.error)
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('An error occurred during sign in')
     } finally {
       setIsLoading(false)

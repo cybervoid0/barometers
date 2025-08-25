@@ -2,10 +2,10 @@ import 'server-only'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, Separator } from '@/components/ui'
 import { ShowMore } from '@/components/elements'
-import { cn } from '@/utils'
+import { Button, Separator } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
+import { cn } from '@/utils'
 
 export const dynamic = 'force-static'
 const paragraphStyles = 'mb-4 indent-8 text-left'

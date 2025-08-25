@@ -11,8 +11,6 @@ export default withBundleAnalyzer({
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {},
-
   images: {
     loader: 'custom',
     loaderFile: './utils/image-loader.ts',

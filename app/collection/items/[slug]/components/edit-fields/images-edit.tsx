@@ -1,28 +1,27 @@
 'use client'
 
-import { isEqual } from 'lodash'
-import type { ComponentProps } from 'react'
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { Edit, ImagePlus, X, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
+import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core'
 import {
-  useSortable,
-  SortableContext,
   arrayMove,
   horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
 } from '@dnd-kit/sortable'
-import { useMemo, useState, useRef } from 'react'
-import { BarometerDTO } from '@/types'
+import { CSS } from '@dnd-kit/utilities'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { isEqual } from 'lodash'
+import { Edit, ImagePlus, Loader2, X } from 'lucide-react'
+import type { ComponentProps } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as yup from 'yup'
+import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import { FrontRoutes } from '@/constants/routes-front'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/services/fetch'
-import { customImageLoader } from '@/utils'
-import { cn, getThumbnailBase64 } from '@/utils'
-import * as UI from '@/components/ui'
+import { BarometerDTO } from '@/types'
+import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -112,7 +111,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
           extraFiles?.map(async file => {
             try {
               await deleteImage(file)
-            } catch (error) {
+            } catch (_error) {
               // don't mind if it was not possible to delete the file
             }
           }),
@@ -205,7 +204,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
       const currentImages = form.getValues('images')
       const extraImages = currentImages.filter(img => !barometerImages?.includes(img))
       await Promise.all(extraImages.map(deleteImage))
-    } catch (error) {
+    } catch (_error) {
       // do nothing
     } finally {
       setIsUploading(false)

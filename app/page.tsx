@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { CategoryCard, SearchField, NewArrivals } from '@/components/elements'
+import { CategoryCard, NewArrivals, SearchField } from '@/components/elements'
 import { FrontRoutes } from '@/constants'
 import { getCategories } from '@/services'
 import { cn } from '@/utils'
