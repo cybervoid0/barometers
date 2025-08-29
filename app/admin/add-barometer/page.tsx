@@ -116,7 +116,7 @@ export default function AddCard() {
       purchasedAt: '',
       serial: '',
       estimatedPrice: '',
-      subCategoryId: '',
+      subCategoryId: 'none',
       materials: [],
     },
   })
@@ -131,7 +131,8 @@ export default function AddCard() {
         date: dayjs(`${values.date}-01-01`).toISOString(),
         purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
         estimatedPrice: values.estimatedPrice ? parseFloat(values.estimatedPrice) : null,
-        subCategoryId: values.subCategoryId ? parseInt(values.subCategoryId, 10) : null,
+        ...(values.subCategoryId &&
+          values.subCategoryId !== 'none' && { subCategoryId: parseInt(values.subCategoryId, 10) }),
         images: await Promise.all(
           (values.images || []).map(async (url, i) => ({
             url,
@@ -174,12 +175,6 @@ export default function AddCard() {
       setValue('manufacturerId', String(manufacturers.data[0].id))
     }
   }, [manufacturers.data, setValue])
-
-  useEffect(() => {
-    if (subcategories.data.length > 0) {
-      setValue('subCategoryId', String(subcategories.data[0].id))
-    }
-  }, [subcategories.data, setValue])
 
   const handleAddManufacturer = (id: string) => {
     setValue('manufacturerId', id)
@@ -380,19 +375,14 @@ export default function AddCard() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Movement Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={
-                      field.value ||
-                      (subcategories.data.length > 0 ? String(subcategories.data[0].id) : '')
-                    }
-                  >
+                  <Select onValueChange={field.onChange} value={field.value || 'none'}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select movement type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="max-h-60">
+                      <SelectItem value="none">No type</SelectItem>
                       {subcategories.data.map(({ name, id }) => (
                         <SelectItem key={id} value={String(id)}>
                           {name}
