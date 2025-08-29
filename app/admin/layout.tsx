@@ -2,7 +2,7 @@
 
 import { LogOut } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
-import { FC, PropsWithChildren } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 

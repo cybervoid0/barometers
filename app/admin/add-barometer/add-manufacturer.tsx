@@ -142,7 +142,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
                 <UI.FormItem>
                   <UI.FormLabel>Name *</UI.FormLabel>
                   <UI.FormControl>
-                    <UI.Input {...field} id="manufacturer-name" />
+                    <UI.Input {...field} />
                   </UI.FormControl>
                   <UI.FormMessage />
                 </UI.FormItem>
@@ -342,6 +342,7 @@ const IconUpload = ({ onFileChange }: IconUploadProps) => {
           >
             <X className="h-3 w-3" />
           </UI.Button>
+          {/** biome-ignore lint/performance/noImgElement: preview requires dynamic src from blob URL */}
           <img
             src={previewUrl}
             alt="Icon preview"

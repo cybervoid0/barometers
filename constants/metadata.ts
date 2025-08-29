@@ -1,11 +1,11 @@
-import { Metadata } from 'next'
-import { Collection, WithContext } from 'schema-dts'
+import type { Metadata } from 'next'
+import type { Collection, WithContext } from 'schema-dts'
 import { email, github, instagram } from '@/constants/globals'
 
 export const title = 'Barometers Realm'
 export const description =
   'A collection of unique weather instruments spanning the late 18th century to the mid-20th century, with a focus on mercury and aneroid barometers, showcasing the craftsmanship traditions of past masters.'
-export const url = process.env.NEXT_PUBLIC_BASE_URL!
+export const url = process.env.NEXT_PUBLIC_BASE_URL ?? ''
 export const keywords = [
   'barometer',
   'barometers',

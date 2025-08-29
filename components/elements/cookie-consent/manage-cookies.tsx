@@ -1,6 +1,6 @@
 'use client'
 
-import { type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { showPreferences } from 'vanilla-cookieconsent'
 import { useCountry } from '@/providers/CountryProvider'
 import { cn } from '@/utils'

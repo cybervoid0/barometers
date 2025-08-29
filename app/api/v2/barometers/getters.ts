@@ -1,6 +1,6 @@
-import { type Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
-import { SortValue } from '@/types'
+import type { SortValue } from '@/types'
 
 function getSortCriteria(
   sortBy: SortValue | null,

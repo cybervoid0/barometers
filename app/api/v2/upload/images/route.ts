@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import path from 'path'
+import path from 'node:path'
+import { type NextRequest, NextResponse } from 'next/server'
 import { v4 as uuid } from 'uuid'
 import { minioBucket, minioClient } from '@/services/minio'
-import { FileDto, UrlDto, UrlProps } from './types'
+import type { FileDto, UrlDto, UrlProps } from './types'
 
 export async function POST(req: NextRequest) {
   try {

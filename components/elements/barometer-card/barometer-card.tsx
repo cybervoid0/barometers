@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { type HTMLAttributes } from 'react'
-import { BarometerListDTO } from '@/types'
+import type { HTMLAttributes } from 'react'
+import type { BarometerListDTO } from '@/types'
 import { cn, customImageLoader } from '@/utils'
 
 interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {

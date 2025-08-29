@@ -1,4 +1,4 @@
-import { AccessRole } from '@prisma/client'
+import type { AccessRole } from '@prisma/client'
 
 export interface MenuItem {
   id: number | string

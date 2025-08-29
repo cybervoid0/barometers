@@ -1,9 +1,9 @@
 import 'server-only'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { type Viewport } from 'next'
+import type { Viewport } from 'next'
 import { Cinzel, Raleway } from 'next/font/google'
-import { type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
@@ -78,6 +78,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <meta name="msvalidate.01" content="09CC87C263AEB12612A9A1C31447E181" />
           <script
             type="application/ld+json"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>

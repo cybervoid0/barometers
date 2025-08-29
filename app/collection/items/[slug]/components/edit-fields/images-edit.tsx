@@ -1,6 +1,6 @@
 'use client'
 
-import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core'
+import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
 import {
   arrayMove,
   horizontalListSortingStrategy,
@@ -20,7 +20,7 @@ import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import { FrontRoutes } from '@/constants/routes-front'
 import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/services/fetch'
-import { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/types'
 import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
@@ -64,6 +64,7 @@ function SortableImage({
         <X className="h-3.5 w-3.5" />
       </button>
       <div {...listeners} className="cursor-move">
+        {/* biome-ignore lint/performance/noImgElement: uses custom image loader for optimization */}
         <img
           src={customImageLoader({ src: image, quality: 85, width: 100 })}
           alt="Barometer"
@@ -90,8 +91,8 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
     if (!over) return
     if (active.id !== over.id) {
       const currentImages = form.getValues('images')
-      const oldIndex = currentImages.findIndex(image => image === active.id)
-      const newIndex = currentImages.findIndex(image => image === over.id)
+      const oldIndex = currentImages.indexOf(String(active.id))
+      const newIndex = currentImages.indexOf(String(over.id))
       const newOrder = arrayMove(currentImages, oldIndex, newIndex)
       form.setValue('images', newOrder)
     }

@@ -70,7 +70,7 @@ export function SignInForm() {
                 <UI.FormLabel>E-mail</UI.FormLabel>
                 <UI.FormControl>
                   <div className="relative">
-                    <UI.Input {...field} type="email" id="email" className="pr-10" />
+                    <UI.Input {...field} type="email" className="pr-10" />
                     <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                   </div>
                 </UI.FormControl>
@@ -90,7 +90,6 @@ export function SignInForm() {
                     <UI.Input
                       {...field}
                       type={showPassword ? 'text' : 'password'}
-                      id="password"
                       className="pr-10"
                     />
                     <UI.Button

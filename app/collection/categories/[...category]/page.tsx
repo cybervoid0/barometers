@@ -1,7 +1,7 @@
 import 'server-only'
 
 import capitalize from 'lodash/capitalize'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { FooterVideo } from '@/components/containers'
 import { BarometerCard, ShowMore } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
@@ -10,7 +10,7 @@ import { openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometersByParams, getCategory } from '@/services'
-import { DynamicOptions, SortOptions, SortValue } from '@/types'
+import { type DynamicOptions, SortOptions, type SortValue } from '@/types'
 import Sort from './sort'
 
 export const dynamicParams = true
@@ -33,7 +33,7 @@ export async function generateMetadata({
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: imageStorage + images.at(0)!.url,
+      url: imageStorage + (images.at(0)?.url ?? ''),
       alt: name,
     }))
   const url = `${FrontRoutes.Categories}${category.join('/')}`

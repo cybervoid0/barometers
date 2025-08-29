@@ -1,9 +1,10 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
 import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  if (!baseUrl) throw new Error('NEXT_PUBLIC_BASE_URL environmental var should be set')
   return [
     {
       url: baseUrl + FrontRoutes.Home,
@@ -21,6 +22,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: baseUrl + FrontRoutes.History,
       lastModified: new Date(),
       priority: 0.9,
+    },
+    {
+      url: baseUrl + FrontRoutes.Foundation,
+      lastModified: new Date(),
+      priority: 0.9,
+    },
+    {
+      url: baseUrl + FrontRoutes.Donate,
+      lastModified: new Date(),
+      priority: 1,
     },
     ...(await getItemPages(baseUrl)),
     ...(await getBrandPages(baseUrl)),

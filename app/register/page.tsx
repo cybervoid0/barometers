@@ -73,7 +73,7 @@ export default function Register() {
                   <UI.FormLabel>Name</UI.FormLabel>
                   <UI.FormControl>
                     <div className="relative">
-                      <UI.Input {...field} id="name" className="pr-10" />
+                      <UI.Input {...field} className="pr-10" />
                       <User className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
                   </UI.FormControl>
@@ -90,7 +90,7 @@ export default function Register() {
                   <UI.FormLabel>E-mail</UI.FormLabel>
                   <UI.FormControl>
                     <div className="relative">
-                      <UI.Input {...field} type="email" id="email" className="pr-10" />
+                      <UI.Input {...field} type="email" className="pr-10" />
                       <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
                   </UI.FormControl>
@@ -110,7 +110,6 @@ export default function Register() {
                       <UI.Input
                         {...field}
                         type={showPassword ? 'text' : 'password'}
-                        id="password"
                         className="pr-10"
                       />
                       <UI.Button
@@ -146,7 +145,6 @@ export default function Register() {
                       <UI.Input
                         {...field}
                         type={showRepeatPassword ? 'text' : 'password'}
-                        id="repeat-password"
                         className="pr-10"
                       />
                       <UI.Button

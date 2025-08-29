@@ -9,7 +9,7 @@ import { Table } from '@/components/elements'
 import { Pagination } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { fetchReportList } from '@/services'
-import { InaccuracyReportListDTO } from '@/types'
+import type { InaccuracyReportListDTO } from '@/types'
 
 const itemsOnPage = 6
 

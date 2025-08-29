@@ -10,7 +10,7 @@ import * as yup from 'yup'
 import * as UI from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
 import { updateBarometer } from '@/services/fetch'
-import { BarometerDTO, Dimensions } from '@/types'
+import type { BarometerDTO, Dimensions } from '@/types'
 import { cn } from '@/utils'
 
 interface DimensionEditProps extends ComponentProps<'button'> {

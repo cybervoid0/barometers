@@ -1,6 +1,6 @@
 'use server'
 
-import { Document, Prisma } from '@prisma/client'
+import { type Document, Prisma } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 import { cleanObject } from '@/utils'
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import { useId } from 'react'
 import {
   Select,
   SelectContent,
@@ -8,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SortOptions, SortValue } from '@/types'
+import { SortOptions, type SortValue } from '@/types'
 import { cn } from '@/utils'
 
 interface SortProps {
@@ -20,6 +21,7 @@ interface SortProps {
 export default function Sort({ sortBy, className }: SortProps) {
   const router = useRouter()
   const pathName = usePathname()
+  const triggerId = useId()
 
   const handleSortChange = (value: string) => {
     const path = pathName.split('/')
@@ -28,9 +30,11 @@ export default function Sort({ sortBy, className }: SortProps) {
 
   return (
     <div className={cn('space-y-1', className)}>
-      <label className="text-muted-foreground text-xs font-medium">Sort by</label>
+      <label htmlFor={triggerId} className="text-muted-foreground text-xs font-medium">
+        Sort by
+      </label>
       <Select value={sortBy} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-full text-xs capitalize">
+        <SelectTrigger id={triggerId} className="w-full text-xs capitalize">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>

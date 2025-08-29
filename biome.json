@@ -1,9 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": true },
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*", "!**/.next/**", "!**/node_modules/**", "!**/dist/**", "!**/*.css"]
+    "includes": ["**/*", "!**/.next", "!**/node_modules", "!**/dist", "!**/*.css"]
   },
   "formatter": {
     "enabled": true,
@@ -21,30 +25,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
-      "a11y": { "noNoninteractiveElementInteractions": "off" },
-      "complexity": { "noBannedTypes": "error", "noUselessTypeConstraint": "error" },
-      "correctness": {
-        "noPrecisionLoss": "error",
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "useExhaustiveDependencies": "warn",
-        "useHookAtTopLevel": "error"
-      },
-      "style": {
-        "noDoneCallback": "error",
-        "noNamespace": "error",
-        "useArrayLiterals": "error",
-        "useAsConstAssertion": "error",
-        "useBlockStatements": "off"
-      },
-      "suspicious": {
-        "noConsole": { "level": "error", "options": { "allow": ["warn", "error"] } },
-        "noExplicitAny": "error",
-        "noExtraNonNullAssertion": "error",
-        "noMisleadingInstantiator": "error",
-        "noUnsafeDeclarationMerging": "error"
-      }
+      "recommended": true
     }
   },
   "javascript": {
@@ -60,48 +41,12 @@
       "bracketSpacing": true
     }
   },
-  "html": { "formatter": { "selfCloseVoidElements": "always" } },
-  "overrides": [
-    {
-      "includes": ["*.d.ts"],
-      "linter": {
-        "rules": {
-          "style": {
-            "noNamespace": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["*.ts", "*.tsx", "*.mts", "*.cts"],
-      "linter": {
-        "rules": {
-          "complexity": { "noArguments": "error" },
-          "correctness": {
-            "noConstAssign": "off",
-            "noGlobalObjectCalls": "off",
-            "noInvalidBuiltinInstantiation": "off",
-            "noInvalidConstructorSuper": "off",
-            "noSetterReturn": "off",
-            "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off"
-          },
-          "style": { "useConst": "error" },
-          "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
-            "noFunctionAssign": "off",
-            "noImportAssign": "off",
-            "noRedeclare": "off",
-            "noUnsafeNegation": "off",
-            "noVar": "error",
-            "useGetterReturn": "off"
-          }
-        }
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
       }
     }
-  ],
-  "assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } }
+  }
 }

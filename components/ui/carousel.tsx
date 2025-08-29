@@ -116,6 +116,7 @@ const Carousel = React.forwardRef<
         canScrollNext,
       }}
     >
+      {/** biome-ignore lint/a11y/useSemanticElements: shadCn-code */}
       <div
         ref={ref}
         onKeyDownCapture={handleKeyDown}
@@ -157,6 +158,7 @@ const CarouselItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
     const { orientation } = useCarousel()
 
     return (
+      // biome-ignore lint/a11y/useSemanticElements: ShadCn code
       <div
         ref={ref}
         role="group"

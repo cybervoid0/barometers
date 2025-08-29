@@ -10,7 +10,7 @@ import * as yup from 'yup'
 import * as UI from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
 import { updateBarometer } from '@/services/fetch'
-import { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/types'
 import { cn } from '@/utils'
 
 interface DateEditProps extends ComponentProps<'button'> {

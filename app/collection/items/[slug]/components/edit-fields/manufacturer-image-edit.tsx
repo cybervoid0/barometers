@@ -1,6 +1,6 @@
 'use client'
 
-import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core'
+import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
 import {
   arrayMove,
   horizontalListSortingStrategy,
@@ -14,7 +14,7 @@ import { useCallback } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
-import { ManufacturerForm } from './types'
+import type { ManufacturerForm } from './types'
 
 interface Props {
   imageUrls: string[]
@@ -123,8 +123,8 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
       if (!over) return
       if (active.id !== over.id) {
         const images = form.getValues('images') || []
-        const oldIndex = images.findIndex(image => image === active.id)
-        const newIndex = images.findIndex(image => image === over.id)
+        const oldIndex = images.indexOf(active.id)
+        const newIndex = images.indexOf(over.id)
 
         const newOrder = arrayMove(images, oldIndex, newIndex)
         form.setValue('images', newOrder, { shouldDirty: true })

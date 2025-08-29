@@ -22,9 +22,7 @@ function getPrismaClient(): PrismaClient {
  * This type is used to define functions that need access to a PrismaClient instance and
  * additional arguments.
  */
-type AsyncFunction<T, Args extends unknown[]> = {
-  (prisma: PrismaClient, ...args: Args): Promise<T>
-}
+type AsyncFunction<T, Args extends unknown[]> = (prisma: PrismaClient, ...args: Args) => Promise<T>
 
 /**
  * Higher-order function to automatically manage PrismaClient connections.

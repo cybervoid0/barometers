@@ -1,7 +1,7 @@
-import { exec } from 'child_process'
+import { exec } from 'node:child_process'
+import path from 'node:path'
 import dotenv from 'dotenv'
 import { ensureDirSync } from 'fs-extra'
-import path from 'path'
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
@@ -16,7 +16,6 @@ const backupDir = path.join(projectRoot, 'backups')
 const file = path.join(backupDir, `backup_${time}.dump`)
 
 exec(`/opt/homebrew/opt/libpq/bin/pg_dump "${url}" -F c -f "${file}"`, e =>
-  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(
     e
       ? `❌ Error: Unable to create Barometers DB dump. ${e instanceof Error ? e.message : e}`

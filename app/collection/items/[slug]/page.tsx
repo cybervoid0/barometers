@@ -21,7 +21,7 @@ import { Card, SeparatorWithText } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/services'
-import { Dimensions } from '@/types'
+import type { Dimensions } from '@/types'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 // local components
 import { ImageCarousel } from './components/carousel'

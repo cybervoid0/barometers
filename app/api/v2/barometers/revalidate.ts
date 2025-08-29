@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { BAROMETERS_PER_CATEGORY_PAGE } from '@/constants/globals'
 import { FrontRoutes } from '@/constants/routes-front'

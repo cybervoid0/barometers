@@ -16,7 +16,7 @@ import {
 } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { deleteBarometer } from '@/services'
-import { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/types'
 import { cn } from '@/utils'
 
 interface Props {

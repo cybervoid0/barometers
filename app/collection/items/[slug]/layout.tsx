@@ -1,6 +1,6 @@
 import capitalize from 'lodash/capitalize'
-import { Metadata } from 'next/types'
-import { PropsWithChildren } from 'react'
+import type { Metadata } from 'next/types'
+import type { PropsWithChildren } from 'react'
 import { imageStorage } from '@/constants/globals'
 import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'

@@ -3,12 +3,11 @@
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import * as React from 'react'
-import { ButtonProps, type ButtonVariants, buttonVariants } from '@/components/ui/button'
+import { type ButtonProps, type ButtonVariants, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils'
 
 const PaginationCore = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav
-    role="navigation"
     aria-label="pagination"
     className={cn('mx-auto flex w-full justify-center', className)}
     {...props}
@@ -161,7 +160,7 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
         </PaginationItem>
 
         {renderMobilePages().map((page, index) => (
-          <PaginationItem key={`mobile-${index}`}>
+          <PaginationItem key={page === 'ellipsis' ? `ellipsis-${index}` : `page-${page}`}>
             {page === 'ellipsis' ? (
               <PaginationEllipsis />
             ) : (
@@ -193,8 +192,8 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
           />
         </PaginationItem>
 
-        {renderDesktopPages().map((page, index) => (
-          <PaginationItem key={`desktop-${index}`}>
+        {renderDesktopPages().map(page => (
+          <PaginationItem key={`desktop-${page}`}>
             <PaginationLink
               onClick={() => handlePageChange(page)}
               isActive={page === value}

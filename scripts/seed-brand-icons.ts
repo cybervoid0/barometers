@@ -43,14 +43,12 @@ const main = withPrisma(async prisma => {
     .filter(image => image.image)
     .map(image => ({ ...image, image: `${baseUrl}/${bucket}/${image.image}` }))
 
-  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`Processing ${images.length} brand icons...`)
 
   const processedImages = await Promise.all(
     images.map(image =>
       limit(async () => {
         try {
-          // biome-ignore lint/suspicious/noConsole: output in script
           console.log(`Processing ${image.name}...`)
 
           const response = await fetch(image.image)
@@ -79,7 +77,6 @@ const main = withPrisma(async prisma => {
             data: { icon: resizedBuffer },
           })
 
-          // biome-ignore lint/suspicious/noConsole: output in script
           console.log(
             `✓ Saved icon for ${image.name}`,
             `${Math.round(resizedBuffer.length / 1024)}KB`,
@@ -97,16 +94,14 @@ const main = withPrisma(async prisma => {
   const successful = processedImages.filter(result => result.success)
   const failed = processedImages.filter(result => !result.success)
 
-  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`\n✅ Successfully processed: ${successful.length}`)
-  // biome-ignore lint/suspicious/noConsole: output in script
   console.log(`❌ Failed: ${failed.length}`)
 
   if (failed.length > 0) {
-    // biome-ignore lint/suspicious/noConsole: output in script
     console.log('\nFailed brands:')
-    // biome-ignore lint/suspicious/noConsole: output in script
-    failed.forEach(result => console.log(`- ${result.name}: ${result.error}`))
+    failed.forEach(result => {
+      console.log(`- ${result.name}: ${result.error}`)
+    })
   }
 })
 

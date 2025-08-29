@@ -5,7 +5,7 @@ import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { HTMLAttributes, useCallback } from 'react'
+import { type HTMLAttributes, useCallback } from 'react'
 import { isAdmin } from '@/components/elements'
 import {
   NavigationMenu,
@@ -15,7 +15,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui'
-import { MenuItem } from '@/types'
+import type { MenuItem } from '@/types'
 import { cn } from '@/utils'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {

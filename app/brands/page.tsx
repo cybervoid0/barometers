@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ArrowUp } from 'lucide-react'
-import { type Metadata } from 'next'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 import { title } from '../../constants/metadata'
-import { type DynamicOptions } from '../../types'
+import type { DynamicOptions } from '../../types'
 
 export const dynamic: DynamicOptions = 'force-static'
 

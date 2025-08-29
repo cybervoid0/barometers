@@ -15,7 +15,7 @@ import { deleteImage, updateBarometer, updateManufacturer } from '@/services/fet
 import type { BarometerDTO } from '@/types'
 import { cn, getThumbnailBase64 } from '@/utils'
 import { ManufacturerImageEdit } from './manufacturer-image-edit'
-import { type ManufacturerForm } from './types'
+import type { ManufacturerForm } from './types'
 
 interface ManufacturerEditProps extends ComponentProps<'button'> {
   size?: string | number
@@ -181,203 +181,193 @@ export function ManufacturerEdit({
     [barometer.id, barometer.name, brandImages, currentBrand?.id],
   )
   return (
-    <>
-      <UI.Dialog
-        onOpenChange={async isOpen => {
-          if (isOpen) {
-            resetManufacturerIndex()
-            // Don't reset to initialValues - let useEffect handle the proper data
-            return
-          }
-          await cleanupOnClose()
-        }}
-      >
-        <UI.DialogTrigger asChild>
-          <UI.Button
-            variant="ghost"
-            aria-label="Edit manufacturer"
-            className={cn('h-fit w-fit p-1', className)}
-            {...props}
-          >
-            <Edit className="text-destructive" size={Number(size) || 18} />
-          </UI.Button>
-        </UI.DialogTrigger>
-        <UI.DialogContent>
-          {isLoading ? (
-            <div className="bg-background/60 absolute inset-0 z-50 flex items-center justify-center">
-              <div className="border-muted-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
-            </div>
-          ) : null}
-          <UI.Form {...form}>
-            <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(update)} noValidate>
-              <UI.DialogHeader className="mt-6 mb-2">
-                <div className="flex items-center justify-between">
-                  <UI.DialogTitle>Edit Manufacturer</UI.DialogTitle>
-                  <UI.Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    aria-label="Delete manufacturer"
-                    onClick={() => manufacturers.delete(currentBrand?.slug)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </UI.Button>
-                </div>
-                <UI.DialogDescription>
-                  Edit manufacturer information and update barometer details.
-                </UI.DialogDescription>
-              </UI.DialogHeader>
-
-              <div className="flex flex-col gap-2">
-                <UI.Label htmlFor="manufacturer-select">Manufacturer</UI.Label>
-                <UI.Select
-                  value={String(selectedManufacturerIndex)}
-                  onValueChange={val => setSelectedManufacturerIndex(Number(val))}
+    <UI.Dialog
+      onOpenChange={async isOpen => {
+        if (isOpen) {
+          resetManufacturerIndex()
+          // Don't reset to initialValues - let useEffect handle the proper data
+          return
+        }
+        await cleanupOnClose()
+      }}
+    >
+      <UI.DialogTrigger asChild>
+        <UI.Button
+          variant="ghost"
+          aria-label="Edit manufacturer"
+          className={cn('h-fit w-fit p-1', className)}
+          {...props}
+        >
+          <Edit className="text-destructive" size={Number(size) || 18} />
+        </UI.Button>
+      </UI.DialogTrigger>
+      <UI.DialogContent>
+        {isLoading ? (
+          <div className="bg-background/60 absolute inset-0 z-50 flex items-center justify-center">
+            <div className="border-muted-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+          </div>
+        ) : null}
+        <UI.Form {...form}>
+          <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(update)} noValidate>
+            <UI.DialogHeader className="mt-6 mb-2">
+              <div className="flex items-center justify-between">
+                <UI.DialogTitle>Edit Manufacturer</UI.DialogTitle>
+                <UI.Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  aria-label="Delete manufacturer"
+                  onClick={() => manufacturers.delete(currentBrand?.slug)}
                 >
-                  <UI.SelectTrigger
-                    id="manufacturer-select"
-                    aria-label="Manufacturer"
-                    className="w-full"
-                  >
-                    <UI.SelectValue />
-                  </UI.SelectTrigger>
-                  <UI.SelectContent className="max-h-[500px]">
-                    {manufacturers.data.map(({ name }, i) => (
-                      <UI.SelectItem key={i} value={String(i)}>
-                        {name}
-                      </UI.SelectItem>
-                    ))}
-                  </UI.SelectContent>
-                </UI.Select>
+                  <Trash2 className="h-4 w-4" />
+                </UI.Button>
               </div>
+              <UI.DialogDescription>
+                Edit manufacturer information and update barometer details.
+              </UI.DialogDescription>
+            </UI.DialogHeader>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UI.FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <UI.FormItem>
-                      <UI.FormLabel>First name</UI.FormLabel>
-                      <UI.FormControl>
-                        <UI.Input id="firstName" {...field} />
-                      </UI.FormControl>
-                      <UI.FormMessage />
-                    </UI.FormItem>
-                  )}
-                />
-                <UI.FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <UI.FormItem>
-                      <UI.FormLabel>Name / Company name</UI.FormLabel>
-                      <UI.FormControl>
-                        <UI.Input id="manufacturer-name" autoFocus {...field} />
-                      </UI.FormControl>
-                      <UI.FormMessage />
-                    </UI.FormItem>
-                  )}
-                />
-              </div>
+            <div className="flex flex-col gap-2">
+              <UI.Label>Manufacturer</UI.Label>
+              <UI.Select
+                value={String(selectedManufacturerIndex)}
+                onValueChange={val => setSelectedManufacturerIndex(Number(val))}
+              >
+                <UI.SelectTrigger aria-label="Manufacturer" className="w-full">
+                  <UI.SelectValue />
+                </UI.SelectTrigger>
+                <UI.SelectContent className="max-h-[500px]">
+                  {manufacturers.data.map(({ name, id }, i) => (
+                    <UI.SelectItem key={id} value={String(i)}>
+                      {name}
+                    </UI.SelectItem>
+                  ))}
+                </UI.SelectContent>
+              </UI.Select>
+            </div>
 
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <UI.FormField
                 control={form.control}
-                name="countries"
+                name="firstName"
                 render={({ field }) => (
                   <UI.FormItem>
-                    <UI.FormLabel>Countries</UI.FormLabel>
+                    <UI.FormLabel>First name</UI.FormLabel>
                     <UI.FormControl>
-                      <CountriesMultiSelect
-                        selected={(field.value as number[]) ?? []}
-                        options={countries.data?.map(({ id, name }) => ({ id, name })) ?? []}
-                        onChange={vals => field.onChange(vals)}
-                        placeholder={
-                          ((field.value as number[]) ?? []).length === 0
-                            ? 'Select countries'
-                            : undefined
-                        }
-                      />
+                      <UI.Input {...field} />
                     </UI.FormControl>
                     <UI.FormMessage />
                   </UI.FormItem>
                 )}
               />
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UI.FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <UI.FormItem>
-                      <UI.FormLabel>City</UI.FormLabel>
-                      <UI.FormControl>
-                        <UI.Input id="city" {...field} />
-                      </UI.FormControl>
-                      <UI.FormMessage />
-                    </UI.FormItem>
-                  )}
-                />
-                <UI.FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <UI.FormItem>
-                      <UI.FormLabel>External URL</UI.FormLabel>
-                      <UI.FormControl>
-                        <UI.Input id="url" {...field} />
-                      </UI.FormControl>
-                      <UI.FormMessage />
-                    </UI.FormItem>
-                  )}
-                />
-              </div>
-
               <UI.FormField
                 control={form.control}
-                name="successors"
+                name="name"
                 render={({ field }) => (
                   <UI.FormItem>
-                    <UI.FormLabel>Successors</UI.FormLabel>
+                    <UI.FormLabel>Name / Company name</UI.FormLabel>
                     <UI.FormControl>
-                      <SuccessorsMultiSelect
-                        selected={(field.value as string[]) ?? []}
-                        options={manufacturers.data.map(({ id, name }) => ({ id, name }))}
-                        onChange={vals => field.onChange(vals)}
-                      />
+                      <UI.Input autoFocus {...field} />
                     </UI.FormControl>
                     <UI.FormMessage />
                   </UI.FormItem>
                 )}
               />
+            </div>
 
-              <ManufacturerImageEdit
-                imageUrls={brandImages}
-                form={form}
-                setLoading={setIsLoading}
-              />
+            <UI.FormField
+              control={form.control}
+              name="countries"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Countries</UI.FormLabel>
+                  <UI.FormControl>
+                    <CountriesMultiSelect
+                      selected={(field.value as number[]) ?? []}
+                      options={countries.data?.map(({ id, name }) => ({ id, name })) ?? []}
+                      onChange={vals => field.onChange(vals)}
+                      placeholder={
+                        ((field.value as number[]) ?? []).length === 0
+                          ? 'Select countries'
+                          : undefined
+                      }
+                    />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
 
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <UI.FormField
                 control={form.control}
-                name="description"
+                name="city"
                 render={({ field }) => (
                   <UI.FormItem>
-                    <UI.FormLabel>Description</UI.FormLabel>
+                    <UI.FormLabel>City</UI.FormLabel>
                     <UI.FormControl>
-                      <UI.Textarea id="description" autoResize {...field} />
+                      <UI.Input {...field} />
                     </UI.FormControl>
                     <UI.FormMessage />
                   </UI.FormItem>
                 )}
               />
+              <UI.FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <UI.FormItem>
+                    <UI.FormLabel>External URL</UI.FormLabel>
+                    <UI.FormControl>
+                      <UI.Input {...field} />
+                    </UI.FormControl>
+                    <UI.FormMessage />
+                  </UI.FormItem>
+                )}
+              />
+            </div>
 
-              <UI.Button type="submit" variant="outline" className="w-full">
-                Update
-              </UI.Button>
-            </form>
-          </UI.Form>
-        </UI.DialogContent>
-      </UI.Dialog>
-    </>
+            <UI.FormField
+              control={form.control}
+              name="successors"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Successors</UI.FormLabel>
+                  <UI.FormControl>
+                    <SuccessorsMultiSelect
+                      selected={(field.value as string[]) ?? []}
+                      options={manufacturers.data.map(({ id, name }) => ({ id, name }))}
+                      onChange={vals => field.onChange(vals)}
+                    />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <ManufacturerImageEdit imageUrls={brandImages} form={form} setLoading={setIsLoading} />
+
+            <UI.FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Description</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Textarea autoResize {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.Button type="submit" variant="outline" className="w-full">
+              Update
+            </UI.Button>
+          </form>
+        </UI.Form>
+      </UI.DialogContent>
+    </UI.Dialog>
   )
 }
 

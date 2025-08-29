@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import ReactMarkdown, { Components } from 'react-markdown'
+import type { FC } from 'react'
+import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 const defaultComponents: Components = {

@@ -1,5 +1,5 @@
 import { Instagram, Mail } from 'lucide-react'
-import { type HTMLAttributes } from 'react'
+import type { HTMLAttributes } from 'react'
 import { ModeToggle } from '@/components/elements'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 import { email, instagram } from '@/constants'

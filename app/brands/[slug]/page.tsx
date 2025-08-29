@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { type Metadata } from 'next'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'

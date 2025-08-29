@@ -87,7 +87,7 @@ const barometerSchema = yup.object().shape({
     .test('is-positive-number', 'Must be a positive number', value => {
       if (!value) return true // Allow empty string
       const num = parseFloat(value)
-      return !isNaN(num) && num > 0
+      return !Number.isNaN(num) && num > 0
     })
     .default(''),
   subCategoryId: yup.string().default(''),
@@ -131,7 +131,7 @@ export default function AddCard() {
         date: dayjs(`${values.date}-01-01`).toISOString(),
         purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
         estimatedPrice: values.estimatedPrice ? parseFloat(values.estimatedPrice) : null,
-        subCategoryId: values.subCategoryId ? parseInt(values.subCategoryId) : null,
+        subCategoryId: values.subCategoryId ? parseInt(values.subCategoryId, 10) : null,
         images: await Promise.all(
           (values.images || []).map(async (url, i) => ({
             url,
@@ -231,7 +231,7 @@ export default function AddCard() {
                 <FormItem>
                   <FormLabel>Title *</FormLabel>
                   <FormControl>
-                    <Input {...field} id="barometer-name" placeholder="Enter barometer name" />
+                    <Input {...field} placeholder="Enter barometer name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,6 +1,7 @@
 'use client'
 
 import { Upload, X } from 'lucide-react'
+import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -111,10 +112,14 @@ export function FileUpload({ name }: FileUploadProps) {
                     >
                       <X className="h-3 w-3" />
                     </Button>
-                    <img
-                      src={imageStorage + fileName}
+
+                    <Image
+                      unoptimized
                       alt={`Upload ${i + 1}`}
-                      className="h-12 w-12 rounded object-contain p-1"
+                      src={imageStorage + fileName}
+                      width={48}
+                      height={48}
+                      className="object-contain p-1"
                     />
                   </Card>
                 ))}

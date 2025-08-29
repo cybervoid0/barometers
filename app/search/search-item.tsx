@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from '@/components/ui'
-import { SearchResultsDTO } from '@/types'
+import type { SearchResultsDTO } from '@/types'
 import { customImageLoader } from '@/utils'
 
 interface ItemProps {

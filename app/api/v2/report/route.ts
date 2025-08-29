@@ -1,7 +1,7 @@
-import { InaccuracyReport } from '@prisma/client'
+import type { InaccuracyReport } from '@prisma/client'
 import Redis from 'ioredis'
 import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { FrontRoutes } from '@/constants/routes-front'
 import { cleanObject, trimTrailingSlash } from '@/utils'
 import { DEFAULT_PAGE_SIZE } from '../parameters'
@@ -12,7 +12,7 @@ import { createReport } from './setters'
 const REPORT_COOL_DOWN = 10
 const REPORT_MAX_ATTEMPTS = 3
 
-const redis = new Redis(process.env.REDIS_URL!)
+const redis = new Redis(process.env.REDIS_URL ?? '')
 
 /**
  * Fetches a paginated list of inaccuracy reports for barometers.

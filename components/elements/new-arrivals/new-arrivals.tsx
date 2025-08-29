@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { type HTMLAttributes } from 'react'
+import type { HTMLAttributes } from 'react'
 import { Button } from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
 import { cn } from '@/utils'

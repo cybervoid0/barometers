@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 import * as UI from '@/components/ui'
 import { createReport } from '@/services/fetch'
-import { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/types'
 
 interface Props extends React.ComponentProps<'button'> {
   barometer: BarometerDTO
@@ -102,30 +102,24 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
             <div className="space-y-2">
               <UI.Label htmlFor="reporterName">Name</UI.Label>
               <UI.Input
-                id="reporterName"
                 aria-invalid={!!errors.reporterName}
-                aria-describedby="reporterName-error"
                 placeholder="Your name"
                 {...register('reporterName')}
               />
               {errors.reporterName && (
-                <p id="reporterName-error" className="text-xs text-red-500">
-                  {errors.reporterName.message}
-                </p>
+                <p className="text-xs text-destructive-foreground">{errors.reporterName.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <UI.Label htmlFor="reporterEmail">Email</UI.Label>
               <UI.Input
-                id="reporterEmail"
                 type="email"
                 aria-invalid={!!errors.reporterEmail}
-                aria-describedby="reporterEmail-error"
                 placeholder="your@email.com"
                 {...register('reporterEmail')}
               />
               {errors.reporterEmail && (
-                <p id="reporterEmail-error" className="text-xs text-red-500">
+                <p className="text-xs text-destructive-foreground">
                   {errors.reporterEmail.message}
                 </p>
               )}
@@ -133,17 +127,15 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
             <div className="space-y-2">
               <UI.Label htmlFor="description">Feedback</UI.Label>
               <UI.Textarea
-                id="description"
                 aria-invalid={!!errors.description}
-                aria-describedby="description-help"
                 placeholder="Describe the inaccuracy"
                 className="min-h-24"
                 {...register('description')}
               />
               {errors.description && (
-                <p className="text-xs text-red-500">{errors.description.message}</p>
+                <p className="text-xs text-destructive-foreground">{errors.description.message}</p>
               )}
-              <p id="description-help" className="text-muted-foreground text-xs">
+              <p className="text-muted-foreground text-xs">
                 {descriptionValue.length > 0 && descriptionValue.length <= maxFeedbackLen
                   ? `${symbolsLeft} symbol${symbolsLeft === 1 ? '' : 's'} remaining`
                   : descriptionValue.length > maxFeedbackLen

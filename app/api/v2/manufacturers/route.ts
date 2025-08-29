@@ -1,6 +1,6 @@
-import { Manufacturer } from '@prisma/client'
+import type { Manufacturer } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import traverse from 'traverse'
 import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'

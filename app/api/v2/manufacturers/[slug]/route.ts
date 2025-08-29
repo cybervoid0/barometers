@@ -1,5 +1,5 @@
 import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { FrontRoutes } from '@/constants/routes-front'
 import { withPrisma } from '@/prisma/prismaClient'
 import { trimTrailingSlash } from '@/utils'
@@ -14,7 +14,7 @@ interface Props {
 /**
  * Query a specific manufacturer by slug
  */
-export async function GET(req: NextRequest, { params: { slug } }: Props) {
+export async function GET(_req: NextRequest, { params: { slug } }: Props) {
   try {
     const manufacturer = await getManufacturer(slug)
     return NextResponse.json(manufacturer, { status: 200 })
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, { params: { slug } }: Props) {
  * Delete manufacturer by ID
  */
 
-export const DELETE = withPrisma(async (prisma, req: NextRequest, { params: { slug } }: Props) => {
+export const DELETE = withPrisma(async (prisma, _req: NextRequest, { params: { slug } }: Props) => {
   try {
     const manufacturer = await prisma.manufacturer.findUnique({ where: { slug } })
     if (!manufacturer) {

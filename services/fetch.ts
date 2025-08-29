@@ -1,4 +1,4 @@
-import { InaccuracyReport, Manufacturer } from '@prisma/client'
+import type { InaccuracyReport, Manufacturer } from '@prisma/client'
 import { ApiRoutes } from '@/constants/routes-back'
 import type {
   BarometerDTO,

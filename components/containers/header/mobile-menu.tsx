@@ -17,7 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui'
-import { MenuItem } from '@/types'
+import type { MenuItem } from '@/types'
 import { cn } from '@/utils'
 import { SocialButtons } from '../footer'
 

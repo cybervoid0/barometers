@@ -8,12 +8,8 @@ interface PayPalHostedButton {
   hostedButtonId: string
 }
 
-interface PayPalHostedButtons {
-  (
-    config: PayPalHostedButton,
-  ): {
-    render: (container: HTMLElement) => void
-  }
+type PayPalHostedButtons = (config: PayPalHostedButton) => {
+  render: (container: HTMLElement) => void
 }
 
 declare global {
@@ -64,6 +60,7 @@ export function PayPalStackedButton({
           console.error('Failed to load PayPal SDK:', e)
         }}
       />
+      {/** biome-ignore lint/correctness/useUniqueElementIds: PayPal ID */}
       <div
         ref={containerRef}
         id="paypal-container-LEG7JKHVDZ6WA"
