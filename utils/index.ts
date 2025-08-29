@@ -9,5 +9,7 @@ export { default as customImageLoader } from './image-loader'
 // Image utilities
 export { generateIcon, getThumbnailBase64 } from './images'
 export { cleanObject } from './misc'
+// Server
+export { revalidateCategory } from './revalidate'
 // Text utilities
 export { getBrandSlug, slug, trimTrailingSlash } from './text'

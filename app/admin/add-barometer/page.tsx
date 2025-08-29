@@ -37,6 +37,7 @@ import { FileUpload } from './file-upload'
 
 dayjs.extend(utc)
 
+// ! выяснить как использовать Prisma.BarometerCreateInput тип для основы схемы
 // Yup validation schema
 const barometerSchema = yup.object().shape({
   collectionId: yup

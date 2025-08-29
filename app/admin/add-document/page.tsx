@@ -122,7 +122,7 @@ export default function AddDocument() {
 
   const [isPending, startTransition] = useTransition()
 
-  const handleFormSubmit = async (values: DocumentFormData) => {
+  const submitForm = async (values: DocumentFormData) => {
     startTransition(async () => {
       try {
         const documentWithImages = {
@@ -166,15 +166,13 @@ export default function AddDocument() {
     }
   }, [condition.data, setValue])
 
-  const onSubmit = (data: DocumentFormData) => handleFormSubmit(data)
-
   return (
     <div className="mx-auto max-w-lg">
       <h3 className="mt-6 mb-10">Add new document</h3>
 
       <FormProvider {...methods}>
         <Form {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
             <FormField
               control={methods.control}
               name="title"
