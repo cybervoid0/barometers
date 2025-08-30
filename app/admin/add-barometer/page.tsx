@@ -1,13 +1,9 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { useEffect } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -26,83 +22,24 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { imageStorage } from '@/constants/globals'
 import { useBarometers } from '@/hooks/useBarometers'
-import { createBarometer } from '@/services/fetch'
-import { getThumbnailBase64, slug } from '@/utils'
+import { createBarometer } from '@/lib/barometers/actions'
+import {
+  type BarometerFormData,
+  BarometerFormTransformSchema,
+  BarometerFormValidationSchema,
+} from '@/lib/schemas/barometer-form.schema'
 import { AddManufacturer } from './add-manufacturer'
 import { MaterialsMultiSelect } from './add-materials'
 import { Dimensions } from './dimensions'
 import { FileUpload } from './file-upload'
 
-dayjs.extend(utc)
-
-// ! выяснить как использовать Prisma.BarometerCreateInput тип для основы схемы
-// Yup validation schema
-const barometerSchema = yup.object().shape({
-  collectionId: yup
-    .string()
-    .required('Catalogue No. is required')
-    .max(100, 'Catalogue No. must be less than 100 characters'),
-  name: yup
-    .string()
-    .required('Title is required')
-    .max(200, 'Title must be less than 200 characters'),
-  categoryId: yup.string().required('Category is required'),
-  date: yup
-    .string()
-    .required('Year is required')
-    .matches(/^\d{4}$/, 'Year must be 4 digits'),
-  dateDescription: yup.string().required('Date description is required'),
-  manufacturerId: yup.string().required('Manufacturer is required'),
-  conditionId: yup.string().required('Condition is required'),
-  description: yup.string().default(''),
-  dimensions: yup
-    .array()
-    .of(
-      yup.object().shape({
-        dim: yup.string().default(''),
-        value: yup.string().default(''),
-      }),
-    )
-    .default([]),
-  images: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'At least one image is required')
-    .default([]),
-  purchasedAt: yup
-    .string()
-    .test('valid-date', 'Must be a valid date', value => {
-      if (!value) return true // Allow empty string
-      return dayjs(value).isValid()
-    })
-    .test('not-future', 'Purchase date cannot be in the future', value => {
-      if (!value) return true
-      return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
-    })
-    .default(''),
-  serial: yup.string().max(100, 'Serial number must be less than 100 characters').default(''),
-  estimatedPrice: yup
-    .string()
-    .test('is-positive-number', 'Must be a positive number', value => {
-      if (!value) return true // Allow empty string
-      const num = parseFloat(value)
-      return !Number.isNaN(num) && num > 0
-    })
-    .default(''),
-  subCategoryId: yup.string().default(''),
-  materials: yup.array().of(yup.number().required()).default([]),
-})
-
-// Auto-generated TypeScript type from Yup schema
-type BarometerFormData = yup.InferType<typeof barometerSchema>
-
 export default function AddCard() {
   const { condition, categories, subcategories, manufacturers, materials } = useBarometers()
+  const [isPending, startTransition] = useTransition()
 
   const methods = useForm<BarometerFormData>({
-    resolver: yupResolver(barometerSchema),
+    resolver: zodResolver(BarometerFormValidationSchema),
     defaultValues: {
       collectionId: '',
       name: '',
@@ -122,41 +59,21 @@ export default function AddCard() {
     },
   })
 
-  const { handleSubmit, setValue, reset } = methods
+  const { handleSubmit, setValue, reset, control } = methods
 
-  const queryClient = useQueryClient()
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: BarometerFormData) => {
-      const barometerWithImages = {
-        ...values,
-        date: dayjs(`${values.date}-01-01`).toISOString(),
-        purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
-        estimatedPrice: values.estimatedPrice ? parseFloat(values.estimatedPrice) : null,
-        ...(values.subCategoryId &&
-          values.subCategoryId !== 'none' && { subCategoryId: parseInt(values.subCategoryId, 10) }),
-        images: await Promise.all(
-          (values.images || []).map(async (url, i) => ({
-            url,
-            order: i,
-            name: values.name,
-            blurData: await getThumbnailBase64(imageStorage + url),
-          })),
-        ),
-        slug: slug(values.name),
+  const submitForm = (values: BarometerFormData) => {
+    startTransition(async () => {
+      try {
+        // Transform schema does ALL the heavy lifting - validation AND transformation!
+        const transformedData = await BarometerFormTransformSchema.parseAsync(values)
+        const { id } = await createBarometer(transformedData)
+        reset()
+        toast.success(`Added ${id} to the database`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error adding barometer')
       }
-      return createBarometer(barometerWithImages)
-    },
-    onSuccess: ({ id }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['barometers'],
-      })
-      reset()
-      toast.success(`Added ${id} to the database`)
-    },
-    onError: error => {
-      toast.error(error.message || 'Error adding barometer')
-    },
-  })
+    })
+  }
 
   // Set default values when data loads
   useEffect(() => {
@@ -181,19 +98,15 @@ export default function AddCard() {
     setValue('manufacturerId', id)
   }
 
-  const onSubmit = (data: BarometerFormData) => {
-    mutate(data)
-  }
-
   return (
     <div className="mx-auto max-w-lg">
       <h3 className="mt-6 mb-10">Add new barometer</h3>
 
       <FormProvider {...methods}>
         <Form {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
             <FormField
-              control={methods.control}
+              control={control}
               name="collectionId"
               render={({ field }) => (
                 <FormItem>
@@ -207,7 +120,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="serial"
               render={({ field }) => (
                 <FormItem>
@@ -221,7 +134,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -235,7 +148,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="date"
               render={({ field }) => (
                 <FormItem>
@@ -257,7 +170,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="dateDescription"
               render={({ field }) => (
                 <FormItem>
@@ -271,7 +184,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="purchasedAt"
               render={({ field }) => (
                 <FormItem>
@@ -302,7 +215,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="estimatedPrice"
               render={({ field }) => (
                 <FormItem>
@@ -322,14 +235,14 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="materials"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Materials</FormLabel>
                   <FormControl>
                     <MaterialsMultiSelect
-                      value={field.value}
+                      value={field.value || []}
                       onChange={field.onChange}
                       materials={materials.data ?? []}
                     />
@@ -340,7 +253,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
@@ -371,12 +284,12 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="subCategoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Movement Type</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || 'none'}>
+                  <Select onValueChange={field.onChange} value={field.value || ''}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select movement type" />
@@ -397,7 +310,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="manufacturerId"
               render={({ field }) => (
                 <FormItem>
@@ -431,7 +344,7 @@ export default function AddCard() {
             />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="conditionId"
               render={({ field }) => (
                 <FormItem>
@@ -466,7 +379,7 @@ export default function AddCard() {
             <Dimensions />
 
             <FormField
-              control={methods.control}
+              control={control}
               name="description"
               render={({ field }) => (
                 <FormItem>
