@@ -1,51 +1,69 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit, Trash2 } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  type ComponentProps,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
-import { FrontRoutes } from '@/constants/routes-front'
-import { useBarometers } from '@/hooks/useBarometers'
-import { deleteImage, updateBarometer, updateManufacturer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import { deleteBrand, updateBrand } from '@/lib/brands/actions'
+import type { AllBrandsDTO } from '@/lib/brands/queries'
+import type { CountryListDTO } from '@/lib/counties/queries'
+import { deleteImage } from '@/services/fetch'
 import { cn, getThumbnailBase64 } from '@/utils'
 import { ManufacturerImageEdit } from './manufacturer-image-edit'
-import type { ManufacturerForm } from './types'
 
 interface ManufacturerEditProps extends ComponentProps<'button'> {
   size?: string | number
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
+  brands: AllBrandsDTO
+  countries: CountryListDTO
 }
 
-const initialValues: ManufacturerForm = {
-  id: '',
-  name: '',
-  firstName: '',
-  city: '',
-  countries: [],
-  url: '',
-  description: '',
-  successors: [],
-  images: [],
-}
+const validationSchema = z.object({
+  id: z.string(),
+  name: z
+    .string()
+    .min(1, 'Name is required')
+    .min(2, 'Name should be longer than 2 symbols')
+    .max(100, 'Name should be shorter than 100 symbols'),
+  firstName: z.string(),
+  city: z.string().max(100, 'City should be shorter than 100 symbols'),
+  countries: z.array(z.number().int()),
+  url: z.string().refine(value => !value || /^(https?:\/\/).+/i.test(value), 'Must be a valid URL'),
+  description: z.string(),
+  successors: z.array(z.string()),
+  images: z.array(z.string()),
+})
+
+type ManufacturerForm = z.output<typeof validationSchema>
 
 export function ManufacturerEdit({
   size = 18,
   barometer,
+  brands,
+  countries,
   className,
   ...props
 }: ManufacturerEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [isLoading, setIsLoading] = useState(false)
-  const { manufacturers, countries } = useBarometers()
   const [selectedManufacturerIndex, setSelectedManufacturerIndex] = useState<number>(0)
   const currentBrand = useMemo(
-    () => manufacturers.data[selectedManufacturerIndex],
-    [manufacturers.data, selectedManufacturerIndex],
+    () => brands[selectedManufacturerIndex],
+    [brands, selectedManufacturerIndex],
   )
   const brandImages = useMemo(
     () => currentBrand?.images?.map(({ url }) => url),
@@ -67,35 +85,25 @@ export function ManufacturerEdit({
     }
   }, [currentBrand])
 
-  const validationSchema: yup.ObjectSchema<ManufacturerForm> = yup
-    .object({
-      id: yup.string().default(''),
-      name: yup
-        .string()
-        .required('Name is required')
-        .min(2, 'Name should be longer than 2 symbols')
-        .max(100, 'Name should be shorter than 100 symbols'),
-      firstName: yup.string().default(''),
-      city: yup.string().max(100, 'City should be shorter than 100 symbols').default(''),
-      countries: yup.array().of(yup.number().integer().required()).defined().default([]),
-      url: yup
-        .string()
-        .test('is-url', 'Must be a valid URL', value => !value || /^(https?:\/\/).+/i.test(value))
-        .default(''),
-      description: yup.string().default(''),
-      successors: yup.array().of(yup.string().required()).defined().default([]),
-      images: yup.array().of(yup.string().required()).defined().default([]),
-    })
-    .required()
-
   const form = useForm<ManufacturerForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: initialValues,
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+      id: '',
+      name: '',
+      firstName: '',
+      city: '',
+      countries: [],
+      url: '',
+      description: '',
+      successors: [],
+      images: [],
+    },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
 
-  const cleanupOnClose = async () => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: form not gonna change
+  const cleanupOnClose = useCallback(async () => {
     // delete unused files from storage
     try {
       setIsLoading(true)
@@ -107,15 +115,13 @@ export function ManufacturerEdit({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [brandImages])
 
   // Reset selected manufacturer index only
   const resetManufacturerIndex = useCallback(() => {
-    const manufacturerIndex = manufacturers.data.findIndex(
-      ({ id }) => id === barometer.manufacturer.id,
-    )
+    const manufacturerIndex = brands.findIndex(({ id }) => id === barometer.manufacturer.id)
     setSelectedManufacturerIndex(manufacturerIndex)
-  }, [barometer.manufacturer.id, manufacturers.data])
+  }, [barometer.manufacturer.id, brands])
 
   // when dialog opens we'll reset index; form will be updated by effect below
 
@@ -127,31 +133,34 @@ export function ManufacturerEdit({
   }, [currentBrandFormData, currentBrand, form.reset])
 
   const update = useCallback(
-    async (formValues: ManufacturerForm) => {
-      setIsLoading(true)
-      try {
-        // erase deleted images
-        const extraFiles = brandImages?.filter(url => !formValues.images.includes(url))
-        if (extraFiles)
-          await Promise.all(
-            extraFiles?.map(async file => {
-              try {
-                await deleteImage(file)
-              } catch (_error) {
-                // don't mind if it was not possible to delete the file
-              }
-            }),
-          )
+    (formValues: ManufacturerForm) => {
+      startTransition(async () => {
+        try {
+          // Check if manufacturer changed
+          if (currentBrand.id !== barometer.manufacturer.id) {
+            toast.info(`Brand was not updated`)
+            return setOpen(false)
+          }
 
-        const updatedBarometer = {
-          id: barometer.id,
-          manufacturerId: currentBrand.id,
-        }
-        const updatedManufacturer = {
-          ...formValues,
-          successors: formValues.successors.map(id => ({ id })),
-          countries: formValues.countries.map(id => ({ id })),
-          images: await Promise.all(
+          // erase deleted images
+          const extraFiles = brandImages?.filter(url => !formValues.images.includes(url))
+          if (extraFiles)
+            await Promise.all(
+              extraFiles?.map(async file => {
+                try {
+                  await deleteImage(file)
+                } catch (_error) {
+                  // don't mind if it was not possible to delete the file
+                }
+              }),
+            )
+
+          const updatedBarometer = {
+            id: barometer.id,
+            manufacturerId: currentBrand.id,
+          }
+
+          const imageData = await Promise.all(
             formValues.images.map(async (url, i) => {
               const blurData = await getThumbnailBase64(imageStorage + url)
               return {
@@ -161,36 +170,47 @@ export function ManufacturerEdit({
                 blurData,
               }
             }),
-          ),
+          )
+
+          const updatedManufacturer = {
+            ...formValues,
+            successors: {
+              set: formValues.successors.map(id => ({ id })),
+            },
+            countries: {
+              set: formValues.countries.map(id => ({ id })),
+            },
+            images: {
+              deleteMany: {},
+              create: imageData,
+            },
+          }
+
+          const [{ name: barometerName }, { name: manufacturerName }] = await Promise.all([
+            updateBarometer(updatedBarometer),
+            updateBrand(updatedManufacturer),
+          ])
+
+          setOpen(false)
+          toast.success(`Updated manufacturer to ${manufacturerName} in ${barometerName}.`)
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Error updating manufacturer')
         }
-        const [{ slug }, { name }] = await Promise.all([
-          updateBarometer(updatedBarometer),
-          updateManufacturer(updatedManufacturer),
-        ])
-        toast.success(`${name} updated`)
-        // Small delay to show toast before redirect
-        setTimeout(() => {
-          window.location.href = FrontRoutes.Barometer + (slug ?? '')
-        }, 1000)
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Error updating manufacturer')
-      } finally {
-        setIsLoading(false)
-      }
+      })
     },
-    [barometer.id, barometer.name, brandImages, currentBrand?.id],
+    [barometer.id, barometer.name, barometer.manufacturer.id, brandImages, currentBrand?.id],
   )
+  // reset form on open and cleanup on close
+  useEffect(() => {
+    if (open) {
+      resetManufacturerIndex()
+    } else {
+      cleanupOnClose()
+    }
+  }, [open, resetManufacturerIndex, cleanupOnClose])
+
   return (
-    <UI.Dialog
-      onOpenChange={async isOpen => {
-        if (isOpen) {
-          resetManufacturerIndex()
-          // Don't reset to initialValues - let useEffect handle the proper data
-          return
-        }
-        await cleanupOnClose()
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -207,7 +227,7 @@ export function ManufacturerEdit({
             <div className="border-muted-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
           </div>
         ) : null}
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader className="mt-6 mb-2">
               <div className="flex items-center justify-between">
@@ -217,7 +237,7 @@ export function ManufacturerEdit({
                   variant="destructive"
                   size="icon"
                   aria-label="Delete manufacturer"
-                  onClick={() => manufacturers.delete(currentBrand?.slug)}
+                  onClick={() => deleteBrand(currentBrand?.slug)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </UI.Button>
@@ -237,7 +257,7 @@ export function ManufacturerEdit({
                   <UI.SelectValue />
                 </UI.SelectTrigger>
                 <UI.SelectContent className="max-h-[500px]">
-                  {manufacturers.data.map(({ name, id }, i) => (
+                  {brands.map(({ name, id }, i) => (
                     <UI.SelectItem key={id} value={String(i)}>
                       {name}
                     </UI.SelectItem>
@@ -284,7 +304,7 @@ export function ManufacturerEdit({
                   <UI.FormControl>
                     <CountriesMultiSelect
                       selected={(field.value as number[]) ?? []}
-                      options={countries.data?.map(({ id, name }) => ({ id, name })) ?? []}
+                      options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
                       onChange={vals => field.onChange(vals)}
                       placeholder={
                         ((field.value as number[]) ?? []).length === 0
@@ -336,7 +356,7 @@ export function ManufacturerEdit({
                   <UI.FormControl>
                     <SuccessorsMultiSelect
                       selected={(field.value as string[]) ?? []}
-                      options={manufacturers.data.map(({ id, name }) => ({ id, name }))}
+                      options={brands.map(({ id, name }) => ({ id, name }))}
                       onChange={vals => field.onChange(vals)}
                     />
                   </UI.FormControl>
@@ -361,11 +381,16 @@ export function ManufacturerEdit({
               )}
             />
 
-            <UI.Button type="submit" variant="outline" className="w-full">
+            <UI.Button
+              disabled={isPending || isLoading}
+              type="submit"
+              variant="outline"
+              className="w-full"
+            >
               Update
             </UI.Button>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

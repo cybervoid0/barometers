@@ -1,84 +1,79 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { useBarometers } from '@/hooks/useBarometers'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import type { MovementListDTO } from '@/lib/movements/queries'
 import { cn } from '@/utils'
 
 interface SubcategoryEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
-}
-
-interface SubcategoryForm {
-  subCategoryId?: string | null
+  barometer: NonNullable<BarometerDTO>
+  movements: MovementListDTO
 }
 
 const NONE_VALUE = '__none__'
 
-const validationSchema: yup.ObjectSchema<SubcategoryForm> = yup.object({
-  subCategoryId: yup.string().nullable().optional(),
+const validationSchema = z.object({
+  subCategoryId: z.string().nullable().optional(),
 })
 
-export function SubcategoryEdit({
+type SubcategoryForm = z.output<typeof validationSchema>
+
+export function MovementsEdit({
   size = 18,
   barometer,
+  movements,
   className,
   ...props
 }: SubcategoryEditProps) {
-  const { subcategories } = useBarometers()
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<SubcategoryForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      subCategoryId: barometer.subCategoryId ? String(barometer.subCategoryId) : NONE_VALUE,
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const update = async (values: SubcategoryForm) => {
-    try {
-      const subCategoryId =
-        values.subCategoryId && values.subCategoryId !== NONE_VALUE
-          ? Number(values.subCategoryId)
-          : null
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({
+      subCategoryId: barometer.subCategoryId ? String(barometer.subCategoryId) : NONE_VALUE,
+    })
+  }, [open, form.reset, barometer.subCategoryId])
 
-      // Don't update DB if selected value doesn't differ from the recorded
-      if (subCategoryId === barometer.subCategoryId) {
-        return
+  const update = (values: SubcategoryForm) => {
+    startTransition(async () => {
+      try {
+        const subCategoryId =
+          values.subCategoryId && values.subCategoryId !== NONE_VALUE
+            ? Number(values.subCategoryId)
+            : null
+
+        // Don't update DB if selected value doesn't differ from the recorded
+        if (subCategoryId === barometer.subCategoryId) return setOpen(false)
+
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          subCategoryId,
+        })
+
+        setOpen(false)
+        toast.success(`Updated movement type in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }
-
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        subCategoryId,
-      })
-
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+    })
   }
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            subCategoryId: barometer.subCategoryId ? String(barometer.subCategoryId) : NONE_VALUE,
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -90,7 +85,7 @@ export function SubcategoryEdit({
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Movement Type</UI.DialogTitle>
@@ -115,7 +110,7 @@ export function SubcategoryEdit({
                         </UI.SelectTrigger>
                         <UI.SelectContent className="max-h-[300px]">
                           <UI.SelectItem value={NONE_VALUE}>None</UI.SelectItem>
-                          {subcategories.data.map(({ name, id }) => (
+                          {movements.map(({ name, id }) => (
                             <UI.SelectItem key={id} value={String(id)}>
                               {name}
                             </UI.SelectItem>
@@ -129,12 +124,12 @@ export function SubcategoryEdit({
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

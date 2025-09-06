@@ -1,30 +1,29 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isEqual } from 'lodash'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 interface TextAreaEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
-  property: keyof BarometerDTO
+  barometer: NonNullable<BarometerDTO>
+  property: keyof NonNullable<BarometerDTO>
   label?: string
 }
 
-const validationSchema = yup.object({
-  value: yup.string().required('This field is required'),
+const validationSchema = z.object({
+  value: z.string().min(1, 'This field is required'),
 })
 
-type TextAreaForm = yup.InferType<typeof validationSchema>
+type TextAreaForm = z.output<typeof validationSchema>
 
 export function TextAreaEdit({
   size = 18,
@@ -34,45 +33,46 @@ export function TextAreaEdit({
   className,
   ...props
 }: TextAreaEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
   const form = useForm<TextAreaForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      value: String(barometer[property] || ''),
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const handleUpdate = async (values: TextAreaForm) => {
-    try {
-      if (isEqual(values.value, barometer[property])) {
-        return
+  // reset form on open with current data
+  useEffect(() => {
+    if (!open) return
+    form.reset({
+      value: String(barometer[property] || ''),
+    })
+  }, [open, barometer, property, form])
+
+  const handleUpdate = (values: TextAreaForm) => {
+    startTransition(async () => {
+      try {
+        if (isEqual(values.value, barometer[property])) {
+          toast.info(`Nothing was updated in ${barometer.name}.`)
+          return setOpen(false)
+        }
+
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          [property]: values.value,
+        })
+
+        setOpen(false)
+        toast.success(`Updated ${String(property).toLowerCase()} in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }
-
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        [property]: values.value,
-      })
-
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+    })
   }
 
   const displayLabel = label || String(property).charAt(0).toUpperCase() + String(property).slice(1)
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            value: String(barometer[property] || ''),
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -84,7 +84,7 @@ export function TextAreaEdit({
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-2xl">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit {displayLabel}</UI.DialogTitle>
@@ -108,12 +108,12 @@ export function TextAreaEdit({
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

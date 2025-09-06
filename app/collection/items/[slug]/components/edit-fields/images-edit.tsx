@@ -8,31 +8,30 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isEqual } from 'lodash'
 import { Edit, ImagePlus, Loader2, X } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import { useMemo, useRef, useState } from 'react'
+import { type ComponentProps, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
-import { FrontRoutes } from '@/constants/routes-front'
-import { createImageUrls, deleteImage, updateBarometer, uploadFileToCloud } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
 import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = yup.object({
-  images: yup.array().of(yup.string().required()).defined().default([]),
+const validationSchema = z.object({
+  images: z.array(z.string()),
 })
 
-type ImagesForm = yup.InferType<typeof validationSchema>
+type ImagesForm = z.output<typeof validationSchema>
 
 function SortableImage({
   image,
@@ -75,16 +74,21 @@ function SortableImage({
   )
 }
 export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
-  const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer])
+  const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<ImagesForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      images: barometerImages,
-    },
+    resolver: zodResolver(validationSchema),
   })
+
+  // reset form on open and when barometer images change
+  useEffect(() => {
+    if (!open) return
+    form.reset({ images: barometerImages })
+  }, [open, barometerImages, form])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -98,29 +102,29 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
     }
   }
 
-  const update = async (values: ImagesForm) => {
-    // exit if no image was changed
-    if (isEqual(values.images, barometerImages)) {
-      return
-    }
-    setIsUploading(true)
-    try {
-      // erase deleted images
-      const extraFiles = barometerImages?.filter(img => !values.images.includes(img))
-      if (extraFiles)
-        await Promise.all(
-          extraFiles?.map(async file => {
-            try {
-              await deleteImage(file)
-            } catch (_error) {
-              // don't mind if it was not possible to delete the file
-            }
-          }),
-        )
+  const update = (values: ImagesForm) => {
+    startTransition(async () => {
+      // exit if no image was changed
+      if (isEqual(values.images, barometerImages)) {
+        toast.info(`Nothing was updated in ${barometer.name}.`)
+        return setOpen(false)
+      }
+      setIsUploading(true)
+      try {
+        // erase deleted images
+        const extraFiles = barometerImages?.filter(img => !values.images.includes(img))
+        if (extraFiles)
+          await Promise.all(
+            extraFiles?.map(async file => {
+              try {
+                await deleteImage(file)
+              } catch (_error) {
+                // don't mind if it was not possible to delete the file
+              }
+            }),
+          )
 
-      const updatedBarometer = {
-        id: barometer.id,
-        images: await Promise.all(
+        const imageData = await Promise.all(
           values.images.map(async (url, i) => {
             const blurData = await getThumbnailBase64(imageStorage + url)
             return {
@@ -130,20 +134,26 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
               blurData,
             }
           }),
-        ),
-      }
+        )
 
-      const { slug } = await updateBarometer(updatedBarometer)
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      console.error(error)
-      toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
-    } finally {
-      setIsUploading(false)
-    }
+        const updatedBarometer = {
+          id: barometer.id,
+          images: {
+            deleteMany: {},
+            create: imageData,
+          },
+        }
+
+        const { name } = await updateBarometer(updatedBarometer)
+        setOpen(false)
+        toast.success(`Updated images in ${name}.`)
+      } catch (error) {
+        console.error(error)
+        toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
+      } finally {
+        setIsUploading(false)
+      }
+    })
   }
 
   /**
@@ -198,30 +208,31 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
     }
   }
 
-  const onClose = async () => {
-    // delete unused files from storage
-    try {
-      setIsUploading(true)
-      const currentImages = form.getValues('images')
-      const extraImages = currentImages.filter(img => !barometerImages?.includes(img))
-      await Promise.all(extraImages.map(deleteImage))
-    } catch (_error) {
-      // do nothing
-    } finally {
-      setIsUploading(false)
+  // reset form on open and cleanup on close
+  // biome-ignore lint/correctness/useExhaustiveDependencies: form not gonna change
+  useEffect(() => {
+    if (open) {
+      form.reset()
+    } else {
+      // delete unused files from storage when closing
+      const cleanup = async () => {
+        try {
+          setIsUploading(true)
+          const currentImages = form.getValues('images')
+          const extraImages = currentImages.filter(img => !barometerImages?.includes(img))
+          await Promise.all(extraImages.map(deleteImage))
+        } catch (_error) {
+          // do nothing
+        } finally {
+          setIsUploading(false)
+        }
+      }
+      cleanup()
     }
-  }
+  }, [open, barometerImages])
 
   return (
-    <UI.Dialog
-      onOpenChange={async isOpen => {
-        if (isOpen) {
-          form.reset({ images: barometerImages })
-        } else {
-          await onClose()
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -233,7 +244,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-4xl">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <div className="relative">
               {isUploading && (
@@ -254,7 +265,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                     variant="outline"
                     className="w-fit"
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
+                    disabled={isUploading || isPending}
                   >
                     <ImagePlus className="mr-2 h-4 w-4" />
                     Add Images
@@ -303,14 +314,14 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                   type="submit"
                   variant="outline"
                   className="w-full"
-                  disabled={isUploading}
+                  disabled={isUploading || isPending}
                 >
                   Save
                 </UI.Button>
               </div>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { IsAdmin } from '@/components/elements'
 import {
@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
-import { deleteBarometer } from '@/services'
+import { deleteBarometer } from '@/lib/barometers/actions'
 import type { BarometerDTO } from '@/types'
 import { cn } from '@/utils'
 
@@ -28,21 +28,20 @@ const warnStyles = 'leading-tight tracking-tighter indent-4 font-medium text-des
 
 export function DeleteBarometer({ barometer, className }: Props) {
   const [open, setOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, startTransition] = useTransition()
   const router = useRouter()
 
-  const handleDelete = async () => {
-    setIsDeleting(true)
-    try {
-      const { message } = await deleteBarometer(barometer.slug)
-      toast.success(message)
-      setOpen(false)
-      router.replace(FrontRoutes.Categories + barometer.category.name)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error deleting barometer')
-    } finally {
-      setIsDeleting(false)
-    }
+  const handleDelete = () => {
+    startTransition(async () => {
+      try {
+        await deleteBarometer(barometer.slug)
+        toast.success('Barometer deleted successfully')
+        setOpen(false)
+        router.replace(FrontRoutes.Categories + barometer.category.name)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error deleting barometer')
+      }
+    })
   }
 
   return (

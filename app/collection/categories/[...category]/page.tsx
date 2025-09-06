@@ -5,11 +5,12 @@ import type { Metadata } from 'next'
 import { FooterVideo } from '@/components/containers'
 import { BarometerCard, ShowMore } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
-import { BAROMETERS_PER_CATEGORY_PAGE, imageStorage } from '@/constants'
+import { DEFAULT_PAGE_SIZE, imageStorage } from '@/constants'
 import { openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
+import { getBarometersByParams } from '@/lib/barometers/queries'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getBarometersByParams, getCategory } from '@/services'
+import { getCategory } from '@/services'
 import { type DynamicOptions, SortOptions, type SortValue } from '@/types'
 import Sort from './sort'
 
@@ -60,8 +61,8 @@ export default async function Collection({ params: { category } }: CollectionPro
   const [categoryName, sort, page] = category
   const { barometers, totalPages } = await getBarometersByParams(
     categoryName,
-    Number(page),
-    BAROMETERS_PER_CATEGORY_PAGE,
+    +page,
+    DEFAULT_PAGE_SIZE,
     sort as SortValue,
   )
   const { description } = await getCategory(categoryName)
@@ -88,7 +89,9 @@ export default async function Collection({ params: { category } }: CollectionPro
               />
             ))}
           </div>
-          {totalPages > 1 && <Pagination total={totalPages} value={+page} className="mt-4" />}
+          {totalPages > 1 && (
+            <Pagination pageAsRoute total={totalPages} value={+page} className="mt-4" />
+          )}
         </Card>
       </div>
       {categoryName === 'recorders' && <FooterVideo />}
@@ -110,7 +113,7 @@ export const generateStaticParams = withPrisma(async prisma => {
   for (const { name, id } of categories) {
     const categoryData = categoriesWithCount.find(({ categoryId }) => categoryId === id)
     const barometersPerCategory = categoryData?._count._all ?? 0
-    const pagesPerCategory = Math.ceil(barometersPerCategory / BAROMETERS_PER_CATEGORY_PAGE)
+    const pagesPerCategory = Math.ceil(barometersPerCategory / DEFAULT_PAGE_SIZE)
     // generate all category/sort/page combinations for static page generation
     for (const { value: sort } of SortOptions) {
       for (let page = 1; page <= pagesPerCategory; page += 1) {

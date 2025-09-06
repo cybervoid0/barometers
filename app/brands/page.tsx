@@ -7,9 +7,11 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { FrontRoutes } from '@/constants/routes-front'
-import { withPrisma } from '@/prisma/prismaClient'
+import { type BrandsByCountryDTO, getBrandsByCountry } from '@/lib/brands/queries'
+import { type CountryListDTO, getCountries } from '@/lib/counties/queries'
 import { title } from '../../constants/metadata'
 import type { DynamicOptions } from '../../types'
+import { BrandEdit } from './brand-edit'
 
 export const dynamic: DynamicOptions = 'force-static'
 
@@ -17,52 +19,12 @@ export const metadata: Metadata = {
   title: `${title} - Manufacturers`,
 }
 
-const getBrandsByCountry = withPrisma(async prisma => {
-  return prisma.country.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-    where: {
-      manufacturers: {
-        some: {},
-      },
-    },
-    include: {
-      manufacturers: {
-        orderBy: {
-          name: 'asc',
-        },
-        select: {
-          id: true,
-          firstName: true,
-          name: true,
-          slug: true,
-          barometers: {
-            select: {
-              images: {
-                where: {
-                  order: 0,
-                },
-                select: {
-                  url: true,
-                  blurData: true,
-                },
-                take: 1,
-              },
-            },
-            take: 1,
-          },
-          icon: true,
-        },
-      },
-    },
-  })
-})
-
 const BrandsOfCountry = ({
   country,
+  countries,
 }: {
-  country: Awaited<ReturnType<typeof getBrandsByCountry>>[number]
+  country: BrandsByCountryDTO[number]
+  countries: CountryListDTO
 }) => {
   const width = 32
   return (
@@ -71,34 +33,34 @@ const BrandsOfCountry = ({
       <Separator className="mx-2 mb-5" />
 
       <div className="flex flex-col gap-4">
-        {country.manufacturers.map(({ id, firstName, name, slug, icon }) => {
+        {country.manufacturers.map(brand => {
+          const { id, firstName, name, slug, icon } = brand
           const base64 = icon ? Buffer.from(icon).toString('base64') : null
           const image = base64 ? `data:image/png;base64,${base64}` : null
           return (
-            <Link
-              className="w-fit no-underline hover:underline"
-              key={id}
-              href={FrontRoutes.Brands + slug}
-            >
-              <div className="flex flex-nowrap items-center gap-3">
-                {image ? (
-                  <Image
-                    unoptimized
-                    width={width}
-                    height={width}
-                    alt={name}
-                    loading="lazy"
-                    src={image}
-                    className="h-8 w-8 object-contain"
-                  />
-                ) : (
-                  <ArrowUp size={32} />
-                )}
-                <p className="w-fit font-medium capitalize">
-                  {name + (firstName ? `, ${firstName}` : '')}
-                </p>
-              </div>
-            </Link>
+            <div key={id} className="flex gap-1 items-center">
+              <BrandEdit brand={brand} countries={countries} />
+              <Link className="w-fit no-underline hover:underline" href={FrontRoutes.Brands + slug}>
+                <div className="flex flex-nowrap items-center gap-3">
+                  {image ? (
+                    <Image
+                      unoptimized
+                      width={width}
+                      height={width}
+                      alt={name}
+                      loading="lazy"
+                      src={image}
+                      className="h-8 w-8 object-contain"
+                    />
+                  ) : (
+                    <ArrowUp size={32} />
+                  )}
+                  <p className="w-fit font-medium capitalize">
+                    {name + (firstName ? `, ${firstName}` : '')}
+                  </p>
+                </div>
+              </Link>
+            </div>
           )
         })}
       </div>
@@ -107,10 +69,11 @@ const BrandsOfCountry = ({
 }
 
 export default async function Manufacturers() {
-  const countries = await getBrandsByCountry()
+  const brandsByCountry = await getBrandsByCountry()
+  const countries = await getCountries()
   const firstColStates = ['France', 'Great Britain']
-  const firstColumn = countries.filter(({ name }) => firstColStates.includes(name))
-  const secondColumn = countries.filter(({ name }) => !firstColStates.includes(name))
+  const firstColumn = brandsByCountry.filter(({ name }) => firstColStates.includes(name))
+  const secondColumn = brandsByCountry.filter(({ name }) => !firstColStates.includes(name))
   return (
     <div className="pt-6">
       <h2 className="mb-4">Manufacturers</h2>
@@ -124,13 +87,13 @@ export default async function Manufacturers() {
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
           <div>
             {firstColumn.map(country => (
-              <BrandsOfCountry key={country.id} country={country} />
+              <BrandsOfCountry key={country.id} country={country} countries={countries} />
             ))}
           </div>
           <Separator orientation="vertical" className="hidden sm:block" />
           <div>
             {secondColumn.map(country => (
-              <BrandsOfCountry key={country.id} country={country} />
+              <BrandsOfCountry key={country.id} country={country} countries={countries} />
             ))}
           </div>
         </div>

@@ -59,7 +59,7 @@ export function SignInForm() {
   }
 
   return (
-    <UI.Form {...form}>
+    <UI.FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <div className="space-y-4">
           <UI.FormField
@@ -119,6 +119,6 @@ export function SignInForm() {
           {isLoading ? 'Signing in...' : 'Sign In'}
         </UI.Button>
       </form>
-    </UI.Form>
+    </UI.FormProvider>
   )
 }

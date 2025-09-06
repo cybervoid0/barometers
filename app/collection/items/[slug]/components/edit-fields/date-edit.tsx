@@ -1,68 +1,72 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 interface DateEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = yup.object({
-  date: yup
+const fromYear = 1600 // barometers barely existed before this year
+const currentYear = dayjs().year()
+
+const validationSchema = z.object({
+  date: z
     .string()
-    .required('Year is required')
-    .matches(/^\d{4}$/, 'Must be a 4-digit year')
-    .test('year-range', 'Year must be between 1000 and 2099', value => {
-      if (!value) return false
-      const year = parseInt(value, 10)
-      return year >= 1000 && year <= 2099
-    }),
+    .min(1, 'Year is required')
+    .length(4, 'Must be exactly 4 digits')
+    .regex(/^\d{4}$/, 'Must be a 4-digit year')
+    .refine(year => {
+      return +year >= fromYear && +year <= currentYear
+    }, `Year must be between ${fromYear} and ${currentYear}`),
 })
 
-type DateForm = yup.InferType<typeof validationSchema>
+type DateForm = z.output<typeof validationSchema>
 
 export function DateEdit({ size = 18, barometer, className, ...props }: DateEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const form = useForm<DateForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      date: dayjs(barometer.date).format('YYYY'),
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const update = async (values: DateForm) => {
-    try {
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        date: dayjs(`${values.date}-01-01`).toISOString(),
-      })
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+  const update = (values: DateForm) => {
+    startTransition(async () => {
+      try {
+        if (+values.date === dayjs(barometer.date).year()) {
+          toast.info(`Nothing was updated in ${barometer.name}.`)
+          return setOpen(false)
+        }
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          date: dayjs(`${values.date}-01-01`).toISOString(),
+        })
+        toast.success(`Updated year in ${name}.`)
+        setOpen(false)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+      }
+    })
   }
 
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ date: dayjs(barometer.date).format('YYYY') })
+  }, [open, form.reset, barometer.date])
+
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({ date: dayjs(barometer.date).format('YYYY') })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -74,7 +78,7 @@ export function DateEdit({ size = 18, barometer, className, ...props }: DateEdit
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Year</UI.DialogTitle>
@@ -105,12 +109,12 @@ export function DateEdit({ size = 18, barometer, className, ...props }: DateEdit
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

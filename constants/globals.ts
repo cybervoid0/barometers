@@ -10,3 +10,4 @@ export const imageStorage = `${process.env.NEXT_PUBLIC_MINIO_URL}/${process.env.
 export const github = 'https://github.com/shenshin'
 
 export const BAROMETERS_PER_CATEGORY_PAGE = 12
+export const DEFAULT_PAGE_SIZE = 12

@@ -9,12 +9,12 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 import { Button } from '@/components/ui/button'
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormProvider,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
@@ -171,7 +171,7 @@ export default function AddDocument() {
       <h3 className="mt-6 mb-10">Add new document</h3>
 
       <FormProvider {...methods}>
-        <Form {...methods}>
+        <FormProvider {...methods}>
           <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
             <FormField
               control={methods.control}
@@ -458,7 +458,7 @@ export default function AddDocument() {
               {isPending ? 'Adding...' : 'Add new document'}
             </Button>
           </form>
-        </Form>
+        </FormProvider>
       </FormProvider>
     </div>
   )

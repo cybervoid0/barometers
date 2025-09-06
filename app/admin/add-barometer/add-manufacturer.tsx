@@ -119,7 +119,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
           <UI.DialogTitle>Add Manufacturer</UI.DialogTitle>
         </UI.DialogHeader>
 
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <UI.FormField
               control={form.control}
@@ -190,7 +190,7 @@ export function AddManufacturer({ onAddManufacturer }: AddManufacturerProps) {
               <IconUpload onFileChange={handleIconChange} />
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

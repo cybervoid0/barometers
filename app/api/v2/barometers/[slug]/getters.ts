@@ -1,7 +1,7 @@
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const getBarometer = withPrisma(async (prisma, slug: string) => {
-  const barometer = await prisma.barometer.findFirst({
+  return prisma.barometer.findFirstOrThrow({
     where: {
       slug: {
         equals: slug,
@@ -55,8 +55,6 @@ export const getBarometer = withPrisma(async (prisma, slug: string) => {
       },
     },
   })
-  if (barometer === null) throw new Error('Barometer not found')
-  return barometer
 })
 
 export type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>

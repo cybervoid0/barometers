@@ -1,8 +1,6 @@
 import type { InaccuracyReport, Manufacturer } from '@prisma/client'
 import { ApiRoutes } from '@/constants/routes-back'
 import type {
-  BarometerDTO,
-  BarometerListDTO,
   CategoryDTO,
   CategoryListDTO,
   ConditionListDTO,
@@ -12,7 +10,6 @@ import type {
   ManufacturerDTO,
   ManufacturerListDTO,
   MaterialListDTO,
-  SearchResultsDTO,
   SubcategoryListDTO,
   UrlDto,
 } from '@/types'
@@ -33,56 +30,6 @@ export async function handleApiError(res: Response): Promise<void> {
   }
 }
 
-/******* Barometers ********/
-export async function fetchBarometer(slug: string): Promise<BarometerDTO> {
-  const res = await fetch(ApiRoutes.Barometers + slug)
-  return res.json()
-}
-export async function fetchBarometerList(
-  searchParams: Record<string, string>,
-): Promise<BarometerListDTO> {
-  const res = await fetch(`${ApiRoutes.Barometers}?${new URLSearchParams(searchParams)}`, {
-    cache: 'no-cache',
-  })
-  return res.json()
-}
-export async function searchBarometers(
-  searchParams: Record<string, string>,
-): Promise<SearchResultsDTO> {
-  const pageSize = '10'
-  const url = `${ApiRoutes.BarometerSearch}?${new URLSearchParams({ ...searchParams, size: pageSize })}`
-  const res = await fetch(url, { cache: 'no-cache' })
-  return res.json()
-}
-export async function createBarometer<T>(barometer: T): Promise<{ id: string }> {
-  const res = await fetch(ApiRoutes.Barometers, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(barometer),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
-export async function updateBarometer<T>(barometer: T): Promise<{ slug: string }> {
-  const res = await fetch(ApiRoutes.Barometers, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(barometer),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
-export async function deleteBarometer(slug: string): Promise<{ message: string }> {
-  const res = await fetch(`${ApiRoutes.Barometers}/${slug}`, {
-    method: 'DELETE',
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
 /******* Categories ********/
 export async function fetchCategoryList(): Promise<CategoryListDTO> {
   const res = await fetch(ApiRoutes.Categories)

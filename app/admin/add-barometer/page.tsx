@@ -6,12 +6,12 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormProvider,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
@@ -103,7 +103,7 @@ export default function AddCard() {
       <h3 className="mt-6 mb-10">Add new barometer</h3>
 
       <FormProvider {...methods}>
-        <Form {...methods}>
+        <FormProvider {...methods}>
           <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
             <FormField
               control={control}
@@ -401,7 +401,7 @@ export default function AddCard() {
               {isPending ? 'Adding...' : 'Add new barometer'}
             </Button>
           </form>
-        </Form>
+        </FormProvider>
       </FormProvider>
     </div>
   )

@@ -1,4 +1,17 @@
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion'
+export {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './alert-dialog'
 export { Badge, type BadgeProps, badgeVariants } from './badge'
 export {
   Breadcrumb,
@@ -69,13 +82,13 @@ export {
   DropdownMenuTrigger,
 } from './dropdown-menu'
 export {
-  Form,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormProvider,
   useFormField,
 } from './form'
 export { Input } from './input'

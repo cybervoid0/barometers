@@ -1,40 +1,37 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 dayjs.extend(utc)
 interface PurchasedAtEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = yup.object({
-  purchasedAt: yup
+const validationSchema = z.object({
+  purchasedAt: z
     .string()
-    .test('valid-date', 'Must be a valid date', value => {
-      if (!value) return true // Allow empty string
+    .min(1, 'Purchase date is required')
+    .refine(value => {
       return dayjs(value).isValid()
-    })
-    .test('not-future', 'Purchase date cannot be in the future', value => {
-      if (!value) return true
+    }, 'Must be a valid date')
+    .refine(value => {
       return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
-    })
-    .defined(),
+    }, 'Purchase date cannot be in the future'),
 })
 
-type PurchasedAtForm = yup.InferType<typeof validationSchema>
+type PurchasedAtForm = z.output<typeof validationSchema>
 
 export function PurchasedAtEdit({
   size = 18,
@@ -42,28 +39,45 @@ export function PurchasedAtEdit({
   className,
   ...props
 }: PurchasedAtEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const form = useForm<PurchasedAtForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
+    resolver: zodResolver(validationSchema),
+  })
+
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({
       purchasedAt: barometer.purchasedAt
         ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
         : '',
-    },
-  })
+    })
+  }, [open, barometer.purchasedAt, form.reset])
 
-  const update = async (values: PurchasedAtForm) => {
-    try {
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
-      })
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+  const update = (values: PurchasedAtForm) => {
+    startTransition(async () => {
+      try {
+        const currentValue = barometer.purchasedAt
+          ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
+          : ''
+
+        if (values.purchasedAt === currentValue) {
+          toast.info(`Nothing was updated in ${barometer.name}.`)
+          return setOpen(false)
+        }
+
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
+        })
+
+        setOpen(false)
+        toast.success(`Updated purchase date in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+      }
+    })
   }
 
   const clearDate = () => {
@@ -71,17 +85,7 @@ export function PurchasedAtEdit({
   }
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            purchasedAt: barometer.purchasedAt
-              ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
-              : '',
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -93,12 +97,12 @@ export function PurchasedAtEdit({
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Purchase Date</UI.DialogTitle>
               <UI.DialogDescription>
-                Update the purchase date for this barometer. Leave empty if unknown.
+                Update the purchase date for this barometer.
               </UI.DialogDescription>
             </UI.DialogHeader>
             <div className="mt-4 space-y-4">
@@ -123,6 +127,7 @@ export function PurchasedAtEdit({
                           variant="outline"
                           size="sm"
                           onClick={clearDate}
+                          disabled={isPending}
                           className="shrink-0"
                         >
                           Clear
@@ -135,12 +140,12 @@ export function PurchasedAtEdit({
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

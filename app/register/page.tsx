@@ -60,7 +60,7 @@ export default function Register() {
 
   return (
     <article className="flex justify-center">
-      <UI.Form {...form}>
+      <UI.FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
           <div className="w-80 space-y-4">
             <h2 className="mb-2 text-center text-2xl">Registration</h2>
@@ -173,7 +173,7 @@ export default function Register() {
             {isLoading ? 'Signing up...' : 'Sign up'}
           </UI.Button>
         </form>
-      </UI.Form>
+      </UI.FormProvider>
     </article>
   )
 }

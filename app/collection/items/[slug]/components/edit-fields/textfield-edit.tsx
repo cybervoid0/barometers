@@ -1,65 +1,68 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit } from 'lucide-react'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 interface TextFieldEditProps {
   size?: number
-  barometer: BarometerDTO
-  property: keyof BarometerDTO
+  barometer: NonNullable<BarometerDTO>
+  property: keyof NonNullable<BarometerDTO>
   className?: string
 }
 
-const textFieldSchema = yup.object().shape({
-  value: yup.string().required('Field is required').max(200, 'Must be less than 200 characters'),
+const textFieldSchema = z.object({
+  value: z.string().min(1, 'Field is required').max(200, 'Must be less than 200 characters'),
 })
 
-type FormData = yup.InferType<typeof textFieldSchema>
+type FormData = z.infer<typeof textFieldSchema>
 
 export function TextFieldEdit({ size = 18, barometer, property, className }: TextFieldEditProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<FormData>({
-    resolver: yupResolver(textFieldSchema),
-    defaultValues: {
-      value: String(barometer[property] || ''),
-    },
+    resolver: zodResolver(textFieldSchema),
   })
 
-  const onSubmit = async (values: FormData) => {
-    setIsUpdating(true)
-    try {
-      // Check if value actually changed
-      if (values.value === String(barometer[property] || '')) {
-        setOpen(false)
-        return
-      }
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ value: String(barometer[property] || '') })
+  }, [open, form.reset, barometer[property], property])
 
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        [property]: values.value,
-      })
-
-      toast.success(`${barometer.name} updated`)
-      setOpen(false)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    } finally {
-      setIsUpdating(false)
+  const onSubmit = (values: FormData) => {
+    // Check if value actually changed
+    if (values.value === String(barometer[property] || '')) {
+      toast.info(`Nothing was updated in ${barometer.name}.`)
+      return setOpen(false)
     }
+    startTransition(async () => {
+      try {
+        const { slug, name } = await updateBarometer({
+          id: barometer.id,
+          [property]: values.value,
+        })
+        // reload the page if property was 'name' or 'slug' and the page URL has changed
+        if (property === 'name' || property === 'slug') {
+          router.replace(FrontRoutes.Barometer + slug)
+        }
+        toast.success(`${name} updated`)
+        setOpen(false)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+      }
+    })
   }
 
   return (
@@ -80,7 +83,7 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
           </UI.DialogDescription>
         </UI.DialogHeader>
 
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <UI.FormField
               control={form.control}
@@ -94,11 +97,11 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
                 </UI.FormItem>
               )}
             />
-            <UI.Button type="submit" variant="outline" className="w-full" disabled={isUpdating}>
-              {isUpdating ? 'Saving...' : 'Save'}
+            <UI.Button type="submit" variant="outline" className="w-full" disabled={isPending}>
+              {isPending ? 'Saving...' : 'Save'}
             </UI.Button>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

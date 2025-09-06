@@ -2,101 +2,95 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit } from 'lucide-react'
-import { type ComponentProps, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as zod from 'zod'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { updateBarometer } from '@/lib/barometers/actions'
 import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { ConditionsDTO } from '@/lib/conditions/queries'
-import { cn } from '@/utils'
+import type { AllBrandsDTO } from '@/lib/brands/queries'
 
-interface ConditionEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
+interface Props {
   barometer: NonNullable<BarometerDTO>
-  conditions: ConditionsDTO
+  brands: AllBrandsDTO
 }
 
-const validationSchema = zod.object({
-  conditionId: zod.string().min(1, 'Condition is required'),
+const validationSchema = z.object({
+  brandId: z.string().min(1, 'Brand is required'),
 })
 
-type ConditionForm = zod.infer<typeof validationSchema>
+type BrandForm = z.output<typeof validationSchema>
 
-export function ConditionEdit({
-  size = 18,
-  barometer,
-  conditions,
-  className,
-  ...props
-}: ConditionEditProps) {
+function BrandEdit({ brands, barometer }: Props) {
   const [open, setOpen] = useState(false)
+  const closeDialog = () => setOpen(false)
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<ConditionForm>({
+  const form = useForm<BrandForm>({
     resolver: zodResolver(validationSchema),
   })
 
   // reset form on open
   useEffect(() => {
     if (!open) return
-    form.reset({ conditionId: barometer.condition?.id ?? '' })
-  }, [open, form.reset, barometer.condition?.id])
+    form.reset({ brandId: barometer.manufacturerId })
+  }, [open, barometer.manufacturerId, form.reset])
 
-  const update = (values: ConditionForm) => {
-    if (values.conditionId === barometer.conditionId) {
-      toast.info(`Nothing was updated in ${barometer.name}.`)
-      return setOpen(false)
-    }
-    startTransition(async () => {
-      try {
-        const { name } = await updateBarometer({
-          id: barometer.id,
-          conditionId: values.conditionId,
-        })
-        setOpen(false)
-        toast.success(`Updated condition in ${name}.`)
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Error updating barometer condition')
+  // biome-ignore lint/correctness/useExhaustiveDependencies: exclude closeDialog
+  const update = useCallback(
+    (values: BrandForm) => {
+      if (values.brandId === barometer.manufacturerId) {
+        toast.info(`Nothing was updated in ${barometer.name}.`)
+        return closeDialog()
       }
-    })
-  }
-
+      startTransition(async () => {
+        try {
+          const { name } = await updateBarometer({
+            id: barometer.id,
+            manufacturerId: values.brandId,
+          })
+          setOpen(false)
+          toast.success(`Updated brand in ${name}.`)
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Error updating barometer brand')
+        }
+      })
+    },
+    [barometer.manufacturerId, barometer.name],
+  )
   return (
     <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
-        <UI.Button
-          variant="ghost"
-          aria-label="Edit condition"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
+        <UI.Button variant="ghost" aria-label="Change brand" className="h-fit w-fit p-1">
+          <Edit className="text-destructive" size={18} />
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
         <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
-              <UI.DialogTitle>Edit Condition</UI.DialogTitle>
-              <UI.DialogDescription>Update the condition for this barometer.</UI.DialogDescription>
+              <UI.DialogTitle>Change Brand</UI.DialogTitle>
+              <UI.DialogDescription>
+                Update the manufacturer for this barometer.
+              </UI.DialogDescription>
             </UI.DialogHeader>
             <div className="mt-4 space-y-4">
               <UI.FormField
                 control={form.control}
-                name="conditionId"
+                name="brandId"
                 render={({ field }) => (
                   <UI.FormItem>
-                    <UI.FormLabel>Condition</UI.FormLabel>
+                    <UI.FormLabel>Brand</UI.FormLabel>
                     <UI.FormControl>
                       <UI.Select value={field.value} onValueChange={field.onChange}>
                         <UI.SelectTrigger className="w-full">
-                          <UI.SelectValue placeholder="Select condition" />
+                          <UI.SelectValue placeholder="Select brand" />
                         </UI.SelectTrigger>
-                        <UI.SelectContent>
-                          {conditions.map(({ name, id }) => (
+                        <UI.SelectContent side="bottom" className="max-h-[200px]">
+                          {brands.map(({ name, id, firstName }) => (
                             <UI.SelectItem key={id} value={id}>
+                              {firstName ? `${firstName} ` : ''}
                               {name}
                             </UI.SelectItem>
                           ))}
@@ -119,3 +113,5 @@ export function ConditionEdit({
     </UI.Dialog>
   )
 }
+
+export { BrandEdit }

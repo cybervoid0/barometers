@@ -1,33 +1,29 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 interface EstimatedPriceEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = yup.object({
-  estimatedPrice: yup
+const validationSchema = z.object({
+  estimatedPrice: z
     .string()
-    .required('Price is required')
-    .test('is-decimal', 'Must be a valid decimal number', value => {
-      if (!value) return false
-      return /^\d+(\.\d{1,2})?$/.test(value)
-    }),
+    .min(1, 'Price is required')
+    .regex(/^\d+(\.\d{1,2})?$/, 'Must be a valid decimal number'),
 })
 
-type EstimatedPriceForm = yup.InferType<typeof validationSchema>
+type EstimatedPriceForm = z.output<typeof validationSchema>
 
 export function EstimatedPriceEdit({
   size = 18,
@@ -35,46 +31,44 @@ export function EstimatedPriceEdit({
   className,
   ...props
 }: EstimatedPriceEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const form = useForm<EstimatedPriceForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '',
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const update = async (values: EstimatedPriceForm) => {
-    try {
-      const newEstimatedPrice = Number(values.estimatedPrice)
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '' })
+  }, [open, form.reset, barometer.estimatedPrice])
 
-      // Don't update if value hasn't changed
-      if (newEstimatedPrice === barometer.estimatedPrice) {
-        return
+  const update = (values: EstimatedPriceForm) => {
+    startTransition(async () => {
+      try {
+        const newEstimatedPrice = Number(values.estimatedPrice)
+
+        // Don't update if value hasn't changed
+        if (newEstimatedPrice === barometer.estimatedPrice) {
+          toast.info(`Nothing was updated in ${barometer.name}`)
+          return setOpen(false)
+        }
+
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          estimatedPrice: newEstimatedPrice,
+        })
+
+        setOpen(false)
+        toast.success(`Updated estimated price in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }
-
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        estimatedPrice: newEstimatedPrice,
-      })
-
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+    })
   }
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '',
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -86,7 +80,7 @@ export function EstimatedPriceEdit({
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Estimated Price</UI.DialogTitle>
@@ -115,12 +109,12 @@ export function EstimatedPriceEdit({
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

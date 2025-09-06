@@ -3,20 +3,20 @@ import 'server-only'
 import { BarometerCardWithIcon } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
-import { fetchBarometerList } from '@/services'
-
-const itemsOnPage = 12
+import { getBarometersByParams } from '@/lib/barometers/queries'
 
 interface newArrivalsProps {
   searchParams: Record<string, string>
 }
 
 export default async function NewArrivals({ searchParams }: newArrivalsProps) {
-  const { barometers, totalPages, page } = await fetchBarometerList({
-    sort: 'last-added',
-    page: searchParams.page ?? 1,
-    size: searchParams.size ?? itemsOnPage,
-  })
+  const { page: pageNo, size } = searchParams
+  const { barometers, totalPages, page } = await getBarometersByParams(
+    null, // all categories
+    +pageNo,
+    +size,
+    'last-added', // sort by
+  )
   return (
     <div className="flex flex-col gap-2 pt-6">
       <h2>Last Added</h2>

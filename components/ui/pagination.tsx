@@ -93,9 +93,16 @@ interface PaginationProps {
   value?: number
   onChange?: (page: number) => void
   className?: string
+  pageAsRoute?: boolean
 }
 
-export function Pagination({ total, value = 1, onChange, className }: PaginationProps) {
+export function Pagination({
+  total,
+  value = 1,
+  onChange,
+  className,
+  pageAsRoute = false,
+}: PaginationProps) {
   const router = useRouter()
   const pathname = usePathname()
 
@@ -103,7 +110,10 @@ export function Pagination({ total, value = 1, onChange, className }: Pagination
     if (onChange) {
       onChange(newPage)
     } else {
-      router.push(pathname.split('/').slice(0, -1).concat(`${newPage}`).join('/'))
+      const pagePath = pageAsRoute
+        ? pathname.split('/').slice(0, -1).concat(`${newPage}`).join('/')
+        : `${pathname}?${new URLSearchParams({ page: String(newPage) })}`
+      router.push(pagePath)
     }
   }
 

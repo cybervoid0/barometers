@@ -1,6 +1,9 @@
+import 'server-only'
+
 import { Pagination } from '@/components/ui/pagination'
+import { DEFAULT_PAGE_SIZE } from '@/constants'
 import { FrontRoutes } from '@/constants/routes-front'
-import { searchBarometers } from '@/services/fetch'
+import { searchBarometers } from '@/lib/barometers/search'
 import { SearchInfo } from './search-info'
 import { SearchItem } from './search-item'
 
@@ -9,7 +12,14 @@ interface SearchProps {
 }
 
 export default async function Search({ searchParams }: SearchProps) {
-  const { barometers = [], page = 1, totalPages = 0 } = await searchBarometers(searchParams)
+  const query = searchParams.q ?? ''
+  const pageSize = Math.max(Number(searchParams.size) ?? DEFAULT_PAGE_SIZE, 0)
+  const pageNo = Math.max(Number(searchParams.page) || 1, 1)
+  const {
+    barometers = [],
+    page = 1,
+    totalPages = 0,
+  } = await searchBarometers(query, pageSize, pageNo)
 
   return (
     <article className="mx-auto mt-6 max-w-lg">
