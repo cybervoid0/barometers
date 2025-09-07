@@ -34,3 +34,9 @@ export const SortOptions = [
 ] as const satisfies { value: string; label: string }[]
 
 export type SortValue = (typeof SortOptions)[number]['value']
+export interface CookieTable extends Record<string, string> {
+  name: string
+  domain: string
+  description: string
+  expiration: string
+}

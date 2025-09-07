@@ -59,7 +59,7 @@ export default function Register() {
   }
 
   return (
-    <div className="flex justify-center">
+    <article className="flex justify-center">
       <UI.Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
           <div className="w-80 space-y-4">
@@ -174,6 +174,6 @@ export default function Register() {
           </UI.Button>
         </form>
       </UI.Form>
-    </div>
+    </article>
   )
 }

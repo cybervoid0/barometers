@@ -13,6 +13,7 @@ export const FrontRoutes = {
   AddBarometer: '/admin/add-barometer/',
   AddDocument: '/admin/add-document/',
   Reports: '/admin/reports/',
+  CookiePolicy: '/cookies/',
 } as const
 
 export type FrontRoutes = (typeof FrontRoutes)[keyof typeof FrontRoutes]

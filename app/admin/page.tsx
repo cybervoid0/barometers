@@ -4,7 +4,7 @@ import { FrontRoutes } from '@/constants/routes-front'
 
 export default function Admin() {
   return (
-    <div className="p-6">
+    <article className="p-6">
       <div className="space-y-4">
         <Link
           href={FrontRoutes.AddBarometer}
@@ -28,6 +28,6 @@ export default function Admin() {
           View Inaccuracy Reports
         </Link>
       </div>
-    </div>
+    </article>
   )
 }

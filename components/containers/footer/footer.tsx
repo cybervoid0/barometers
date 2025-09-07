@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ManageCookies } from '@/components/elements'
+import { FrontRoutes } from '@/constants'
 import { cn } from '@/utils'
 import { SocialButtons } from './social-buttons'
 
@@ -15,7 +16,7 @@ export function Footer() {
         <div className="grow text-center">
           <p className="mb-2 text-xs">
             By using this website, you agree to our{' '}
-            <Link href="/terms-and-conditions">Terms & Conditions</Link>
+            <Link href={FrontRoutes.Terms}>Terms & Conditions</Link>
           </p>
 
           <p className="text-xs">

@@ -8,7 +8,7 @@ const headerStyle = 'mb-3 leading-tight'
 
 export default function TermsAndConditions() {
   return (
-    <>
+    <article>
       <section className={cn('pt-6', sectionStyle)}>
         <h2 className="mb-4 leading-tight">Terms & Conditions for Website Use</h2>
 
@@ -126,6 +126,6 @@ export default function TermsAndConditions() {
           clarification.
         </p>
       </section>
-    </>
+    </article>
   )
 }

@@ -13,7 +13,7 @@ const listSx = cn(
 
 export default function Donate() {
   return (
-    <>
+    <article>
       <h2 className="mt-6">Donate</h2>
       <p className={cn(paragraphSx, 'mt-6 mb-8')}>
         Your generosity helps us safeguard and share the legacy of historical weather instruments
@@ -86,6 +86,6 @@ export default function Donate() {
       <CheckConsent service="payPal" category="functional" placeholder>
         <PayPalStackedButton className="mt-20" />
       </CheckConsent>
-    </>
+    </article>
   )
 }

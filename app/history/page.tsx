@@ -26,7 +26,7 @@ function Figure({ src, className, ...props }: { src: string } & React.ComponentP
 
 export default function History() {
   return (
-    <section className="pt-6">
+    <article className="pt-6">
       <h2>History of the Barometer</h2>
 
       <h3 className={headerStyles}>The Discovery of Torricelli and the First Barometer</h3>
@@ -991,6 +991,6 @@ export default function History() {
           the likelihood of rain.
         </p>
       </ShowMore>
-    </section>
+    </article>
   )
 }

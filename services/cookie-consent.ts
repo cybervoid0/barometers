@@ -1,5 +1,142 @@
 import type { CookieConsentConfig } from 'vanilla-cookieconsent'
 import { email, FrontRoutes } from '@/constants'
+import type { CookieTable } from '@/types'
+
+const necessaryCookies = [
+  {
+    name: '__Host-next-auth.csrf-token',
+    domain: 'NextAuth.js',
+    description: 'CSRF protection token for secure authentication.',
+    expiration: 'Session',
+  },
+  {
+    name: '__Secure-next-auth.callback-url',
+    domain: 'NextAuth.js',
+    description: 'Callback URL for authentication redirects.',
+    expiration: 'Session',
+  },
+  {
+    name: 'cc_cookie',
+    domain: 'Cookie Consent',
+    description: 'Stores your cookie preferences and consent choices.',
+    expiration: '1 year',
+  },
+  {
+    name: 'geo_country',
+    domain: 'Geolocation',
+    description:
+      'Stores your country code (e.g., "DE", "US") to determine if cookie consent is required for EU users.',
+    expiration: '1 day',
+  },
+] as const satisfies CookieTable[]
+
+const analyticsCookies = [
+  {
+    name: '_ga',
+    domain: 'Google Analytics',
+    description: 'Cookie set by Google Analytics for tracking website usage.',
+    expiration: '2 years',
+  },
+  {
+    name: '_gid',
+    domain: 'Google Analytics',
+    description: 'Cookie set by Google Analytics for tracking website usage',
+    expiration: '24 hours',
+  },
+] as const satisfies CookieTable[]
+
+const functionalCookies = [
+  {
+    name: 'cookie_prefs',
+    domain: 'PayPal',
+    description: 'Stores user cookie preferences for PayPal services.',
+    expiration: '1 year',
+  },
+  {
+    name: 'cookie_check',
+    domain: 'PayPal',
+    description: 'Verifies that cookies are enabled in the browser.',
+    expiration: 'Session',
+  },
+  {
+    name: 'd_id',
+    domain: 'PayPal',
+    description: 'Device identifier for fraud prevention and security.',
+    expiration: '1 year',
+  },
+  {
+    name: 'datadome',
+    domain: 'PayPal',
+    description: 'Bot protection and security monitoring.',
+    expiration: '1 year',
+  },
+  {
+    name: 'ddall',
+    domain: 'PayPal',
+    description: 'DataDome security and bot detection configuration.',
+    expiration: '1 year',
+  },
+  {
+    name: 'enforce_policy',
+    domain: 'PayPal',
+    description: 'GDPR compliance and privacy policy enforcement.',
+    expiration: '1 year',
+  },
+  {
+    name: 'fn_dt',
+    domain: 'PayPal',
+    description: 'Function timestamp for session tracking.',
+    expiration: 'Session',
+  },
+  {
+    name: 'l7_az',
+    domain: 'PayPal',
+    description: 'Load balancer availability zone identifier.',
+    expiration: 'Session',
+  },
+  {
+    name: 'LANG',
+    domain: 'PayPal',
+    description: 'User language preference for localization.',
+    expiration: '1 year',
+  },
+  {
+    name: 'nsid',
+    domain: 'PayPal',
+    description: 'Session identifier for maintaining user session.',
+    expiration: 'Session',
+  },
+  {
+    name: 'rssk',
+    domain: 'PayPal',
+    description: 'Risk assessment session key for fraud prevention.',
+    expiration: '1 year',
+  },
+  {
+    name: 'tcs',
+    domain: 'PayPal',
+    description: 'Terms and conditions acceptance tracking.',
+    expiration: 'Session',
+  },
+  {
+    name: 'TLTDID/TLTSID',
+    domain: 'PayPal',
+    description: 'Transaction and session identifiers for payment processing.',
+    expiration: 'Session / 1 year',
+  },
+  {
+    name: 'ts/ts_c/tsrce',
+    domain: 'PayPal',
+    description: 'Timestamp cookies for session synchronization.',
+    expiration: '1 year',
+  },
+  {
+    name: 'x-pp-s',
+    domain: 'PayPal',
+    description: 'PayPal session token for secure payment processing.',
+    expiration: 'Session',
+  },
+] as const satisfies CookieTable[]
 
 /**
  * Cookie consent configuration for the application.
@@ -100,33 +237,7 @@ const cookieConsentConfig = {
                   description: 'Description',
                   expiration: 'Expiration',
                 },
-                body: [
-                  {
-                    name: '__Host-next-auth.csrf-token',
-                    domain: 'NextAuth.js',
-                    description: 'CSRF protection token for secure authentication.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: '__Secure-next-auth.callback-url',
-                    domain: 'NextAuth.js',
-                    description: 'Callback URL for authentication redirects.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'cc_cookie',
-                    domain: 'Cookie Consent',
-                    description: 'Stores your cookie preferences and consent choices.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'geo_country',
-                    domain: 'Geolocation',
-                    description:
-                      'Stores your country code (e.g., "DE", "US") to determine if cookie consent is required for EU users.',
-                    expiration: '1 day',
-                  },
-                ],
+                body: necessaryCookies,
               },
             },
             {
@@ -139,20 +250,7 @@ const cookieConsentConfig = {
                   description: 'Description',
                   expiration: 'Expiration',
                 },
-                body: [
-                  {
-                    name: '_ga',
-                    domain: 'Google Analytics',
-                    description: 'Cookie set by Google Analytics for tracking website usage.',
-                    expiration: '2 years',
-                  },
-                  {
-                    name: '_gid',
-                    domain: 'Google Analytics',
-                    description: 'Cookie set by Google Analytics for tracking website usage',
-                    expiration: '24 hours',
-                  },
-                ],
+                body: analyticsCookies,
               },
             },
             {
@@ -167,98 +265,7 @@ const cookieConsentConfig = {
                   description: 'Description',
                   expiration: 'Expiration',
                 },
-                body: [
-                  {
-                    name: 'cookie_prefs',
-                    domain: 'PayPal',
-                    description: 'Stores user cookie preferences for PayPal services.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'cookie_check',
-                    domain: 'PayPal',
-                    description: 'Verifies that cookies are enabled in the browser.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'd_id',
-                    domain: 'PayPal',
-                    description: 'Device identifier for fraud prevention and security.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'datadome',
-                    domain: 'PayPal',
-                    description: 'Bot protection and security monitoring.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'ddall',
-                    domain: 'PayPal',
-                    description: 'DataDome security and bot detection configuration.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'enforce_policy',
-                    domain: 'PayPal',
-                    description: 'GDPR compliance and privacy policy enforcement.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'fn_dt',
-                    domain: 'PayPal',
-                    description: 'Function timestamp for session tracking.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'l7_az',
-                    domain: 'PayPal',
-                    description: 'Load balancer availability zone identifier.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'LANG',
-                    domain: 'PayPal',
-                    description: 'User language preference for localization.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'nsid',
-                    domain: 'PayPal',
-                    description: 'Session identifier for maintaining user session.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'rssk',
-                    domain: 'PayPal',
-                    description: 'Risk assessment session key for fraud prevention.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'tcs',
-                    domain: 'PayPal',
-                    description: 'Terms and conditions acceptance tracking.',
-                    expiration: 'Session',
-                  },
-                  {
-                    name: 'TLTDID/TLTSID',
-                    domain: 'PayPal',
-                    description: 'Transaction and session identifiers for payment processing.',
-                    expiration: 'Session / 1 year',
-                  },
-                  {
-                    name: 'ts/ts_c/tsrce',
-                    domain: 'PayPal',
-                    description: 'Timestamp cookies for session synchronization.',
-                    expiration: '1 year',
-                  },
-                  {
-                    name: 'x-pp-s',
-                    domain: 'PayPal',
-                    description: 'PayPal session token for secure payment processing.',
-                    expiration: 'Session',
-                  },
-                ],
+                body: functionalCookies,
               },
             },
             {
@@ -272,4 +279,4 @@ const cookieConsentConfig = {
   },
 } satisfies CookieConsentConfig
 
-export { cookieConsentConfig }
+export { cookieConsentConfig, necessaryCookies, analyticsCookies, functionalCookies }

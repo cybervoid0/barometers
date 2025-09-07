@@ -12,7 +12,7 @@ export default async function Search({ searchParams }: SearchProps) {
   const { barometers = [], page = 1, totalPages = 0 } = await searchBarometers(searchParams)
 
   return (
-    <div className="mx-auto mt-6 max-w-lg">
+    <article className="mx-auto mt-6 max-w-lg">
       <div className="flex flex-col space-y-6">
         <div className="grow">
           <h2 className="mb-10">Search the entire collection</h2>
@@ -34,6 +34,6 @@ export default async function Search({ searchParams }: SearchProps) {
         </div>
         {totalPages > 1 && <Pagination total={totalPages} value={+page} />}
       </div>
-    </div>
+    </article>
   )
 }

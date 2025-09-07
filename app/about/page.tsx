@@ -15,7 +15,7 @@ const headerStyles = 'mt-12 mb-6'
 
 export default function About() {
   return (
-    <div className="pt-6">
+    <article className="pt-6">
       <h2 className="mb-3">Founder's Statement</h2>
       <p className={paragraphStyles}>
         <Image
@@ -305,6 +305,6 @@ export default function About() {
           craftsmanship and tradition.
         </p>
       </ShowMore>
-    </div>
+    </article>
   )
 }

@@ -66,7 +66,7 @@ const BrandsOfCountry = ({
 }) => {
   const width = 32
   return (
-    <div className="mr-4 mb-5">
+    <article className="mr-4 mb-5">
       <h3 className="mb-3 px-5 text-xl font-semibold">{country.name}</h3>
       <Separator className="mx-2 mb-5" />
 
@@ -102,7 +102,7 @@ const BrandsOfCountry = ({
           )
         })}
       </div>
-    </div>
+    </article>
   )
 }
 

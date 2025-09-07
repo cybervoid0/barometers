@@ -16,7 +16,7 @@ const contactTxSx = 'text-sm text-muted-foreground'
 
 export default function Foundation() {
   return (
-    <>
+    <article>
       <section className={sectionSx}>
         <h3 className={header3Sx}>Mission</h3>
         <Image
@@ -254,6 +254,6 @@ export default function Foundation() {
           </div>
         </section>
       </section>
-    </>
+    </article>
   )
 }

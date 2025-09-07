@@ -1,7 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import type { ComponentProps } from 'react'
 import { showPreferences } from 'vanilla-cookieconsent'
+import { Separator } from '@/components/ui'
+import { FrontRoutes } from '@/constants'
 import { useCountry } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
 
@@ -16,16 +19,22 @@ function ManageCookies({
   const { isEU } = useCountry()
   if (!isEU) return null
   return (
-    <button
-      onClick={showPreferences}
-      className={cn(
-        'decoration-muted-foreground hover:decoration-foreground inline cursor-pointer text-xs underline',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </button>
+    <div className="inline-flex items-center gap-2">
+      <Link className="text-xs" href={FrontRoutes.CookiePolicy}>
+        Cookie Policy
+      </Link>
+      <Separator orientation="vertical" className="h-3" />
+      <button
+        onClick={showPreferences}
+        className={cn(
+          'decoration-muted-foreground hover:decoration-foreground cursor-pointer text-xs underline',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </button>
+    </div>
   )
 }
 
