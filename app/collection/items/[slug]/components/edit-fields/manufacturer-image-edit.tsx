@@ -123,8 +123,8 @@ export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
       if (!over) return
       if (active.id !== over.id) {
         const images = form.getValues('images') || []
-        const oldIndex = images.indexOf(active.id)
-        const newIndex = images.indexOf(over.id)
+        const oldIndex = images.indexOf(String(active.id))
+        const newIndex = images.indexOf(String(over.id))
 
         const newOrder = arrayMove(images, oldIndex, newIndex)
         form.setValue('images', newOrder, { shouldDirty: true })
