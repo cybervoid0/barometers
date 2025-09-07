@@ -86,7 +86,11 @@
     "yup": "^1.7.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": ["biome check --error-on-warnings", "biome check --write", "biome format --write"]
+    "*.{js,jsx,ts,tsx}": [
+      "biome check --error-on-warnings",
+      "biome check --write",
+      "biome format --write"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
