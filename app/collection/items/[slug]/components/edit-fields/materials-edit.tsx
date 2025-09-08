@@ -10,12 +10,12 @@ import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { updateBarometer } from '@/lib/barometers/actions'
 import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { MaterialList } from '@/lib/materials/queries'
+import type { MaterialsDTO } from '@/lib/materials/queries'
 import { cn } from '@/utils'
 
 interface MaterialsEditProps extends ComponentProps<'button'> {
   barometer: NonNullable<BarometerDTO>
-  materials: MaterialList
+  materials: MaterialsDTO
 }
 
 const validationSchema = z.object({

@@ -9,13 +9,13 @@ import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { updateBarometer } from '@/lib/barometers/actions'
 import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { MovementListDTO } from '@/lib/movements/queries'
+import type { MovementsDTO } from '@/lib/movements/queries'
 import { cn } from '@/utils'
 
 interface SubcategoryEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: NonNullable<BarometerDTO>
-  movements: MovementListDTO
+  movements: MovementsDTO
 }
 
 const NONE_VALUE = '__none__'

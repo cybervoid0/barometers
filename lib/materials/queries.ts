@@ -10,4 +10,4 @@ export const getMaterials = withPrisma(prisma =>
   }),
 )
 
-export type MaterialList = Awaited<ReturnType<typeof getMaterials>>
+export type MaterialsDTO = Awaited<ReturnType<typeof getMaterials>>

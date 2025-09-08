@@ -14,4 +14,4 @@ export const getMovements = withPrisma(async prisma => {
   return subCats.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 })
 
-export type MovementListDTO = Awaited<ReturnType<typeof getMovements>>
+export type MovementsDTO = Awaited<ReturnType<typeof getMovements>>

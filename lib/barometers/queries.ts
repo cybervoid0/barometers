@@ -158,7 +158,27 @@ const getBarometer = withPrisma(async (prisma, slug: string) => {
   })
 })
 
+const getAllBarometers = withPrisma(async prisma =>
+  prisma.barometer.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  }),
+)
+
 type BarometerDTO = Awaited<ReturnType<typeof getBarometer>>
 type BarometerListDTO = Awaited<ReturnType<typeof getBarometersByParams>>
+type AllBarometersDTO = Awaited<ReturnType<typeof getAllBarometers>>
 
-export { type BarometerDTO, type BarometerListDTO, getBarometer, getBarometersByParams }
+export {
+  type BarometerDTO,
+  type BarometerListDTO,
+  type AllBarometersDTO,
+  getBarometer,
+  getBarometersByParams,
+  getAllBarometers,
+}
