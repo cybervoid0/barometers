@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const getConditions = withPrisma(prisma =>

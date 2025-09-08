@@ -1,3 +1,5 @@
+'use server'
+
 import type { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { FrontRoutes } from '@/constants'

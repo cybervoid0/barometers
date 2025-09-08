@@ -1,3 +1,5 @@
+import 'server-only'
+
 import type { Prisma } from '@prisma/client'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
