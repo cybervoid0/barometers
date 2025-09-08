@@ -10,16 +10,16 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { ImagePlus, X } from 'lucide-react'
 import NextImage from 'next/image'
-import { useCallback } from 'react'
+import { type TransitionStartFunction, useCallback } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
-import type { ManufacturerForm } from './types'
+import type { ManufacturerForm } from '../collection/items/[slug]/components/edit-fields/types'
 
 interface Props {
   imageUrls: string[]
   form: UseFormReturn<ManufacturerForm>
-  setLoading: (loading: boolean) => void
+  startTransition: TransitionStartFunction
 }
 
 function SortableImage({
@@ -65,56 +65,54 @@ function SortableImage({
   )
 }
 
-export function ManufacturerImageEdit({ imageUrls, form, setLoading }: Props) {
+export function ManufacturerImageEdit({ imageUrls, form, startTransition }: Props) {
   /**
    * Upload images to storage
    */
   const uploadImages = useCallback(
-    async (files: File[]) => {
+    (files: File[]) => {
       if (!files || !Array.isArray(files) || files.length === 0) return
-      setLoading(true)
-      try {
-        const urlsDto = await createImageUrls(
-          files.map(file => ({
-            fileName: file.name,
-            contentType: file.type,
-          })),
-        )
-        await Promise.all(
-          urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
-        )
+      startTransition(async () => {
+        try {
+          const urlsDto = await createImageUrls(
+            files.map(file => ({
+              fileName: file.name,
+              contentType: file.type,
+            })),
+          )
+          await Promise.all(
+            urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
+          )
 
-        const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
-        const prev = form.getValues('images') || []
-        form.setValue('images', [...prev, ...newImages], { shouldDirty: true })
-      } catch (error) {
-        console.error(error instanceof Error ? error.message : 'Error uploading files')
-      } finally {
-        setLoading(false)
-      }
+          const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
+          const prev = form.getValues('images') || []
+          form.setValue('images', [...prev, ...newImages], { shouldDirty: true })
+        } catch (error) {
+          console.error(error instanceof Error ? error.message : 'Error uploading files')
+        }
+      })
     },
-    [form.getValues, form.setValue, setLoading],
+    [form.getValues, form.setValue, startTransition],
   )
 
   const handleDeleteFile = useCallback(
-    async (img: string) => {
-      setLoading(true)
-      try {
-        // if the image file was uploaded but not yet added to the entity
-        if (!imageUrls?.includes(img)) await deleteImage(img)
-        const old = form.getValues('images') || []
-        form.setValue(
-          'images',
-          old.filter(file => !file.includes(img)),
-          { shouldDirty: true },
-        )
-      } catch (error) {
-        console.error(error instanceof Error ? error.message : 'Error deleting file')
-      } finally {
-        setLoading(false)
-      }
+    (img: string) => {
+      startTransition(async () => {
+        try {
+          // if the image file was uploaded but not yet added to the entity
+          if (!imageUrls?.includes(img)) await deleteImage(img)
+          const old = form.getValues('images') || []
+          form.setValue(
+            'images',
+            old.filter(file => !file.includes(img)),
+            { shouldDirty: true },
+          )
+        } catch (error) {
+          console.error(error instanceof Error ? error.message : 'Error deleting file')
+        }
+      })
     },
-    [imageUrls, form.getValues, form.setValue, setLoading],
+    [imageUrls, form.getValues, form.setValue, startTransition],
   )
 
   const handleDragEnd = useCallback(

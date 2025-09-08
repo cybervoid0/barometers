@@ -6,14 +6,20 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { RequiredFieldMark } from '@/components/elements'
 import * as UI from '@/components/ui'
+import { imageStorage } from '@/constants'
 import { deleteBrand, updateBrand } from '@/lib/brands/actions'
-import type { BrandDTO } from '@/lib/brands/queries'
+import type { AllBrandsDTO, BrandDTO } from '@/lib/brands/queries'
 import type { CountryListDTO } from '@/lib/counties/queries'
+import { deleteImages } from '@/lib/images/actions'
+import { cn, getThumbnailBase64 } from '@/utils'
+import { ManufacturerImageEdit } from './manufacturer-image-edit'
 
 interface Props {
   brand: BrandDTO
   countries: CountryListDTO
+  brands: AllBrandsDTO
 }
 
 // Schema for form validation (input)
@@ -24,36 +30,24 @@ const brandFormSchema = z.object({
     .min(1, 'Name is required')
     .min(2, 'Name should be longer than 2 symbols')
     .max(100, 'Name should be shorter than 100 symbols'),
-  firstName: z.string(),
+  firstName: z.string().max(100, 'Name should be shorter than 100 symbols'),
   city: z.string().max(100, 'City should be shorter than 100 symbols'),
   countries: z.array(z.number().int()),
-  url: z.string().url('URL should be valid internet domain').or(z.literal('')),
+  url: z.url('URL should be valid internet domain').or(z.literal('')),
   description: z.string(),
   successors: z.array(z.string()),
-  images: z.array(
-    z.object({
-      id: z.string(),
-      url: z.string(),
-    }),
-  ),
-})
-
-// Schema for API submission (output with transforms)
-const brandApiSchema = brandFormSchema.extend({
-  firstName: z.string().transform(val => (val === '' ? null : val)),
-  city: z.string().transform(val => (val === '' ? null : val)),
-  url: z.string().transform(val => (val === '' ? null : val)),
-  description: z.string().transform(val => (val === '' ? null : val)),
+  images: z.array(z.string()),
 })
 
 type BrandForm = z.infer<typeof brandFormSchema>
 
-export function BrandEdit({ brand, countries }: Props) {
+export function BrandEdit({ brand, countries, brands }: Props) {
   const [openBrandDialog, setOpenBrandDialog] = useState(false)
-  const closeBrandDialog = () => setOpenBrandDialog(false)
+  const closeBrandDialog = useCallback(() => setOpenBrandDialog(false), [])
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-  const closeDeleteDialog = () => setOpenDeleteDialog(false)
+  const closeDeleteDialog = useCallback(() => setOpenDeleteDialog(false), [])
   const [isPending, startTransition] = useTransition()
+  const brandImages = useMemo(() => brand.images.map(img => img.url), [brand.images])
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(brandFormSchema),
@@ -61,27 +55,57 @@ export function BrandEdit({ brand, countries }: Props) {
     reValidateMode: 'onChange',
   })
 
-  const cleanUpOnClose = useCallback(() => {}, [])
+  const cleanUpOnClose = useCallback(() => {
+    startTransition(async () => {
+      try {
+        // Clean up temporary uploaded images on dialog close
+        const uploadedImages = form.getValues('images')
+        const extraImages = uploadedImages.filter(img => !brandImages?.includes(img))
+        await deleteImages(extraImages)
+      } catch (_error) {}
+    })
+  }, [brandImages, form.getValues])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: exclude closeDialog
   const onUpdate = useCallback(
-    (values: BrandForm) => {
+    ({ images, countries, successors, ...values }: BrandForm) => {
       startTransition(async () => {
         try {
-          // Transform form data to API format (empty strings -> null)
-          const apiData = brandApiSchema.parse(values)
+          if (!form.formState.isDirty) {
+            toast.info(`${values.name} was not updated`)
+            closeBrandDialog()
+            return
+          }
+
+          // Remove images that were deleted from form
+          const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
+          if (extraImages) deleteImages(extraImages)
+
+          const imageData = await Promise.all(
+            images.map(async (url, i) => {
+              const blurData = await getThumbnailBase64(imageStorage + url)
+              return {
+                url,
+                order: i,
+                name: values.name,
+                blurData,
+              }
+            }),
+          )
+
           const { name } = await updateBrand({
-            ...apiData,
-            countries: {
-              set: apiData.countries.map(id => ({ id })),
-            },
+            ...values,
             successors: {
-              set: apiData.successors.map(id => ({ id })),
+              set: successors.map(id => ({ id })),
+            },
+            countries: {
+              set: countries.map(id => ({ id })),
             },
             images: {
-              set: apiData.images,
+              deleteMany: {},
+              create: imageData,
             },
           })
+
           toast.success(`Brand ${name} was updated`)
           closeBrandDialog()
         } catch (error) {
@@ -91,14 +115,13 @@ export function BrandEdit({ brand, countries }: Props) {
         }
       })
     },
-    [brand.name],
+    [brandImages, closeBrandDialog, form.formState.isDirty],
   )
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: exclude closeDialog
   const onDelete = useCallback(() => {
     startTransition(async () => {
       try {
-        //await deleteBrand(brand.slug)
+        await deleteBrand(brand.slug)
         toast.success(`Brand ${brand.name} was deleted`)
         closeDeleteDialog()
         closeBrandDialog()
@@ -106,7 +129,7 @@ export function BrandEdit({ brand, countries }: Props) {
         toast.error(error instanceof Error ? error.message : `Error deleting brand ${brand.name}.`)
       }
     })
-  }, [brand])
+  }, [brand, closeBrandDialog, closeDeleteDialog])
 
   // Update form values when selected manufacturer changes
   useEffect(() => {
@@ -118,11 +141,11 @@ export function BrandEdit({ brand, countries }: Props) {
       city: brand.city ?? '',
       url: brand.url ?? '',
       description: brand.description ?? '',
-      images: brand.images,
+      images: brandImages,
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
     })
-  }, [openBrandDialog, brand, form.reset, cleanUpOnClose])
+  }, [openBrandDialog, brand, brandImages, form.reset, cleanUpOnClose])
 
   return (
     <UI.Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>
@@ -170,9 +193,6 @@ export function BrandEdit({ brand, countries }: Props) {
         </UI.DialogHeader>
         <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onUpdate)} noValidate>
-            <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
-              Update
-            </UI.Button>
             <UI.FormField
               control={form.control}
               name="firstName"
@@ -185,9 +205,248 @@ export function BrandEdit({ brand, countries }: Props) {
                 </UI.FormItem>
               )}
             />
+
+            <UI.FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>
+                    Last name <RequiredFieldMark />
+                  </UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} />
+                  </UI.FormControl>
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>City</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} />
+                  </UI.FormControl>
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.FormField
+              control={form.control}
+              name="countries"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Countries</UI.FormLabel>
+                  <UI.FormControl>
+                    <CountriesMultiSelect
+                      selected={(field.value as number[]) ?? []}
+                      options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
+                      onChange={vals => field.onChange(vals)}
+                      placeholder={
+                        ((field.value as number[]) ?? []).length === 0
+                          ? 'Select countries'
+                          : undefined
+                      }
+                    />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>External URL</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Input {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.FormField
+              control={form.control}
+              name="successors"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Successors</UI.FormLabel>
+                  <UI.FormControl>
+                    <SuccessorsMultiSelect
+                      selected={(field.value as string[]) ?? []}
+                      options={brands.map(({ id, name }) => ({ id, name }))}
+                      onChange={vals => field.onChange(vals)}
+                    />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <ManufacturerImageEdit
+              imageUrls={brandImages}
+              form={form}
+              startTransition={startTransition}
+            />
+
+            <UI.FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <UI.FormItem>
+                  <UI.FormLabel>Description</UI.FormLabel>
+                  <UI.FormControl>
+                    <UI.Textarea autoResize {...field} />
+                  </UI.FormControl>
+                  <UI.FormMessage />
+                </UI.FormItem>
+              )}
+            />
+
+            <UI.DialogFooter className="mt-6">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+                Update
+              </UI.Button>
+            </UI.DialogFooter>
           </form>
         </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
+  )
+}
+
+// Countries multiselect (numbers)
+function CountriesMultiSelect({
+  selected,
+  options,
+  onChange,
+  placeholder,
+}: {
+  selected: number[]
+  options: { id: number; name: string }[]
+  onChange: (values: number[]) => void
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <UI.Popover open={open} onOpenChange={setOpen} modal>
+      <UI.PopoverTrigger asChild>
+        <UI.Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {selected.length === 0
+            ? placeholder || 'Select countries'
+            : `${selected.length} selected`}
+        </UI.Button>
+      </UI.PopoverTrigger>
+      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <UI.Command>
+          <UI.CommandInput placeholder="Search country..." />
+          <UI.CommandList className="max-h-[200px]">
+            <UI.CommandEmpty>No country found.</UI.CommandEmpty>
+            <UI.CommandGroup>
+              {options.map(opt => {
+                const isActive = selected.includes(opt.id)
+                return (
+                  <UI.CommandItem
+                    key={opt.id}
+                    value={opt.name}
+                    onSelect={() => {
+                      const next = isActive
+                        ? selected.filter(v => v !== opt.id)
+                        : [...selected, opt.id]
+                      onChange(next)
+                    }}
+                  >
+                    <div
+                      className={cn(
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border',
+                        isActive ? 'bg-primary text-primary-foreground' : 'opacity-50',
+                      )}
+                    >
+                      {isActive ? '✓' : ''}
+                    </div>
+                    {opt.name}
+                  </UI.CommandItem>
+                )
+              })}
+            </UI.CommandGroup>
+          </UI.CommandList>
+        </UI.Command>
+      </UI.PopoverContent>
+    </UI.Popover>
+  )
+}
+
+// Successors multiselect (strings)
+function SuccessorsMultiSelect({
+  selected,
+  options,
+  onChange,
+}: {
+  selected: string[]
+  options: { id: string; name: string }[]
+  onChange: (values: string[]) => void
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <UI.Popover open={open} onOpenChange={setOpen} modal>
+      <UI.PopoverTrigger asChild>
+        <UI.Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {selected.length === 0 ? 'Select brands' : `${selected.length} selected`}
+        </UI.Button>
+      </UI.PopoverTrigger>
+      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <UI.Command>
+          <UI.CommandInput placeholder="Search brand..." />
+          <UI.CommandList className="max-h-[200px]">
+            <UI.CommandEmpty>No brand found.</UI.CommandEmpty>
+            <UI.CommandGroup>
+              {options.map(opt => {
+                const isActive = selected.includes(opt.id)
+                return (
+                  <UI.CommandItem
+                    key={opt.id}
+                    value={opt.name}
+                    onSelect={() => {
+                      const next = isActive
+                        ? selected.filter(v => v !== opt.id)
+                        : [...selected, opt.id]
+                      onChange(next)
+                    }}
+                  >
+                    <div
+                      className={cn(
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border',
+                        isActive ? 'bg-primary text-primary-foreground' : 'opacity-50',
+                      )}
+                    >
+                      {isActive ? '✓' : ''}
+                    </div>
+                    {opt.name}
+                  </UI.CommandItem>
+                )
+              })}
+            </UI.CommandGroup>
+          </UI.CommandList>
+        </UI.Command>
+      </UI.PopoverContent>
+    </UI.Popover>
   )
 }

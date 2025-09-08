@@ -7,7 +7,12 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { FrontRoutes } from '@/constants/routes-front'
-import { type BrandsByCountryDTO, getBrandsByCountry } from '@/lib/brands/queries'
+import {
+  type AllBrandsDTO,
+  type BrandsByCountryDTO,
+  getAllBrands,
+  getBrandsByCountry,
+} from '@/lib/brands/queries'
 import { type CountryListDTO, getCountries } from '@/lib/counties/queries'
 import { title } from '../../constants/metadata'
 import type { DynamicOptions } from '../../types'
@@ -19,14 +24,16 @@ export const metadata: Metadata = {
   title: `${title} - Manufacturers`,
 }
 
+const width = 32
 const BrandsOfCountry = ({
   country,
   countries,
+  allBrands,
 }: {
   country: BrandsByCountryDTO[number]
   countries: CountryListDTO
+  allBrands: AllBrandsDTO
 }) => {
-  const width = 32
   return (
     <article className="mr-4 mb-5">
       <h3 className="mb-3 px-5 text-xl font-semibold">{country.name}</h3>
@@ -39,7 +46,7 @@ const BrandsOfCountry = ({
           const image = base64 ? `data:image/png;base64,${base64}` : null
           return (
             <div key={id} className="flex gap-1 items-center">
-              <BrandEdit brand={brand} countries={countries} />
+              <BrandEdit brand={brand} countries={countries} brands={allBrands} />
               <Link className="w-fit no-underline hover:underline" href={FrontRoutes.Brands + slug}>
                 <div className="flex flex-nowrap items-center gap-3">
                   {image ? (
@@ -68,9 +75,12 @@ const BrandsOfCountry = ({
   )
 }
 
-export default async function Manufacturers() {
-  const brandsByCountry = await getBrandsByCountry()
-  const countries = await getCountries()
+export default async function Brands() {
+  const [brandsByCountry, countries, allBrands] = await Promise.all([
+    getBrandsByCountry(),
+    getCountries(),
+    getAllBrands(),
+  ])
   const firstColStates = ['France', 'Great Britain']
   const firstColumn = brandsByCountry.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = brandsByCountry.filter(({ name }) => !firstColStates.includes(name))
@@ -87,13 +97,23 @@ export default async function Manufacturers() {
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
           <div>
             {firstColumn.map(country => (
-              <BrandsOfCountry key={country.id} country={country} countries={countries} />
+              <BrandsOfCountry
+                allBrands={allBrands}
+                key={country.id}
+                country={country}
+                countries={countries}
+              />
             ))}
           </div>
           <Separator orientation="vertical" className="hidden sm:block" />
           <div>
             {secondColumn.map(country => (
-              <BrandsOfCountry key={country.id} country={country} countries={countries} />
+              <BrandsOfCountry
+                allBrands={allBrands}
+                key={country.id}
+                country={country}
+                countries={countries}
+              />
             ))}
           </div>
         </div>
