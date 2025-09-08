@@ -48,23 +48,13 @@ export function BrandEdit({ brand, countries, brands }: Props) {
   const closeDeleteDialog = useCallback(() => setOpenDeleteDialog(false), [])
   const [isPending, startTransition] = useTransition()
   const brandImages = useMemo(() => brand.images.map(img => img.url), [brand.images])
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(brandFormSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
-
-  const cleanUpOnClose = useCallback(() => {
-    startTransition(async () => {
-      try {
-        // Clean up temporary uploaded images on dialog close
-        const uploadedImages = form.getValues('images')
-        const extraImages = uploadedImages.filter(img => !brandImages?.includes(img))
-        await deleteImages(extraImages)
-      } catch (_error) {}
-    })
-  }, [brandImages, form.getValues])
 
   const onUpdate = useCallback(
     ({ images, countries, successors, ...values }: BrandForm) => {
@@ -75,10 +65,6 @@ export function BrandEdit({ brand, countries, brands }: Props) {
             closeBrandDialog()
             return
           }
-
-          // Remove images that were deleted from form
-          const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
-          if (extraImages) deleteImages(extraImages)
 
           const imageData = await Promise.all(
             images.map(async (url, i) => {
@@ -106,7 +92,12 @@ export function BrandEdit({ brand, countries, brands }: Props) {
             },
           })
 
+          // Remove images that were deleted from form
+          const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
+          if (extraImages.length > 0) deleteImages(extraImages)
+
           toast.success(`Brand ${name} was updated`)
+          setIsSubmitSuccessful(true)
           closeBrandDialog()
         } catch (error) {
           toast.error(
@@ -131,9 +122,22 @@ export function BrandEdit({ brand, countries, brands }: Props) {
     })
   }, [brand, closeBrandDialog, closeDeleteDialog])
 
+  const cleanUpOnClose = useCallback(() => {
+    if (isSubmitSuccessful) return
+    startTransition(async () => {
+      try {
+        // Clean up temporary uploaded images on dialog close
+        const uploadedImages = form.getValues('images')
+        const extraImages = uploadedImages.filter(img => !brandImages?.includes(img))
+        await deleteImages(extraImages)
+      } catch (_error) {}
+    })
+  }, [brandImages, form.getValues, isSubmitSuccessful])
+
   // Update form values when selected manufacturer changes
   useEffect(() => {
     if (!openBrandDialog) return cleanUpOnClose()
+    setIsSubmitSuccessful(false)
     form.reset({
       id: brand.id,
       name: brand.name,

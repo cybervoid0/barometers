@@ -24,10 +24,9 @@ const createBrand = withPrisma(async (prisma, data: Prisma.ManufacturerUnchecked
 
 const updateBrand = withPrisma(async (prisma, data: Prisma.ManufacturerUncheckedUpdateInput) => {
   const oldBrand = await prisma.manufacturer.findUniqueOrThrow({ where: { id: data.id as string } })
-  const slug =
-    data.name && data.firstName
-      ? getBrandSlug(data.name as string, data.firstName as string)
-      : oldBrand.slug
+  const slug = data.name
+    ? getBrandSlug(data.name as string, data.firstName as string | undefined)
+    : oldBrand.slug
   const { id, name } = await prisma.manufacturer.update({
     where: {
       id: data.id as string,
