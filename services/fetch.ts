@@ -1,18 +1,6 @@
-import type { InaccuracyReport, Manufacturer } from '@prisma/client'
+import type { InaccuracyReport } from '@prisma/client'
 import { ApiRoutes } from '@/constants/routes-back'
-import type {
-  CategoryDTO,
-  CategoryListDTO,
-  ConditionListDTO,
-  CountryListDTO,
-  FileProps,
-  InaccuracyReportListDTO,
-  ManufacturerDTO,
-  ManufacturerListDTO,
-  MaterialListDTO,
-  SubcategoryListDTO,
-  UrlDto,
-} from '@/types'
+import type { FileProps, InaccuracyReportListDTO, UrlDto } from '@/types'
 
 /**
  * Handles API response errors by extracting a detailed error message from the response body.
@@ -30,72 +18,6 @@ export async function handleApiError(res: Response): Promise<void> {
   }
 }
 
-/******* Categories ********/
-export async function fetchCategoryList(): Promise<CategoryListDTO> {
-  const res = await fetch(ApiRoutes.Categories)
-  return res.json()
-}
-export async function fetchCategory(name: string): Promise<CategoryDTO> {
-  const res = await fetch(ApiRoutes.Categories + name)
-  return res.json()
-}
-
-/******* Conditions ********/
-export async function fetchConditions(): Promise<ConditionListDTO> {
-  const res = await fetch(ApiRoutes.Conditions)
-  return res.json()
-}
-
-/******* Manufacturers ********/
-export async function fetchManufacturerList(searchParams?: {
-  page?: string
-  size?: string
-}): Promise<ManufacturerListDTO> {
-  const res = await fetch(
-    `${ApiRoutes.Manufacturers}${searchParams ? `?${new URLSearchParams(searchParams)}` : ''}`,
-    {
-      cache: 'no-cache',
-    },
-  )
-  return res.json()
-}
-export async function fetchManufacturer(slug: string): Promise<ManufacturerDTO> {
-  const res = await fetch(ApiRoutes.Manufacturers + slug)
-  return res.json()
-}
-export async function deleteManufacturer(slug: string) {
-  await fetch(ApiRoutes.Manufacturers + slug, {
-    method: 'DELETE',
-  })
-}
-export async function addManufacturer(
-  manufacturer: { countries: { id: number }[] } & Partial<Omit<Manufacturer, 'icon'>> & {
-      icon?: string | null
-    },
-): Promise<{ id: string }> {
-  const res = await fetch(ApiRoutes.Manufacturers, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(manufacturer),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
-export async function updateManufacturer(
-  updatedData: Partial<Manufacturer>,
-): Promise<Manufacturer> {
-  const res = await fetch(ApiRoutes.Manufacturers, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedData),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
 /******* Images ********/
 export async function createImageUrls(files: FileProps[]): Promise<UrlDto> {
   const res = await fetch(ApiRoutes.ImageUpload, {
@@ -142,35 +64,5 @@ export async function fetchReportList(
   const res = await fetch(`${ApiRoutes.Reports}?${qs.toString()}`, {
     cache: 'no-cache',
   })
-  return res.json()
-}
-/******* Subcategories (Movement types) ********/
-export async function fetchSubcategoryList(): Promise<SubcategoryListDTO> {
-  const res = await fetch(ApiRoutes.Subcategories)
-  return res.json()
-}
-/******* Materials ********/
-export async function fetchMaterialList(): Promise<MaterialListDTO> {
-  const res = await fetch(ApiRoutes.Materials)
-  return res.json()
-}
-/******* Countries ********/
-export async function fetchCountryList(): Promise<CountryListDTO> {
-  const res = await fetch(ApiRoutes.Countries)
-  return res.json()
-}
-
-/******* Documents ********/
-// Document creation moved to Server Action: lib/documents/actions.ts
-
-export async function updateDocument<T>(document: T): Promise<{ id: string }> {
-  const res = await fetch(ApiRoutes.Documents, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(document),
-  })
-  if (!res.ok) await handleApiError(res)
   return res.json()
 }

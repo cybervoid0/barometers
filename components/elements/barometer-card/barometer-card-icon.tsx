@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { CategoryIcon } from '@/components/elements'
-import type { BarometerListDTO } from '@/types'
 import { cn } from '@/utils'
 import { BarometerCard } from './barometer-card'
 
@@ -10,7 +9,11 @@ interface Props extends React.ComponentProps<'div'> {
   categoryName: string
   categoryLink?: string
   manufacturer?: string
-  image: BarometerListDTO['barometers'][number]['images'][number]
+  image: {
+    url: string
+    order: number | null
+    blurData: string
+  }
 }
 
 export function BarometerCardWithIcon({

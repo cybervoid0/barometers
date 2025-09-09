@@ -16,11 +16,11 @@ import {
 } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { deleteBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { cn } from '@/utils'
 
 interface Props {
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
   className?: string
 }
 

@@ -1,8 +1,6 @@
-import 'server-only'
-
 import { withPrisma } from '@/prisma/prismaClient'
 
-export const getCategories = withPrisma(async prisma => {
+const getCategories = withPrisma(async prisma => {
   const categories = await prisma.category.findMany({
     orderBy: {
       order: 'asc',
@@ -26,9 +24,7 @@ export const getCategories = withPrisma(async prisma => {
   }))
 })
 
-export type CategoriesDTO = Awaited<ReturnType<typeof getCategories>>
-
-export const getCategory = withPrisma(async (prisma, name: string) => {
+const getCategory = withPrisma(async (prisma, name: string) => {
   const {
     images: [image],
     ...category
@@ -59,4 +55,7 @@ export const getCategory = withPrisma(async (prisma, name: string) => {
   }
 })
 
-export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
+type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
+type CategoriesDTO = Awaited<ReturnType<typeof getCategories>>
+
+export { type CategoryDTO, type CategoriesDTO, getCategories, getCategory }

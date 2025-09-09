@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Navigation, Pagination, Zoom } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { IsAdmin } from '@/components/elements'
-import type { BarometerDTO } from '@/types'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { customImageLoader } from '@/utils'
 import { ImagesEdit } from './edit-fields/images-edit'
 import 'swiper/css'
@@ -14,7 +14,7 @@ import 'swiper/css/pagination'
 import './swiper-styles.css'
 
 interface ImageCarouselProps {
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
 export function ImageCarousel({ barometer }: ImageCarouselProps) {

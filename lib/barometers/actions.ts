@@ -7,7 +7,6 @@ import { withPrisma } from '@/prisma/prismaClient'
 import { minioBucket, minioClient } from '@/services/minio'
 import { revalidateCategory, slug as slugify, trimTrailingSlash } from '@/utils'
 
-// Simple function - just creates the barometer with provided data
 const createBarometer = withPrisma(async (prisma, data: Prisma.BarometerUncheckedCreateInput) => {
   const { id, categoryId } = await prisma.barometer.create({
     data,

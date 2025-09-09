@@ -7,11 +7,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as yup from 'yup'
 import * as UI from '@/components/ui'
+import type { BarometerDTO } from '@/lib/barometers/queries'
 import { createReport } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
 
 interface Props extends React.ComponentProps<'button'> {
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
 const maxFeedbackLen = 1000
