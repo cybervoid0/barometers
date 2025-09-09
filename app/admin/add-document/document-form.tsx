@@ -455,7 +455,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
           )}
         />
 
-        <UI.Button type="submit" variant="outline" disabled={isPending} className="mt-6">
+        <UI.Button type="submit" disabled={isPending} className="mt-6 w-full">
           {isPending ? 'Adding...' : 'Add new document'}
         </UI.Button>
       </form>

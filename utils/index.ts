@@ -7,7 +7,7 @@ export { cn } from './cn'
 // Image loader
 export { default as customImageLoader } from './image-loader'
 // Image utilities
-export { generateIcon, getThumbnailBase64 } from './images'
+export { generateIcon, getIconBuffer, getThumbnailBase64 } from './images'
 export { cleanObject } from './misc'
 // Server
 export { revalidateCategory } from './revalidate'

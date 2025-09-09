@@ -5,7 +5,7 @@ import { ensureDirSync } from 'fs-extra'
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
-const url = process.env.DATABASE_URL
+const url = process.env.REMOTE_DATABASE_URL
 if (!url) throw new Error('No DATABASE_URL in .env')
 
 ensureDirSync('backups')

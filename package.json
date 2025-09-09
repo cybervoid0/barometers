@@ -25,7 +25,7 @@
     "jest": "jest",
     "jest:watch": "jest --watch",
     "test": "npm run lint && npm run typecheck && npm run jest",
-    "dump": "bun db-backup.ts",
+    "dump": "dotenv -e .env.local ./scripts/tunnel.sh bun ./scripts/db-backup.ts",
     "prepare": "husky"
   },
   "dependencies": {

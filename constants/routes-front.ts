@@ -11,6 +11,7 @@ export const FrontRoutes = {
   NewArrivals: '/collection/new-arrivals/',
   Admin: '/admin/',
   AddBarometer: '/admin/add-barometer/',
+  AddBrand: '/admin/add-brand/',
   AddDocument: '/admin/add-document/',
   Reports: '/admin/reports/',
   CookiePolicy: '/cookies/',

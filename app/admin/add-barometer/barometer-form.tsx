@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { RequiredFieldMark } from '@/components/elements'
 import { Button } from '@/components/ui/button'
 import {
   FormControl,
@@ -33,7 +34,6 @@ import {
   BarometerFormTransformSchema,
   BarometerFormValidationSchema,
 } from '@/lib/schemas/barometer-form.schema'
-import { AddManufacturer } from './add-manufacturer'
 import { MaterialsMultiSelect } from './add-materials'
 import { Dimensions } from './dimensions'
 import { FileUpload } from './file-upload'
@@ -101,10 +101,6 @@ export default function BarometerForm({
     })
   }, [categories, conditions, brands, reset])
 
-  const handleAddManufacturer = (id: string) => {
-    setValue('manufacturerId', id)
-  }
-
   return (
     <FormProvider {...methods}>
       <FormProvider {...methods}>
@@ -114,7 +110,9 @@ export default function BarometerForm({
             name="collectionId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Catalogue No. *</FormLabel>
+                <FormLabel>
+                  Catalogue No. <RequiredFieldMark />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="Enter AWIF catalogue #" />
                 </FormControl>
@@ -142,7 +140,9 @@ export default function BarometerForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>
+                  Title <RequiredFieldMark />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="Enter barometer name" />
                 </FormControl>
@@ -156,7 +156,9 @@ export default function BarometerForm({
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year *</FormLabel>
+                <FormLabel>
+                  Year <RequiredFieldMark />
+                </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -178,7 +180,9 @@ export default function BarometerForm({
             name="dateDescription"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date description *</FormLabel>
+                <FormLabel>
+                  Date description <RequiredFieldMark />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="Enter date description" />
                 </FormControl>
@@ -261,7 +265,9 @@ export default function BarometerForm({
             name="categoryId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category *</FormLabel>
+                <FormLabel>
+                  Category <RequiredFieldMark />
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -328,7 +334,6 @@ export default function BarometerForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  <AddManufacturer onAddManufacturer={handleAddManufacturer} />
                 </div>
                 <FormMessage />
               </FormItem>
@@ -383,7 +388,7 @@ export default function BarometerForm({
             )}
           />
 
-          <Button type="submit" variant="outline" disabled={isPending} className="mt-6">
+          <Button type="submit" disabled={isPending} className="mt-6 w-full">
             {isPending ? 'Adding...' : 'Add new barometer'}
           </Button>
         </form>

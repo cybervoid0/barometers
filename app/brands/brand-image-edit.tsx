@@ -14,11 +14,11 @@ import { type TransitionStartFunction, useCallback } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
-import type { ManufacturerForm } from '../collection/items/[slug]/components/edit-fields/types'
+import type { BrandEditForm } from './brand-edit-schema'
 
 interface Props {
   imageUrls: string[]
-  form: UseFormReturn<ManufacturerForm>
+  form: UseFormReturn<BrandEditForm>
   startTransition: TransitionStartFunction
 }
 
@@ -65,7 +65,7 @@ function SortableImage({
   )
 }
 
-export function ManufacturerImageEdit({ imageUrls, form, startTransition }: Props) {
+export function BrandImageEdit({ imageUrls, form, startTransition }: Props) {
   /**
    * Upload images to storage
    */

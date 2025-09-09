@@ -1,45 +1,26 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit, Trash2 } from 'lucide-react'
+import { Edit, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-import { RequiredFieldMark } from '@/components/elements'
+import { IconUpload, RequiredFieldMark } from '@/components/elements'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants'
 import { deleteBrand, updateBrand } from '@/lib/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/lib/brands/queries'
 import type { CountryListDTO } from '@/lib/counties/queries'
 import { deleteImages } from '@/lib/images/actions'
-import { cn, getThumbnailBase64 } from '@/utils'
-import { ManufacturerImageEdit } from './manufacturer-image-edit'
+import { generateIcon, getThumbnailBase64 } from '@/utils'
+import { type BrandEditForm, brandEditSchema } from './brand-edit-schema'
+import { BrandImageEdit } from './brand-image-edit'
 
 interface Props {
   brand: BrandDTO
   countries: CountryListDTO
   brands: AllBrandsDTO
 }
-
-// Schema for form validation (input)
-const brandFormSchema = z.object({
-  id: z.string(),
-  name: z
-    .string()
-    .min(1, 'Name is required')
-    .min(2, 'Name should be longer than 2 symbols')
-    .max(100, 'Name should be shorter than 100 symbols'),
-  firstName: z.string().max(100, 'Name should be shorter than 100 symbols'),
-  city: z.string().max(100, 'City should be shorter than 100 symbols'),
-  countries: z.array(z.number().int()),
-  url: z.url('URL should be valid internet domain').or(z.literal('')),
-  description: z.string(),
-  successors: z.array(z.string()),
-  images: z.array(z.string()),
-})
-
-type BrandForm = z.infer<typeof brandFormSchema>
 
 export function BrandEdit({ brand, countries, brands }: Props) {
   const [openBrandDialog, setOpenBrandDialog] = useState(false)
@@ -50,14 +31,33 @@ export function BrandEdit({ brand, countries, brands }: Props) {
   const brandImages = useMemo(() => brand.images.map(img => img.url), [brand.images])
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
-  const form = useForm<BrandForm>({
-    resolver: zodResolver(brandFormSchema),
+  const form = useForm<BrandEditForm>({
+    resolver: zodResolver(brandEditSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
 
+  const handleIconChange = useCallback(
+    async (file: File | null) => {
+      if (!file) {
+        form.setValue('icon', null, { shouldDirty: true })
+        return
+      }
+      try {
+        const fileUrl = URL.createObjectURL(file)
+        const iconData = await generateIcon(fileUrl, 50)
+        URL.revokeObjectURL(fileUrl)
+        form.setValue('icon', iconData, { shouldDirty: true })
+      } catch (error) {
+        form.setValue('icon', null, { shouldDirty: true })
+        toast.error(error instanceof Error ? error.message : 'Image cannot be opened')
+      }
+    },
+    [form],
+  )
+
   const onUpdate = useCallback(
-    ({ images, countries, successors, ...values }: BrandForm) => {
+    ({ images, countries, successors, ...values }: BrandEditForm) => {
       startTransition(async () => {
         try {
           if (!form.formState.isDirty) {
@@ -78,7 +78,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
             }),
           )
 
-          const { name } = await updateBrand({
+          const brandWithRelations = {
             ...values,
             successors: {
               set: successors.map(id => ({ id })),
@@ -90,7 +90,9 @@ export function BrandEdit({ brand, countries, brands }: Props) {
               deleteMany: {},
               create: imageData,
             },
-          })
+          }
+
+          const { name } = await updateBrand(brandWithRelations)
 
           // Remove images that were deleted from form
           const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
@@ -148,6 +150,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       images: brandImages,
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
+      icon: brand.icon ? Buffer.from(brand.icon).toString('base64') : null,
     })
   }, [openBrandDialog, brand, brandImages, form.reset, cleanUpOnClose])
 
@@ -196,7 +199,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           <UI.DialogDescription>Update manufacturer details.</UI.DialogDescription>
         </UI.DialogHeader>
         <UI.FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onUpdate)} noValidate>
+          <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
             <UI.FormField
               control={form.control}
               name="firstName"
@@ -243,7 +246,9 @@ export function BrandEdit({ brand, countries, brands }: Props) {
               name="countries"
               render={({ field }) => (
                 <UI.FormItem>
-                  <UI.FormLabel>Countries</UI.FormLabel>
+                  <UI.FormLabel>
+                    Countries <RequiredFieldMark />
+                  </UI.FormLabel>
                   <UI.FormControl>
                     <CountriesMultiSelect
                       selected={(field.value as number[]) ?? []}
@@ -293,11 +298,12 @@ export function BrandEdit({ brand, countries, brands }: Props) {
               )}
             />
 
-            <ManufacturerImageEdit
-              imageUrls={brandImages}
-              form={form}
-              startTransition={startTransition}
-            />
+            <div>
+              <UI.FormLabel>Icon</UI.FormLabel>
+              <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
+            </div>
+
+            <BrandImageEdit imageUrls={brandImages} form={form} startTransition={startTransition} />
 
             <UI.FormField
               control={form.control}
@@ -338,57 +344,92 @@ function CountriesMultiSelect({
   placeholder?: string
 }) {
   const [open, setOpen] = useState(false)
+
+  const selectedCountries = useMemo(
+    () => options.filter(country => selected.includes(country.id)),
+    [options, selected],
+  )
+
+  const handleSelect = useCallback(
+    (countryId: number) => {
+      if (selected.includes(countryId)) {
+        onChange(selected.filter(id => id !== countryId))
+      } else {
+        onChange([...selected, countryId])
+      }
+    },
+    [onChange, selected],
+  )
+
+  const handleRemove = useCallback(
+    (countryId: number) => {
+      onChange(selected.filter(id => id !== countryId))
+    },
+    [onChange, selected],
+  )
+
   return (
-    <UI.Popover open={open} onOpenChange={setOpen} modal>
-      <UI.PopoverTrigger asChild>
-        <UI.Button
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {selected.length === 0
-            ? placeholder || 'Select countries'
-            : `${selected.length} selected`}
-        </UI.Button>
-      </UI.PopoverTrigger>
-      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-        <UI.Command>
-          <UI.CommandInput placeholder="Search country..." />
-          <UI.CommandList className="max-h-[200px]">
-            <UI.CommandEmpty>No country found.</UI.CommandEmpty>
-            <UI.CommandGroup>
-              {options.map(opt => {
-                const isActive = selected.includes(opt.id)
-                return (
-                  <UI.CommandItem
-                    key={opt.id}
-                    value={opt.name}
-                    onSelect={() => {
-                      const next = isActive
-                        ? selected.filter(v => v !== opt.id)
-                        : [...selected, opt.id]
-                      onChange(next)
-                    }}
-                  >
-                    <div
-                      className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border',
-                        isActive ? 'bg-primary text-primary-foreground' : 'opacity-50',
-                      )}
+    <div className="space-y-2">
+      {selectedCountries.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedCountries.map(country => (
+            <UI.Badge key={country.id} variant="default" className="px-2 py-1">
+              {country.name}
+              <UI.Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="ml-1 h-auto p-0"
+                onClick={() => handleRemove(country.id)}
+              >
+                <X className="h-3 w-3" />
+              </UI.Button>
+            </UI.Badge>
+          ))}
+        </div>
+      )}
+      <UI.Popover open={open} onOpenChange={setOpen} modal>
+        <UI.PopoverTrigger asChild>
+          <UI.Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-start"
+          >
+            {selected.length === 0
+              ? placeholder || 'Select countries'
+              : `${selected.length} countr${selected.length === 1 ? 'y' : 'ies'} selected`}
+          </UI.Button>
+        </UI.PopoverTrigger>
+        <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+          <UI.Command>
+            <UI.CommandInput placeholder="Search country..." />
+            <UI.CommandList className="max-h-[200px]">
+              <UI.CommandEmpty>No country found.</UI.CommandEmpty>
+              <UI.CommandGroup>
+                {options.map(opt => {
+                  const isActive = selected.includes(opt.id)
+                  return (
+                    <UI.CommandItem
+                      key={opt.id}
+                      value={opt.name}
+                      onSelect={() => handleSelect(opt.id)}
+                      className="flex items-center space-x-2"
                     >
-                      {isActive ? '✓' : ''}
-                    </div>
-                    {opt.name}
-                  </UI.CommandItem>
-                )
-              })}
-            </UI.CommandGroup>
-          </UI.CommandList>
-        </UI.Command>
-      </UI.PopoverContent>
-    </UI.Popover>
+                      <div className="flex h-4 w-4 items-center justify-center">
+                        {isActive && <div className="h-2 w-2 bg-current rounded-full" />}
+                      </div>
+                      {opt.name}
+                    </UI.CommandItem>
+                  )
+                })}
+              </UI.CommandGroup>
+            </UI.CommandList>
+          </UI.Command>
+        </UI.PopoverContent>
+      </UI.Popover>
+    </div>
   )
 }
 
@@ -403,54 +444,91 @@ function SuccessorsMultiSelect({
   onChange: (values: string[]) => void
 }) {
   const [open, setOpen] = useState(false)
+
+  const selectedBrands = useMemo(
+    () => options.filter(brand => selected.includes(brand.id)),
+    [options, selected],
+  )
+
+  const handleSelect = useCallback(
+    (brandId: string) => {
+      if (selected.includes(brandId)) {
+        onChange(selected.filter(id => id !== brandId))
+      } else {
+        onChange([...selected, brandId])
+      }
+    },
+    [onChange, selected],
+  )
+
+  const handleRemove = useCallback(
+    (brandId: string) => {
+      onChange(selected.filter(id => id !== brandId))
+    },
+    [onChange, selected],
+  )
+
   return (
-    <UI.Popover open={open} onOpenChange={setOpen} modal>
-      <UI.PopoverTrigger asChild>
-        <UI.Button
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {selected.length === 0 ? 'Select brands' : `${selected.length} selected`}
-        </UI.Button>
-      </UI.PopoverTrigger>
-      <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-        <UI.Command>
-          <UI.CommandInput placeholder="Search brand..." />
-          <UI.CommandList className="max-h-[200px]">
-            <UI.CommandEmpty>No brand found.</UI.CommandEmpty>
-            <UI.CommandGroup>
-              {options.map(opt => {
-                const isActive = selected.includes(opt.id)
-                return (
-                  <UI.CommandItem
-                    key={opt.id}
-                    value={opt.name}
-                    onSelect={() => {
-                      const next = isActive
-                        ? selected.filter(v => v !== opt.id)
-                        : [...selected, opt.id]
-                      onChange(next)
-                    }}
-                  >
-                    <div
-                      className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border',
-                        isActive ? 'bg-primary text-primary-foreground' : 'opacity-50',
-                      )}
+    <div className="space-y-2">
+      {selectedBrands.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedBrands.map(brand => (
+            <UI.Badge key={brand.id} variant="default" className="px-2 py-1">
+              {brand.name}
+              <UI.Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="ml-1 h-auto p-0"
+                onClick={() => handleRemove(brand.id)}
+              >
+                <X className="h-3 w-3" />
+              </UI.Button>
+            </UI.Badge>
+          ))}
+        </div>
+      )}
+      <UI.Popover open={open} onOpenChange={setOpen} modal>
+        <UI.PopoverTrigger asChild>
+          <UI.Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-start"
+          >
+            {selected.length === 0
+              ? 'Select brands'
+              : `${selected.length} brand${selected.length === 1 ? '' : 's'} selected`}
+          </UI.Button>
+        </UI.PopoverTrigger>
+        <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+          <UI.Command>
+            <UI.CommandInput placeholder="Search brand..." />
+            <UI.CommandList className="max-h-[200px]">
+              <UI.CommandEmpty>No brand found.</UI.CommandEmpty>
+              <UI.CommandGroup>
+                {options.map(opt => {
+                  const isActive = selected.includes(opt.id)
+                  return (
+                    <UI.CommandItem
+                      key={opt.id}
+                      value={opt.name}
+                      onSelect={() => handleSelect(opt.id)}
+                      className="flex items-center space-x-2"
                     >
-                      {isActive ? '✓' : ''}
-                    </div>
-                    {opt.name}
-                  </UI.CommandItem>
-                )
-              })}
-            </UI.CommandGroup>
-          </UI.CommandList>
-        </UI.Command>
-      </UI.PopoverContent>
-    </UI.Popover>
+                      <div className="flex h-4 w-4 items-center justify-center">
+                        {isActive && <div className="h-2 w-2 bg-current rounded-full" />}
+                      </div>
+                      {opt.name}
+                    </UI.CommandItem>
+                  )
+                })}
+              </UI.CommandGroup>
+            </UI.CommandList>
+          </UI.Command>
+        </UI.PopoverContent>
+      </UI.Popover>
+    </div>
   )
 }
