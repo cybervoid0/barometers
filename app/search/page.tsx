@@ -19,7 +19,7 @@ export default async function Search({ searchParams }: SearchProps) {
     barometers = [],
     page = 1,
     totalPages = 0,
-  } = await searchBarometers(query, pageSize, pageNo)
+  } = await searchBarometers(query, pageNo, pageSize)
 
   return (
     <article className="mx-auto mt-6 max-w-lg">

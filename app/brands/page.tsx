@@ -4,6 +4,7 @@ import { ArrowUp } from 'lucide-react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IsAdmin } from '@/components/elements'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { FrontRoutes } from '@/constants/routes-front'
@@ -46,7 +47,9 @@ const BrandsOfCountry = ({
           const image = base64 ? `data:image/png;base64,${base64}` : null
           return (
             <div key={id} className="flex gap-1 items-center">
-              <BrandEdit brand={brand} countries={countries} brands={allBrands} />
+              <IsAdmin>
+                <BrandEdit brand={brand} countries={countries} brands={allBrands} />
+              </IsAdmin>
               <Link className="w-fit no-underline hover:underline" href={FrontRoutes.Brands + slug}>
                 <div className="flex flex-nowrap items-center gap-3">
                   {image ? (

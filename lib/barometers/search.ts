@@ -10,13 +10,15 @@ export const searchBarometers = withPrisma(
   async (prisma, query: string, page: number, pageSize: number) => {
     const skip = pageSize ? (page - 1) * pageSize : undefined
 
-    const where: Prisma.BarometerWhereInput = {
-      OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-        { manufacturer: { name: { contains: query, mode: 'insensitive' } } },
-      ],
-    }
+    const where: Prisma.BarometerWhereInput = query.trim()
+      ? {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } },
+            { manufacturer: { name: { contains: query, mode: 'insensitive' } } },
+          ],
+        }
+      : { id: { equals: '__EMPTY_SEARCH__' } } // return empty response if query is empty
 
     const [barometers, totalItems] = await Promise.all([
       prisma.barometer.findMany({
