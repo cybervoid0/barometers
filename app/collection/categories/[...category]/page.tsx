@@ -59,9 +59,10 @@ export async function generateMetadata({
 
 export default async function Collection({ params: { category } }: CollectionProps) {
   const [categoryName, sort, page] = category
+  const pageNo = Math.max(parseInt(page, 10) || 1, 1)
   const { barometers, totalPages } = await getBarometersByParams(
     categoryName,
-    +page,
+    pageNo,
     DEFAULT_PAGE_SIZE,
     sort as SortValue,
   )
@@ -90,7 +91,7 @@ export default async function Collection({ params: { category } }: CollectionPro
             ))}
           </div>
           {totalPages > 1 && (
-            <Pagination pageAsRoute total={totalPages} value={+page} className="mt-4" />
+            <Pagination pageAsRoute total={totalPages} value={pageNo} className="mt-4" />
           )}
         </Card>
       </div>

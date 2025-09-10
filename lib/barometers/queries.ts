@@ -35,8 +35,8 @@ const getBarometersByParams = withPrisma(
     size: number,
     sortBy: SortValue | null,
   ) => {
-    const pageNo = Math.max(page || 1, 1)
-    const pageSize = Math.max(size ?? DEFAULT_PAGE_SIZE, 0)
+    const pageNo = Math.max(page, 1)
+    const pageSize = Math.max(size ?? DEFAULT_PAGE_SIZE, 1)
     // perform case-insensitive compare with the stored categories
     const category = categoryName
       ? await prisma.category.findFirst({

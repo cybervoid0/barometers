@@ -1,11 +1,20 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { RequiredFieldMark } from '@/components/elements'
+import { MultiSelect, RequiredFieldMark } from '@/components/elements'
 import { Button } from '@/components/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import {
   FormControl,
   FormField,
@@ -15,6 +24,7 @@ import {
   FormProvider,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -34,7 +44,7 @@ import {
   BarometerFormTransformSchema,
   BarometerFormValidationSchema,
 } from '@/lib/schemas/barometer-form.schema'
-import { MaterialsMultiSelect } from './add-materials'
+import { cn } from '@/utils'
 import { Dimensions } from './dimensions'
 import { FileUpload } from './file-upload'
 
@@ -249,10 +259,13 @@ export default function BarometerForm({
               <FormItem>
                 <FormLabel>Materials</FormLabel>
                 <FormControl>
-                  <MaterialsMultiSelect
-                    value={field.value || []}
+                  <MultiSelect
+                    selected={field.value || []}
                     onChange={field.onChange}
-                    materials={materials ?? []}
+                    options={materials?.map(m => ({ id: m.id, name: m.name })) ?? []}
+                    placeholder="Select materials..."
+                    searchPlaceholder="Search materials..."
+                    emptyMessage="No materials found."
                   />
                 </FormControl>
                 <FormMessage />
@@ -318,22 +331,56 @@ export default function BarometerForm({
             name="manufacturerId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Manufacturer *</FormLabel>
+                <FormLabel>
+                  Manufacturer <RequiredFieldMark />
+                </FormLabel>
                 <div className="flex gap-2">
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select manufacturer" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-60">
-                      {brands.map(({ name, id }) => (
-                        <SelectItem key={id} value={String(id)}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            'w-full justify-between',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value
+                            ? brands.find(brand => String(brand.id) === field.value)?.name
+                            : 'Select manufacturer'}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+                      <Command>
+                        <CommandInput placeholder="Search manufacturers..." />
+                        <CommandList className="max-h-60 overflow-y-auto">
+                          <CommandEmpty>No manufacturer found.</CommandEmpty>
+                          <CommandGroup>
+                            {brands.map(({ name, id }) => (
+                              <CommandItem
+                                key={id}
+                                value={name}
+                                onSelect={() => {
+                                  field.onChange(String(id))
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    String(id) === field.value ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                {name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <FormMessage />
               </FormItem>
@@ -345,7 +392,9 @@ export default function BarometerForm({
             name="conditionId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Condition *</FormLabel>
+                <FormLabel>
+                  Condition <RequiredFieldMark />
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">

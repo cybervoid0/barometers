@@ -13,8 +13,8 @@ interface SearchProps {
 
 export default async function Search({ searchParams }: SearchProps) {
   const query = searchParams.q ?? ''
-  const pageSize = Math.max(Number(searchParams.size) ?? DEFAULT_PAGE_SIZE, 0)
-  const pageNo = Math.max(Number(searchParams.page) || 1, 1)
+  const pageSize = Math.max(parseInt(searchParams.size, 10) || DEFAULT_PAGE_SIZE, 0)
+  const pageNo = Math.max(parseInt(searchParams.page, 10) || 1, 1)
   const {
     barometers = [],
     page = 1,

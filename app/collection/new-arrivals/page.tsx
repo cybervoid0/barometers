@@ -2,7 +2,7 @@ import 'server-only'
 
 import { BarometerCardWithIcon } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { DEFAULT_PAGE_SIZE, FrontRoutes } from '@/constants'
 import { getBarometersByParams } from '@/lib/barometers/queries'
 
 interface newArrivalsProps {
@@ -10,11 +10,12 @@ interface newArrivalsProps {
 }
 
 export default async function NewArrivals({ searchParams }: newArrivalsProps) {
-  const { page: pageNo, size } = searchParams
+  const pageNo = Math.max(parseInt(searchParams.page, 10) || 1, 1)
+  const size = Math.max(parseInt(searchParams.size, 10) || DEFAULT_PAGE_SIZE, 1)
   const { barometers, totalPages, page } = await getBarometersByParams(
     null, // all categories
-    +pageNo,
-    +size,
+    pageNo,
+    size,
     'last-added', // sort by
   )
   return (

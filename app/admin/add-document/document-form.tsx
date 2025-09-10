@@ -3,12 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { Check, X } from 'lucide-react'
-import { useCallback, useMemo, useTransition } from 'react'
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { RequiredFieldMark } from '@/components/elements'
+import { MultiSelect, RequiredFieldMark } from '@/components/elements'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import type { AllBarometersDTO } from '@/lib/barometers/queries'
@@ -444,10 +443,13 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             <UI.FormItem>
               <UI.FormLabel>Related Barometers</UI.FormLabel>
               <UI.FormControl>
-                <BarometersMultiSelect
-                  values={field.value}
+                <MultiSelect
+                  selected={field.value || []}
                   onChange={field.onChange}
-                  barometers={allBarometers}
+                  options={allBarometers?.map(b => ({ id: b.id, name: b.name })) ?? []}
+                  placeholder="Select barometers..."
+                  searchPlaceholder="Search barometers..."
+                  emptyMessage="No barometers found."
                 />
               </UI.FormControl>
               <UI.FormMessage />
@@ -460,90 +462,5 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
         </UI.Button>
       </form>
     </UI.FormProvider>
-  )
-}
-
-interface BarometersMultiSelectProps {
-  values: string[]
-  onChange: (value: string[]) => void
-  barometers: Array<{ id: string; name: string }>
-}
-
-function BarometersMultiSelect({ values, onChange, barometers }: BarometersMultiSelectProps) {
-  const selectedBarometers = useMemo(
-    () => barometers.filter(barometer => values.includes(barometer.id)),
-    [barometers, values],
-  )
-
-  const handleSelect = useCallback(
-    (barometerId: string) => {
-      if (values.includes(barometerId)) {
-        onChange(values.filter(id => id !== barometerId))
-      } else {
-        onChange([...values, barometerId])
-      }
-    },
-    [onChange, values],
-  )
-
-  const handleRemove = useCallback(
-    (barometerId: string) => {
-      onChange(values.filter(id => id !== barometerId))
-    },
-    [onChange, values],
-  )
-
-  return (
-    <div className="space-y-2">
-      {selectedBarometers.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selectedBarometers.map(barometer => (
-            <UI.Badge key={barometer.id} variant="default" className="px-2 py-1">
-              {barometer.name}
-              <UI.Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="ml-1 h-auto p-0"
-                onClick={() => handleRemove(barometer.id)}
-              >
-                <X className="h-3 w-3" />
-              </UI.Button>
-            </UI.Badge>
-          ))}
-        </div>
-      )}
-      <UI.Popover modal>
-        <UI.PopoverTrigger asChild>
-          <UI.Button type="button" variant="outline" className="w-full justify-start">
-            {selectedBarometers.length === 0
-              ? 'Select barometers...'
-              : `${selectedBarometers.length} barometer${selectedBarometers.length === 1 ? '' : 's'} selected`}
-          </UI.Button>
-        </UI.PopoverTrigger>
-        <UI.PopoverContent className="w-full p-0" align="start">
-          <UI.Command>
-            <UI.CommandInput placeholder="Search barometers..." />
-            <UI.CommandList className="max-h-[200px]">
-              <UI.CommandEmpty>No barometers found.</UI.CommandEmpty>
-              <UI.CommandGroup>
-                {barometers.map(barometer => (
-                  <UI.CommandItem
-                    key={barometer.id}
-                    onSelect={() => handleSelect(barometer.id)}
-                    className="flex items-center space-x-2"
-                  >
-                    <div className="flex h-4 w-4 items-center justify-center">
-                      {values.includes(barometer.id) && <Check className="h-3 w-3" />}
-                    </div>
-                    <span>{barometer.name}</span>
-                  </UI.CommandItem>
-                ))}
-              </UI.CommandGroup>
-            </UI.CommandList>
-          </UI.Command>
-        </UI.PopoverContent>
-      </UI.Popover>
-    </div>
   )
 }
