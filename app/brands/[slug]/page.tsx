@@ -7,8 +7,8 @@ import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
 import { Card } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { title } from '@/constants/metadata'
+import { type BrandDTO, getBrand } from '@/lib/brands/queries'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getManufacturer } from '@/services'
 
 interface Props {
   params: {
@@ -38,7 +38,7 @@ const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
 )
 
 export async function generateMetadata({ params: { slug } }: Props): Promise<Metadata> {
-  const manufacturer = await getManufacturer(slug)
+  const manufacturer = await getBrand(slug)
   return {
     title: `${title} - Manufacturer: ${manufacturer.name}`,
   }
@@ -51,7 +51,7 @@ export const generateStaticParams = withPrisma(async prisma =>
 )
 
 export default async function Manufacturer({ params: { slug } }: Props) {
-  const manufacturer = await getManufacturer(slug)
+  const manufacturer = await getBrand(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
   return (
@@ -93,13 +93,7 @@ export default async function Manufacturer({ params: { slug } }: Props) {
  * The Connections component displays a list of related manufacturers (e.g., successors or predecessors) with a label.
  * If the list is empty, the component renders nothing.
  */
-const Connections = ({
-  brands,
-  label,
-}: {
-  label: string
-  brands: Awaited<ReturnType<typeof getManufacturer>>['successors']
-}) =>
+const Connections = ({ brands, label }: { label: string; brands: BrandDTO['successors'] }) =>
   brands.length > 0 && (
     <div>
       <span className="text-xl font-medium">{`${label}${brands.length > 1 ? 's' : ''}: `}</span>

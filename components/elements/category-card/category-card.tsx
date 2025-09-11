@@ -1,7 +1,7 @@
 import NextImage from 'next/image'
 import NextLink from 'next/link'
 import type { FC } from 'react'
-import type { CategoryDTO } from '@/types'
+import type { CategoryDTO } from '@/lib/categories/queries'
 import { cn, customImageLoader } from '@/utils'
 import { CategoryIcon } from '../category-icon'
 

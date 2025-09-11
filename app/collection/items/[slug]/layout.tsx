@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react'
 import { imageStorage } from '@/constants/globals'
 import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
-import { getBarometer } from '@/services'
+import { getBarometer } from '@/lib/barometers/queries'
 
 export async function generateMetadata({
   params: { slug },
@@ -12,7 +12,9 @@ export async function generateMetadata({
   params: { slug: string }
 }): Promise<Metadata> {
   try {
-    const { description, name, images } = await getBarometer(slug)
+    const barometer = await getBarometer(slug)
+    if (!barometer) throw new Error()
+    const { description, name, images } = barometer
     const barometerTitle = `${title}: ${capitalize(name)}`
     const [image] = images
 

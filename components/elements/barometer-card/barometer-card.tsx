@@ -1,15 +1,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { HTMLAttributes } from 'react'
-import type { BarometerListDTO } from '@/types'
 import { cn, customImageLoader } from '@/utils'
 
 interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {
-  image?: BarometerListDTO['barometers'][number]['images'][number]
   name: string
   link: string
-  manufacturer?: string
   priority: boolean
+  manufacturer?: string
+  image?: {
+    url: string
+    order: number | null
+    blurData: string
+  }
 }
 
 export async function BarometerCard({

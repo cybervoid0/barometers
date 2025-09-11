@@ -14,8 +14,6 @@ import {
 import { Label } from '@/components/ui/label'
 import { cn } from '@/utils'
 
-const Form = FormProvider
-
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -158,7 +156,7 @@ FormMessage.displayName = 'FormMessage'
 
 export {
   useFormField,
-  Form,
+  FormProvider,
   FormItem,
   FormLabel,
   FormControl,

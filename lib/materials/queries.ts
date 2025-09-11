@@ -1,0 +1,13 @@
+import 'server-only'
+
+import { withPrisma } from '@/prisma/prismaClient'
+
+export const getMaterials = withPrisma(prisma =>
+  prisma.material.findMany({
+    orderBy: {
+      name: 'asc',
+    },
+  }),
+)
+
+export type MaterialsDTO = Awaited<ReturnType<typeof getMaterials>>

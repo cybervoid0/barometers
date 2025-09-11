@@ -1,88 +1,89 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isEqual } from 'lodash'
 import { Edit, Plus, Trash2 } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useCallback, useEffect, useState, useTransition } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO, Dimensions } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import type { Dimensions } from '@/types'
 import { cn } from '@/utils'
 
 interface DimensionEditProps extends ComponentProps<'button'> {
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = yup.object({
-  dimensions: yup
-    .array()
-    .of(
-      yup.object({
-        dim: yup.string().required('Unit is required'),
-        value: yup.string().required('Value is required'),
+const maxDimensions = 7
+
+const validationSchema = z.object({
+  dimensions: z
+    .array(
+      z.object({
+        dim: z.string().min(1, 'Unit is required').max(20, 'Dimension name is too long'),
+        value: z.string().min(1, 'Value is required').max(20, 'Dimension value is too long'),
       }),
     )
-    .defined()
-    .default([]),
+    .max(maxDimensions, 'Too many dimensions'),
 })
 
-type DimensionsForm = yup.InferType<typeof validationSchema>
+type DimensionsForm = z.output<typeof validationSchema>
 
 export function DimensionEdit({ barometer, className, ...props }: DimensionEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const form = useForm<DimensionsForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      dimensions: (barometer.dimensions as Dimensions) || [],
-    },
+    resolver: zodResolver(validationSchema),
   })
+
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ dimensions: (barometer.dimensions as Dimensions) || [] })
+  }, [open, form.reset, barometer.dimensions])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'dimensions',
   })
 
-  const handleUpdateBarometer = async (values: DimensionsForm) => {
-    try {
-      // Filter out empty entries
-      const filteredDimensions = values.dimensions.filter(({ dim }) => dim.trim())
+  const handleUpdateBarometer = useCallback(
+    (values: DimensionsForm) => {
+      startTransition(async () => {
+        try {
+          // Filter out empty entries
+          const filteredDimensions = values.dimensions.filter(({ dim }) => dim.trim())
 
-      if (isEqual(filteredDimensions, barometer.dimensions)) {
-        return
-      }
+          if (isEqual(filteredDimensions, barometer.dimensions)) {
+            toast.info(`Nothing was updated in ${barometer.name}.`)
+            return setOpen(false)
+          }
 
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        dimensions: filteredDimensions,
+          const { name } = await updateBarometer({
+            id: barometer.id,
+            dimensions: filteredDimensions,
+          })
+
+          setOpen(false)
+          toast.success(`Updated dimensions in ${name}.`)
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+        }
       })
-
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
-  }
+    },
+    [barometer.name, barometer.dimensions, barometer.id],
+  )
 
   const addDimension = () => {
-    if (fields.length >= 7) return
+    if (fields.length >= maxDimensions) return
     append({ dim: '', value: '' })
   }
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            dimensions: (barometer.dimensions as Dimensions) || [],
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -94,13 +95,22 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-2xl">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Dimensions</UI.DialogTitle>
               <UI.DialogDescription>Update the dimensions for this barometer.</UI.DialogDescription>
             </UI.DialogHeader>
             <div className="mt-4 space-y-4">
+              <UI.FormField
+                control={form.control}
+                name="dimensions"
+                render={() => (
+                  <UI.FormItem>
+                    <UI.FormMessage />
+                  </UI.FormItem>
+                )}
+              />
               <div className="space-y-3">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
@@ -111,6 +121,7 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                       aria-label="Delete parameter"
                       onClick={() => remove(index)}
                       className="shrink-0"
+                      disabled={isPending}
                     >
                       <Trash2 className="h-4 w-4" />
                     </UI.Button>
@@ -140,26 +151,31 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                     />
                   </div>
                 ))}
-                <UI.Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addDimension}
-                  disabled={fields.length >= 7}
-                  className="w-fit"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Parameter
-                </UI.Button>
+                <div className="flex w-full">
+                  <UI.Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addDimension}
+                    disabled={fields.length >= 7 || isPending}
+                    className="w-fit"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Parameter
+                  </UI.Button>
+                  <div className="grow flex items-center justify-center">
+                    {fields.length === 0 && <p className="leading-none">No dimensions</p>}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

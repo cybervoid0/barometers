@@ -1,62 +1,70 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit } from 'lucide-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import * as zod from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { useBarometers } from '@/hooks/useBarometers'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import type { ConditionsDTO } from '@/lib/conditions/queries'
 import { cn } from '@/utils'
 
 interface ConditionEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
+  conditions: ConditionsDTO
 }
 
-const validationSchema = yup.object({
-  conditionId: yup.string().required('Condition is required'),
+const validationSchema = zod.object({
+  conditionId: zod.string().min(1, 'Condition is required'),
 })
 
-type ConditionForm = yup.InferType<typeof validationSchema>
+type ConditionForm = zod.infer<typeof validationSchema>
 
-export function ConditionEdit({ size = 18, barometer, className, ...props }: ConditionEditProps) {
-  const { condition } = useBarometers()
+export function ConditionEdit({
+  size = 18,
+  barometer,
+  conditions,
+  className,
+  ...props
+}: ConditionEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<ConditionForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      conditionId: barometer.condition?.id ?? '',
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const update = async (values: ConditionForm) => {
-    try {
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        conditionId: values.conditionId,
-      })
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ conditionId: barometer.condition?.id ?? '' })
+  }, [open, form.reset, barometer.condition?.id])
+
+  const update = (values: ConditionForm) => {
+    if (values.conditionId === barometer.conditionId) {
+      toast.info(`Nothing was updated in ${barometer.name}.`)
+      return setOpen(false)
     }
+    startTransition(async () => {
+      try {
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          conditionId: values.conditionId,
+        })
+        setOpen(false)
+        toast.success(`Updated condition in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer condition')
+      }
+    })
   }
 
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({ conditionId: barometer.condition?.id ?? '' })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -68,7 +76,7 @@ export function ConditionEdit({ size = 18, barometer, className, ...props }: Con
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Condition</UI.DialogTitle>
@@ -87,7 +95,7 @@ export function ConditionEdit({ size = 18, barometer, className, ...props }: Con
                           <UI.SelectValue placeholder="Select condition" />
                         </UI.SelectTrigger>
                         <UI.SelectContent>
-                          {condition.data.map(({ name, id }) => (
+                          {conditions.map(({ name, id }) => (
                             <UI.SelectItem key={id} value={id}>
                               {name}
                             </UI.SelectItem>
@@ -101,12 +109,12 @@ export function ConditionEdit({ size = 18, barometer, className, ...props }: Con
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

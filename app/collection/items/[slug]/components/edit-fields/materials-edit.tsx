@@ -1,77 +1,73 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isEqual } from 'lodash'
 import { Check, Edit, X } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import { useMemo } from 'react'
+import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
-import { useBarometers } from '@/hooks/useBarometers'
-import { updateBarometer } from '@/services/fetch'
-import type { BarometerDTO } from '@/types'
+import { updateBarometer } from '@/lib/barometers/actions'
+import type { BarometerDTO } from '@/lib/barometers/queries'
+import type { MaterialsDTO } from '@/lib/materials/queries'
 import { cn } from '@/utils'
 
 interface MaterialsEditProps extends ComponentProps<'button'> {
-  barometer: BarometerDTO
+  barometer: NonNullable<BarometerDTO>
+  materials: MaterialsDTO
 }
 
-const validationSchema = yup.object({
-  materials: yup.array().of(yup.number().required()).defined().default([]),
+const validationSchema = z.object({
+  materials: z.array(z.number()),
 })
 
-type MaterialsForm = yup.InferType<typeof validationSchema>
+type MaterialsForm = z.output<typeof validationSchema>
 
-export function MaterialsEdit({ barometer, className, ...props }: MaterialsEditProps) {
-  const { materials: materialList } = useBarometers()
+export function MaterialsEdit({ barometer, materials, className, ...props }: MaterialsEditProps) {
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<MaterialsForm>({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      materials: barometer.materials.map(({ id }) => id),
-    },
+    resolver: zodResolver(validationSchema),
   })
 
-  const handleUpdateBarometer = async (values: MaterialsForm) => {
-    try {
-      if (
-        isEqual(
-          values.materials,
-          barometer.materials.map(({ id }) => id),
-        )
-      ) {
-        return
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset({ materials: barometer.materials.map(({ id }) => id) })
+  }, [open, form.reset, barometer.materials.map])
+
+  const handleUpdateBarometer = (values: MaterialsForm) => {
+    startTransition(async () => {
+      try {
+        if (
+          isEqual(
+            values.materials,
+            barometer.materials.map(({ id }) => id),
+          )
+        ) {
+          toast.info(`Nothing was updated in ${barometer.name}.`)
+          return setOpen(false)
+        }
+
+        const { name } = await updateBarometer({
+          id: barometer.id,
+          materials: {
+            set: values.materials.map(id => ({ id })),
+          },
+        })
+
+        setOpen(false)
+        toast.success(`Updated materials in ${name}.`)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }
-
-      const { slug } = await updateBarometer({
-        id: barometer.id,
-        materials: values.materials,
-      })
-
-      toast.success(`${barometer.name} updated`)
-      setTimeout(() => {
-        window.location.href = FrontRoutes.Barometer + (slug ?? '')
-      }, 1000)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error updating barometer')
-    }
+    })
   }
 
-  const materialsData = useMemo(() => materialList.data ?? [], [materialList])
-
   return (
-    <UI.Dialog
-      onOpenChange={isOpen => {
-        if (isOpen) {
-          form.reset({
-            materials: barometer.materials.map(({ id }) => id),
-          })
-        }
-      }}
-    >
+    <UI.Dialog open={open} onOpenChange={setOpen}>
       <UI.DialogTrigger asChild>
         <UI.Button
           variant="ghost"
@@ -83,7 +79,7 @@ export function MaterialsEdit({ barometer, className, ...props }: MaterialsEditP
         </UI.Button>
       </UI.DialogTrigger>
       <UI.DialogContent className="sm:max-w-md">
-        <UI.Form {...form}>
+        <UI.FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
             <UI.DialogHeader>
               <UI.DialogTitle>Edit Materials</UI.DialogTitle>
@@ -100,7 +96,7 @@ export function MaterialsEdit({ barometer, className, ...props }: MaterialsEditP
                       <MaterialsMultiSelect
                         value={field.value}
                         onChange={field.onChange}
-                        materials={materialsData}
+                        materials={materials}
                       />
                     </UI.FormControl>
                     <UI.FormMessage />
@@ -109,12 +105,12 @@ export function MaterialsEdit({ barometer, className, ...props }: MaterialsEditP
               />
             </div>
             <div className="mt-6">
-              <UI.Button type="submit" variant="outline" className="w-full">
+              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Update
               </UI.Button>
             </div>
           </form>
-        </UI.Form>
+        </UI.FormProvider>
       </UI.DialogContent>
     </UI.Dialog>
   )

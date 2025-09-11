@@ -16,26 +16,31 @@ import {
   Wrench,
 } from 'lucide-react'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { IsAdmin, MD, ShowMore } from '@/components/elements'
 import { Card, SeparatorWithText } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
+import { getBarometer } from '@/lib/barometers/queries'
+import { getAllBrands } from '@/lib/brands/queries'
+import { getConditions } from '@/lib/conditions/queries'
+import { getMaterials } from '@/lib/materials/queries'
+import { getMovements } from '@/lib/movements/queries'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getBarometer } from '@/services'
 import type { Dimensions } from '@/types'
 import { BreadcrumbsComponent } from './components/breadcrumbs'
 // local components
 import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { DeleteBarometer } from './components/delete-barometer'
+import { BrandEdit } from './components/edit-fields/brand-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
-import { ManufacturerEdit } from './components/edit-fields/manufacturer-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
+import { MovementsEdit } from './components/edit-fields/movements-edit'
 import { PurchasedAtEdit } from './components/edit-fields/purchased-at-edit'
-import { SubcategoryEdit } from './components/edit-fields/subcategory-edit'
 import { TextAreaEdit } from './components/edit-fields/textarea-edit'
 import { TextFieldEdit } from './components/edit-fields/textfield-edit'
 import { InaccuracyReport } from './components/inaccuracy-report'
@@ -60,9 +65,17 @@ export const generateStaticParams = withPrisma(prisma =>
 )
 
 export default async function Page({ params: { slug } }: Props) {
-  const barometer = await getBarometer(slug)
+  const [barometer, materials, movements, brands, conditions] = await Promise.all([
+    getBarometer(slug).catch(() => null),
+    getMaterials().catch(() => []),
+    getMovements().catch(() => []),
+    getAllBrands().catch(() => []),
+    getConditions().catch(() => []),
+  ])
+
+  if (!barometer) notFound()
   const { firstName, name, city } = barometer.manufacturer
-  const dimensions = (barometer.dimensions ?? []) as Dimensions
+  const dimensions = (barometer?.dimensions ?? []) as Dimensions
   return (
     <>
       <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
@@ -81,7 +94,7 @@ export default async function Page({ params: { slug } }: Props) {
           <PropertyCard
             icon={Factory}
             title="Manufacturer | Retailer"
-            edit={<ManufacturerEdit barometer={barometer} />}
+            edit={<BrandEdit barometer={barometer} brands={brands} />}
           >
             <Link
               className="block text-sm"
@@ -127,12 +140,12 @@ export default async function Page({ params: { slug } }: Props) {
             title="Dating"
             edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
           >
-            {barometer.dateDescription}
+            {barometer?.dateDescription}
           </PropertyCard>
           <PropertyCard
             icon={Star}
             title="Condition"
-            edit={<ConditionEdit barometer={barometer} />}
+            edit={<ConditionEdit barometer={barometer} conditions={conditions} />}
           >
             <Condition condition={barometer.condition} />
           </PropertyCard>
@@ -140,7 +153,7 @@ export default async function Page({ params: { slug } }: Props) {
             adminOnly={!barometer.subCategory?.name}
             icon={Wrench}
             title="Movement Type"
-            edit={<SubcategoryEdit barometer={barometer} />}
+            edit={<MovementsEdit barometer={barometer} movements={movements} />}
           >
             <p className="text-sm capitalize">{barometer.subCategory?.name}</p>
           </PropertyCard>
@@ -176,7 +189,7 @@ export default async function Page({ params: { slug } }: Props) {
             adminOnly={!barometer.materials || barometer.materials.length === 0}
             icon={TreePine}
             title="Materials"
-            edit={<MaterialsEdit barometer={barometer} />}
+            edit={<MaterialsEdit materials={materials} barometer={barometer} />}
           >
             <p className="text-sm capitalize">
               {barometer.materials.map(item => item.name).join(', ')}

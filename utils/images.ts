@@ -77,3 +77,8 @@ export async function generateIcon(
 
   return canvas.toDataURL('image/png')
 }
+
+export const getIconBuffer = (icon: string | undefined | null) =>
+  icon && typeof icon === 'string'
+    ? Buffer.from(icon.replace(/^data:image\/\w+;base64,/, ''), 'base64')
+    : null

@@ -1,4 +1,4 @@
-'use server'
+import 'server-only'
 
 import { cache } from 'react'
 import { withPrisma } from '@/prisma/prismaClient'

@@ -1,28 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-function getPrismaClient(): PrismaClient {
-  if (globalForPrisma.prisma) return globalForPrisma.prisma
-  const prisma = new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : [],
-  })
-  globalForPrisma.prisma = prisma
-  return prisma
-}
+const prisma = globalForPrisma.prisma || new PrismaClient()
 
-/**
- * Type definition for an asynchronous function that uses a PrismaClient instance.
- *
- * @template T - The return type of the asynchronous function.
- * @template Args - A tuple representing the arguments passed to the function (excluding `prisma`).
- *
- * This type is used to define functions that need access to a PrismaClient instance and
- * additional arguments.
- */
-type AsyncFunction<T, Args extends unknown[]> = (prisma: PrismaClient, ...args: Args) => Promise<T>
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 /**
  * Higher-order function to automatically manage PrismaClient connections.
@@ -41,16 +23,10 @@ type AsyncFunction<T, Args extends unknown[]> = (prisma: PrismaClient, ...args: 
  * });
  * ```
  */
-export function withPrisma<T, Args extends unknown[]>(fn: AsyncFunction<T, Args>) {
-  return async function wrappedWithParams(...args: Args): Promise<T> {
-    const prisma = getPrismaClient()
-    try {
-      return await fn(prisma, ...args)
-    } finally {
-      // Only disconnect in development to avoid connection issues during build
-      if (process.env.NODE_ENV === 'development') {
-        await prisma.$disconnect()
-      }
-    }
+export function withPrisma<T, Args extends unknown[]>(
+  fn: (prisma: PrismaClient, ...args: Args) => Promise<T>,
+) {
+  return async (...args: Args): Promise<T> => {
+    return fn(prisma, ...args)
   }
 }
