@@ -9,6 +9,7 @@ import { FrontRoutes } from '@/constants'
 import { title } from '@/constants/metadata'
 import { type BrandDTO, getBrand } from '@/lib/brands/queries'
 import { withPrisma } from '@/prisma/prismaClient'
+import type { DynamicOptions } from '@/types'
 
 interface Props {
   params: {
@@ -16,7 +17,7 @@ interface Props {
   }
 }
 
-export const dynamic = 'force-static'
+export const dynamic: DynamicOptions = 'force-static'
 
 const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
   prisma.barometer.findMany({
