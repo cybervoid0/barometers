@@ -6,7 +6,7 @@ import { cn } from '@/utils'
 
 const { fullName, shortName, tradeName, postAddress } = foundation
 const documentVersion = '1.0'
-const versionDate = dayjs(new Date(2025, 5, 9))
+const versionDate = dayjs.utc(new Date(2025, 5, 9))
 
 export default function PrivacyPolicy() {
   return (

@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui'
 import { analyticsCookies, functionalCookies, necessaryCookies } from '@/services/cookie-consent'
 import type { CookieTable } from '@/types'
 
-const versionDate = dayjs(new Date(2025, 5, 9)).format('MMMM D, YYYY')
+const versionDate = dayjs.utc(new Date(2025, 5, 9))
 const paragraphStyles = 'mb-4 indent-8 text-left'
 const sectionStyles = 'mb-10 mt-10'
 const listStyles = 'mb-10'
@@ -70,7 +70,7 @@ export default function CookiePolicy() {
       <section className={sectionStyles}>
         <h2 className="mb-3">Cookie Policy</h2>
         <p className={paragraphStyles}>
-          Version: <span className="ml-2">{versionDate}</span>
+          Version: <span className="ml-2">{versionDate.format('MMMM D, YYYY')}</span>
         </p>
       </section>
 
