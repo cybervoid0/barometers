@@ -1,9 +1,10 @@
 import Image from 'next/image'
 import { CheckConsent, PayPalStackedButton } from '@/components/elements'
 import { CopyButton } from '@/components/ui'
-import { bitcoinAddress, ethereumAddress } from '@/constants'
+import { foundation } from '@/constants'
 import { cn } from '@/utils'
 
+const { bitcoinAddress, ethereumAddress } = foundation
 const paragraphSx = 'mb-4 indent-8 text-left'
 const listSx = cn(
   'mb-1 ml-12 space-y-2 -indent-6', //layout

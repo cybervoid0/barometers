@@ -19,6 +19,7 @@ interface CountryContextType {
 }
 
 const CountryContext = createContext<CountryContextType | undefined>(undefined)
+const defaultCountry = 'NL'
 
 /**
  * Provider that shares country and EU status across the application.
@@ -27,10 +28,10 @@ const CountryContext = createContext<CountryContextType | undefined>(undefined)
  * Used by cookie consent components to determine behavior.
  */
 export function CountryProvider({ children }: PropsWithChildren) {
-  const [country, setCountry] = useState<string>('US')
+  const [country, setCountry] = useState<string>(defaultCountry)
   const [isEU, setIsEU] = useState<boolean>(false)
   useEffect(() => {
-    const geoCountry = Cookies.get('geo_country') ?? 'US'
+    const geoCountry = Cookies.get('geo_country') ?? defaultCountry
     const isEurope = EU_ALPHA2.has(geoCountry)
     setCountry(geoCountry)
     setIsEU(isEurope)

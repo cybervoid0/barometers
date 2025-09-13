@@ -15,6 +15,7 @@ export const FrontRoutes = {
   AddDocument: '/admin/add-document/',
   Reports: '/admin/reports/',
   CookiePolicy: '/cookies/',
+  PrivacyPolicy: '/privacy/',
 } as const
 
 export type FrontRoutes = (typeof FrontRoutes)[keyof typeof FrontRoutes]

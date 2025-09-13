@@ -226,11 +226,11 @@
 
   /* H1 is used only once in the site layout header */
   h1 {
-    @apply text-secondary text-[1.3rem] leading-tight font-semibold tracking-wider uppercase sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
+    @apply font-cinzel text-secondary text-[1.3rem] leading-tight font-semibold tracking-wider uppercase sm:text-[1.4rem] lg:text-[1.6rem] xl:text-[1.8rem];
   }
   /* H2 is used for page headers */
   h2 {
-    @apply xs:text-2xl text-xl leading-tight font-semibold tracking-wider capitalize;
+    @apply font-cinzel xs:text-2xl text-xl leading-tight font-semibold tracking-wider capitalize;
   }
 
   h3 {

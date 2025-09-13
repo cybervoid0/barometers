@@ -27,7 +27,7 @@ export async function Header() {
             <NextLink className="no-underline" href="/">
               <div className="flex items-center gap-4">
                 <div className="flex flex-col gap-2">
-                  <h1 className="font-cinzel leading-none">Barometers Realm</h1>
+                  <h1 className="leading-none">Barometers Realm</h1>
                   <p className="xs:text-xs text-[10px] leading-none lg:text-[0.875rem]">
                     Europe's richest online collection of barometers
                   </p>
