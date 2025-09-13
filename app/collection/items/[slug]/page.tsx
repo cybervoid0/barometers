@@ -12,6 +12,7 @@ import {
   Ruler,
   ShoppingCart,
   Star,
+  Tags,
   TreePine,
   Wrench,
 } from 'lucide-react'
@@ -22,6 +23,7 @@ import { Card, SeparatorWithText } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { getBarometer } from '@/lib/barometers/queries'
 import { getAllBrands } from '@/lib/brands/queries'
+import { getCategories } from '@/lib/categories/queries'
 import { getConditions } from '@/lib/conditions/queries'
 import { getMaterials } from '@/lib/materials/queries'
 import { getMovements } from '@/lib/movements/queries'
@@ -37,6 +39,7 @@ import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
+import { EditCategory } from './components/edit-fields/edit-category'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
 import { MovementsEdit } from './components/edit-fields/movements-edit'
@@ -65,12 +68,13 @@ export const generateStaticParams = withPrisma(prisma =>
 )
 
 export default async function Page({ params: { slug } }: Props) {
-  const [barometer, materials, movements, brands, conditions] = await Promise.all([
-    getBarometer(slug).catch(() => null),
-    getMaterials().catch(() => []),
-    getMovements().catch(() => []),
-    getAllBrands().catch(() => []),
-    getConditions().catch(() => []),
+  const [barometer, materials, movements, brands, conditions, categories] = await Promise.all([
+    getBarometer(slug),
+    getMaterials(),
+    getMovements(),
+    getAllBrands(),
+    getConditions(),
+    getCategories(),
   ])
 
   if (!barometer) notFound()
@@ -101,6 +105,15 @@ export default async function Page({ params: { slug } }: Props) {
               href={FrontRoutes.Brands + barometer.manufacturer.slug}
               /* display manufacturer name and city (or country if city is not specified) */
             >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Link>
+          </PropertyCard>
+          <PropertyCard
+            icon={Tags}
+            title="Category"
+            edit={<EditCategory barometer={barometer} categories={categories} />}
+          >
+            <Link className="text-sm w-fit" href={FrontRoutes.Categories + barometer.category.name}>
+              {barometer.category.label}
+            </Link>
           </PropertyCard>
           <PropertyCard
             icon={Hash}

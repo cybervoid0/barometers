@@ -1,15 +1,15 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { DialogDescription } from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import {
   Button,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   FormControl,
@@ -17,7 +17,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormProvider,
   Select,
   SelectContent,
   SelectItem,
@@ -26,40 +25,34 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/lib/barometers/actions'
 import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { ConditionsDTO } from '@/lib/conditions/queries'
+import type { CategoriesDTO } from '@/lib/categories/queries'
 import { EditButton } from './edit-button'
 
-interface ConditionEditProps {
+interface Props {
   barometer: NonNullable<BarometerDTO>
-  conditions: ConditionsDTO
+  categories: CategoriesDTO
 }
 
-const ValidationSchema = z.object({
-  conditionId: z.string().min(1, 'Condition is required'),
+const Schema = z.object({
+  categoryId: z.string().min(1, 'Select the category'),
 })
 
-type ConditionForm = z.infer<typeof ValidationSchema>
+type Form = z.infer<typeof Schema>
 
-export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
+export function EditCategory({ barometer, categories }: Props) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<ConditionForm>({
-    resolver: zodResolver(ValidationSchema),
+  const form = useForm<Form>({
+    resolver: zodResolver(Schema),
     defaultValues: {
-      conditionId: barometer.conditionId,
+      categoryId: barometer.categoryId,
     },
   })
 
-  // reset form on open
-  useEffect(() => {
-    if (!open) return
-    form.reset()
-  }, [open, form.reset])
-
   const update = useCallback(
-    (values: ConditionForm) => {
-      if (values.conditionId === barometer.conditionId) {
+    ({ categoryId }: Form) => {
+      if (!form.formState.isDirty) {
         toast.info(`Nothing was updated in ${barometer.name}.`)
         return setOpen(false)
       }
@@ -67,44 +60,49 @@ export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
         try {
           const { name } = await updateBarometer({
             id: barometer.id,
-            conditionId: values.conditionId,
+            categoryId,
           })
           setOpen(false)
-          toast.success(`Updated condition in ${name}.`)
+          toast.success(`Changed category in ${name}.`)
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Error updating barometer condition')
         }
       })
     },
-    [barometer],
+    [barometer, form.formState.isDirty],
   )
+  // reset form on open
+  useEffect(() => {
+    if (!open) return
+    form.reset()
+  }, [open, form.reset])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <EditButton />
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(update)} noValidate>
+          <form onSubmit={form.handleSubmit(update)}>
             <DialogHeader>
-              <DialogTitle>Edit Condition</DialogTitle>
-              <DialogDescription>Update the condition for {barometer.name}.</DialogDescription>
+              <DialogTitle>Edit Category</DialogTitle>
+              <DialogDescription>Update the category for {barometer.name}.</DialogDescription>
             </DialogHeader>
             <div className="mt-4 space-y-4">
               <FormField
                 control={form.control}
-                name="conditionId"
+                name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Condition</FormLabel>
+                    <FormLabel>Category</FormLabel>
                     <FormControl>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select condition" />
+                          <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {conditions.map(({ name, id }) => (
+                          {categories.map(({ id, label }) => (
                             <SelectItem key={id} value={id}>
-                              {name}
+                              {label}
                             </SelectItem>
                           ))}
                         </SelectContent>
