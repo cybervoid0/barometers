@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
 import { Separator } from '@/components/ui'
 import { email, FrontRoutes, foundation } from '@/constants'
@@ -6,6 +7,7 @@ import { cn } from '@/utils'
 
 const { fullName, shortName, tradeName, postAddress } = foundation
 const documentVersion = '1.0'
+dayjs.extend(utc)
 const versionDate = dayjs.utc(new Date(2025, 5, 9))
 
 export default function PrivacyPolicy() {

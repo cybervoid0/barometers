@@ -7,11 +7,13 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { Table } from '@/components/elements'
 import { Separator } from '@/components/ui'
 import { analyticsCookies, functionalCookies, necessaryCookies } from '@/services/cookie-consent'
 import type { CookieTable } from '@/types'
 
+dayjs.extend(utc)
 const versionDate = dayjs.utc(new Date(2025, 5, 9))
 const paragraphStyles = 'mb-4 indent-8 text-left'
 const sectionStyles = 'mb-10 mt-10'
