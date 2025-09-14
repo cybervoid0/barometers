@@ -2,7 +2,13 @@
 
 import NextImage from 'next/image'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { customImageLoader } from '@/utils'
 
 interface ImageLightboxProps {
@@ -24,10 +30,11 @@ export function ImageLightbox({ src, name }: ImageLightboxProps) {
           src={customImageLoader({ src, width: 250, quality: 80 })}
           alt={name}
           className="cursor-zoom-in"
-          priority
         />
       </DialogTrigger>
       <DialogContent>
+        <DialogTitle className="sr-only">{name}</DialogTitle>
+        <DialogDescription className="sr-only">Full size view of {name}</DialogDescription>
         <NextImage
           unoptimized
           width={1000}

@@ -150,7 +150,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       images: brandImages,
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
-      icon: brand.icon ? Buffer.from(brand.icon).toString('base64') : null,
+      icon: brand.icon,
     })
   }, [openBrandDialog, brand, brandImages, form.reset, cleanUpOnClose])
 

@@ -1,11 +1,11 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SearchField } from '@/components/elements'
 
 interface SearchInfoProps {
   isEmptyResult: boolean
-  queryString: string
 }
 
 const message = {
@@ -20,16 +20,19 @@ const titleClasses = {
   hidden: 'hidden',
 } as const
 
-export function SearchInfo({ isEmptyResult, queryString }: SearchInfoProps) {
+export function SearchInfo({ isEmptyResult }: SearchInfoProps) {
+  const searchParams = useSearchParams()
+
   const [msg, setMsg] = useState<keyof typeof message>('welcome')
 
   useEffect(() => {
+    const queryString = searchParams.get('q')
     setMsg(isEmptyResult ? (!queryString ? 'welcome' : 'notFound') : 'hidden')
-  }, [queryString, isEmptyResult])
+  }, [searchParams, isEmptyResult])
 
   return (
     <div className="flex flex-col space-y-4">
-      <SearchField queryString={queryString} className="px-4 md:px-0" />
+      <SearchField className="px-4 md:px-0" />
       <p className={`${titleClasses[msg]} text-sm font-normal md:text-base`}>{message[msg]}</p>
     </div>
   )

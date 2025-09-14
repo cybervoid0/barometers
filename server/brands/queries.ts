@@ -2,6 +2,7 @@ import 'server-only'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
+import { bufferToBase64Url } from '@/utils'
 
 export const getAllBrands = withPrisma(async prisma => {
   return prisma.manufacturer.findMany({
@@ -67,7 +68,10 @@ export const getBrands = withPrisma(async (prisma, page?: number, size?: number)
     prisma.manufacturer.count(),
   ])
   return {
-    manufacturers,
+    manufacturers: manufacturers.map(({ icon, ...brand }) => ({
+      ...brand,
+      icon: bufferToBase64Url(icon),
+    })),
     page: pageSize ? page : 1,
     totalPages: pageSize ? Math.ceil(totalItems / pageSize) : 1,
     totalItems,
@@ -75,8 +79,8 @@ export const getBrands = withPrisma(async (prisma, page?: number, size?: number)
   }
 })
 
-export const getBrand = withPrisma((prisma, slug: string) =>
-  prisma.manufacturer.findUniqueOrThrow({
+export const getBrand = withPrisma(async (prisma, slug: string) => {
+  const { icon, ...brand } = await prisma.manufacturer.findUniqueOrThrow({
     where: {
       slug,
     },
@@ -100,11 +104,15 @@ export const getBrand = withPrisma((prisma, slug: string) =>
       images: true,
       countries: true,
     },
-  }),
-)
+  })
+  return {
+    ...brand,
+    icon: bufferToBase64Url(icon),
+  }
+})
 
 export const getBrandsByCountry = withPrisma(async prisma => {
-  return prisma.country.findMany({
+  const countries = await prisma.country.findMany({
     orderBy: {
       name: 'asc',
     },
@@ -140,6 +148,17 @@ export const getBrandsByCountry = withPrisma(async prisma => {
         },
       },
     },
+  })
+  return countries.map(country => {
+    return {
+      ...country,
+      manufacturers: country.manufacturers.map(({ icon, ...brand }) => {
+        return {
+          ...brand,
+          icon: bufferToBase64Url(icon),
+        }
+      }),
+    }
   })
 })
 

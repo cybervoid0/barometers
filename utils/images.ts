@@ -82,3 +82,13 @@ export const getIconBuffer = (icon: string | undefined | null) =>
   icon && typeof icon === 'string'
     ? Buffer.from(icon.replace(/^data:image\/\w+;base64,/, ''), 'base64')
     : null
+
+/**
+ * Generates image from array buffer stored in the database
+ * @param buffer
+ * @returns
+ */
+export function bufferToBase64Url(buffer: Uint8Array | null) {
+  const base64 = buffer ? Buffer.from(buffer).toString('base64') : null
+  return base64 ? `data:image/png;base64,${base64}` : null
+}

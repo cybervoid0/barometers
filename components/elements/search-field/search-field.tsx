@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader, Search, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,10 +10,6 @@ import { z } from 'zod'
 import { Button, Input } from '@/components/ui'
 import { FormControl, FormField, FormItem, FormMessage, FormProvider } from '@/components/ui/form'
 import { cn } from '@/utils'
-
-interface SearchProps extends React.HTMLAttributes<HTMLDivElement> {
-  queryString?: string
-}
 
 const schema = z.object({
   query: z
@@ -24,7 +20,9 @@ const schema = z.object({
 
 type SearchFormData = z.infer<typeof schema>
 
-export function SearchField({ queryString, ...props }: SearchProps) {
+export function SearchField(props: React.ComponentProps<'div'>) {
+  const searchParams = useSearchParams()
+
   const [pending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -39,25 +37,27 @@ export function SearchField({ queryString, ...props }: SearchProps) {
 
   // Fill querystring from the page to the form
   useEffect(() => {
+    const queryString = searchParams.get('q')
     if (!queryString) return
     form.reset({ query: queryString })
-  }, [queryString, form])
+  }, [searchParams, form])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: exclude router.push
   const onSubmit = useCallback(
     (values: SearchFormData) => {
       if (!form.formState.isDirty) return
       startTransition(() => {
         try {
-          const qs = values.query.trim()
-          const searchParams = new URLSearchParams({ q: qs })
-          router.push(`/search?${searchParams}`, { scroll: true })
+          const formQuery = values.query.trim()
+          const updatedSearchParams = new URLSearchParams(searchParams)
+          updatedSearchParams.set('q', formQuery)
+          updatedSearchParams.set('page', '1')
+          router.push(`/search?${updatedSearchParams}`, { scroll: true })
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Search failed')
         }
       })
     },
-    [form.formState.isDirty],
+    [form.formState.isDirty, router.push, searchParams],
   )
 
   const handleClear = () => {

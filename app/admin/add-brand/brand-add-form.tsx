@@ -5,7 +5,7 @@ import { useCallback, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { IconUpload, ImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { FormImageUpload, IconUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants'
 import { createBrand } from '@/server/brands/actions'
@@ -272,19 +272,7 @@ function BrandAddForm({ countries, brands }: Props) {
           )}
         />
 
-        <UI.FormField
-          control={form.control}
-          name="images"
-          render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Images</UI.FormLabel>
-              <UI.FormControl>
-                <ImageUpload images={field.value} onImagesChange={field.onChange} maxImages={10} />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
-          )}
-        />
+        <FormImageUpload name="images" />
 
         <div>
           <UI.FormLabel>Icon</UI.FormLabel>

@@ -39,7 +39,7 @@ const Schema = z.object({
 
 type Form = z.infer<typeof Schema>
 
-export function EditCategory({ barometer, categories }: Props) {
+export function CategoryEdit({ barometer, categories }: Props) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -74,8 +74,8 @@ export function EditCategory({ barometer, categories }: Props) {
   // reset form on open
   useEffect(() => {
     if (!open) return
-    form.reset()
-  }, [open, form.reset])
+    form.reset({ categoryId: barometer.categoryId })
+  }, [open, form.reset, barometer.categoryId])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

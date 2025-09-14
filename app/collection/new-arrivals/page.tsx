@@ -6,10 +6,11 @@ import { DEFAULT_PAGE_SIZE, FrontRoutes } from '@/constants'
 import { getBarometersByParams } from '@/server/barometers/queries'
 
 interface newArrivalsProps {
-  searchParams: Record<string, string>
+  searchParams: Promise<{ page: string; size: string }>
 }
 
-export default async function NewArrivals({ searchParams }: newArrivalsProps) {
+export default async function NewArrivals(props: newArrivalsProps) {
+  const searchParams = await props.searchParams
   const pageNo = Math.max(parseInt(searchParams.page, 10) || 1, 1)
   const size = Math.max(parseInt(searchParams.size, 10) || DEFAULT_PAGE_SIZE, 1)
   const { barometers, totalPages, page } = await getBarometersByParams(

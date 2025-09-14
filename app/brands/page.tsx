@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 }
 
 const width = 32
-const BrandsOfCountry = ({
+const BrandByCountry = ({
   country,
   countries,
   allBrands,
@@ -43,8 +43,6 @@ const BrandsOfCountry = ({
       <div className="flex flex-col gap-4">
         {country.manufacturers.map(brand => {
           const { id, firstName, name, slug, icon } = brand
-          const base64 = icon ? Buffer.from(icon).toString('base64') : null
-          const image = base64 ? `data:image/png;base64,${base64}` : null
           return (
             <div key={id} className="flex gap-1 items-center">
               <IsAdmin>
@@ -52,14 +50,14 @@ const BrandsOfCountry = ({
               </IsAdmin>
               <Link className="w-fit no-underline hover:underline" href={FrontRoutes.Brands + slug}>
                 <div className="flex flex-nowrap items-center gap-3">
-                  {image ? (
+                  {icon ? (
                     <Image
                       unoptimized
                       width={width}
                       height={width}
                       alt={name}
                       loading="lazy"
-                      src={image}
+                      src={icon}
                       className="h-8 w-8 object-contain"
                     />
                   ) : (
@@ -100,7 +98,7 @@ export default async function Brands() {
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:gap-x-6">
           <div>
             {firstColumn.map(country => (
-              <BrandsOfCountry
+              <BrandByCountry
                 allBrands={allBrands}
                 key={country.id}
                 country={country}
@@ -111,7 +109,7 @@ export default async function Brands() {
           <Separator orientation="vertical" className="hidden sm:block" />
           <div>
             {secondColumn.map(country => (
-              <BrandsOfCountry
+              <BrandByCountry
                 allBrands={allBrands}
                 key={country.id}
                 country={country}

@@ -78,7 +78,7 @@ export const IconUpload = ({ onFileChange, currentIcon }: IconUploadProps) => {
           ) : currentIcon ? (
             /** biome-ignore lint/performance/noImgElement: current icon requires dynamic base64 src */
             <img
-              src={`data:image/png;base64,${currentIcon}`}
+              src={currentIcon}
               alt="Current icon"
               className="h-12 w-12 rounded border object-cover"
             />
