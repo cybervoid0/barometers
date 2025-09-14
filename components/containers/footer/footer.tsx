@@ -27,9 +27,7 @@ export function Footer() {
             {/* Mobile screens links */}
             <nav className="xs:hidden mt-3 space-y-2">
               <div className="flex justify-center gap-2 items-center">
-                <Link className="" href={FrontRoutes.Terms}>
-                  Terms & Conditions
-                </Link>
+                <Link href={FrontRoutes.Terms}>Terms & Conditions</Link>
                 <Separator orientation="vertical" className="h-3" />
                 <Link href={FrontRoutes.PrivacyPolicy}>Privacy policy</Link>
               </div>
@@ -41,9 +39,7 @@ export function Footer() {
             </nav>
             {/* Desktop screens links */}
             <nav className="hidden xs:flex justify-center items-center gap-2">
-              <Link className="no-underline" href={FrontRoutes.Terms}>
-                Terms & Conditions
-              </Link>
+              <Link href={FrontRoutes.Terms}>Terms & Conditions</Link>
               <Separator orientation="vertical" className="h-3" />
               <Link href={FrontRoutes.PrivacyPolicy}>Privacy policy</Link>
               <Separator orientation="vertical" className="h-3" />
