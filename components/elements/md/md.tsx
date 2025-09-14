@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import ReactMarkdown, { type Components } from 'react-markdown'
+import ReactMarkdown, { type Components, type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 const defaultComponents: Components = {
@@ -16,13 +16,14 @@ const defaultComponents: Components = {
   ),
 }
 
-export const MD: FC<Parameters<typeof ReactMarkdown>[0]> = ({ children, className, ...props }) => (
-  <ReactMarkdown
-    {...props}
-    components={defaultComponents}
-    className={className}
-    remarkPlugins={[remarkGfm]}
-  >
-    {children}
-  </ReactMarkdown>
+interface MDProps extends Options {
+  className?: string
+}
+
+export const MD: FC<MDProps> = ({ children, className, ...props }) => (
+  <div className={className}>
+    <ReactMarkdown {...props} components={defaultComponents} remarkPlugins={[remarkGfm]}>
+      {children}
+    </ReactMarkdown>
+  </div>
 )
