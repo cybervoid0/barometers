@@ -5,8 +5,6 @@ import { FrontRoutes } from '@/constants'
 import { cn } from '@/utils'
 import { SocialButtons } from './social-buttons'
 
-const listStyle = 'flex items-center gap-2 text-xs'
-
 export function Footer() {
   return (
     <footer
@@ -25,25 +23,37 @@ export function Footer() {
             <span className="xs:hidden">AWIF</span>. All right reserved.
           </p>
 
-          <ul className="w-fit mt-4 mx-auto flex items-center gap-2 flex-wrap justify-center">
-            <li className={listStyle}>
-              <Link href={FrontRoutes.Terms}>Terms & Conditions</Link>
+          <div className="mt-3 text-xs [&_a,button]:no-underline [&_a,button]:hover:underline">
+            {/* Mobile screens links */}
+            <nav className="xs:hidden mt-3 space-y-2">
+              <div className="flex justify-center gap-2 items-center">
+                <Link className="" href={FrontRoutes.Terms}>
+                  Terms & Conditions
+                </Link>
+                <Separator orientation="vertical" className="h-3" />
+                <Link href={FrontRoutes.PrivacyPolicy}>Privacy policy</Link>
+              </div>
+              <div className="flex justify-center gap-2 items-center">
+                <Link href={FrontRoutes.CookiePolicy}>Cookie Policy</Link>
+                <Separator orientation="vertical" className="h-3" />
+                <ManageCookies />
+              </div>
+            </nav>
+            {/* Desktop screens links */}
+            <nav className="hidden xs:flex justify-center items-center gap-2">
+              <Link className="no-underline" href={FrontRoutes.Terms}>
+                Terms & Conditions
+              </Link>
               <Separator orientation="vertical" className="h-3" />
-            </li>
-            <li className={listStyle}>
               <Link href={FrontRoutes.PrivacyPolicy}>Privacy policy</Link>
               <Separator orientation="vertical" className="h-3" />
-            </li>
-            <li className={listStyle}>
               <Link href={FrontRoutes.CookiePolicy}>Cookie Policy</Link>
               <Separator orientation="vertical" className="h-3" />
-            </li>
-            <li className={listStyle}>
               <ManageCookies />
-            </li>
-          </ul>
+            </nav>
+          </div>
         </div>
-        {/* Buttons */}
+
         <SocialButtons className="absolute inset-y-0 right-8 hidden sm:flex" />
       </div>
     </footer>
