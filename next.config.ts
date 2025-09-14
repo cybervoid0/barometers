@@ -1,13 +1,17 @@
 import path from 'node:path'
 import bundleAnalyzer from '@next/bundle-analyzer'
+import type { NextConfig } from 'next'
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-export default withBundleAnalyzer({
+const nextConfig: NextConfig = {
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
+  experimental: {
+    reactCompiler: true,
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -35,5 +39,9 @@ export default withBundleAnalyzer({
       }
     })
   },
-  allowedDevOrigins: [new URL(process.env.NEXT_PUBLIC_BASE_URL).hostname],
-})
+  allowedDevOrigins: process.env.NEXT_PUBLIC_BASE_URL
+    ? [new URL(process.env.NEXT_PUBLIC_BASE_URL).hostname]
+    : [],
+}
+
+export default withBundleAnalyzer(nextConfig)
