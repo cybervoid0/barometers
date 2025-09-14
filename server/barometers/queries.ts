@@ -138,6 +138,9 @@ const getBarometer = withPrisma(async (prisma, slug: string) => {
           },
           images: true,
         },
+        omit: {
+          icon: true,
+        },
       },
       images: {
         orderBy: {
