@@ -7,14 +7,13 @@ import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import type { AllBarometersDTO } from '@/server/barometers/queries'
 import type { ConditionsDTO } from '@/server/conditions/queries'
 import { createDocument } from '@/server/documents/actions'
 import { getThumbnailBase64 } from '@/utils'
-import { FileUpload } from '../add-barometer/file-upload'
 
 dayjs.extend(utc)
 
@@ -415,7 +414,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
           )}
         />
 
-        <FileUpload name="images" />
+        <FormImageUpload name="images" />
 
         <UI.FormField
           control={methods.control}

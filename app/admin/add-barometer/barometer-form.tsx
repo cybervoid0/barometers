@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -46,7 +46,6 @@ import {
   BarometerFormValidationSchema,
 } from './barometer-form.schema'
 import { Dimensions } from './dimensions'
-import { FileUpload } from './file-upload'
 
 interface Props {
   conditions: ConditionsDTO
@@ -414,7 +413,7 @@ export default function BarometerForm({
             )}
           />
 
-          <FileUpload name="images" />
+          <FormImageUpload name="images" />
 
           <Dimensions />
 

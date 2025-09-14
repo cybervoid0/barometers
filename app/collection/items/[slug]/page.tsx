@@ -35,11 +35,11 @@ import { ImageCarousel } from './components/carousel'
 import { Condition } from './components/condition'
 import { DeleteBarometer } from './components/delete-barometer'
 import { BrandEdit } from './components/edit-fields/brand-edit'
+import { CategoryEdit } from './components/edit-fields/category-edit'
 import { ConditionEdit } from './components/edit-fields/condition-edit'
 import { DateEdit } from './components/edit-fields/date-edit'
 // edit components
 import { DimensionEdit } from './components/edit-fields/dimensions-edit'
-import { EditCategory } from './components/edit-fields/edit-category'
 import { EstimatedPriceEdit } from './components/edit-fields/estimated-price-edit'
 import { MaterialsEdit } from './components/edit-fields/materials-edit'
 import { MovementsEdit } from './components/edit-fields/movements-edit'
@@ -110,7 +110,7 @@ export default async function Page(props: Props) {
           <PropertyCard
             icon={Tags}
             title="Category"
-            edit={<EditCategory barometer={barometer} categories={categories} />}
+            edit={<CategoryEdit barometer={barometer} categories={categories} />}
           >
             <Link className="text-sm w-fit" href={FrontRoutes.Categories + barometer.category.name}>
               {barometer.category.label}
