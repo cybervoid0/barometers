@@ -1,11 +1,11 @@
 'use server'
 
-import type { Image, Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { FrontRoutes } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
-import { minioBucket, minioClient } from '@/services/minio'
 import { revalidateCategory, slug as slugify, trimTrailingSlash } from '@/utils'
+import { deleteImages } from '../images/actions'
 
 const createBarometer = withPrisma(async (prisma, data: Prisma.BarometerUncheckedCreateInput) => {
   const { id, categoryId } = await prisma.barometer.create({
@@ -35,23 +35,6 @@ const updateBarometer = withPrisma(async (prisma, data: Prisma.BarometerUnchecke
   return { slug, name }
 })
 
-/**
- * Deletes selected images from storage
- */
-async function deleteImagesFromStorage(images: Image[]) {
-  await Promise.all(
-    images.map(async image => {
-      try {
-        await minioClient.removeObject(minioBucket, image.url)
-      } catch (error) {
-        // don't throw error if image was not deleted
-        console.error(`Could not delete ${image.url} from storage`)
-        console.error(error)
-      }
-    }),
-  )
-}
-
 const deleteBarometer = withPrisma(async (prisma, slug: string) => {
   const barometer = await prisma.barometer.findFirstOrThrow({
     where: {
@@ -66,7 +49,14 @@ const deleteBarometer = withPrisma(async (prisma, slug: string) => {
     where: { barometers: { some: { id: barometer.id } } },
   }
   // save deleting images info
-  const imagesBeforeDbUpdate = await prisma.image.findMany(args)
+  const imagesBeforeDbUpdate = (
+    await prisma.image.findMany({
+      ...args,
+      select: {
+        url: true,
+      },
+    })
+  ).map(({ url }) => url)
   await prisma.$transaction(async tx => {
     await tx.image.deleteMany(args)
     await tx.barometer.delete({
@@ -75,7 +65,7 @@ const deleteBarometer = withPrisma(async (prisma, slug: string) => {
       },
     })
   })
-  await deleteImagesFromStorage(imagesBeforeDbUpdate)
+  await deleteImages(imagesBeforeDbUpdate)
   revalidatePath(FrontRoutes.Barometer + barometer.slug)
   revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals))
   await revalidateCategory(prisma, barometer.categoryId)
