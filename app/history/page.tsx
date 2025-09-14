@@ -10,11 +10,12 @@ const paragraphStyles = 'indent-8 text-justify sm:text-left'
 const headerStyles = 'mt-12 first-of-type:mt-6 mb-4'
 
 function Figure({ src, className, ...props }: { src: string } & React.ComponentProps<'div'>) {
+  const imageUrl = src.trim()
   return (
     <div className={cn('float-left mb-4 w-full sm:mr-4 sm:mb-0 sm:w-auto', className)} {...props}>
       <NextImage
         unoptimized
-        src={customImageLoader({ src: `/history/${src}`, width: 400, quality: 80 })}
+        src={customImageLoader({ src: `/history/${imageUrl}`, width: 400, quality: 80 })}
         width={400}
         height={400}
         alt="Figure"
