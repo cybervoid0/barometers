@@ -93,7 +93,6 @@
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@biomejs/biome": "2.2.2",
-    "@csstools/postcss-cascade-layers": "^5.0.2",
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",
