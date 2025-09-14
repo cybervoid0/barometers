@@ -40,7 +40,7 @@ export default function PrivacyPolicy() {
       <ol
         className={cn(
           'list-decimal marker:text-xl marker:xs:text-2xl marker:font-semibold', // markers
-          'list-inside space-y-8 [&>li>h3]:inline [&>li>h3+*]:mt-6', // list content
+          'list-inside space-y-8 [&>li>h3]:inline [&>li>h3+*]:mt-6 [&>li>ul]:space-y-1', // list content
           '[&_p]:mb-4 [&_p]:indent-8', // paragraphs
         )}
       >
