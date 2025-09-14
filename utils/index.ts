@@ -8,7 +8,6 @@ export { cn } from './cn'
 export { default as customImageLoader } from './image-loader'
 // Image utilities
 export { generateIcon, getIconBuffer, getThumbnailBase64 } from './images'
-export { cleanObject } from './misc'
 // Server
 export { revalidateCategory } from './revalidate'
 // Text utilities

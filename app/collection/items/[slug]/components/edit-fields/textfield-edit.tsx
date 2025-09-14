@@ -9,8 +9,8 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { FrontRoutes } from '@/constants/routes-front'
-import { updateBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
+import { updateBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
 import { cn } from '@/utils'
 
 interface TextFieldEditProps {

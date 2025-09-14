@@ -1,5 +1,5 @@
 import { AccessRole } from '@prisma/client'
-import { getCategories } from '@/lib/categories/queries'
+import { getCategories } from '@/server/categories/queries'
 import type { MenuItem } from '@/types'
 import { FrontRoutes } from './routes-front'
 

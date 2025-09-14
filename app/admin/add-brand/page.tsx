@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { getAllBrands } from '@/lib/brands/queries'
-import { getCountries } from '@/lib/counties/queries'
+import { getAllBrands } from '@/server/brands/queries'
+import { getCountries } from '@/server/counties/queries'
 import type { DynamicOptions } from '@/types'
 import BrandAddForm from './brand-add-form'
 

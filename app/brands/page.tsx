@@ -13,8 +13,8 @@ import {
   type BrandsByCountryDTO,
   getAllBrands,
   getBrandsByCountry,
-} from '@/lib/brands/queries'
-import { type CountryListDTO, getCountries } from '@/lib/counties/queries'
+} from '@/server/brands/queries'
+import { type CountryListDTO, getCountries } from '@/server/counties/queries'
 import { title } from '../../constants/metadata'
 import type { DynamicOptions } from '../../types'
 import { BrandEdit } from './brand-edit'

@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { getAllBarometers } from '@/lib/barometers/queries'
-import { getConditions } from '@/lib/conditions/queries'
+import { getAllBarometers } from '@/server/barometers/queries'
+import { getConditions } from '@/server/conditions/queries'
 import type { DynamicOptions } from '@/types'
 import { DocumentForm } from './document-form'
 

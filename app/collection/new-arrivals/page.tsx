@@ -3,7 +3,7 @@ import 'server-only'
 import { BarometerCardWithIcon } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
 import { DEFAULT_PAGE_SIZE, FrontRoutes } from '@/constants'
-import { getBarometersByParams } from '@/lib/barometers/queries'
+import { getBarometersByParams } from '@/server/barometers/queries'
 
 interface newArrivalsProps {
   searchParams: Record<string, string>

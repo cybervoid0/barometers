@@ -1,42 +1,41 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AtSign, Eye, EyeOff, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
-import { register } from '@/actions/register'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
+import { register } from '@/server/register/actions'
 
-const registerSchema = yup.object().shape({
-  name: yup
-    .string()
-    .required('Name is required')
-    .min(2, 'Name should be 2-50 symbols long')
-    .max(50, 'Name should be 2-50 symbols long'),
-  email: yup.string().required('Email is required').email('Invalid email'),
-  password: yup
-    .string()
-    .required('Password is required')
-    .min(6, 'Should be at least 6 symbols long'),
-  repeatPassword: yup
-    .string()
-    .required('Please repeat password')
-    .oneOf([yup.ref('password')], 'Passwords are not identical'),
-})
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, 'Name is required')
+      .min(2, 'Name should be 2-50 symbols long')
+      .max(50, 'Name should be 2-50 symbols long'),
+    email: z.string().min(1, 'Email is required').email('Invalid email'),
+    password: z.string().min(1, 'Password is required').min(6, 'Should be at least 6 symbols long'),
+    repeatPassword: z.string().min(1, 'Please repeat password'),
+  })
+  .refine(data => data.password === data.repeatPassword, {
+    message: 'Passwords are not identical',
+    path: ['repeatPassword'],
+  })
 
-type RegisterFormData = yup.InferType<typeof registerSchema>
+type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function Register() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showRepeatPassword, setShowRepeatPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<RegisterFormData>({
-    resolver: yupResolver(registerSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -46,16 +45,15 @@ export default function Register() {
   })
 
   const onSubmit = async (values: RegisterFormData) => {
-    setIsLoading(true)
-    try {
-      await register(values)
-      toast.success(`${values.name} was successfully registered`)
-      router.push('/signin')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Registration error')
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      try {
+        await register(values)
+        toast.success(`${values.name} was successfully registered`)
+        router.push('/signin')
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Registration error')
+      }
+    })
   }
 
   return (
@@ -169,8 +167,8 @@ export default function Register() {
             />
           </div>
 
-          <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
-            {isLoading ? 'Signing up...' : 'Sign up'}
+          <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isPending}>
+            {isPending ? 'Signing up...' : 'Sign up'}
           </UI.Button>
         </form>
       </UI.FormProvider>

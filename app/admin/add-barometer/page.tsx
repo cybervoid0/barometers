@@ -1,10 +1,10 @@
 import 'server-only'
 
-import { getAllBrands } from '@/lib/brands/queries'
-import { getCategories } from '@/lib/categories/queries'
-import { getConditions } from '@/lib/conditions/queries'
-import { getMaterials } from '@/lib/materials/queries'
-import { getMovements } from '@/lib/movements/queries'
+import { getAllBrands } from '@/server/brands/queries'
+import { getCategories } from '@/server/categories/queries'
+import { getConditions } from '@/server/conditions/queries'
+import { getMaterials } from '@/server/materials/queries'
+import { getMovements } from '@/server/movements/queries'
 import type { DynamicOptions } from '@/types'
 import BarometerForm from './barometer-form'
 

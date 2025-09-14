@@ -17,9 +17,10 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
-import { updateBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
-import { createImageUrls, deleteImage, uploadFileToCloud } from '@/services/fetch'
+import { updateBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
+import { createImageUrls, deleteImage, deleteImages } from '@/server/images/actions'
+import { uploadFileToCloud } from '@/server/images/upload'
 import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
@@ -113,16 +114,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
       try {
         // erase deleted images
         const extraFiles = barometerImages?.filter(img => !values.images.includes(img))
-        if (extraFiles)
-          await Promise.all(
-            extraFiles?.map(async file => {
-              try {
-                await deleteImage(file)
-              } catch (_error) {
-                // don't mind if it was not possible to delete the file
-              }
-            }),
-          )
+        if (extraFiles) await deleteImages(extraFiles)
 
         const imageData = await Promise.all(
           values.images.map(async (url, i) => {

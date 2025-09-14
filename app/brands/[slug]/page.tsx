@@ -7,8 +7,8 @@ import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
 import { Card } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
 import { title } from '@/constants/metadata'
-import { type BrandDTO, getBrand } from '@/lib/brands/queries'
 import { withPrisma } from '@/prisma/prismaClient'
+import { type BrandDTO, getBrand } from '@/server/brands/queries'
 import type { DynamicOptions } from '@/types'
 
 interface Props {

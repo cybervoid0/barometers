@@ -3,7 +3,7 @@ import 'server-only'
 import { Pagination } from '@/components/ui/pagination'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import { FrontRoutes } from '@/constants/routes-front'
-import { searchBarometers } from '@/lib/barometers/search'
+import { searchBarometers } from '@/server/barometers/search'
 import { SearchInfo } from './search-info'
 import { SearchItem } from './search-item'
 
