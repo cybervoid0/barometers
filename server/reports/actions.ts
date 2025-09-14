@@ -22,7 +22,7 @@ interface Props {
 
 export const createReport = withPrisma(
   async (prisma, { reporterEmail, reporterName, barometerId, description }: Props) => {
-    const headersList = headers()
+    const headersList = await headers()
     // getting sender IP address
     const ip =
       headersList.get('x-forwarded-for')?.split(',')[0] || headersList.get('remote-addr') || null

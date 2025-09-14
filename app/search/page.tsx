@@ -8,10 +8,11 @@ import { SearchInfo } from './search-info'
 import { SearchItem } from './search-item'
 
 interface SearchProps {
-  searchParams: Record<string, string>
+  searchParams: Promise<{ q: string; size: string; page: string }>
 }
 
-export default async function Search({ searchParams }: SearchProps) {
+export default async function Search(props: SearchProps) {
+  const searchParams = await props.searchParams
   const query = searchParams.q ?? ''
   const pageSize = Math.max(parseInt(searchParams.size, 10) || DEFAULT_PAGE_SIZE, 0)
   const pageNo = Math.max(parseInt(searchParams.page, 10) || 1, 1)

@@ -54,9 +54,9 @@ export const dynamicParams = true
 dayjs.extend(utc)
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 /**
@@ -67,7 +67,8 @@ export const generateStaticParams = withPrisma(prisma =>
   prisma.barometer.findMany({ select: { slug: true } }),
 )
 
-export default async function Page({ params: { slug } }: Props) {
+export default async function Page(props: Props) {
+  const { slug } = await props.params
   const [barometer, materials, movements, brands, conditions, categories] = await Promise.all([
     getBarometer(slug),
     getMaterials(),

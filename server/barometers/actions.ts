@@ -4,7 +4,8 @@ import type { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { FrontRoutes } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
-import { revalidateCategory, slug as slugify, trimTrailingSlash } from '@/utils'
+import { slug as slugify, trimTrailingSlash } from '@/utils'
+import { revalidateCategory } from '@/utils/revalidate'
 import { deleteImages } from '../images/actions'
 
 const createBarometer = withPrisma(async (prisma, data: Prisma.BarometerUncheckedCreateInput) => {

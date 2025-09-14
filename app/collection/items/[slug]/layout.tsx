@@ -6,11 +6,10 @@ import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
 import { getBarometer } from '@/server/barometers/queries'
 
-export async function generateMetadata({
-  params: { slug },
-}: {
-  params: { slug: string }
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
+  const { slug } = await props.params
   try {
     const barometer = await getBarometer(slug)
     if (!barometer) throw new Error()

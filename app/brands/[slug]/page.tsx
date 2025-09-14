@@ -12,9 +12,9 @@ import { type BrandDTO, getBrand } from '@/server/brands/queries'
 import type { DynamicOptions } from '@/types'
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export const dynamic: DynamicOptions = 'force-static'
@@ -38,7 +38,8 @@ const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
   }),
 )
 
-export async function generateMetadata({ params: { slug } }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { slug } = await props.params
   const manufacturer = await getBrand(slug)
   return {
     title: `${title} - Manufacturer: ${manufacturer.name}`,
@@ -51,7 +52,8 @@ export const generateStaticParams = withPrisma(async prisma =>
   }),
 )
 
-export default async function Manufacturer({ params: { slug } }: Props) {
+export default async function Manufacturer(props: Props) {
+  const { slug } = await props.params
   const manufacturer = await getBrand(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`

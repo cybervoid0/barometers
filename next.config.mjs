@@ -19,6 +19,11 @@ export default withBundleAnalyzer({
     config.resolve.alias['@'] = path.resolve('./')
     return config
   },
+  turbopack: {
+    resolveAlias: {
+      '@': path.resolve('./'),
+    },
+  },
   redirects: async () => {
     const categories = ['miscellaneous', 'recorders', 'pocket', 'mercury', 'bourdon', 'aneroid']
     return categories.map(name => {
