@@ -8,6 +8,8 @@ export const getBrandSlug = (lastName: string, firstName?: string | undefined | 
   slug(`${firstName ? `${firstName}_` : ''}${lastName}`)
 
 /**
- * Removes slashes at the end of API route URL
+ * Removes slashes at the beginning/end of API route URL
  */
 export const trimTrailingSlash = (url: string) => url.replace(/\/+$/, '')
+export const trimLeadingSlashes = (url: string) => url.replace(/^\/+/, '')
+export const trimSlashes = (url: string) => trimTrailingSlash(trimLeadingSlashes(url))

@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { type ButtonProps, type ButtonVariants, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils'
@@ -105,14 +105,17 @@ export function Pagination({
 }: PaginationProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const handlePageChange = (newPage: number) => {
     if (onChange) {
       onChange(newPage)
     } else {
+      const updatedSearchParams = new URLSearchParams(searchParams)
+      updatedSearchParams.set('page', String(newPage))
       const pagePath = pageAsRoute
         ? pathname.split('/').slice(0, -1).concat(`${newPage}`).join('/')
-        : `${pathname}?${new URLSearchParams({ page: String(newPage) })}`
+        : `${pathname}?${updatedSearchParams}`
       router.push(pagePath)
     }
   }

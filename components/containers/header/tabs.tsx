@@ -16,7 +16,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui'
 import type { MenuItem } from '@/types'
-import { cn } from '@/utils'
+import { cn, trimSlashes } from '@/utils'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   menu: MenuItem[]
@@ -33,7 +33,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
   const underline = useCallback(
     (url: string) => {
       const rootPath: string | undefined = `/${pathname.split('/')[1]}`
-      const isActive = url === rootPath
+      const isActive = trimSlashes(url) === trimSlashes(rootPath)
       return { 'border-b-[0.5px] border-b-foreground': isActive }
     },
     [pathname],
