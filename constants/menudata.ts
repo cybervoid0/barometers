@@ -15,7 +15,7 @@ export async function getMenuData(): Promise<MenuItem[]> {
       id: 1,
       label: 'Foundation',
       link: FrontRoutes.Foundation,
-      children: [
+      /* children: [
         {
           id: 6,
           label: 'About Us',
@@ -26,7 +26,7 @@ export async function getMenuData(): Promise<MenuItem[]> {
           label: 'Donate',
           link: FrontRoutes.Donate,
         },
-      ],
+      ], */
     },
     {
       id: 2,

@@ -223,9 +223,9 @@ export default function Foundation() {
             unpaid basis. They are, however, entitled to reimbursement for expenses actually
             incurred.
           </p>
-          <Link className="block text-center text-3xl" href={FrontRoutes.Donate}>
+          {/* <Link className="block text-center text-3xl" href={FrontRoutes.Donate}>
             Support us!
-          </Link>
+          </Link> */}
         </section>
         <section className="mt-16">
           <div className="flex flex-col gap-8 sm:flex-row">
