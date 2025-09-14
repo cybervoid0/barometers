@@ -1,33 +1,35 @@
 'use client'
 
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AtSign, Eye, EyeOff } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { z } from 'zod'
 import * as UI from '@/components/ui'
 
-// Yup validation schema
-const signInSchema = yup.object().shape({
-  email: yup.string().required('Email is required').email('Invalid email address'),
-  password: yup
+const signInSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z
     .string()
-    .required('Password is required')
+    .min(1, 'Password is required')
     .min(8, 'Password must be at least 8 characters'),
 })
 
-type SignInFormData = yup.InferType<typeof signInSchema>
+type SignInFormData = z.infer<typeof signInSchema>
 
 export function SignInForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const callbackUrl = searchParams.get('callbackUrl') || '/admin'
 
   const form = useForm<SignInFormData>({
-    resolver: yupResolver(signInSchema),
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -35,32 +37,31 @@ export function SignInForm() {
   })
 
   const onSubmit = async (values: SignInFormData) => {
-    setIsLoading(true)
-    try {
-      const res = await signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      })
+    startTransition(async () => {
+      try {
+        const res = await signIn('credentials', {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        })
 
-      if (res?.ok) {
-        toast.success('You have successfully logged in.')
-        router.push('/admin')
-      }
+        if (res?.ok) {
+          toast.success('You have successfully logged in.')
+          router.push(callbackUrl)
+        }
 
-      if (res?.error) {
-        toast.error(res.error)
+        if (res?.error) {
+          toast.error(res.error)
+        }
+      } catch (_error) {
+        toast.error('An error occurred during sign in')
       }
-    } catch (_error) {
-      toast.error('An error occurred during sign in')
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   return (
     <UI.FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6" noValidate>
         <div className="space-y-4">
           <UI.FormField
             control={form.control}
@@ -115,8 +116,8 @@ export function SignInForm() {
           />
         </div>
 
-        <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
+        <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isPending}>
+          {isPending ? 'Signing in...' : 'Sign In'}
         </UI.Button>
       </form>
     </UI.FormProvider>

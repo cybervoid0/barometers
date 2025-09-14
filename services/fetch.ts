@@ -1,6 +1,5 @@
-import type { InaccuracyReport } from '@prisma/client'
 import { ApiRoutes } from '@/constants/routes-back'
-import type { FileProps, InaccuracyReportListDTO, UrlDto } from '@/types'
+import type { FileProps, UrlDto } from '@/types'
 
 /**
  * Handles API response errors by extracting a detailed error message from the response body.
@@ -46,23 +45,4 @@ export async function deleteImage(fileName: string) {
     method: 'DELETE',
   })
   if (!res.ok) await handleApiError(res)
-}
-/******* Inaccuracy Report ********/
-export async function createReport(report: Partial<InaccuracyReport>): Promise<{ id: string }> {
-  const res = await fetch(ApiRoutes.Reports, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(report),
-  })
-  if (!res.ok) await handleApiError(res)
-  return res.json()
-}
-export async function fetchReportList(
-  searchParams: Record<string, string>,
-): Promise<InaccuracyReportListDTO> {
-  const qs = new URLSearchParams(searchParams)
-  const res = await fetch(`${ApiRoutes.Reports}?${qs.toString()}`, {
-    cache: 'no-cache',
-  })
-  return res.json()
 }
