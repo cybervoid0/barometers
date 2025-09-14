@@ -11,7 +11,7 @@ import { imageStorage } from '@/constants'
 import { createBrand } from '@/lib/brands/actions'
 import type { AllBrandsDTO } from '@/lib/brands/queries'
 import type { CountryListDTO } from '@/lib/counties/queries'
-import { createImageUrls, uploadFileToCloud } from '@/services/fetch'
+import { createImageUrls, uploadFileToCloud } from '@/lib/images/actions'
 import { generateIcon, getThumbnailBase64 } from '@/utils'
 
 // Zod validation schema
