@@ -7,8 +7,8 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { register } from '@/actions/register'
 import * as UI from '@/components/ui'
+import { register } from '@/lib/register/actions'
 
 const registerSchema = z
   .object({
