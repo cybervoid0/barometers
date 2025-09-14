@@ -90,7 +90,6 @@
       "biome format --write"
     ]
   },
-  "browserslist": ["safari >= 7.1", "ios_saf >= 7.1"],
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@biomejs/biome": "2.2.2",
