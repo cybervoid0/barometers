@@ -17,9 +17,10 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import * as UI from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
-import { updateBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
-import { createImageUrls, deleteImage, deleteImages, uploadFileToCloud } from '@/lib/images/actions'
+import { updateBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
+import { createImageUrls, deleteImage, deleteImages } from '@/server/images/actions'
+import { uploadFileToCloud } from '@/server/images/upload'
 import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {

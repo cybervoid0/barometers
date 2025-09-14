@@ -13,7 +13,8 @@ import NextImage from 'next/image'
 import { type TransitionStartFunction, useCallback } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import { createImageUrls, deleteImage, uploadFileToCloud } from '@/lib/images/actions'
+import { createImageUrls, deleteImage } from '@/server/images/actions'
+import { uploadFileToCloud } from '@/server/images/upload'
 import type { BrandEditForm } from './brand-edit-schema'
 
 interface Props {

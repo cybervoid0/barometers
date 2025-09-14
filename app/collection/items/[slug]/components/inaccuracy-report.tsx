@@ -23,8 +23,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui'
-import type { BarometerDTO } from '@/lib/barometers/queries'
-import { createReport } from '@/lib/reports/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
+import { createReport } from '@/server/reports/actions'
 
 interface Props extends React.ComponentProps<'button'> {
   barometer: NonNullable<BarometerDTO>

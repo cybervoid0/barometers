@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Table } from '@/components/elements'
 import { FrontRoutes } from '@/constants'
-import type { InaccuracyReportsDTO } from '@/lib/reports/queries'
+import type { InaccuracyReportsDTO } from '@/server/reports/queries'
 
 interface Props {
   reports: InaccuracyReportsDTO['reports']

@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react'
 import { imageStorage } from '@/constants/globals'
 import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { FrontRoutes } from '@/constants/routes-front'
-import { getBarometer } from '@/lib/barometers/queries'
+import { getBarometer } from '@/server/barometers/queries'
 
 export async function generateMetadata({
   params: { slug },

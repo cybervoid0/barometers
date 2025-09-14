@@ -15,8 +15,8 @@ import {
   DialogTrigger,
 } from '@/components/ui'
 import { FrontRoutes } from '@/constants'
-import { deleteBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
+import { deleteBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
 import { cn } from '@/utils'
 
 interface Props {

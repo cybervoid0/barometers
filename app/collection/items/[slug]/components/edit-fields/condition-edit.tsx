@@ -24,9 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui'
-import { updateBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { ConditionsDTO } from '@/lib/conditions/queries'
+import { updateBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
+import type { ConditionsDTO } from '@/server/conditions/queries'
 import { EditButton } from './edit-button'
 
 interface ConditionEditProps {

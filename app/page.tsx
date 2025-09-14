@@ -2,7 +2,7 @@ import 'server-only'
 
 import { CategoryCard, NewArrivals, SearchField } from '@/components/elements'
 import { FrontRoutes } from '@/constants'
-import { getCategories } from '@/lib/categories/queries'
+import { getCategories } from '@/server/categories/queries'
 import { cn } from '@/utils'
 
 export const dynamic = 'force-static'

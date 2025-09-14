@@ -1,5 +1,5 @@
 import { Pagination } from '@/components/ui'
-import { getInaccuracyReports } from '@/lib/reports/queries'
+import { getInaccuracyReports } from '@/server/reports/queries'
 import type { DynamicOptions } from '@/types'
 import { ReportTable } from './report-table'
 

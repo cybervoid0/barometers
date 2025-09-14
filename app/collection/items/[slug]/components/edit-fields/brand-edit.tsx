@@ -25,9 +25,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui'
-import { updateBarometer } from '@/lib/barometers/actions'
-import type { BarometerDTO } from '@/lib/barometers/queries'
-import type { AllBrandsDTO } from '@/lib/brands/queries'
+import { updateBarometer } from '@/server/barometers/actions'
+import type { BarometerDTO } from '@/server/barometers/queries'
+import type { AllBrandsDTO } from '@/server/brands/queries'
 import { EditButton } from './edit-button'
 
 interface Props {

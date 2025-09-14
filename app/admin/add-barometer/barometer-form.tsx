@@ -33,18 +33,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { createBarometer } from '@/lib/barometers/actions'
-import type { AllBrandsDTO } from '@/lib/brands/queries'
-import type { CategoriesDTO } from '@/lib/categories/queries'
-import type { ConditionsDTO } from '@/lib/conditions/queries'
-import type { MaterialsDTO } from '@/lib/materials/queries'
-import type { MovementsDTO } from '@/lib/movements/queries'
+import { createBarometer } from '@/server/barometers/actions'
+import type { AllBrandsDTO } from '@/server/brands/queries'
+import type { CategoriesDTO } from '@/server/categories/queries'
+import type { ConditionsDTO } from '@/server/conditions/queries'
+import type { MaterialsDTO } from '@/server/materials/queries'
+import type { MovementsDTO } from '@/server/movements/queries'
+import { cn } from '@/utils'
 import {
   type BarometerFormData,
   BarometerFormTransformSchema,
   BarometerFormValidationSchema,
-} from '@/lib/schemas/barometer-form.schema'
-import { cn } from '@/utils'
+} from './barometer-form.schema'
 import { Dimensions } from './dimensions'
 import { FileUpload } from './file-upload'
 
