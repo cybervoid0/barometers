@@ -87,7 +87,8 @@
     "*.{js,jsx,ts,tsx}": [
       "biome check --error-on-warnings",
       "biome check --write",
-      "biome format --write"
+      "biome format --write",
+      "jest --findRelatedTests --passWithNoTests"
     ]
   },
   "devDependencies": {
