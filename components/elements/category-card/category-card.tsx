@@ -32,7 +32,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               fill
               priority={priority}
               loading={priority ? 'eager' : 'lazy'}
-              src={customImageLoader({ src: image.url, quality: 90, width: 600 })}
+              src={customImageLoader({ src: image.url, quality: 95, width: 509 })}
               alt={name}
               className={cn(
                 'transition-all duration-5000 hover:scale-150 active:scale-150',
