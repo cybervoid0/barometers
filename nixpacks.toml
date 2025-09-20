@@ -2,19 +2,22 @@
 nixPkgs = ['openssl']
 cmds = [
   'apt-get update && apt-get install -y --no-install-recommends libssl3 ca-certificates curl unzip',
-  'curl -fsSL https://bun.sh/install | bash',
-  'ln -sf /root/.bun/bin/bun /usr/local/bin/bun',
-  'export PATH=/root/.bun/bin:$PATH && bun --version'
+  'export BUN_INSTALL=/usr/local && curl -fsSL https://bun.sh/install | bash',
+  'printf "export PATH=/usr/local/bin:\\$PATH\n" > /etc/profile.d/bun.sh',
+  'bun --version'
+]
+
+[phases.install]
+cmds = [
+  'bun install'
 ]
 
 [phases.build]
 cmds = [
-  'bun install',
   'bun run build'
 ]
 
 [variables]
-PATH = "/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu"
 PRISMA_CLI_BINARY_TARGETS = "debian-openssl-3.0.x"
 
