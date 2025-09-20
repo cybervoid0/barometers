@@ -1,12 +1,15 @@
 import type { Metadata } from 'next'
 import type { Collection, WithContext } from 'schema-dts'
-import { email, github, instagram } from '@/constants/globals'
+import { email, foundation, github, instagram } from '@/constants/globals'
 
 export const title = 'Barometers Realm'
 export const description =
-  'A collection of unique weather instruments spanning the late 18th century to the mid-20th century, with a focus on mercury and aneroid barometers, showcasing the craftsmanship traditions of past masters.'
+  'Art of Weather Instruments Foundation presents a collection of unique weather instruments spanning the late 18th century to the mid-20th century, with a focus on mercury and aneroid barometers, showcasing the craftsmanship traditions of past masters.'
 export const url = process.env.NEXT_PUBLIC_BASE_URL ?? ''
 export const keywords = [
+  'AWIF',
+  'Art of Weather Instruments Foundation',
+  'foundation',
   'barometer',
   'barometers',
   'antique',
@@ -73,9 +76,13 @@ export const jsonLd: WithContext<Collection> = {
   description,
   url,
   author: {
-    '@type': 'Person',
+    '@type': 'Organization',
     email,
-    name: 'Leo Shirokov',
+    name: foundation.tradeName,
+    url,
+    legalName: foundation.fullName,
+    address: foundation.postAddress,
+    brand: foundation.shortName,
   },
 }
 export const meta: Metadata = {
@@ -84,6 +91,10 @@ export const meta: Metadata = {
   description,
   keywords,
   authors: [
+    {
+      name: foundation.tradeName,
+      url,
+    },
     {
       name: 'Leo Shirokov',
       url: instagram,
