@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   experimental: {
     reactCompiler: true,
+    optimizeCss: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
