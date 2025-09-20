@@ -1,0 +1,8 @@
+# Modern browsers only - no polyfills for old browsers
+> 1%
+last 2 versions
+not dead
+not ie 11
+not op_mini all
+not android < 5
+not ios < 12

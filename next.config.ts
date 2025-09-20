@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
   },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
