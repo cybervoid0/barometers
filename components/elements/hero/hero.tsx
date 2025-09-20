@@ -1,17 +1,18 @@
-import NextImage from 'next/image'
+import Image from 'next/image'
 import './animations.css'
 import Link from 'next/link'
-import { FrontRoutes } from '@/constants'
+import { FrontRoutes, foundation } from '@/constants'
 import { customImageLoader } from '@/utils'
 
-export const HeadingImage = () => {
+export const Hero = () => {
   return (
     <div className="xs:h-40 relative h-[50vh] w-full overflow-hidden">
-      <NextImage
+      <Image
         unoptimized
         priority
-        alt="Barograph"
-        src={customImageLoader({ src: '/shared/landing-header.png', width: 1000, quality: 80 })}
+        fetchPriority="high"
+        alt={foundation.tradeName}
+        src={customImageLoader({ src: '/shared/landing-header.png', width: 1920, quality: 80 })}
         fill
         className="z-1 animate-[heading-fade-in_1s_ease-in-out,heading-scale-down_2s_ease-out] object-cover object-[right_55%_bottom_50%]"
       />

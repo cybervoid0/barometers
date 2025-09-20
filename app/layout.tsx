@@ -70,6 +70,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
             <GoogleAnalytics gaId={gtag} />
           </CheckConsent>
           <link rel="shortcut icon" href="/favicon.svg" />
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_MINIO_URL} crossOrigin="" />
           <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
           <meta
             name="google-site-verification"

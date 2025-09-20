@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   images: {
     loader: 'custom',
     loaderFile: './utils/image-loader.ts',
+    deviceSizes: [640, 1080, 1920],
+    imageSizes: [640, 1080, 1920],
   },
   webpack: config => {
     config.resolve.alias['@'] = path.resolve('./')
