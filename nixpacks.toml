@@ -1,2 +1,16 @@
 [phases.setup]
 nixPkgs = ['bun', 'openssl']
+
+[phases.build]
+cmds = [
+  'apt-get update && apt-get install -y --no-install-recommends libssl3',
+  'bun install',
+  'bun run build'
+]
+
+[variables]
+LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu"
+PRISMA_CLI_BINARY_TARGETS = "debian-openssl-3.0.x"
+
+[start]
+cmd = 'bun start'
