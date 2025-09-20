@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
