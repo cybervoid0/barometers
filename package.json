@@ -123,6 +123,9 @@
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   },
+  "engines": {
+    "bun": ">=1.2.22"
+  },
   "private": true,
   "overrides": {
     "@types/react": "19.1.13",
