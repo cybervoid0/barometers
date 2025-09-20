@@ -1,9 +1,14 @@
 [phases.setup]
-nixPkgs = ['bun', 'openssl']
+nixPkgs = ['openssl']
+cmds = [
+  'apt-get update && apt-get install -y --no-install-recommends libssl3 ca-certificates curl',
+  'curl -fsSL https://bun.sh/install | bash',
+  'ln -sf /root/.bun/bin/bun /usr/local/bin/bun',
+  'bun --version'
+]
 
 [phases.build]
 cmds = [
-  'apt-get update && apt-get install -y --no-install-recommends libssl3',
   'bun install',
   'bun run build'
 ]
