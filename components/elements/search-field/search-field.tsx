@@ -105,6 +105,7 @@ export function SearchField(props: React.ComponentProps<'div'>) {
               )}
             />
             <Button
+              aria-label="Search"
               type="submit"
               size="icon"
               className="shrink-0 rounded-l-none"

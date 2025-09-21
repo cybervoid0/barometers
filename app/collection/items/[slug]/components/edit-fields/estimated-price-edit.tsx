@@ -6,7 +6,22 @@ import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Input,
+} from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import { cn } from '@/utils'
@@ -68,54 +83,52 @@ export function EstimatedPriceEdit({
   }
 
   return (
-    <UI.Dialog open={open} onOpenChange={setOpen}>
-      <UI.DialogTrigger asChild>
-        <UI.Button
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
           variant="ghost"
           aria-label="Edit estimated price"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent className="sm:max-w-md">
-        <UI.FormProvider {...form}>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
-            <UI.DialogHeader>
-              <UI.DialogTitle>Edit Estimated Price</UI.DialogTitle>
-              <UI.DialogDescription>
-                Update the estimated price for this barometer.
-              </UI.DialogDescription>
-            </UI.DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Edit Estimated Price</DialogTitle>
+              <DialogDescription>Update the estimated price for this barometer.</DialogDescription>
+            </DialogHeader>
             <div className="mt-4 space-y-4">
-              <UI.FormField
+              <FormField
                 control={form.control}
                 name="estimatedPrice"
                 render={({ field }) => (
-                  <UI.FormItem>
-                    <UI.FormLabel>Estimated Price</UI.FormLabel>
-                    <UI.FormControl>
+                  <FormItem>
+                    <FormLabel>Estimated Price</FormLabel>
+                    <FormControl>
                       <div className="relative">
                         <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                           €
                         </span>
-                        <UI.Input {...field} className="pl-8" placeholder="0.00" autoFocus />
+                        <Input {...field} className="pl-8" placeholder="0.00" autoFocus />
                       </div>
-                    </UI.FormControl>
-                    <UI.FormMessage />
-                  </UI.FormItem>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
             <div className="mt-6">
-              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
-              </UI.Button>
+              </Button>
             </div>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }

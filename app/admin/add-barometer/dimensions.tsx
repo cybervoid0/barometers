@@ -1,9 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Button, Input, Label, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui'
 
 export function Dimensions() {
   const { control, register } = useFormContext()

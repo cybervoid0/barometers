@@ -31,6 +31,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
               unoptimized
               fill
               priority={priority}
+              fetchPriority={priority ? 'high' : 'auto'}
               loading={priority ? 'eager' : 'lazy'}
               src={customImageLoader({ src: image.url, quality: 90, width: 509 })}
               alt={name}

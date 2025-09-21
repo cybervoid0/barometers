@@ -2,7 +2,7 @@
 
 import { Upload, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import * as UI from '@/components/ui'
+import { Button } from '@/components/ui'
 import { cn } from '@/utils'
 
 interface IconUploadProps {
@@ -55,7 +55,7 @@ export const IconUpload = ({ onFileChange, currentIcon }: IconUploadProps) => {
       {displayIcon && (
         <div className="relative w-fit">
           {/* Delete button */}
-          <UI.Button
+          <Button
             variant="outline"
             size="icon"
             className={cn(
@@ -67,7 +67,7 @@ export const IconUpload = ({ onFileChange, currentIcon }: IconUploadProps) => {
             type="button"
           >
             <X className="h-3 w-3" />
-          </UI.Button>
+          </Button>
           {previewUrl ? (
             /** biome-ignore lint/performance/noImgElement: preview requires dynamic src from blob URL */
             <img
@@ -86,7 +86,7 @@ export const IconUpload = ({ onFileChange, currentIcon }: IconUploadProps) => {
         </div>
       )}
 
-      <UI.Button
+      <Button
         type="button"
         variant="outline"
         size="sm"
@@ -95,7 +95,7 @@ export const IconUpload = ({ onFileChange, currentIcon }: IconUploadProps) => {
       >
         <Upload className="h-4 w-4" />
         {displayIcon ? 'Change Icon' : 'Select Icon'}
-      </UI.Button>
+      </Button>
 
       <input
         ref={fileInputRef}

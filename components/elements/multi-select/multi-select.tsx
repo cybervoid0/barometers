@@ -2,7 +2,19 @@
 
 import { X } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import * as UI from '@/components/ui'
+import {
+  Badge,
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui'
 
 interface MultiSelectProps<T extends string | number> {
   selected: T[]
@@ -51,9 +63,9 @@ export function MultiSelect<T extends string | number>({
       {selectedItems.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedItems.map(item => (
-            <UI.Badge key={item.id} variant="default" className="px-2 py-1">
+            <Badge key={item.id} variant="default" className="px-2 py-1">
               {item.name}
-              <UI.Button
+              <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -61,14 +73,14 @@ export function MultiSelect<T extends string | number>({
                 onClick={() => handleRemove(item.id)}
               >
                 <X className="h-3 w-3" />
-              </UI.Button>
-            </UI.Badge>
+              </Button>
+            </Badge>
           ))}
         </div>
       )}
-      <UI.Popover open={open} onOpenChange={setOpen} modal>
-        <UI.PopoverTrigger asChild>
-          <UI.Button
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
             type="button"
             variant="outline"
             role="combobox"
@@ -76,18 +88,18 @@ export function MultiSelect<T extends string | number>({
             className="w-full justify-start"
           >
             {selected.length === 0 ? placeholder : `${selected.length} selected`}
-          </UI.Button>
-        </UI.PopoverTrigger>
-        <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-          <UI.Command>
-            <UI.CommandInput placeholder={searchPlaceholder} />
-            <UI.CommandList className="max-h-[200px]">
-              <UI.CommandEmpty>{emptyMessage}</UI.CommandEmpty>
-              <UI.CommandGroup>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+          <Command>
+            <CommandInput placeholder={searchPlaceholder} />
+            <CommandList className="max-h-[200px]">
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandGroup>
                 {options.map(opt => {
                   const isActive = selected.includes(opt.id)
                   return (
-                    <UI.CommandItem
+                    <CommandItem
                       key={opt.id}
                       value={opt.name}
                       onSelect={() => handleSelect(opt.id)}
@@ -97,14 +109,14 @@ export function MultiSelect<T extends string | number>({
                         {isActive && <div className="h-2 w-2 bg-current rounded-full" />}
                       </div>
                       {opt.name}
-                    </UI.CommandItem>
+                    </CommandItem>
                   )
                 })}
-              </UI.CommandGroup>
-            </UI.CommandList>
-          </UI.Command>
-        </UI.PopoverContent>
-      </UI.Popover>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

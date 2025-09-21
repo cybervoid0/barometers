@@ -7,7 +7,31 @@ import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Badge,
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { MaterialsDTO } from '@/server/materials/queries'
@@ -67,52 +91,52 @@ export function MaterialsEdit({ barometer, materials, className, ...props }: Mat
   }
 
   return (
-    <UI.Dialog open={open} onOpenChange={setOpen}>
-      <UI.DialogTrigger asChild>
-        <UI.Button
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
           variant="ghost"
           aria-label="Edit materials"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent className="sm:max-w-md">
-        <UI.FormProvider {...form}>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
-            <UI.DialogHeader>
-              <UI.DialogTitle>Edit Materials</UI.DialogTitle>
-              <UI.DialogDescription>Update the materials for this barometer.</UI.DialogDescription>
-            </UI.DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Edit Materials</DialogTitle>
+              <DialogDescription>Update the materials for this barometer.</DialogDescription>
+            </DialogHeader>
             <div className="mt-4 space-y-4">
-              <UI.FormField
+              <FormField
                 control={form.control}
                 name="materials"
                 render={({ field }) => (
-                  <UI.FormItem>
-                    <UI.FormLabel>Materials</UI.FormLabel>
-                    <UI.FormControl>
+                  <FormItem>
+                    <FormLabel>Materials</FormLabel>
+                    <FormControl>
                       <MaterialsMultiSelect
                         value={field.value}
                         onChange={field.onChange}
                         materials={materials}
                       />
-                    </UI.FormControl>
-                    <UI.FormMessage />
-                  </UI.FormItem>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
             <div className="mt-6">
-              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Update
-              </UI.Button>
+              </Button>
             </div>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -142,9 +166,9 @@ function MaterialsMultiSelect({ value, onChange, materials }: MaterialsMultiSele
       {selectedMaterials.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedMaterials.map(material => (
-            <UI.Badge key={material.id} variant="default" className="px-2 py-1">
+            <Badge key={material.id} variant="default" className="px-2 py-1">
               {material.name}
-              <UI.Button
+              <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -152,27 +176,27 @@ function MaterialsMultiSelect({ value, onChange, materials }: MaterialsMultiSele
                 onClick={() => handleRemove(material.id)}
               >
                 <X className="h-3 w-3" />
-              </UI.Button>
-            </UI.Badge>
+              </Button>
+            </Badge>
           ))}
         </div>
       )}
-      <UI.Popover modal>
-        <UI.PopoverTrigger asChild>
-          <UI.Button type="button" variant="outline" className="w-full justify-start">
+      <Popover modal>
+        <PopoverTrigger asChild>
+          <Button type="button" variant="outline" className="w-full justify-start">
             {selectedMaterials.length === 0
               ? 'Select materials...'
               : `${selectedMaterials.length} material${selectedMaterials.length === 1 ? '' : 's'} selected`}
-          </UI.Button>
-        </UI.PopoverTrigger>
-        <UI.PopoverContent className="w-full p-0" align="start">
-          <UI.Command>
-            <UI.CommandInput placeholder="Search materials..." />
-            <UI.CommandList className="max-h-[200px]">
-              <UI.CommandEmpty>No materials found.</UI.CommandEmpty>
-              <UI.CommandGroup>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search materials..." />
+            <CommandList className="max-h-[200px]">
+              <CommandEmpty>No materials found.</CommandEmpty>
+              <CommandGroup>
                 {materials.map(material => (
-                  <UI.CommandItem
+                  <CommandItem
                     key={material.id}
                     onSelect={() => handleSelect(material.id)}
                     className="flex items-center space-x-2"
@@ -181,13 +205,13 @@ function MaterialsMultiSelect({ value, onChange, materials }: MaterialsMultiSele
                       {value.includes(material.id) && <Check className="h-3 w-3" />}
                     </div>
                     <span>{material.name}</span>
-                  </UI.CommandItem>
+                  </CommandItem>
                 ))}
-              </UI.CommandGroup>
-            </UI.CommandList>
-          </UI.Command>
-        </UI.PopoverContent>
-      </UI.Popover>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

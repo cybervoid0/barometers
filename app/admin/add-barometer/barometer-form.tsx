@@ -6,33 +6,31 @@ import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
-import { Button } from '@/components/ui/button'
 import {
+  Button,
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
-import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
   FormProvider,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
+  Textarea,
+} from '@/components/ui'
 import { createBarometer } from '@/server/barometers/actions'
 import type { AllBrandsDTO } from '@/server/brands/queries'
 import type { CategoriesDTO } from '@/server/categories/queries'

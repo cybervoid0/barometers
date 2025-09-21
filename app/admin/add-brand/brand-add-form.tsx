@@ -6,7 +6,17 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { FormImageUpload, IconUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Input,
+  Textarea,
+} from '@/components/ui'
 import { imageStorage } from '@/constants'
 import { createBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO } from '@/server/brands/queries'
@@ -154,47 +164,47 @@ function BrandAddForm({ countries, brands }: Props) {
   )
 
   return (
-    <UI.FormProvider {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-4">
-        <UI.FormField
+        <FormField
           control={form.control}
           name="firstName"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>First name</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>First name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>
+            <FormItem>
+              <FormLabel>
                 Name <RequiredFieldMark />
-              </UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="countries"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>
+            <FormItem>
+              <FormLabel>
                 Countries <RequiredFieldMark />
-              </UI.FormLabel>
-              <UI.FormControl>
+              </FormLabel>
+              <FormControl>
                 <MultiSelect
                   selected={field.value}
                   options={(countries || []).map(({ id, name }) => ({ id, name }))}
@@ -203,19 +213,19 @@ function BrandAddForm({ countries, brands }: Props) {
                   searchPlaceholder="Search countries..."
                   emptyMessage="No countries found."
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="successors"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Successors</UI.FormLabel>
-              <UI.FormControl>
+            <FormItem>
+              <FormLabel>Successors</FormLabel>
+              <FormControl>
                 <MultiSelect
                   selected={field.value}
                   options={brands.map(({ id, name }) => ({ id, name }))}
@@ -224,68 +234,68 @@ function BrandAddForm({ countries, brands }: Props) {
                   searchPlaceholder="Search brands..."
                   emptyMessage="No brands found."
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="city"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>City</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>City</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="url"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Website URL</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="https://example.com" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Website URL</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="https://example.com" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Description</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Textarea {...field} rows={3} autoResize />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} rows={3} autoResize />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
         <FormImageUpload name="images" />
 
         <div>
-          <UI.FormLabel>Icon</UI.FormLabel>
+          <FormLabel>Icon</FormLabel>
           <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
         </div>
 
         <div className="flex items-center justify-between pt-4">
-          <UI.Button type="submit" disabled={isPending} className="w-full">
+          <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? 'Creating...' : 'Create Brand'}
-          </UI.Button>
+          </Button>
         </div>
       </form>
-    </UI.FormProvider>
+    </FormProvider>
   )
 }
 

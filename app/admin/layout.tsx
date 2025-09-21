@@ -3,8 +3,7 @@
 import { LogOut } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import type { FC, PropsWithChildren } from 'react'
-import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui'
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   const { data } = useSession()
@@ -23,7 +22,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleLogOut}>
+                <Button aria-label="Log out" variant="ghost" size="icon" onClick={handleLogOut}>
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>

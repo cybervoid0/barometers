@@ -6,7 +6,43 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { IconUpload, RequiredFieldMark } from '@/components/elements'
-import * as UI from '@/components/ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Badge,
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Textarea,
+} from '@/components/ui'
 import { imageStorage } from '@/constants'
 import { deleteBrand, updateBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/server/brands/queries'
@@ -155,19 +191,19 @@ export function BrandEdit({ brand, countries, brands }: Props) {
   }, [openBrandDialog, brand, brandImages, form.reset, cleanUpOnClose])
 
   return (
-    <UI.Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>
-      <UI.DialogTrigger asChild>
-        <UI.Button variant="ghost" aria-label="Edit manufacturer" className="h-fit w-fit p-1">
+    <Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" aria-label="Edit manufacturer" className="h-fit w-fit p-1">
           <Edit className="text-destructive" size={18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent>
-        <UI.DialogHeader>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
           <div className="flex items-center gap-4">
-            <UI.DialogTitle>Edit {brand.name}</UI.DialogTitle>
-            <UI.AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <UI.AlertDialogTrigger asChild>
-                <UI.Button
+            <DialogTitle>Edit {brand.name}</DialogTitle>
+            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button
                   type="button"
                   variant="destructive"
                   size="icon"
@@ -175,81 +211,81 @@ export function BrandEdit({ brand, countries, brands }: Props) {
                   className="w-6 h-6"
                 >
                   <Trash2 className="h-4 w-4" />
-                </UI.Button>
-              </UI.AlertDialogTrigger>
-              <UI.AlertDialogContent>
-                <UI.AlertDialogHeader>
-                  <UI.AlertDialogTitle>Delete Brand</UI.AlertDialogTitle>
-                  <UI.AlertDialogDescription>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+                  <AlertDialogDescription>
                     Are you sure you want to delete "{brand.name}"? This action cannot be undone.
-                  </UI.AlertDialogDescription>
-                </UI.AlertDialogHeader>
-                <UI.AlertDialogFooter>
-                  <UI.AlertDialogCancel>Cancel</UI.AlertDialogCancel>
-                  <UI.AlertDialogAction
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
                     onClick={onDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
                     Delete
-                  </UI.AlertDialogAction>
-                </UI.AlertDialogFooter>
-              </UI.AlertDialogContent>
-            </UI.AlertDialog>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
-          <UI.DialogDescription>Update manufacturer details.</UI.DialogDescription>
-        </UI.DialogHeader>
-        <UI.FormProvider {...form}>
+          <DialogDescription>Update manufacturer details.</DialogDescription>
+        </DialogHeader>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
-            <UI.FormField
+            <FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>First name</UI.FormLabel>
-                  <UI.FormControl>
-                    <UI.Input {...field} />
-                  </UI.FormControl>
-                </UI.FormItem>
+                <FormItem>
+                  <FormLabel>First name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>
+                <FormItem>
+                  <FormLabel>
                     Last name <RequiredFieldMark />
-                  </UI.FormLabel>
-                  <UI.FormControl>
-                    <UI.Input {...field} />
-                  </UI.FormControl>
-                </UI.FormItem>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="city"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>City</UI.FormLabel>
-                  <UI.FormControl>
-                    <UI.Input {...field} />
-                  </UI.FormControl>
-                </UI.FormItem>
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="countries"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>
+                <FormItem>
+                  <FormLabel>
                     Countries <RequiredFieldMark />
-                  </UI.FormLabel>
-                  <UI.FormControl>
+                  </FormLabel>
+                  <FormControl>
                     <CountriesMultiSelect
                       selected={(field.value as number[]) ?? []}
                       options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
@@ -260,74 +296,74 @@ export function BrandEdit({ brand, countries, brands }: Props) {
                           : undefined
                       }
                     />
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>External URL</UI.FormLabel>
-                  <UI.FormControl>
-                    <UI.Input {...field} />
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                <FormItem>
+                  <FormLabel>External URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="successors"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>Successors</UI.FormLabel>
-                  <UI.FormControl>
+                <FormItem>
+                  <FormLabel>Successors</FormLabel>
+                  <FormControl>
                     <SuccessorsMultiSelect
                       selected={(field.value as string[]) ?? []}
                       options={brands.map(({ id, name }) => ({ id, name }))}
                       onChange={vals => field.onChange(vals)}
                     />
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
             <div>
-              <UI.FormLabel>Icon</UI.FormLabel>
+              <FormLabel>Icon</FormLabel>
               <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
             </div>
 
             <BrandImageEdit imageUrls={brandImages} form={form} startTransition={startTransition} />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>Description</UI.FormLabel>
-                  <UI.FormControl>
-                    <UI.Textarea autoResize {...field} />
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea autoResize {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.DialogFooter className="mt-6">
-              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+            <DialogFooter className="mt-6">
+              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Update
-              </UI.Button>
-            </UI.DialogFooter>
+              </Button>
+            </DialogFooter>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -373,9 +409,9 @@ function CountriesMultiSelect({
       {selectedCountries.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedCountries.map(country => (
-            <UI.Badge key={country.id} variant="default" className="px-2 py-1">
+            <Badge key={country.id} variant="default" className="px-2 py-1">
               {country.name}
-              <UI.Button
+              <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -383,14 +419,14 @@ function CountriesMultiSelect({
                 onClick={() => handleRemove(country.id)}
               >
                 <X className="h-3 w-3" />
-              </UI.Button>
-            </UI.Badge>
+              </Button>
+            </Badge>
           ))}
         </div>
       )}
-      <UI.Popover open={open} onOpenChange={setOpen} modal>
-        <UI.PopoverTrigger asChild>
-          <UI.Button
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
             type="button"
             variant="outline"
             role="combobox"
@@ -400,18 +436,18 @@ function CountriesMultiSelect({
             {selected.length === 0
               ? placeholder || 'Select countries'
               : `${selected.length} countr${selected.length === 1 ? 'y' : 'ies'} selected`}
-          </UI.Button>
-        </UI.PopoverTrigger>
-        <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-          <UI.Command>
-            <UI.CommandInput placeholder="Search country..." />
-            <UI.CommandList className="max-h-[200px]">
-              <UI.CommandEmpty>No country found.</UI.CommandEmpty>
-              <UI.CommandGroup>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+          <Command>
+            <CommandInput placeholder="Search country..." />
+            <CommandList className="max-h-[200px]">
+              <CommandEmpty>No country found.</CommandEmpty>
+              <CommandGroup>
                 {options.map(opt => {
                   const isActive = selected.includes(opt.id)
                   return (
-                    <UI.CommandItem
+                    <CommandItem
                       key={opt.id}
                       value={opt.name}
                       onSelect={() => handleSelect(opt.id)}
@@ -421,14 +457,14 @@ function CountriesMultiSelect({
                         {isActive && <div className="h-2 w-2 bg-current rounded-full" />}
                       </div>
                       {opt.name}
-                    </UI.CommandItem>
+                    </CommandItem>
                   )
                 })}
-              </UI.CommandGroup>
-            </UI.CommandList>
-          </UI.Command>
-        </UI.PopoverContent>
-      </UI.Popover>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
@@ -473,9 +509,9 @@ function SuccessorsMultiSelect({
       {selectedBrands.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedBrands.map(brand => (
-            <UI.Badge key={brand.id} variant="default" className="px-2 py-1">
+            <Badge key={brand.id} variant="default" className="px-2 py-1">
               {brand.name}
-              <UI.Button
+              <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -483,14 +519,14 @@ function SuccessorsMultiSelect({
                 onClick={() => handleRemove(brand.id)}
               >
                 <X className="h-3 w-3" />
-              </UI.Button>
-            </UI.Badge>
+              </Button>
+            </Badge>
           ))}
         </div>
       )}
-      <UI.Popover open={open} onOpenChange={setOpen} modal>
-        <UI.PopoverTrigger asChild>
-          <UI.Button
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
             type="button"
             variant="outline"
             role="combobox"
@@ -500,18 +536,18 @@ function SuccessorsMultiSelect({
             {selected.length === 0
               ? 'Select brands'
               : `${selected.length} brand${selected.length === 1 ? '' : 's'} selected`}
-          </UI.Button>
-        </UI.PopoverTrigger>
-        <UI.PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-          <UI.Command>
-            <UI.CommandInput placeholder="Search brand..." />
-            <UI.CommandList className="max-h-[200px]">
-              <UI.CommandEmpty>No brand found.</UI.CommandEmpty>
-              <UI.CommandGroup>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+          <Command>
+            <CommandInput placeholder="Search brand..." />
+            <CommandList className="max-h-[200px]">
+              <CommandEmpty>No brand found.</CommandEmpty>
+              <CommandGroup>
                 {options.map(opt => {
                   const isActive = selected.includes(opt.id)
                   return (
-                    <UI.CommandItem
+                    <CommandItem
                       key={opt.id}
                       value={opt.name}
                       onSelect={() => handleSelect(opt.id)}
@@ -521,14 +557,14 @@ function SuccessorsMultiSelect({
                         {isActive && <div className="h-2 w-2 bg-current rounded-full" />}
                       </div>
                       {opt.name}
-                    </UI.CommandItem>
+                    </CommandItem>
                   )
                 })}
-              </UI.CommandGroup>
-            </UI.CommandList>
-          </UI.Command>
-        </UI.PopoverContent>
-      </UI.Popover>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

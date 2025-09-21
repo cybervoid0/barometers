@@ -17,6 +17,7 @@ export function ModeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
+          aria-label="Toggle theme"
           className="group outline-hidden focus:outline-hidden focus-visible:ring-0"
           variant="outline"
           size="icon"

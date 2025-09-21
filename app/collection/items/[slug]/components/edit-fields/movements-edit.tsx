@@ -6,7 +6,26 @@ import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { MovementsDTO } from '@/server/movements/queries'
@@ -73,64 +92,62 @@ export function MovementsEdit({
   }
 
   return (
-    <UI.Dialog open={open} onOpenChange={setOpen}>
-      <UI.DialogTrigger asChild>
-        <UI.Button
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
           variant="ghost"
           aria-label="Edit movement type"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent className="sm:max-w-md">
-        <UI.FormProvider {...form}>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
-            <UI.DialogHeader>
-              <UI.DialogTitle>Edit Movement Type</UI.DialogTitle>
-              <UI.DialogDescription>
-                Update the movement type for this barometer.
-              </UI.DialogDescription>
-            </UI.DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Edit Movement Type</DialogTitle>
+              <DialogDescription>Update the movement type for this barometer.</DialogDescription>
+            </DialogHeader>
             <div className="mt-4 space-y-4">
-              <UI.FormField
+              <FormField
                 control={form.control}
                 name="subCategoryId"
                 render={({ field }) => (
-                  <UI.FormItem>
-                    <UI.FormLabel>Movement Type</UI.FormLabel>
-                    <UI.FormControl>
-                      <UI.Select
+                  <FormItem>
+                    <FormLabel>Movement Type</FormLabel>
+                    <FormControl>
+                      <Select
                         value={field.value || undefined}
                         onValueChange={value => field.onChange(value === NONE_VALUE ? null : value)}
                       >
-                        <UI.SelectTrigger className="w-full">
-                          <UI.SelectValue placeholder="Pick value" />
-                        </UI.SelectTrigger>
-                        <UI.SelectContent className="max-h-[300px]">
-                          <UI.SelectItem value={NONE_VALUE}>None</UI.SelectItem>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Pick value" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          <SelectItem value={NONE_VALUE}>None</SelectItem>
                           {movements.map(({ name, id }) => (
-                            <UI.SelectItem key={id} value={String(id)}>
+                            <SelectItem key={id} value={String(id)}>
                               {name}
-                            </UI.SelectItem>
+                            </SelectItem>
                           ))}
-                        </UI.SelectContent>
-                      </UI.Select>
-                    </UI.FormControl>
-                    <UI.FormMessage />
-                  </UI.FormItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
             <div className="mt-6">
-              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
-              </UI.Button>
+              </Button>
             </div>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }

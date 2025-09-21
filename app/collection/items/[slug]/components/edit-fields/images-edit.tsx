@@ -15,7 +15,21 @@ import { type ComponentProps, useEffect, useMemo, useRef, useState, useTransitio
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+} from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
@@ -224,19 +238,19 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
   }, [open, barometerImages])
 
   return (
-    <UI.Dialog open={open} onOpenChange={setOpen}>
-      <UI.DialogTrigger asChild>
-        <UI.Button
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
           variant="ghost"
           aria-label="Edit images"
           className={cn('absolute top-0 right-20 z-10 h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={Number(size) || 18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent className="sm:max-w-4xl">
-        <UI.FormProvider {...form}>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-4xl">
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <div className="relative">
               {isUploading && (
@@ -244,15 +258,15 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               )}
-              <UI.DialogHeader>
-                <UI.DialogTitle>Edit Images</UI.DialogTitle>
-                <UI.DialogDescription>
+              <DialogHeader>
+                <DialogTitle>Edit Images</DialogTitle>
+                <DialogDescription>
                   Add, remove, or reorder images for this barometer.
-                </UI.DialogDescription>
-              </UI.DialogHeader>
+                </DialogDescription>
+              </DialogHeader>
               <div className="mt-4 space-y-4">
                 <div className="space-y-4">
-                  <UI.Button
+                  <Button
                     type="button"
                     variant="outline"
                     className="w-fit"
@@ -261,7 +275,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                   >
                     <ImagePlus className="mr-2 h-4 w-4" />
                     Add Images
-                  </UI.Button>
+                  </Button>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -271,13 +285,13 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                     onChange={handleFileSelect}
                   />
 
-                  <UI.FormField
+                  <FormField
                     control={form.control}
                     name="images"
                     render={({ field }) => (
-                      <UI.FormItem>
-                        <UI.FormLabel>Images</UI.FormLabel>
-                        <UI.FormControl>
+                      <FormItem>
+                        <FormLabel>Images</FormLabel>
+                        <FormControl>
                           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext
                               items={field.value}
@@ -294,27 +308,27 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                               </div>
                             </SortableContext>
                           </DndContext>
-                        </UI.FormControl>
-                        <UI.FormMessage />
-                      </UI.FormItem>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </div>
               </div>
               <div className="mt-6">
-                <UI.Button
+                <Button
                   type="submit"
                   variant="outline"
                   className="w-full"
                   disabled={isUploading || isPending}
                 >
                   Save
-                </UI.Button>
+                </Button>
               </div>
             </div>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }

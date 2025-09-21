@@ -41,17 +41,17 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
 
   return (
     <nav {...props}>
-      <NavigationMenu>
-        <NavigationMenuList>
-          {menuData
-            .filter(
-              ({ visibleFor }) =>
-                typeof visibleFor === 'undefined' ||
-                (isAdmin(session) && visibleFor === AccessRole.ADMIN),
-            )
-            .map(menuItem =>
-              'children' in menuItem ? (
-                <NavigationMenu key={menuItem.id}>
+      <div className="flex">
+        {menuData
+          .filter(
+            ({ visibleFor }) =>
+              typeof visibleFor === 'undefined' ||
+              (isAdmin(session) && visibleFor === AccessRole.ADMIN),
+          )
+          .map(menuItem =>
+            'children' in menuItem ? (
+              <NavigationMenu key={menuItem.id}>
+                <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className={cn(menuStyle, underline(menuItem.link))}>
                       <p>{menuItem.label}</p>
@@ -78,26 +78,22 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
-                </NavigationMenu>
-              ) : (
-                <NavigationMenuItem key={menuItem.id}>
-                  <NavigationMenuLink asChild>
-                    <Link href={menuItem.link} className="no-underline">
-                      <p className={cn(menuStyle, underline(menuItem.link))}>{menuItem.label}</p>
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ),
-            )}
-          <NavigationMenuItem className={cn(menuItemStyle, underline('/search'))}>
-            <NavigationMenuLink asChild className="">
-              <Link href="/search">
-                <Search size="18" />
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
+                </NavigationMenuList>
+              </NavigationMenu>
+            ) : (
+              <div key={menuItem.id} className={cn(menuStyle, underline(menuItem.link))}>
+                <Link href={menuItem.link} className="no-underline">
+                  <p>{menuItem.label}</p>
+                </Link>
+              </div>
+            ),
+          )}
+        <div className={cn(menuItemStyle, underline('/search'))}>
+          <Link href="/search">
+            <Search size="18" />
+          </Link>
+        </div>
+      </div>
     </nav>
   )
 }

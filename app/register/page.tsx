@@ -7,7 +7,17 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Input,
+} from '@/components/ui'
 import { register } from '@/server/register/actions'
 
 const registerSchema = z
@@ -58,59 +68,59 @@ export default function Register() {
 
   return (
     <article className="flex justify-center">
-      <UI.FormProvider {...form}>
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
           <div className="w-80 space-y-4">
             <h2 className="mb-2 text-center text-2xl">Registration</h2>
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>Name</UI.FormLabel>
-                  <UI.FormControl>
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
                     <div className="relative">
-                      <UI.Input {...field} className="pr-10" />
+                      <Input {...field} className="pr-10" />
                       <User className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>E-mail</UI.FormLabel>
-                  <UI.FormControl>
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
                     <div className="relative">
-                      <UI.Input {...field} type="email" className="pr-10" />
+                      <Input {...field} type="email" className="pr-10" />
                       <AtSign className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                     </div>
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>Password</UI.FormLabel>
-                  <UI.FormControl>
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
                     <div className="relative">
-                      <UI.Input
+                      <Input
                         {...field}
                         type={showPassword ? 'text' : 'password'}
                         className="pr-10"
                       />
-                      <UI.Button
+                      <Button
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -123,29 +133,29 @@ export default function Register() {
                         ) : (
                           <Eye className="text-muted-foreground h-4 w-4" />
                         )}
-                      </UI.Button>
+                      </Button>
                     </div>
-                  </UI.FormControl>
-                  <UI.FormDescription>Min 8 symbols</UI.FormDescription>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormDescription>Min 8 symbols</FormDescription>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <UI.FormField
+            <FormField
               control={form.control}
               name="repeatPassword"
               render={({ field }) => (
-                <UI.FormItem>
-                  <UI.FormLabel>Repeat password</UI.FormLabel>
-                  <UI.FormControl>
+                <FormItem>
+                  <FormLabel>Repeat password</FormLabel>
+                  <FormControl>
                     <div className="relative">
-                      <UI.Input
+                      <Input
                         {...field}
                         type={showRepeatPassword ? 'text' : 'password'}
                         className="pr-10"
                       />
-                      <UI.Button
+                      <Button
                         type="button"
                         variant="ghost"
                         size="icon"
@@ -158,20 +168,20 @@ export default function Register() {
                         ) : (
                           <Eye className="text-muted-foreground h-4 w-4" />
                         )}
-                      </UI.Button>
+                      </Button>
                     </div>
-                  </UI.FormControl>
-                  <UI.FormMessage />
-                </UI.FormItem>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>
 
-          <UI.Button type="submit" variant="outline" className="h-8 w-full" disabled={isPending}>
+          <Button type="submit" variant="outline" className="h-8 w-full" disabled={isPending}>
             {isPending ? 'Signing up...' : 'Sign up'}
-          </UI.Button>
+          </Button>
         </form>
-      </UI.FormProvider>
+      </FormProvider>
     </article>
   )
 }

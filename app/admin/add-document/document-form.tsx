@@ -8,7 +8,22 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormProvider,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import type { AllBarometersDTO } from '@/server/barometers/queries'
 import type { ConditionsDTO } from '@/server/conditions/queries'
@@ -149,100 +164,100 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
   }
 
   return (
-    <UI.FormProvider {...methods}>
+    <FormProvider {...methods}>
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="title"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>
+            <FormItem>
+              <FormLabel>
                 Title <RequiredFieldMark />
-              </UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="Enter document title" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter document title" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="catalogueNumber"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>
+            <FormItem>
+              <FormLabel>
                 Catalogue Number <RequiredFieldMark />
-              </UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="Enter catalogue number" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter catalogue number" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="documentType"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>
+            <FormItem>
+              <FormLabel>
                 Document Type <RequiredFieldMark />
-              </UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="e.g. Manual, Patent, Advertisement" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g. Manual, Patent, Advertisement" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="subject"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Subject</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="Enter document subject" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter document subject" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="creator"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Creator/Author</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="Enter creator or author name" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Creator/Author</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter creator or author name" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="date"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Date</UI.FormLabel>
-              <UI.FormControl>
+            <FormItem>
+              <FormLabel>Date</FormLabel>
+              <FormControl>
                 <div className="flex gap-2">
-                  <UI.Input
+                  <Input
                     {...field}
                     value={field.value || ''}
                     type="date"
                     placeholder="YYYY-MM-DD"
                     className="flex-1"
                   />
-                  <UI.Button
+                  <Button
                     type="button"
                     variant="outline"
                     size="sm"
@@ -250,129 +265,129 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
                     className="shrink-0"
                   >
                     Clear
-                  </UI.Button>
+                  </Button>
                 </div>
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="dateDescription"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Date Description</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="e.g. c.1870, mid 19th century" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Date Description</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g. c.1870, mid 19th century" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="placeOfOrigin"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Place of Origin</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="Enter place of origin" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Place of Origin</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter place of origin" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="language"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Language</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Input {...field} placeholder="e.g. English, German, French" />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Language</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g. English, German, French" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="physicalDescription"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Physical Description</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Textarea
+            <FormItem>
+              <FormLabel>Physical Description</FormLabel>
+              <FormControl>
+                <Textarea
                   {...field}
                   rows={3}
                   autoResize
                   placeholder="Describe physical characteristics, dimensions, materials, etc."
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="annotations"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Annotations</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Textarea
+            <FormItem>
+              <FormLabel>Annotations</FormLabel>
+              <FormControl>
+                <Textarea
                   {...field}
                   rows={3}
                   autoResize
                   placeholder="Enter inscriptions, stamps, etc. (one per line)"
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="provenance"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Provenance</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Textarea
+            <FormItem>
+              <FormLabel>Provenance</FormLabel>
+              <FormControl>
+                <Textarea
                   {...field}
                   rows={3}
                   autoResize
                   placeholder="Enter history of ownership and origin"
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="acquisitionDate"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Acquisition Date</UI.FormLabel>
-              <UI.FormControl>
+            <FormItem>
+              <FormLabel>Acquisition Date</FormLabel>
+              <FormControl>
                 <div className="flex gap-2">
-                  <UI.Input
+                  <Input
                     {...field}
                     value={field.value || ''}
                     type="date"
                     placeholder="YYYY-MM-DD"
                     className="flex-1"
                   />
-                  <UI.Button
+                  <Button
                     type="button"
                     variant="outline"
                     size="sm"
@@ -380,68 +395,63 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
                     className="shrink-0"
                   >
                     Clear
-                  </UI.Button>
+                  </Button>
                 </div>
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="conditionId"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Condition</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Select onValueChange={field.onChange} value={field.value}>
-                  <UI.SelectTrigger className="w-full">
-                    <UI.SelectValue placeholder="Select condition" />
-                  </UI.SelectTrigger>
-                  <UI.SelectContent className="max-h-60">
-                    <UI.SelectItem value="none">No condition specified</UI.SelectItem>
+            <FormItem>
+              <FormLabel>Condition</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="none">No condition specified</SelectItem>
                     {conditions.map(({ name, id }) => (
-                      <UI.SelectItem key={id} value={id}>
+                      <SelectItem key={id} value={id}>
                         {name}
-                      </UI.SelectItem>
+                      </SelectItem>
                     ))}
-                  </UI.SelectContent>
-                </UI.Select>
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
         <FormImageUpload name="images" />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="description"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Description</UI.FormLabel>
-              <UI.FormControl>
-                <UI.Textarea
-                  {...field}
-                  rows={3}
-                  autoResize
-                  placeholder="Enter document description"
-                />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} rows={3} autoResize placeholder="Enter document description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.FormField
+        <FormField
           control={methods.control}
           name="relatedBarometers"
           render={({ field }) => (
-            <UI.FormItem>
-              <UI.FormLabel>Related Barometers</UI.FormLabel>
-              <UI.FormControl>
+            <FormItem>
+              <FormLabel>Related Barometers</FormLabel>
+              <FormControl>
                 <MultiSelect
                   selected={field.value || []}
                   onChange={field.onChange}
@@ -450,16 +460,16 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
                   searchPlaceholder="Search barometers..."
                   emptyMessage="No barometers found."
                 />
-              </UI.FormControl>
-              <UI.FormMessage />
-            </UI.FormItem>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <UI.Button type="submit" disabled={isPending} className="mt-6 w-full">
+        <Button type="submit" disabled={isPending} className="mt-6 w-full">
           {isPending ? 'Adding...' : 'Add new document'}
-        </UI.Button>
+        </Button>
       </form>
-    </UI.FormProvider>
+    </FormProvider>
   )
 }

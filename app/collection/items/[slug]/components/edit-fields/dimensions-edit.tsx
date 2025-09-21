@@ -7,7 +7,21 @@ import { type ComponentProps, useCallback, useEffect, useState, useTransition } 
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import * as UI from '@/components/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  FormProvider,
+  Input,
+} from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { Dimensions } from '@/types'
@@ -83,38 +97,38 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
   }
 
   return (
-    <UI.Dialog open={open} onOpenChange={setOpen}>
-      <UI.DialogTrigger asChild>
-        <UI.Button
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
           variant="ghost"
           aria-label="Edit dimensions"
           className={cn('h-fit w-fit p-1', className)}
           {...props}
         >
           <Edit className="text-destructive" size={18} />
-        </UI.Button>
-      </UI.DialogTrigger>
-      <UI.DialogContent className="sm:max-w-2xl">
-        <UI.FormProvider {...form}>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl">
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>
-            <UI.DialogHeader>
-              <UI.DialogTitle>Edit Dimensions</UI.DialogTitle>
-              <UI.DialogDescription>Update the dimensions for this barometer.</UI.DialogDescription>
-            </UI.DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Edit Dimensions</DialogTitle>
+              <DialogDescription>Update the dimensions for this barometer.</DialogDescription>
+            </DialogHeader>
             <div className="mt-4 space-y-4">
-              <UI.FormField
+              <FormField
                 control={form.control}
                 name="dimensions"
                 render={() => (
-                  <UI.FormItem>
-                    <UI.FormMessage />
-                  </UI.FormItem>
+                  <FormItem>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
               <div className="space-y-3">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
-                    <UI.Button
+                    <Button
                       type="button"
                       variant="outline"
                       size="icon"
@@ -124,35 +138,35 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                       disabled={isPending}
                     >
                       <Trash2 className="h-4 w-4" />
-                    </UI.Button>
-                    <UI.FormField
+                    </Button>
+                    <FormField
                       control={form.control}
                       name={`dimensions.${index}.dim`}
                       render={({ field: dimField }) => (
-                        <UI.FormItem className="flex-1">
-                          <UI.FormControl>
-                            <UI.Input {...dimField} placeholder="Unit (e.g., Height)" />
-                          </UI.FormControl>
-                          <UI.FormMessage />
-                        </UI.FormItem>
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input {...dimField} placeholder="Unit (e.g., Height)" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
                     />
-                    <UI.FormField
+                    <FormField
                       control={form.control}
                       name={`dimensions.${index}.value`}
                       render={({ field: valueField }) => (
-                        <UI.FormItem className="flex-1">
-                          <UI.FormControl>
-                            <UI.Input {...valueField} placeholder="Value (e.g., 25cm)" />
-                          </UI.FormControl>
-                          <UI.FormMessage />
-                        </UI.FormItem>
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input {...valueField} placeholder="Value (e.g., 25cm)" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
                     />
                   </div>
                 ))}
                 <div className="flex w-full">
-                  <UI.Button
+                  <Button
                     type="button"
                     variant="outline"
                     size="sm"
@@ -162,7 +176,7 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Parameter
-                  </UI.Button>
+                  </Button>
                   <div className="grow flex items-center justify-center">
                     {fields.length === 0 && <p className="leading-none">No dimensions</p>}
                   </div>
@@ -170,13 +184,13 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
               </div>
             </div>
             <div className="mt-6">
-              <UI.Button disabled={isPending} type="submit" variant="outline" className="w-full">
+              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
                 Save
-              </UI.Button>
+              </Button>
             </div>
           </form>
-        </UI.FormProvider>
-      </UI.DialogContent>
-    </UI.Dialog>
+        </FormProvider>
+      </DialogContent>
+    </Dialog>
   )
 }
