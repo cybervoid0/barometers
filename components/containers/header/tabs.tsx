@@ -89,7 +89,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
             ),
           )}
         <div className={cn(menuItemStyle, underline('/search'))}>
-          <Link href="/search">
+          <Link href="/search" aria-label="Search barometer">
             <Search size="18" />
           </Link>
         </div>
