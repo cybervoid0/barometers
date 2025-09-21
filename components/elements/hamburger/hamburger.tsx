@@ -1,4 +1,5 @@
-import { motion, type SVGMotionProps } from 'motion/react'
+import type { SVGMotionProps } from 'motion/react'
+import { motion } from 'motion/react'
 import type { HTMLAttributes } from 'react'
 import { cn } from '@/utils'
 
@@ -11,7 +12,7 @@ interface HamburgerProps extends HTMLAttributes<HTMLSpanElement> {
  * A responsive hamburger menu button component that animates between open and closed states.
  * Displays three lines that transform into an "X" when open, commonly used for toggling navigation menus.
  */
-export function Hamburger({
+function Hamburger({
   strokeWidth = 1.25,
   color = '#fff',
   isOpen,
@@ -82,3 +83,5 @@ const Path = ({
     {...props}
   />
 )
+
+export { Hamburger }
