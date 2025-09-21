@@ -1,3 +1,5 @@
+'use client'
+
 import type { SVGMotionProps } from 'motion/react'
 import { motion } from 'motion/react'
 import type { HTMLAttributes } from 'react'
