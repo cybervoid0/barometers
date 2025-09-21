@@ -23,7 +23,7 @@ export function SocialButtons({ className, ...props }: HTMLAttributes<HTMLDivEle
               aria-label="Visit our Instagram page"
               size="icon"
               variant="outline"
-              className={cn(buttonStyle, 'group-hover:text-red-800')}
+              className={cn(buttonStyle, 'group-hover:text-red-800 min-h-11 min-w-11')}
             >
               <Instagram aria-hidden="true" />
             </Button>
@@ -45,7 +45,7 @@ export function SocialButtons({ className, ...props }: HTMLAttributes<HTMLDivEle
               aria-label="Send us an email"
               size="icon"
               variant="outline"
-              className={cn(buttonStyle, 'group-hover:text-blue-800')}
+              className={cn(buttonStyle, 'group-hover:text-blue-800 min-h-11 min-w-11')}
             >
               <Mail aria-hidden="true" />
             </Button>
