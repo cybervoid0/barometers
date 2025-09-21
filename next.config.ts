@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true,
     loader: 'custom',
     loaderFile: './utils/image-loader.ts',
     deviceSizes: [640, 1080, 1920],
