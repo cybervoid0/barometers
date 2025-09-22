@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials'
 import { withPrisma } from '@/prisma/prismaClient'
 
 export const getUserByEmail = withPrisma((prisma, email?: string | null | undefined) =>
-  prisma.user.findUniqueOrThrow({ where: { email: email ?? undefined } }),
+  prisma.user.findUnique({ where: { email: email ?? undefined } }),
 )
 
 export const authConfig: AuthOptions = {
@@ -17,18 +17,23 @@ export const authConfig: AuthOptions = {
         password: { label: 'password', type: 'password', required: true },
       },
       authorize: async credentials => {
-        if (!credentials) throw new Error('Unknown credentials')
-        const user = await getUserByEmail(credentials.email)
-        if (!user.password) throw new Error('Password is not stored')
-        const passwordMatch = await bcrypt.compare(credentials.password, user.password)
-        if (!passwordMatch) throw new Error('Wrong Password')
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.avatarURL,
-          role: user.role,
-        } as User
+        try {
+          if (!credentials) throw new Error('Unknown credentials')
+          const user = await getUserByEmail(credentials.email)
+          if (!user?.password) throw new Error('Password is not stored')
+          const passwordMatch = await bcrypt.compare(credentials.password, user.password)
+          if (!passwordMatch) throw new Error('Wrong Password')
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.avatarURL,
+            role: user.role,
+          } as User
+        } catch (error) {
+          console.error('Auth error:', error)
+          return null
+        }
       },
     }),
   ],

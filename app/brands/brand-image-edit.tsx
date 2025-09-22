@@ -54,12 +54,12 @@ function SortableImage({
       </button>
       <div {...listeners}>
         <NextImage
-          className="h-auto w-auto"
+          className="h-[100px] w-[100px] object-cover"
           alt="Barometer"
           key={image}
           src={image}
           width={100}
-          height={200}
+          height={100}
         />
       </div>
     </div>
