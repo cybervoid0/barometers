@@ -23,17 +23,19 @@ import { SocialButtons } from '../footer'
 
 interface Props {
   menu: MenuItem[]
+  closeMenu: () => void
 }
 
 const menuItemTextStyle =
   'text-sm font-semibold tracking-[0.15rem] uppercase transition-colors hover:text-foreground/80'
 
-function MenuContent({ menu = [] }: Props) {
+function MenuContent({ menu = [], closeMenu }: Props) {
   const { data: session } = useSession()
   return (
     <SheetContent
       side="left"
       className="z-[100] w-68 overflow-y-auto data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
+      onOpenAutoFocus={e => e.preventDefault()} // Prevent auto-focus to avoid focus outline on accordion
     >
       <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
       <SheetDescription className="sr-only">Barometers website navigation menu</SheetDescription>
@@ -61,6 +63,7 @@ function MenuContent({ menu = [] }: Props) {
                           <li key={nestedItem.id}>
                             <Link
                               href={nestedItem.link}
+                              onClick={closeMenu}
                               className="hover:text-foreground/80 w-full text-xs font-medium tracking-widest uppercase no-underline"
                             >
                               {nestedItem.label}
@@ -76,6 +79,7 @@ function MenuContent({ menu = [] }: Props) {
                   className={cn('block no-underline', menuItemTextStyle)}
                   key={item.id}
                   href={item.link}
+                  onClick={closeMenu}
                 >
                   {item.label}
                 </Link>
@@ -99,6 +103,7 @@ const LazyMenuContent = dynamic(() => Promise.resolve({ default: MenuContent }),
 
 export function MobileMenu({ menu }: Props) {
   const [isOpen, setOpen] = useState(false)
+  const closeMenu = () => setOpen(false)
   const [shouldLoad, setShouldLoad] = useState(false)
 
   const toggle = () => {
@@ -111,7 +116,7 @@ export function MobileMenu({ menu }: Props) {
       <SheetTrigger asChild>
         <Hamburger isOpen={isOpen} onClick={toggle} className="scale-x-120" />
       </SheetTrigger>
-      {shouldLoad && <LazyMenuContent menu={menu} />}
+      {shouldLoad && <LazyMenuContent menu={menu} closeMenu={closeMenu} />}
     </Sheet>
   )
 }
