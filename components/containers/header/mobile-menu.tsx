@@ -23,13 +23,12 @@ import { SocialButtons } from '../footer'
 
 interface Props {
   menu: MenuItem[]
-  closeMenu: () => void
 }
 
 const menuItemTextStyle =
   'text-sm font-semibold tracking-[0.15rem] uppercase transition-colors hover:text-foreground/80'
 
-function MenuContent({ menu = [], closeMenu }: Props) {
+function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }) {
   const { data: session } = useSession()
   return (
     <SheetContent
