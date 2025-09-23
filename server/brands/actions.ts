@@ -1,10 +1,9 @@
 'use server'
 
 import type { Prisma } from '@prisma/client'
-import { revalidatePath } from 'next/cache'
-import { FrontRoutes } from '@/constants'
+import { revalidateTag } from 'next/cache'
 import { withPrisma } from '@/prisma/prismaClient'
-import { getBrandSlug, getIconBuffer, trimTrailingSlash } from '@/utils'
+import { getBrandSlug, getIconBuffer } from '@/utils'
 
 const createBrand = withPrisma(
   async (
@@ -24,15 +23,7 @@ const createBrand = withPrisma(
         icon: iconBuffer,
       },
     })
-    const { successors } = await prisma.manufacturer.findUniqueOrThrow({
-      where: { id },
-      include: { successors: { select: { slug: true } } },
-    })
-    revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
-    revalidatePath(FrontRoutes.Brands + slug)
-    successors.forEach(({ slug }) => {
-      revalidatePath(FrontRoutes.Brands + slug)
-    })
+    revalidateTag('brands')
     return { id, name }
   },
 )
@@ -59,15 +50,7 @@ const updateBrand = withPrisma(
       },
     })
 
-    const { successors } = await prisma.manufacturer.findUniqueOrThrow({
-      where: { id },
-      include: { successors: { select: { slug: true } } },
-    })
-    revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
-    revalidatePath(FrontRoutes.Brands + slug)
-    successors.forEach(({ slug }) => {
-      revalidatePath(FrontRoutes.Brands + slug)
-    })
+    revalidateTag('brands')
     const name = (updateData.name as string) ?? oldBrand.name
     return { slug, name }
   },
@@ -80,8 +63,7 @@ const deleteBrand = withPrisma(async (prisma, slug: string) => {
       id: manufacturer.id,
     },
   })
-  revalidatePath(trimTrailingSlash(FrontRoutes.Brands))
-  revalidatePath(FrontRoutes.Brands + slug)
+  revalidateTag('brands')
 })
 
 export { createBrand, updateBrand, deleteBrand }
