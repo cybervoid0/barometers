@@ -113,7 +113,7 @@ export function MobileMenu({ menu }: Props) {
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Hamburger isOpen={isOpen} onClick={toggle} className="scale-x-120" />
+        <Hamburger isOpen={isOpen} onClick={toggle} className="scale-x-120 md:hidden" />
       </SheetTrigger>
       {shouldLoad && <LazyMenuContent menu={menu} closeMenu={closeMenu} />}
     </Sheet>

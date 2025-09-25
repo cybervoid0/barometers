@@ -1,31 +1,34 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { Check } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { ClearButton, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { AllBrandsDTO } from '@/server/brands/queries'
+import { cn } from '@/utils'
 import { EditButton } from './edit-button'
 
 interface Props {
@@ -34,14 +37,21 @@ interface Props {
 }
 
 const validationSchema = z.object({
-  brandId: z.string().min(1, 'Brand is required'),
+  brandId: z.string().nonempty('Brand is required'),
 })
 
 type BrandForm = z.output<typeof validationSchema>
 
+function getBrandName(name: string, firstName?: string | null): string
+function getBrandName(name: string | undefined, firstName?: string | null): string | undefined
+function getBrandName(name?: string, firstName?: string | null): string | undefined {
+  return name ? `${firstName ? `${firstName} ` : ''}${name}` : undefined
+}
+
 function BrandEdit({ brands, barometer }: Props) {
   const [open, setOpen] = useState(false)
-  const closeDialog = () => setOpen(false)
+  const [brandSearch, setBrandSearch] = useState('')
+
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<BrandForm>({
@@ -52,14 +62,15 @@ function BrandEdit({ brands, barometer }: Props) {
   useEffect(() => {
     if (!open) return
     form.reset({ brandId: barometer.manufacturerId })
-  }, [open, barometer.manufacturerId, form.reset])
+    setBrandSearch('')
+  }, [open, barometer, form])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: exclude closeDialog
   const update = useCallback(
     (values: BrandForm) => {
       if (values.brandId === barometer.manufacturerId) {
         toast.info(`Nothing was updated in ${barometer.name}.`)
-        return closeDialog()
+        setOpen(false)
+        return
       }
       startTransition(async () => {
         try {
@@ -74,40 +85,78 @@ function BrandEdit({ brands, barometer }: Props) {
         }
       })
     },
-    [barometer.manufacturerId, barometer.name],
+    [barometer.manufacturerId, barometer.name, barometer.id],
   )
+  const brandId = form.watch('brandId')
+  const selectedBrandName = useMemo(() => {
+    const selectedBrand = brands.find(brand => String(brand.id) === brandId)
+    return getBrandName(selectedBrand?.name, selectedBrand?.firstName)
+  }, [brandId, brands])
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <EditButton />
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-visible">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
             <DialogHeader>
               <DialogTitle>Change Brand</DialogTitle>
               <DialogDescription>Update the manufacturer for this barometer.</DialogDescription>
             </DialogHeader>
-            <div className="mt-4 space-y-4">
+            <div className="mt-4">
               <FormField
                 control={form.control}
                 name="brandId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand</FormLabel>
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select brand" />
-                        </SelectTrigger>
-                        <SelectContent side="bottom" className="max-h-[200px]">
-                          {brands.map(({ name, id, firstName }) => (
-                            <SelectItem key={id} value={id}>
-                              {firstName ? `${firstName} ` : ''}
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                    <FormLabel>
+                      Brand <RequiredFieldMark />
+                    </FormLabel>
+                    <div className="space-y-2">
+                      <div className="h-10 px-3 mt-1 flex items-center border border-border rounded-md cursor-default">
+                        <p className="text-sm text-muted-foreground">
+                          {selectedBrandName ?? 'None selected'}
+                        </p>
+                      </div>
+
+                      <div className="border rounded-md">
+                        <Command defaultValue={selectedBrandName ?? ''}>
+                          <div className="relative">
+                            <CommandInput
+                              value={brandSearch}
+                              onValueChange={setBrandSearch}
+                              placeholder="Search brands..."
+                              autoFocus={false}
+                            />
+                            <ClearButton onClick={() => setBrandSearch('')} />
+                          </div>
+
+                          <CommandList className="max-h-48 overflow-y-auto">
+                            <CommandEmpty>No brand found.</CommandEmpty>
+                            <CommandGroup>
+                              {brands.map(({ name, id, firstName }) => {
+                                const fullName = getBrandName(name, firstName)
+                                return (
+                                  <CommandItem
+                                    key={id}
+                                    value={fullName}
+                                    onSelect={() => field.onChange(String(id))}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 h-4 w-4',
+                                        id === field.value ? 'opacity-100' : 'opacity-0',
+                                      )}
+                                    />
+                                    {fullName}
+                                  </CommandItem>
+                                )
+                              })}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </div>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

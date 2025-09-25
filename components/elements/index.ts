@@ -1,4 +1,5 @@
 export { BarometerCard, BarometerCardWithIcon } from './barometer-card'
+export { ClearButton } from './ClearButton'
 export { CategoryCard } from './category-card'
 export { CategoryIcon } from './category-icon'
 export { CheckConsent } from './cookie-consent/check-consent'
