@@ -62,7 +62,7 @@ export default function BarometerForm({
 }: Props) {
   const [isPending, startTransition] = useTransition()
 
-  const methods = useForm<BarometerFormData>({
+  const form = useForm<BarometerFormData>({
     resolver: zodResolver(BarometerFormValidationSchema),
     defaultValues: {
       collectionId: '',
@@ -83,7 +83,7 @@ export default function BarometerForm({
     },
   })
 
-  const { handleSubmit, setValue, reset, control } = methods
+  const { handleSubmit, setValue, reset, control } = form
 
   const submitForm = (values: BarometerFormData) => {
     startTransition(async () => {
@@ -109,7 +109,7 @@ export default function BarometerForm({
   }, [categories, conditions, brands, reset])
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...form}>
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6" noValidate>
         <FormField
           control={control}

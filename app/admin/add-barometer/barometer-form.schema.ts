@@ -128,4 +128,3 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
 
 // Export types
 export type BarometerFormData = z.infer<typeof BarometerFormValidationSchema>
-//export type BarometerPrismaData = z.infer<typeof BarometerFormTransformSchema>
