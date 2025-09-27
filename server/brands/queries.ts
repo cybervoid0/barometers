@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { unstable_cache } from 'next/cache'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { bufferToBase64Url } from '@/utils'
 
@@ -24,7 +24,7 @@ export const getAllBrands = unstable_cache(
     })
   }),
   ['getAllBrands'],
-  { tags: ['brands'] },
+  { tags: [Tag.brands] },
 )
 
 export const getBrands = unstable_cache(
@@ -85,7 +85,7 @@ export const getBrands = unstable_cache(
     }
   }),
   ['getBrands'],
-  { tags: ['brands'] },
+  { tags: [Tag.brands] },
 )
 
 export const getBrand = unstable_cache(
@@ -121,7 +121,7 @@ export const getBrand = unstable_cache(
     }
   }),
   ['getBrand'],
-  { tags: ['brands'] },
+  { tags: [Tag.brands] },
 )
 
 export const getBrandsByCountry = unstable_cache(
@@ -176,7 +176,7 @@ export const getBrandsByCountry = unstable_cache(
     })
   }),
   ['getBrandsByCountry'],
-  { tags: ['brands'] },
+  { tags: [Tag.brands] },
 )
 
 export type BrandDTO = Awaited<ReturnType<typeof getBrand>>

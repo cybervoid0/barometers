@@ -36,7 +36,7 @@ const BrandByCountry = ({
   allBrands: AllBrandsDTO
 }) => {
   return (
-    <article className="mr-4 mb-5">
+    <section className="mr-4 mb-5">
       <h3 className="mb-3 px-5 text-xl font-semibold">{country.name}</h3>
       <Separator className="mx-2 mb-5" />
 
@@ -72,7 +72,7 @@ const BrandByCountry = ({
           )
         })}
       </div>
-    </article>
+    </section>
   )
 }
 
@@ -86,7 +86,7 @@ export default async function Brands() {
   const firstColumn = brandsByCountry.filter(({ name }) => firstColStates.includes(name))
   const secondColumn = brandsByCountry.filter(({ name }) => !firstColStates.includes(name))
   return (
-    <div className="pt-6">
+    <article className="pt-6">
       <h2 className="mb-4">Manufacturers</h2>
       <p className="mb-6 indent-8">
         Discover the master craftsmen, renowned manufacturers and distinguished sellers behind these
@@ -119,6 +119,6 @@ export default async function Brands() {
           </div>
         </div>
       </Card>
-    </div>
+    </article>
   )
 }

@@ -16,6 +16,7 @@ export const FrontRoutes = {
   Reports: '/admin/reports/',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
+  Documents: '/documents/',
 } as const
 
 export type FrontRoutes = (typeof FrontRoutes)[keyof typeof FrontRoutes]

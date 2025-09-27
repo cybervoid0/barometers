@@ -1,5 +1,6 @@
 import { flexRender, type Table as ReactTable } from '@tanstack/react-table'
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react'
+import type { ComponentProps } from 'react'
 import {
   Button,
   TableBody,
@@ -9,15 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui'
+import { cn } from '@/utils'
 
-interface Props<T> {
+interface Props<T> extends ComponentProps<typeof TableCore> {
   table: ReactTable<T>
-  className?: string
+  onRowClick?: (rowData: T) => void
 }
 
-export function Table<T>({ table, className }: Props<T>) {
+export function Table<T>({ table, onRowClick, ...props }: Props<T>) {
   return (
-    <TableCore className={className}>
+    <TableCore {...props}>
       <TableHeader>
         {table.getHeaderGroups().map(headerGroup => (
           <TableRow key={headerGroup.id}>
@@ -35,7 +37,9 @@ export function Table<T>({ table, className }: Props<T>) {
                 >
                   {header.isPlaceholder ? null : (
                     <div className="flex items-center gap-2">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      <p className="capitalize">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </p>
                       {canSort && (
                         <Button
                           variant="ghost"
@@ -69,7 +73,11 @@ export function Table<T>({ table, className }: Props<T>) {
           </TableRow>
         ) : (
           table.getRowModel().rows.map(row => (
-            <TableRow key={row.id} className="odd:bg-muted/40">
+            <TableRow
+              key={row.id}
+              className={cn('odd:bg-muted/40', { 'cursor-pointer': Boolean(onRowClick) })}
+              onClick={() => onRowClick?.(row.original)}
+            >
               {row.getVisibleCells().map(cell => (
                 <TableCell
                   key={cell.id}

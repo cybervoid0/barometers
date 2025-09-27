@@ -1,12 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
@@ -24,73 +21,14 @@ import {
   SelectValue,
   Textarea,
 } from '@/components/ui'
-import { imageStorage } from '@/constants/globals'
 import type { AllBarometersDTO } from '@/server/barometers/queries'
 import type { ConditionsDTO } from '@/server/conditions/queries'
 import { createDocument } from '@/server/documents/actions'
-import { getThumbnailBase64 } from '@/utils'
-
-dayjs.extend(utc)
-
-// Zod validation schema
-const documentSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
-  catalogueNumber: z
-    .string()
-    .min(1, 'Catalogue Number is required')
-    .max(100, 'Catalogue Number must be less than 100 characters'),
-  documentType: z
-    .string()
-    .min(1, 'Document Type is required')
-    .max(100, 'Document Type must be less than 100 characters'),
-  subject: z.string().max(200, 'Subject must be less than 200 characters'),
-  creator: z.string().max(200, 'Creator must be less than 200 characters'),
-  date: z
-    .string()
-    .refine(
-      value => {
-        if (!value) return true // Allow empty string
-        return dayjs(value).isValid()
-      },
-      { message: 'Must be a valid date' },
-    )
-    .refine(
-      value => {
-        if (!value) return true
-        return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
-      },
-      { message: 'Date cannot be in the future' },
-    ),
-  dateDescription: z.string().max(200, 'Date description must be less than 200 characters'),
-  placeOfOrigin: z.string().max(200, 'Place of origin must be less than 200 characters'),
-  language: z.string().max(100, 'Language must be less than 100 characters'),
-  physicalDescription: z.string(),
-  annotations: z.string(), // Will be split into array before sending
-  provenance: z.string(),
-  acquisitionDate: z
-    .string()
-    .refine(
-      value => {
-        if (!value) return true // Allow empty string
-        return dayjs(value).isValid()
-      },
-      { message: 'Must be a valid date' },
-    )
-    .refine(
-      value => {
-        if (!value) return true
-        return dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day')
-      },
-      { message: 'Acquisition date cannot be in the future' },
-    ),
-  description: z.string(),
-  conditionId: z.string(),
-  images: z.array(z.string()),
-  relatedBarometers: z.array(z.string()),
-})
-
-// Auto-generated TypeScript type from Zod schema
-type DocumentFormData = z.infer<typeof documentSchema>
+import {
+  type DocumentFormData,
+  DocumentFormTransformSchema,
+  DocumentFormValidationSchema,
+} from './document-form.schema'
 
 interface Props {
   conditions: ConditionsDTO
@@ -99,7 +37,7 @@ interface Props {
 
 export function DocumentForm({ conditions, allBarometers }: Props) {
   const methods = useForm<DocumentFormData>({
-    resolver: zodResolver(documentSchema),
+    resolver: zodResolver(DocumentFormValidationSchema),
     defaultValues: {
       title: '',
       catalogueNumber: '',
@@ -128,33 +66,8 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
   const submitForm = async (values: DocumentFormData) => {
     startTransition(async () => {
       try {
-        const { relatedBarometers, images, ...documentData } = values
-
-        const documentWithImages = {
-          ...documentData,
-          date: values.date ? dayjs.utc(values.date).toISOString() : null,
-          acquisitionDate: values.acquisitionDate
-            ? dayjs.utc(values.acquisitionDate).toISOString()
-            : null,
-          annotations: values.annotations
-            ? values.annotations.split('\n').filter(line => line.trim())
-            : [],
-          images: {
-            create: await Promise.all(
-              (images || []).map(async (url, i) => ({
-                url,
-                order: i,
-                name: values.title,
-                blurData: await getThumbnailBase64(imageStorage + url),
-              })),
-            ),
-          },
-          relatedBarometers: {
-            connect: relatedBarometers.map((id: string) => ({ id })),
-          },
-        }
-
-        const result = await createDocument(documentWithImages)
+        // Transform schema does ALL the heavy lifting - validation AND transformation!
+        const result = await createDocument(await DocumentFormTransformSchema.parseAsync(values))
         reset()
         toast.success(`Added document "${result.title}" to the database`)
       } catch (error) {

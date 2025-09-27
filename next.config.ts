@@ -7,11 +7,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 const nextConfig: NextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   productionBrowserSourceMaps: true,
-  experimental: {
-    reactCompiler: true,
-  },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

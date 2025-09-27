@@ -11,9 +11,9 @@ export default async function AddDocument() {
   const conditions = await getConditions()
   const allBarometers = await getAllBarometers()
   return (
-    <div className="mx-auto max-w-lg">
+    <article className="mx-auto max-w-lg">
       <h3 className="mt-6 mb-10">Add new document</h3>
       <DocumentForm conditions={conditions} allBarometers={allBarometers} />
-    </div>
+    </article>
   )
 }

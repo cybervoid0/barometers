@@ -2,6 +2,7 @@
 
 import type { Prisma } from '@prisma/client'
 import { revalidateTag } from 'next/cache'
+import { Tag } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBrandSlug, getIconBuffer } from '@/utils'
 
@@ -23,7 +24,7 @@ const createBrand = withPrisma(
         icon: iconBuffer,
       },
     })
-    revalidateTag('brands')
+    revalidateTag(Tag.brands)
     return { id, name }
   },
 )
@@ -50,7 +51,7 @@ const updateBrand = withPrisma(
       },
     })
 
-    revalidateTag('brands')
+    revalidateTag(Tag.brands)
     const name = (updateData.name as string) ?? oldBrand.name
     return { slug, name }
   },
@@ -63,7 +64,7 @@ const deleteBrand = withPrisma(async (prisma, slug: string) => {
       id: manufacturer.id,
     },
   })
-  revalidateTag('brands')
+  revalidateTag(Tag.brands)
 })
 
 export { createBrand, updateBrand, deleteBrand }
