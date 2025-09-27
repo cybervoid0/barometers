@@ -24,20 +24,6 @@ export const metadata: Metadata = {
   title: `${title} - Manufacturers`,
 }
 
-// Country flag emojis mapping
-const countryFlags: Record<string, string> = {
-  France: '🇫🇷',
-  'Great Britain': '🇬🇧',
-  Germany: '🇩🇪',
-  Belgium: '🇧🇪',
-  Netherlands: '🇳🇱',
-  Italy: '🇮🇹',
-  Switzerland: '🇨🇭',
-  Austria: '🇦🇹',
-  Australia: '🇦🇺',
-  'United States': '🇺🇸',
-}
-
 const BrandByCountry = ({
   country,
   countries,
@@ -56,7 +42,7 @@ const BrandByCountry = ({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{countryFlags[country.name] || '🏭'}</span>
+            <span className="text-2xl">{country.flag || '🏭'}</span>
             <div>
               <CardTitle className="text-lg">{country.name}</CardTitle>
               <CardDescription className="flex items-center gap-1">
@@ -183,7 +169,7 @@ export default async function Brands() {
                 {topCountries.map(country => (
                   <div key={country.id} className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-1">
-                      <span>{countryFlags[country.name] || '🏭'}</span>
+                      <span>{country.flag || '🏭'}</span>
                       {country.name}
                     </span>
                     <Badge variant="outline" className="text-xs">

@@ -10,10 +10,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:remote": "dotenv -e .env.local ./scripts/tunnel.sh next dev",
+    "dev:remote": "bun ./scripts/tunnel.ts next dev",
     "prisma": "dotenv -e .env.local prisma studio",
-    "prisma:remote": "dotenv -e .env.local ./scripts/tunnel.sh prisma studio",
-    "import-data": "./scripts/import-data.sh",
+    "prisma:remote": "bun ./scripts/tunnel.ts prisma studio",
+    "import-data": "bun ./scripts/import-data.ts",
     "build": "next build",
     "postinstall": "prisma generate",
     "analyze": "ANALYZE=true next build",
@@ -24,10 +24,10 @@
     "format": "biome format --write .",
     "jest": "jest",
     "jest:watch": "jest --watch",
-    "test": "npm run lint && npm run typecheck && npm run jest",
-    "dump": "dotenv -e .env.local ./scripts/tunnel.sh bun ./scripts/db-backup.ts",
+    "test": "bun run lint && bun run typecheck && bun run jest",
+    "dump": "bun ./scripts/tunnel.ts bun ./scripts/db-backup.ts",
     "prepare": "husky",
-    "migrate:remote": "dotenv -e .env.local ./scripts/tunnel.sh npx prisma migrate deploy"
+    "migrate:remote": "bun ./scripts/tunnel.ts npx prisma migrate deploy"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
