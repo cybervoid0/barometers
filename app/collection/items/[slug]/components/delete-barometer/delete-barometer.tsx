@@ -34,7 +34,8 @@ export function DeleteBarometer({ barometer, className }: Props) {
   const handleDelete = () => {
     startTransition(async () => {
       try {
-        await deleteBarometer(barometer.slug)
+        const result = await deleteBarometer(barometer.slug)
+        if (!result.success) throw new Error(result.error)
         toast.success('Barometer deleted successfully')
         setOpen(false)
         router.replace(FrontRoutes.Categories + barometer.category.name)

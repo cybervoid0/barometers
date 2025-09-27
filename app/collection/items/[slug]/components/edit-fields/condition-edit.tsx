@@ -65,12 +65,13 @@ export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
       }
       startTransition(async () => {
         try {
-          const { name } = await updateBarometer({
+          const result = await updateBarometer({
             id: barometer.id,
             conditionId: values.conditionId,
           })
+          if (!result.success) throw new Error(result.error)
           setOpen(false)
-          toast.success(`Updated condition in ${name}.`)
+          toast.success(`Updated condition in ${result.data.name}.`)
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Error updating barometer condition')
         }

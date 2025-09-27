@@ -82,13 +82,13 @@ export function PurchasedAtEdit({
           return setOpen(false)
         }
 
-        const { name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           purchasedAt: values.purchasedAt ? dayjs.utc(values.purchasedAt).toISOString() : null,
         })
-
+        if (!result.success) throw new Error(result.error)
         setOpen(false)
-        toast.success(`Updated purchase date in ${name}.`)
+        toast.success(`Updated purchase date in ${result.data.name}.`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }

@@ -58,12 +58,13 @@ export function CategoryEdit({ barometer, categories }: Props) {
       }
       startTransition(async () => {
         try {
-          const { name } = await updateBarometer({
+          const result = await updateBarometer({
             id: barometer.id,
             categoryId,
           })
+          if (!result.success) throw new Error(result.error)
           setOpen(false)
-          toast.success(`Changed category in ${name}.`)
+          toast.success(`Changed category in ${result.data.name}.`)
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Error updating barometer condition')
         }

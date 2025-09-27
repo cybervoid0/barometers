@@ -75,15 +75,15 @@ export function MaterialsEdit({ barometer, materials, className, ...props }: Mat
           return setOpen(false)
         }
 
-        const { name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           materials: {
             set: values.materials.map(id => ({ id })),
           },
         })
-
+        if (!result.success) throw new Error(result.error)
         setOpen(false)
-        toast.success(`Updated materials in ${name}.`)
+        toast.success(`Updated materials in ${result.data.name}.`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }

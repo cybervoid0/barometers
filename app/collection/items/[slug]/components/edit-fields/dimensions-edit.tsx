@@ -76,13 +76,14 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
             return setOpen(false)
           }
 
-          const { name } = await updateBarometer({
+          const result = await updateBarometer({
             id: barometer.id,
             dimensions: filteredDimensions,
           })
+          if (!result.success) throw new Error(result.error)
 
           setOpen(false)
-          toast.success(`Updated dimensions in ${name}.`)
+          toast.success(`Updated dimensions in ${result.data.name}.`)
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Error updating barometer')
         }

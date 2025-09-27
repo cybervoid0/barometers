@@ -150,7 +150,9 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
           },
         }
 
-        const { name } = await updateBarometer(updatedBarometer)
+        const result = await updateBarometer(updatedBarometer)
+        if (!result.success) throw new Error(result.error)
+        const { name } = result.data
         setOpen(false)
         toast.success(`Updated images in ${name}.`)
       } catch (error) {

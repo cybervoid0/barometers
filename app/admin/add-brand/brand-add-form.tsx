@@ -51,8 +51,9 @@ function BrandAddForm({ countries, brands }: Props) {
     (values: BrandFormData) => {
       startTransition(async () => {
         try {
-          const { name } = await createBrand(await brandTransformSchema.parseAsync(values))
-          toast.success(`Brand ${name} was created`)
+          const result = await createBrand(await brandTransformSchema.parseAsync(values))
+          if (!result.success) throw new Error(result.error)
+          toast.success(`Brand ${result.data.name} was created`)
           reset()
         } catch (error) {
           toast.error(

@@ -47,7 +47,7 @@ const BrandByCountry = ({
   country: BrandsByCountryDTO[number]
   countries: CountryListDTO
   allBrands: AllBrandsDTO
-  leading: boolean
+  leading?: number
 }) => {
   const manufacturerCount = country.manufacturers.length
 
@@ -65,12 +65,12 @@ const BrandByCountry = ({
               </CardDescription>
             </div>
           </div>
-          {leading && (
+          {typeof leading !== 'undefined' && (
             <Badge
               variant="secondary"
               className="text-xs text-primary-foreground hover:bg-secondary cursor-default"
             >
-              Leading Region
+              Leading Region {leading}
             </Badge>
           )}
         </div>
@@ -144,7 +144,7 @@ export default async function Brands() {
           <div>
             <h2 className="text-3xl text-secondary tracking-tight">Manufacturers</h2>
             <p className="text-lg text-muted-foreground">
-              Master craftsmen and renowned barometer makers
+              Master craftsmen and renowned barometer makers / retailers
             </p>
           </div>
         </div>
@@ -195,20 +195,13 @@ export default async function Brands() {
             </CardContent>
           </Card>
         </div>
-
-        <p className="text-muted-foreground leading-relaxed">
-          Discover the master craftsmen, renowned manufacturers and distinguished sellers behind
-          these exceptional barometers, each reflecting timeless artistry and precision. Here is a
-          curated list of barometer makers, along with detailed descriptions and iconic works by
-          each master from the collection, representing the finest traditions of craftsmanship.
-        </p>
       </header>
 
       {/* Manufacturers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {brandsByCountry.map((country, i) => (
           <BrandByCountry
-            leading={[0, 1, 2].includes(i)}
+            leading={[0, 1, 2].includes(i) ? i + 1 : undefined}
             allBrands={allBrands}
             key={country.id}
             country={country}

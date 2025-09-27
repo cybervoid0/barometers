@@ -61,11 +61,12 @@ export function DateEdit({ size = 18, barometer, className, ...props }: DateEdit
           toast.info(`Nothing was updated in ${barometer.name}.`)
           return setOpen(false)
         }
-        const { name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           date: dayjs(`${values.date}-01-01`).toISOString(),
         })
-        toast.success(`Updated year in ${name}.`)
+        if (!result.success) throw new Error(result.error)
+        toast.success(`Updated year in ${result.data.name}.`)
         setOpen(false)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error updating barometer')

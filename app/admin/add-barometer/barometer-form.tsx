@@ -90,9 +90,10 @@ export default function BarometerForm({
       try {
         // Transform schema does ALL the heavy lifting - validation AND transformation!
         const transformedData = await BarometerFormTransformSchema.parseAsync(values)
-        const { id } = await createBarometer(transformedData)
+        const result = await createBarometer(transformedData)
+        if (!result.success) throw new Error(result.error)
         reset()
-        toast.success(`Added ${id} to the database`)
+        toast.success(`Added ${result.data.id} to the database`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error adding barometer')
       }

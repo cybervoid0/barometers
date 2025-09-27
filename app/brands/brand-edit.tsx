@@ -128,13 +128,12 @@ export function BrandEdit({ brand, countries, brands }: Props) {
             },
           }
 
-          const { name } = await updateBrand(brandWithRelations)
-
+          const result = await updateBrand(brandWithRelations)
+          if (!result.success) throw new Error(result.error)
           // Remove images that were deleted from form
           const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
           if (extraImages.length > 0) deleteImages(extraImages)
-
-          toast.success(`Brand ${name} was updated`)
+          toast.success(`Brand ${result.data.name} was updated`)
           setIsSubmitSuccessful(true)
           closeBrandDialog()
         } catch (error) {

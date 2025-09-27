@@ -71,13 +71,13 @@ export function TextAreaEdit({
           return setOpen(false)
         }
 
-        const { name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           [property]: values.value,
         })
-
+        if (!result.success) throw new Error(result.error)
         setOpen(false)
-        toast.success(`Updated ${String(property).toLowerCase()} in ${name}.`)
+        toast.success(`Updated ${String(property).toLowerCase()} in ${result.data.name}.`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }

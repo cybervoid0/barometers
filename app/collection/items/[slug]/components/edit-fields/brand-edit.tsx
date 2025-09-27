@@ -74,10 +74,12 @@ function BrandEdit({ brands, barometer }: Props) {
       }
       startTransition(async () => {
         try {
-          const { name } = await updateBarometer({
+          const result = await updateBarometer({
             id: barometer.id,
             manufacturerId: values.brandId,
           })
+          if (!result.success) throw new Error(result.error)
+          const { name } = result.data
           setOpen(false)
           toast.success(`Updated brand in ${name}.`)
         } catch (error) {

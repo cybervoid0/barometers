@@ -78,13 +78,13 @@ export function MovementsEdit({
         // Don't update DB if selected value doesn't differ from the recorded
         if (subCategoryId === barometer.subCategoryId) return setOpen(false)
 
-        const { name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           subCategoryId,
         })
-
+        if (!result.success) throw new Error(result.error)
         setOpen(false)
-        toast.success(`Updated movement type in ${name}.`)
+        toast.success(`Updated movement type in ${result.data.name}.`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error updating barometer')
       }

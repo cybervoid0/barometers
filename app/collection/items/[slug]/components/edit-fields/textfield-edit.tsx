@@ -63,10 +63,12 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
     }
     startTransition(async () => {
       try {
-        const { slug, name } = await updateBarometer({
+        const result = await updateBarometer({
           id: barometer.id,
           [property]: values.value,
         })
+        if (!result.success) throw new Error(result.error)
+        const { slug, name } = result.data
         // reload the page if property was 'name' or 'slug' and the page URL has changed
         if (property === 'name' || property === 'slug') {
           router.replace(FrontRoutes.Barometer + slug)
