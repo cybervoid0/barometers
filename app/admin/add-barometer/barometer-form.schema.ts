@@ -3,6 +3,8 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
 import { imageStorage } from '@/constants/globals'
+import { saveTempImage } from '@/server/images/actions'
+import { ImageType } from '@/types'
 import { getThumbnailBase64, slug } from '@/utils'
 
 dayjs.extend(utc)
@@ -114,12 +116,17 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
       formData.images.length > 0
         ? {
             create: await Promise.all(
-              formData.images.map(async (url, i) => ({
-                url,
-                order: i,
-                name: formData.name,
-                blurData: await getThumbnailBase64(imageStorage + url),
-              })),
+              formData.images.map(async (url, i) => {
+                const newUrl = await saveTempImage(url, ImageType.Barometer, formData.collectionId)
+                return {
+                  url: newUrl,
+                  order: i,
+                  name: formData.name,
+                  // ! это будет долго качать уже загруженные фотки. изменить алгоритм
+                  // хорошо бы чтобы в форме были сами файлы чтобы не качать картинки
+                  blurData: await getThumbnailBase64(imageStorage + newUrl),
+                }
+              }),
             ),
           }
         : undefined,

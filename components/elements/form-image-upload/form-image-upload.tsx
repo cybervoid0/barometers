@@ -1,114 +1,164 @@
 'use client'
 
+import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { X } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useCallback, useEffect, useTransition } from 'react'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { imageStorage } from '@/constants/globals'
-import { createImageUrls, deleteImage } from '@/server/images/actions'
-import { uploadFileToCloud } from '@/server/images/upload'
+import { deleteImage } from '@/server/images/actions'
+import { storeImages } from '@/server/images/upload'
+import { customImageLoader } from '@/utils'
 import { DragImages } from './drag-images'
 
-interface FormImageUploadProps {
-  name: string
-  label?: string
-  maxImages?: number
+function SortableImage({
+  fileName,
+  index,
+  handleDelete,
+}: {
+  fileName: string
+  index: number
+  handleDelete: (index: number) => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: fileName,
+  })
+
+  return (
+    <div
+      className="relative w-[100px] h-[100px]"
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      {...attributes}
+    >
+      <div className="aspect-square relative" {...listeners}>
+        <Image
+          unoptimized
+          alt={`Upload ${index + 1}`}
+          src={customImageLoader({ src: fileName, width: 100, quality: 90 })}
+          fill
+          className="object-cover rounded-lg absolute"
+        />
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="absolute -top-1 -right-1 h-6 w-6 p-0 rounded-full"
+        onClick={() => handleDelete(index)}
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
+  )
 }
 
-export function FormImageUpload({ name, label = 'Images', maxImages = 10 }: FormImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false)
-  const { control, watch, setValue, clearErrors } = useFormContext()
+interface FormImageUploadProps {
+  existingImages?: string[] // For edit mode - existing images from database
+  isDialogOpen?: boolean // For dialog mode - reset to existing images on open
+}
+const imagesField = 'images'
+const maxImages = 20
+export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps) {
+  const [pending, startTransition] = useTransition()
+  const { control, watch, clearErrors, setValue } = useFormContext()
+  const { append, remove } = useFieldArray({ control, name: imagesField })
 
-  const fileNames: string[] = watch(name) || []
+  const fileNames: string[] = watch(imagesField) || []
+
+  useEffect(() => {
+    if (!isDialogOpen) return
+    setValue(imagesField, existingImages)
+  }, [isDialogOpen, setValue, existingImages])
 
   const uploadImages = async (files: FileList | null) => {
     if (!files || files.length === 0) return
 
-    const filesArray = Array.from(files)
-    setIsUploading(true)
-
-    try {
-      const urlsDto = await createImageUrls(
-        filesArray.map(file => ({
-          fileName: file.name,
-          contentType: file.type,
-        })),
-      )
-
-      await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, filesArray[index])),
-      )
-
-      const newFileNames = [...fileNames, ...urlsDto.urls.map(urlObj => urlObj.public)]
-      setValue(name, newFileNames)
-      clearErrors(name)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error uploading files')
-    } finally {
-      setIsUploading(false)
-    }
+    startTransition(async () => {
+      try {
+        // upload files to Minio
+        append(await storeImages(Array.from(files)))
+        clearErrors(imagesField)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Error uploading files')
+      }
+    })
   }
 
   const handleDeleteFile = async (index: number) => {
-    const fileName = fileNames.at(index)
-    if (!fileName) return
-
     try {
-      await deleteImage(fileName)
-      const updatedFileNames = fileNames.filter((_, i) => i !== index)
-      setValue(name, updatedFileNames)
-      if (updatedFileNames.length > 0) {
-        clearErrors(name)
+      const fileName = fileNames.at(index)
+      if (!fileName) throw new Error('File does not exist')
+
+      // Only delete from storage if it's a new temporary image (not existing)
+      if (!existingImages.includes(fileName)) {
+        await deleteImage(fileName)
       }
+
+      remove(index)
+      clearErrors(imagesField)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error deleting file')
     }
   }
 
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over) return
+      if (active.id !== over.id) {
+        const oldIndex = fileNames.indexOf(String(active.id))
+        const newIndex = fileNames.indexOf(String(over.id))
+        const newOrder = arrayMove(fileNames, oldIndex, newIndex)
+        setValue(imagesField, newOrder, { shouldDirty: true })
+      }
+    },
+    [fileNames, setValue],
+  )
+
   return (
     <FormField
       control={control}
-      name={name}
+      name={imagesField}
       render={() => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>Images</FormLabel>
           <FormControl>
             <div className="space-y-4">
               <DragImages
                 onFileSelect={uploadImages}
-                disabled={isUploading}
+                disabled={pending}
                 currentCount={fileNames.length}
                 maxImages={maxImages}
               />
 
               {fileNames.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {fileNames.map((fileName, i) => (
-                    <div key={fileName} className="relative">
-                      <div className="aspect-square">
-                        <Image
-                          unoptimized
-                          alt={`Upload ${i + 1}`}
-                          src={imageStorage + fileName}
-                          fill
-                          className="object-cover rounded-lg"
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={fileNames} strategy={horizontalListSortingStrategy}>
+                    <div className="flex gap-4 flex-wrap">
+                      {fileNames.map((fileName, i) => (
+                        <SortableImage
+                          key={fileName}
+                          fileName={fileName}
+                          index={i}
+                          handleDelete={handleDeleteFile}
                         />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="absolute -top-1 -right-1 h-6 w-6 p-0 rounded-full"
-                        onClick={() => handleDeleteFile(i)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </div>
           </FormControl>

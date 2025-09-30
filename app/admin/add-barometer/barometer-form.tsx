@@ -93,7 +93,7 @@ export default function BarometerForm({
         const result = await createBarometer(transformedData)
         if (!result.success) throw new Error(result.error)
         reset()
-        toast.success(`Added ${result.data.id} to the database`)
+        toast.success(`Added barometer ${transformedData.name} to the database`)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error adding barometer')
       }
@@ -411,7 +411,7 @@ export default function BarometerForm({
           )}
         />
 
-        <FormImageUpload name="images" />
+        <FormImageUpload />
 
         <Dimensions />
 

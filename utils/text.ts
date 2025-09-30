@@ -1,7 +1,9 @@
 import slugify from 'slugify'
 
 export function slug(text: string): string {
-  return encodeURIComponent(slugify(text, { lower: true, replacement: '_', remove: /[,.'"]/g }))
+  return encodeURIComponent(
+    slugify(text, { trim: true, lower: true, replacement: '_', remove: /[,.'"]/g }),
+  )
 }
 
 export const getBrandSlug = (lastName: string, firstName?: string | undefined | null) =>

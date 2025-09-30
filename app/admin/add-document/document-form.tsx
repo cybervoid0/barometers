@@ -342,7 +342,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
           )}
         />
 
-        <FormImageUpload name="images" />
+        <FormImageUpload />
 
         <FormField
           control={methods.control}

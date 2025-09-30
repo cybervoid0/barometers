@@ -1,20 +1,12 @@
 'use client'
 
-import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-  useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isEqual } from 'lodash'
-import { Edit, ImagePlus, Loader2, X } from 'lucide-react'
-import { type ComponentProps, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { Edit } from 'lucide-react'
+import { type ComponentProps, useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { FormImageUpload } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -23,221 +15,96 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   FormProvider,
+  LoadingOverlay,
 } from '@/components/ui'
 import { imageStorage } from '@/constants/globals'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { createImageUrls, deleteImage, deleteImages } from '@/server/images/actions'
-import { uploadFileToCloud } from '@/server/images/upload'
-import { cn, customImageLoader, getThumbnailBase64 } from '@/utils'
+import { deleteImages, saveTempImage } from '@/server/images/actions'
+import { ImageType } from '@/types'
+import { cn, getThumbnailBase64 } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
   barometer: NonNullable<BarometerDTO>
 }
 
-const validationSchema = z.object({
+const ImagesEditSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  collectionId: z.string(),
   images: z.array(z.string()),
 })
+type ImagesForm = z.output<typeof ImagesEditSchema>
 
-type ImagesForm = z.output<typeof validationSchema>
+const TransformSchema = ImagesEditSchema.transform(
+  async ({ images, ...values }): Promise<Parameters<typeof updateBarometer>[0]> => {
+    return {
+      id: values.id,
+      images: {
+        deleteMany: {},
+        create: await Promise.all(
+          images.map(async (url, i) => {
+            const imageUrl = url.startsWith('temp/')
+              ? await saveTempImage(url, ImageType.Barometer, values.collectionId)
+              : url
+            const blurData = await getThumbnailBase64(imageStorage + imageUrl)
+            return {
+              url: imageUrl,
+              order: i,
+              name: values.name,
+              blurData,
+            }
+          }),
+        ),
+      },
+    }
+  },
+)
 
-function SortableImage({
-  image,
-  handleDelete,
-}: {
-  image: string
-  handleDelete: (image: string) => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: image,
-  })
-
-  return (
-    <div
-      ref={setNodeRef}
-      className="relative"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
-      {...attributes}
-    >
-      <button
-        type="button"
-        className="text-muted-foreground absolute top-1 right-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm"
-        aria-label="Remove image"
-        onClick={() => handleDelete(image)}
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
-      <div {...listeners} className="cursor-move">
-        {/* biome-ignore lint/performance/noImgElement: uses custom image loader for optimization */}
-        <img
-          src={customImageLoader({ src: image, quality: 85, width: 100 })}
-          alt="Barometer"
-          className="min-h-[100px] w-[100px] rounded border object-contain"
-        />
-      </div>
-    </div>
-  )
-}
 export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
-  const barometerImages = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
+  const images = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<ImagesForm>({
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(ImagesEditSchema),
   })
+  const { reset, handleSubmit } = form
 
-  // reset form on open and when barometer images change
   useEffect(() => {
     if (!open) return
-    form.reset({ images: barometerImages })
-  }, [open, barometerImages, form])
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over) return
-    if (active.id !== over.id) {
-      const currentImages = form.getValues('images')
-      const oldIndex = currentImages.indexOf(String(active.id))
-      const newIndex = currentImages.indexOf(String(over.id))
-      const newOrder = arrayMove(currentImages, oldIndex, newIndex)
-      form.setValue('images', newOrder)
-    }
-  }
+    reset({
+      id: barometer.id,
+      collectionId: barometer.collectionId,
+      images,
+      name: barometer.name,
+    })
+  }, [barometer, reset, open, images])
 
   const update = (values: ImagesForm) => {
     startTransition(async () => {
       // exit if no image was changed
-      if (isEqual(values.images, barometerImages)) {
+      if (!form.formState.isDirty) {
         toast.info(`Nothing was updated in ${barometer.name}.`)
         return setOpen(false)
       }
-      setIsUploading(true)
       try {
-        // erase deleted images
-        const extraFiles = barometerImages?.filter(img => !values.images.includes(img))
-        if (extraFiles) await deleteImages(extraFiles)
-
-        const imageData = await Promise.all(
-          values.images.map(async (url, i) => {
-            const blurData = await getThumbnailBase64(imageStorage + url)
-            return {
-              url,
-              order: i,
-              name: barometer.name,
-              blurData,
-            }
-          }),
-        )
-
-        const updatedBarometer = {
-          id: barometer.id,
-          images: {
-            deleteMany: {},
-            create: imageData,
-          },
-        }
-
-        const result = await updateBarometer(updatedBarometer)
+        const result = await updateBarometer(await TransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
         const { name } = result.data
+        // erase deleted images
+        const extraFiles = images?.filter(img => !values.images.includes(img))
+        if (extraFiles) await deleteImages(extraFiles)
         setOpen(false)
         toast.success(`Updated images in ${name}.`)
       } catch (error) {
         console.error(error)
         toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
-      } finally {
-        setIsUploading(false)
       }
     })
   }
-
-  /**
-   * Upload images to storage
-   */
-  const uploadImages = async (files: File[]) => {
-    if (!files || !Array.isArray(files) || files.length === 0) return
-    setIsUploading(true)
-    try {
-      const urlsDto = await createImageUrls(
-        files.map(file => ({
-          fileName: file.name,
-          contentType: file.type,
-        })),
-      )
-      await Promise.all(
-        urlsDto.urls.map((urlObj, index) => uploadFileToCloud(urlObj.signed, files[index])),
-      )
-
-      const newImages = urlsDto.urls.map(url => url.public).filter(url => Boolean(url))
-      const currentImages = form.getValues('images')
-      form.setValue('images', [...currentImages, ...newImages])
-    } catch (error) {
-      const defaultErrMsg = 'Error uploading files'
-      toast.error(error instanceof Error ? error.message : defaultErrMsg)
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
-  const handleDeleteFile = async (img: string) => {
-    setIsUploading(true)
-    try {
-      // if the image file was uploaded but not yet added to the barometer
-      if (!barometerImages?.includes(img)) await deleteImage(img)
-      const currentImages = form.getValues('images')
-      form.setValue(
-        'images',
-        currentImages.filter(file => !file.includes(img)),
-      )
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error deleting file')
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target
-    if (files) {
-      uploadImages(Array.from(files))
-    }
-  }
-
-  // reset form on open and cleanup on close
-  // biome-ignore lint/correctness/useExhaustiveDependencies: form not gonna change
-  useEffect(() => {
-    if (open) {
-      form.reset()
-    } else {
-      // delete unused files from storage when closing
-      const cleanup = async () => {
-        try {
-          setIsUploading(true)
-          const currentImages = form.getValues('images')
-          const extraImages = currentImages.filter(img => !barometerImages?.includes(img))
-          await Promise.all(extraImages.map(deleteImage))
-        } catch (_error) {
-          // do nothing
-        } finally {
-          setIsUploading(false)
-        }
-      }
-      cleanup()
-    }
-  }, [open, barometerImages])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -251,15 +118,11 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
           <Edit className="text-destructive" size={Number(size) || 18} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className={cn('sm:max-w-4xl', { 'overflow-hidden': isPending })}>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(update)} noValidate>
+          <form onSubmit={handleSubmit(update)} noValidate>
             <div className="relative">
-              {isUploading && (
-                <div className="bg-background/80 absolute inset-0 z-50 flex items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              )}
+              {isPending && <LoadingOverlay />}
               <DialogHeader>
                 <DialogTitle>Edit Images</DialogTitle>
                 <DialogDescription>
@@ -267,63 +130,10 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-4">
-                <div className="space-y-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-fit"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading || isPending}
-                  >
-                    <ImagePlus className="mr-2 h-4 w-4" />
-                    Add Images
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileSelect}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="images"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Images</FormLabel>
-                        <FormControl>
-                          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                            <SortableContext
-                              items={field.value}
-                              strategy={horizontalListSortingStrategy}
-                            >
-                              <div className="flex flex-wrap gap-4">
-                                {field.value.map(img => (
-                                  <SortableImage
-                                    key={img}
-                                    image={img}
-                                    handleDelete={handleDeleteFile}
-                                  />
-                                ))}
-                              </div>
-                            </SortableContext>
-                          </DndContext>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormImageUpload existingImages={images} isDialogOpen={open} />
               </div>
               <div className="mt-6">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="w-full"
-                  disabled={isUploading || isPending}
-                >
+                <Button type="submit" variant="outline" className="w-full" disabled={isPending}>
                   Save
                 </Button>
               </div>

@@ -1,11 +1,8 @@
 'use server'
 
 import path from 'node:path'
-import { v4 as uuid } from 'uuid'
 import { minioBucket, minioClient } from '@/services/minio'
-
-type FileProps = { fileName: string; contentType: string }
-type UrlProps = { signed: string; public: string }
+import type { ImageType } from '@/types'
 
 async function deleteImages(fileNames?: string[]) {
   if (!Array.isArray(fileNames) || fileNames.length === 0) return
@@ -21,20 +18,22 @@ async function deleteImage(fileName: string) {
   }
 }
 
-async function createImageUrls(files: FileProps[]) {
-  const urls = await Promise.all(
-    files.map<Promise<UrlProps>>(async ({ fileName }) => {
-      // give unique names to files
-      const extension = path.extname(fileName).toLowerCase()
-      const newFileName = `gallery/${uuid()}${extension}`
-      const signedUrl = await minioClient.presignedPutObject(minioBucket, newFileName)
-      return {
-        signed: signedUrl,
-        public: newFileName,
-      }
-    }),
-  )
-  return { urls }
+function generateImageName(tempUrl: string, type: ImageType, idSuffix: string): string {
+  const extension = path.extname(tempUrl)
+  const random = crypto.randomUUID().slice(0, 8)
+  return `gallery/${type}-${idSuffix}__${random}${extension}`
 }
 
-export { deleteImages, deleteImage, createImageUrls }
+function createTempImage(fileName: string) {
+  const tempImageName = `temp/${crypto.randomUUID()}${path.extname(fileName)}`
+  return minioClient.presignedPutObject(minioBucket, tempImageName)
+}
+
+async function saveTempImage(tempUrl: string, type: ImageType, idSuffix: string) {
+  const permanentName = generateImageName(tempUrl, type, idSuffix)
+  await minioClient.copyObject(minioBucket, permanentName, `/${minioBucket}/${tempUrl}`)
+  await minioClient.removeObject(minioBucket, tempUrl)
+  return permanentName
+}
+
+export { deleteImages, deleteImage, createTempImage, saveTempImage }

@@ -129,6 +129,7 @@ export {
   SheetTitle,
   SheetTrigger,
 } from './sheet'
+export { LoadingOverlay, Spinner } from './spinner'
 export {
   Table,
   TableBody,

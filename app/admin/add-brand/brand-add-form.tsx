@@ -203,7 +203,7 @@ function BrandAddForm({ countries, brands }: Props) {
           )}
         />
 
-        <FormImageUpload name="images" />
+        <FormImageUpload />
 
         <div>
           <FormLabel>Icon</FormLabel>

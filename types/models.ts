@@ -40,3 +40,10 @@ export interface CookieTable extends Record<string, string> {
   description: string
   expiration: string
 }
+
+export enum ImageType {
+  Barometer = 'b',
+  Brand = 'm',
+  Category = 'c',
+  Document = 'd',
+}

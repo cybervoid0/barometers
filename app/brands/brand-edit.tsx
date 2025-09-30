@@ -2,10 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit, Trash2, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { IconUpload, RequiredFieldMark } from '@/components/elements'
+import { FormImageUpload, IconUpload, RequiredFieldMark } from '@/components/elements'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,14 +43,11 @@ import {
   PopoverTrigger,
   Textarea,
 } from '@/components/ui'
-import { imageStorage } from '@/constants'
 import { deleteBrand, updateBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/server/brands/queries'
 import type { CountryListDTO } from '@/server/counties/queries'
-import { deleteImages } from '@/server/images/actions'
-import { generateIcon, getThumbnailBase64 } from '@/utils'
-import { type BrandEditForm, brandEditSchema } from './brand-edit-schema'
-import { BrandImageEdit } from './brand-image-edit'
+import { generateIcon } from '@/utils'
+import { type BrandEditForm, BrandEditSchema, BrandEditTransformSchema } from './brand-edit-schema'
 
 interface Props {
   brand: BrandDTO
@@ -59,16 +56,13 @@ interface Props {
 }
 
 export function BrandEdit({ brand, countries, brands }: Props) {
+  const [loading, setLoading] = useState(false)
   const [openBrandDialog, setOpenBrandDialog] = useState(false)
-  const closeBrandDialog = useCallback(() => setOpenBrandDialog(false), [])
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-  const closeDeleteDialog = useCallback(() => setOpenDeleteDialog(false), [])
-  const [isPending, startTransition] = useTransition()
   const brandImages = useMemo(() => brand.images.map(img => img.url), [brand.images])
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
   const form = useForm<BrandEditForm>({
-    resolver: zodResolver(brandEditSchema),
+    resolver: zodResolver(BrandEditSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
@@ -93,88 +87,44 @@ export function BrandEdit({ brand, countries, brands }: Props) {
   )
 
   const onUpdate = useCallback(
-    ({ images, countries, successors, ...values }: BrandEditForm) => {
-      startTransition(async () => {
-        try {
-          if (!form.formState.isDirty) {
-            toast.info(`${values.name} was not updated`)
-            closeBrandDialog()
-            return
-          }
-
-          const imageData = await Promise.all(
-            images.map(async (url, i) => {
-              const blurData = await getThumbnailBase64(imageStorage + url)
-              return {
-                url,
-                order: i,
-                name: values.name,
-                blurData,
-              }
-            }),
-          )
-
-          const brandWithRelations = {
-            ...values,
-            successors: {
-              set: successors.map(id => ({ id })),
-            },
-            countries: {
-              set: countries.map(id => ({ id })),
-            },
-            images: {
-              deleteMany: {},
-              create: imageData,
-            },
-          }
-
-          const result = await updateBrand(brandWithRelations)
-          if (!result.success) throw new Error(result.error)
-          // Remove images that were deleted from form
-          const extraImages = brandImages.filter(brandImage => !images.includes(brandImage))
-          if (extraImages.length > 0) deleteImages(extraImages)
-          toast.success(`Brand ${result.data.name} was updated`)
-          setIsSubmitSuccessful(true)
-          closeBrandDialog()
-        } catch (error) {
-          toast.error(
-            error instanceof Error ? error.message : `Error updating brand ${values.name}.`,
-          )
+    async (values: BrandEditForm) => {
+      setLoading(true)
+      try {
+        if (!form.formState.isDirty) {
+          toast.info(`${values.name} was not updated`)
+          setOpenBrandDialog(false)
+          return
         }
-      })
+        const result = await updateBrand(await BrandEditTransformSchema.parseAsync(values))
+        if (!result.success) throw new Error(result.error)
+        toast.success(`Brand ${result.data.name} was updated`)
+        setLoading(false)
+        // prevents dialog blinking
+        setTimeout(() => setOpenBrandDialog(false), 100)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : `Error updating brand ${values.name}.`)
+        setLoading(false)
+      }
     },
-    [brandImages, closeBrandDialog, form.formState.isDirty],
+    [form.formState.isDirty],
   )
 
-  const onDelete = useCallback(() => {
-    startTransition(async () => {
-      try {
-        await deleteBrand(brand.slug)
-        toast.success(`Brand ${brand.name} was deleted`)
-        closeDeleteDialog()
-        closeBrandDialog()
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : `Error deleting brand ${brand.name}.`)
-      }
-    })
-  }, [brand, closeBrandDialog, closeDeleteDialog])
-
-  const cleanUpOnClose = useCallback(() => {
-    if (isSubmitSuccessful) return
-    startTransition(async () => {
-      try {
-        // Clean up temporary uploaded images on dialog close
-        const uploadedImages = form.getValues('images')
-        const extraImages = uploadedImages.filter(img => !brandImages?.includes(img))
-        await deleteImages(extraImages)
-      } catch (_error) {}
-    })
-  }, [brandImages, form.getValues, isSubmitSuccessful])
+  const onDelete = useCallback(async () => {
+    try {
+      setLoading(true)
+      await deleteBrand(brand.slug)
+      toast.success(`Brand ${brand.name} was deleted`)
+      setOpenDeleteDialog(false)
+      setOpenBrandDialog(false)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : `Error deleting brand ${brand.name}.`)
+    } finally {
+      setLoading(false)
+    }
+  }, [brand])
 
   // Update form values when selected manufacturer changes
   useEffect(() => {
-    if (!openBrandDialog) return cleanUpOnClose()
-    setIsSubmitSuccessful(false)
     form.reset({
       id: brand.id,
       name: brand.name,
@@ -182,12 +132,12 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       city: brand.city ?? '',
       url: brand.url ?? '',
       description: brand.description ?? '',
-      images: brandImages,
+      images: brand.images.map(({ url }) => url),
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
       icon: brand.icon,
     })
-  }, [openBrandDialog, brand, brandImages, form.reset, cleanUpOnClose])
+  }, [brand, form.reset])
 
   return (
     <Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>
@@ -196,172 +146,174 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           <Edit className="text-destructive" size={18} />
         </Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <div className="flex items-center gap-4">
-            <DialogTitle>Edit {brand.name}</DialogTitle>
-            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  aria-label="Delete manufacturer"
-                  className="w-6 h-6"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Brand</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete "{brand.name}"? This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={onDelete}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+      <div>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex items-center gap-4">
+              <DialogTitle>Edit {brand.name}</DialogTitle>
+              <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    aria-label="Delete manufacturer"
+                    className="w-6 h-6"
                   >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-          <DialogDescription>Update manufacturer details.</DialogDescription>
-        </DialogHeader>
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Last name <RequiredFieldMark />
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="countries"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Countries <RequiredFieldMark />
-                  </FormLabel>
-                  <FormControl>
-                    <CountriesMultiSelect
-                      selected={(field.value as number[]) ?? []}
-                      options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
-                      onChange={vals => field.onChange(vals)}
-                      placeholder={
-                        ((field.value as number[]) ?? []).length === 0
-                          ? 'Select countries'
-                          : undefined
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>External URL</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="successors"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Successors</FormLabel>
-                  <FormControl>
-                    <SuccessorsMultiSelect
-                      selected={(field.value as string[]) ?? []}
-                      options={brands.map(({ id, name }) => ({ id, name }))}
-                      onChange={vals => field.onChange(vals)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div>
-              <FormLabel>Icon</FormLabel>
-              <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete "{brand.name}"? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={onDelete}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
+            <DialogDescription>Update manufacturer details.</DialogDescription>
+          </DialogHeader>
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <BrandImageEdit imageUrls={brandImages} form={form} startTransition={startTransition} />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Last name <RequiredFieldMark />
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea autoResize {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <DialogFooter className="mt-6">
-              <Button disabled={isPending} type="submit" variant="outline" className="w-full">
-                Update
-              </Button>
-            </DialogFooter>
-          </form>
-        </FormProvider>
-      </DialogContent>
+              <FormField
+                control={form.control}
+                name="countries"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Countries <RequiredFieldMark />
+                    </FormLabel>
+                    <FormControl>
+                      <CountriesMultiSelect
+                        selected={(field.value as number[]) ?? []}
+                        options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
+                        onChange={vals => field.onChange(vals)}
+                        placeholder={
+                          ((field.value as number[]) ?? []).length === 0
+                            ? 'Select countries'
+                            : undefined
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>External URL</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="successors"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Successors</FormLabel>
+                    <FormControl>
+                      <SuccessorsMultiSelect
+                        selected={(field.value as string[]) ?? []}
+                        options={brands.map(({ id, name }) => ({ id, name }))}
+                        onChange={vals => field.onChange(vals)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div>
+                <FormLabel>Icon</FormLabel>
+                <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
+              </div>
+
+              <FormImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea autoResize {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter className="mt-6">
+                <Button disabled={loading} type="submit" variant="outline" className="w-full">
+                  Update
+                </Button>
+              </DialogFooter>
+            </form>
+          </FormProvider>
+        </DialogContent>
+      </div>
     </Dialog>
   )
 }
