@@ -5,7 +5,7 @@ import { Edit, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormImageUpload, IconUpload, RequiredFieldMark } from '@/components/elements'
+import { IconUpload, ImageUpload, RequiredFieldMark } from '@/components/elements'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +46,7 @@ import {
 import { deleteBrand, updateBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/server/brands/queries'
 import type { CountryListDTO } from '@/server/counties/queries'
+import { deleteImages } from '@/server/images/actions'
 import { generateIcon } from '@/utils'
 import { type BrandEditForm, BrandEditSchema, BrandEditTransformSchema } from './brand-edit-schema'
 
@@ -95,6 +96,12 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           setOpenBrandDialog(false)
           return
         }
+        // delete images from cloud
+        const deletedImages = brandImages.filter(img => !values.images.includes(img))
+        if (deletedImages.length > 0) {
+          await deleteImages(deletedImages)
+        }
+        // update images in DB
         const result = await updateBrand(await BrandEditTransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
         toast.success(`Brand ${result.data.name} was updated`)
@@ -106,7 +113,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
         setLoading(false)
       }
     },
-    [form.formState.isDirty],
+    [form.formState.isDirty, brandImages],
   )
 
   const onDelete = useCallback(async () => {
@@ -289,7 +296,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
                 <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
               </div>
 
-              <FormImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
+              <ImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
 
               <FormField
                 control={form.control}

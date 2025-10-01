@@ -12,6 +12,9 @@ interface DragImagesProps {
   children?: React.ReactNode
 }
 
+/**
+ * Drag & drop area for uploading image files
+ */
 export function DragImages({
   onFileSelect,
   disabled = false,

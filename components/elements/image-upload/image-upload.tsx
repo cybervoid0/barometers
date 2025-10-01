@@ -1,69 +1,16 @@
 'use client'
 
 import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-  useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { X } from 'lucide-react'
-import Image from 'next/image'
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useTransition } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
+import { LoadingOverlay } from '@/components/ui'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { deleteImage } from '@/server/images/actions'
+import { deleteImage, deleteImages } from '@/server/images/actions'
 import { storeImages } from '@/server/images/upload'
-import { customImageLoader } from '@/utils'
 import { DragImages } from './drag-images'
-
-function SortableImage({
-  fileName,
-  index,
-  handleDelete,
-}: {
-  fileName: string
-  index: number
-  handleDelete: (index: number) => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: fileName,
-  })
-
-  return (
-    <div
-      className="relative w-[100px] h-[100px]"
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
-      {...attributes}
-    >
-      <div className="aspect-square relative" {...listeners}>
-        <Image
-          unoptimized
-          alt={`Upload ${index + 1}`}
-          src={customImageLoader({ src: fileName, width: 100, quality: 90 })}
-          fill
-          className="object-cover rounded-lg absolute"
-        />
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="absolute -top-1 -right-1 h-6 w-6 p-0 rounded-full"
-        onClick={() => handleDelete(index)}
-      >
-        <X className="h-3 w-3" />
-      </Button>
-    </div>
-  )
-}
+import { SortableImage } from './sortable-image'
 
 interface FormImageUploadProps {
   existingImages?: string[] // For edit mode - existing images from database
@@ -71,24 +18,38 @@ interface FormImageUploadProps {
 }
 const imagesField = 'images'
 const maxImages = 20
-export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps) {
+/**
+ * Universal image upload component with drag & drop, reordering, and edit mode support
+ */
+function ImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps) {
   const [pending, startTransition] = useTransition()
-  const { control, watch, clearErrors, setValue } = useFormContext()
+  const { control, watch, clearErrors, setValue, getValues } = useFormContext()
   const { append, remove } = useFieldArray({ control, name: imagesField })
 
-  const fileNames: string[] = watch(imagesField) || []
+  const formImages: string[] = watch(imagesField) || []
 
+  // update form on dialog open if the component is inside a dialog
   useEffect(() => {
     if (!isDialogOpen) return
     setValue(imagesField, existingImages)
   }, [isDialogOpen, setValue, existingImages])
 
+  // cleanup temporary files on component unmount
+  // biome-ignore lint/correctness/useExhaustiveDependencies: cleanup only on unmount
+  useEffect(() => {
+    return () => {
+      // Get current form state at cleanup time
+      const currentImages: string[] = getValues(imagesField)
+      // Only delete temporary images (not existing ones)
+      const tempImages = currentImages.filter(img => img.startsWith('temp/'))
+      if (tempImages.length > 0) deleteImages(tempImages).catch(console.error)
+    }
+  }, []) // Empty deps = cleanup only on unmount
+
   const uploadImages = async (files: FileList | null) => {
     if (!files || files.length === 0) return
-
     startTransition(async () => {
       try {
-        // upload files to Minio
         append(await storeImages(Array.from(files)))
         clearErrors(imagesField)
       } catch (error) {
@@ -99,7 +60,7 @@ export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImage
 
   const handleDeleteFile = async (index: number) => {
     try {
-      const fileName = fileNames.at(index)
+      const fileName = formImages.at(index)
       if (!fileName) throw new Error('File does not exist')
 
       // Only delete from storage if it's a new temporary image (not existing)
@@ -119,13 +80,13 @@ export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImage
       const { active, over } = event
       if (!over) return
       if (active.id !== over.id) {
-        const oldIndex = fileNames.indexOf(String(active.id))
-        const newIndex = fileNames.indexOf(String(over.id))
-        const newOrder = arrayMove(fileNames, oldIndex, newIndex)
+        const oldIndex = formImages.indexOf(String(active.id))
+        const newIndex = formImages.indexOf(String(over.id))
+        const newOrder = arrayMove(formImages, oldIndex, newIndex)
         setValue(imagesField, newOrder, { shouldDirty: true })
       }
     },
-    [fileNames, setValue],
+    [formImages, setValue],
   )
 
   return (
@@ -133,22 +94,23 @@ export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImage
       control={control}
       name={imagesField}
       render={() => (
-        <FormItem>
+        <FormItem className="relative">
+          {pending && <LoadingOverlay />}
           <FormLabel>Images</FormLabel>
           <FormControl>
             <div className="space-y-4">
               <DragImages
                 onFileSelect={uploadImages}
                 disabled={pending}
-                currentCount={fileNames.length}
+                currentCount={formImages.length}
                 maxImages={maxImages}
               />
 
-              {fileNames.length > 0 && (
+              {formImages.length > 0 && (
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={fileNames} strategy={horizontalListSortingStrategy}>
+                  <SortableContext items={formImages} strategy={horizontalListSortingStrategy}>
                     <div className="flex gap-4 flex-wrap">
-                      {fileNames.map((fileName, i) => (
+                      {formImages.map((fileName, i) => (
                         <SortableImage
                           key={fileName}
                           fileName={fileName}
@@ -168,3 +130,4 @@ export function FormImageUpload({ existingImages = [], isDialogOpen }: FormImage
     />
   )
 }
+export { ImageUpload }

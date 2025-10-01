@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { ImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
   Command,
@@ -411,7 +411,7 @@ export default function BarometerForm({
           )}
         />
 
-        <FormImageUpload />
+        <ImageUpload />
 
         <Dimensions />
 

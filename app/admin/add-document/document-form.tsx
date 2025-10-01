@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { ImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
   FormControl,
@@ -342,7 +342,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
           )}
         />
 
-        <FormImageUpload />
+        <ImageUpload />
 
         <FormField
           control={methods.control}

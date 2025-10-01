@@ -6,7 +6,7 @@ import { type ComponentProps, useEffect, useMemo, useState, useTransition } from
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { FormImageUpload } from '@/components/elements'
+import { ImageUpload } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -64,7 +64,7 @@ const TransformSchema = ImagesEditSchema.transform(
 )
 
 export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
-  const images = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
+  const savedImages = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -78,10 +78,10 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
     reset({
       id: barometer.id,
       collectionId: barometer.collectionId,
-      images,
+      images: savedImages,
       name: barometer.name,
     })
-  }, [barometer, reset, open, images])
+  }, [barometer, reset, open, savedImages])
 
   const update = (values: ImagesForm) => {
     startTransition(async () => {
@@ -91,14 +91,13 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         return setOpen(false)
       }
       try {
+        const deletedImages = savedImages.filter(img => !values.images.includes(img))
+        if (deletedImages.length > 0) await deleteImages(deletedImages)
+
         const result = await updateBarometer(await TransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
-        const { name } = result.data
-        // erase deleted images
-        const extraFiles = images?.filter(img => !values.images.includes(img))
-        if (extraFiles) await deleteImages(extraFiles)
         setOpen(false)
-        toast.success(`Updated images in ${name}.`)
+        toast.success(`Updated images in ${result.data.name}.`)
       } catch (error) {
         console.error(error)
         toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
@@ -130,7 +129,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-4">
-                <FormImageUpload existingImages={images} isDialogOpen={open} />
+                <ImageUpload existingImages={savedImages} isDialogOpen={open} />
               </div>
               <div className="mt-6">
                 <Button type="submit" variant="outline" className="w-full" disabled={isPending}>

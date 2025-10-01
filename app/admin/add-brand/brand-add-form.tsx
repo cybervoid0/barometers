@@ -5,7 +5,7 @@ import { useCallback, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { FormImageUpload, IconUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { IconUpload, ImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
   FormControl,
@@ -203,7 +203,7 @@ function BrandAddForm({ countries, brands }: Props) {
           )}
         />
 
-        <FormImageUpload />
+        <ImageUpload />
 
         <div>
           <FormLabel>Icon</FormLabel>
