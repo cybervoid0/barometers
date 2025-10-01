@@ -2,7 +2,7 @@ import 'server-only'
 
 import { BarometerCardWithIcon } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
-import { DEFAULT_PAGE_SIZE, FrontRoutes } from '@/constants'
+import { DEFAULT_PAGE_SIZE, Route } from '@/constants'
 import { getBarometersByParams } from '@/server/barometers/queries'
 
 interface newArrivalsProps {
@@ -37,9 +37,9 @@ export default async function NewArrivals(props: newArrivalsProps) {
             <BarometerCardWithIcon
               key={id}
               barometerName={name}
-              barometerLink={FrontRoutes.Barometer + slug}
+              barometerLink={Route.Barometer + slug}
               categoryName={category.name}
-              categoryLink={FrontRoutes.Categories + category.name}
+              categoryLink={Route.Categories + category.name}
               manufacturer={
                 (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
               }

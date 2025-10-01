@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
 import { Separator } from '@/components/ui'
-import { email, FrontRoutes, foundation } from '@/constants'
+import { email, foundation, Route } from '@/constants'
 import { cn } from '@/utils'
 
 const { fullName, shortName, tradeName, postAddress } = foundation
@@ -283,7 +283,7 @@ export default function PrivacyPolicy() {
           </p>
           <p>
             <strong>Website:</strong>{' '}
-            <Link href={FrontRoutes.Foundation}>barometers.info/foundation</Link>
+            <Link href={Route.Foundation}>barometers.info/foundation</Link>
           </p>
         </li>
       </ol>

@@ -1,7 +1,7 @@
 import { AccessRole } from '@prisma/client'
 import { getCategories } from '@/server/categories/queries'
 import type { MenuItem } from '@/types'
-import { FrontRoutes } from './routes-front'
+import { Route } from './routes'
 
 export async function getMenuData(): Promise<MenuItem[]> {
   const categories = await getCategories()
@@ -9,12 +9,12 @@ export async function getMenuData(): Promise<MenuItem[]> {
     {
       id: 0,
       label: 'Home',
-      link: FrontRoutes.Home,
+      link: Route.Home,
     },
     {
       id: 1,
       label: 'Foundation',
-      link: FrontRoutes.Foundation,
+      link: Route.Foundation,
       /* children: [
         {
           id: 6,
@@ -34,24 +34,24 @@ export async function getMenuData(): Promise<MenuItem[]> {
       link: '/collection',
       children: categories.map(cat => ({
         id: cat.id,
-        link: FrontRoutes.Categories + cat.name.toLocaleLowerCase(),
+        link: Route.Categories + cat.name.toLocaleLowerCase(),
         label: cat.label,
       })),
     },
     {
       id: 3,
       label: 'Brands',
-      link: FrontRoutes.Brands,
+      link: Route.Brands,
     },
     {
       id: 4,
       label: 'About',
-      link: FrontRoutes.About,
+      link: Route.About,
     },
     {
       id: 5,
       label: 'Admin',
-      link: FrontRoutes.Admin,
+      link: Route.Admin,
       visibleFor: AccessRole.ADMIN,
     },
   ]

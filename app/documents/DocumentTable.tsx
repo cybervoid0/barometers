@@ -15,7 +15,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Table } from '@/components/elements'
 import { Badge, Pagination } from '@/components/ui'
-import { DEFAULT_PAGE_SIZE, FrontRoutes } from '@/constants'
+import { DEFAULT_PAGE_SIZE, Route } from '@/constants'
 import type { AllDocumentsDTO } from '@/server/documents/queries'
 
 interface Props {
@@ -102,7 +102,7 @@ function DocumentTable({ archive = [] }: Props) {
   })
 
   const selectRow = (row: TableRow) => {
-    router.push(FrontRoutes.Documents + encodeURIComponent(row.catalogueNumber))
+    router.push(Route.Documents + encodeURIComponent(row.catalogueNumber))
   }
 
   return (

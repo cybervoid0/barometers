@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
 import { Card } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { title } from '@/constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
@@ -78,8 +78,8 @@ export default async function Manufacturer(props: Props) {
               <div key={id}>
                 <BarometerCardWithIcon
                   barometerName={name}
-                  barometerLink={FrontRoutes.Barometer + barometerSlug}
-                  categoryLink={FrontRoutes.Categories + category.name}
+                  barometerLink={Route.Barometer + barometerSlug}
+                  categoryLink={Route.Categories + category.name}
                   categoryName={category.name}
                   image={images[0]}
                 />
@@ -102,7 +102,7 @@ const Connections = ({ brands, label }: { label: string; brands: BrandDTO['succe
       <span className="text-xl font-medium">{`${label}${brands.length > 1 ? 's' : ''}: `}</span>
       {brands.map(({ id, name, firstName, slug }, i, arr) => (
         <Fragment key={id}>
-          <Link href={FrontRoutes.Brands + slug} className="underline">
+          <Link href={Route.Brands + slug} className="underline">
             {firstName} {name}
           </Link>
           {i < arr.length - 1 && `, `}

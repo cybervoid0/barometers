@@ -1,4 +1,4 @@
-export const FrontRoutes = {
+export const Route = {
   Home: '/',
   History: '/history/',
   Foundation: '/foundation/',
@@ -19,4 +19,4 @@ export const FrontRoutes = {
   Documents: '/documents/',
 } as const
 
-export type FrontRoutes = (typeof FrontRoutes)[keyof typeof FrontRoutes]
+export type Route = (typeof Route)[keyof typeof Route]

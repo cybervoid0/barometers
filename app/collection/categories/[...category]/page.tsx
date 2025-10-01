@@ -7,7 +7,7 @@ import { BarometerCard, ShowMore } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
 import { DEFAULT_PAGE_SIZE, imageStorage } from '@/constants'
 import { openGraph, title, twitter } from '@/constants/metadata'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometersByParams } from '@/server/barometers/queries'
 import { getCategory } from '@/server/categories/queries'
@@ -36,7 +36,7 @@ export async function generateMetadata(props: CollectionProps): Promise<Metadata
       url: imageStorage + (images.at(0)?.url ?? ''),
       alt: name,
     }))
-  const url = `${FrontRoutes.Categories}${category.join('/')}`
+  const url = `${Route.Categories}${category.join('/')}`
   return {
     title: collectionTitle,
     description,
@@ -86,7 +86,7 @@ export default async function Collection(props: CollectionProps) {
                 priority={i < 5}
                 image={images[0]}
                 name={name}
-                link={FrontRoutes.Barometer + slug}
+                link={Route.Barometer + slug}
                 manufacturer={
                   (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
                 }

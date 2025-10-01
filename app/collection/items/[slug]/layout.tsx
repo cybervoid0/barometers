@@ -3,7 +3,7 @@ import type { Metadata } from 'next/types'
 import type { PropsWithChildren } from 'react'
 import { imageStorage } from '@/constants/globals'
 import { keywords, openGraph, title, twitter } from '@/constants/metadata'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { getBarometer } from '@/server/barometers/queries'
 
 export async function generateMetadata(props: {
@@ -26,7 +26,7 @@ export async function generateMetadata(props: {
         }
       : undefined
 
-    const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${FrontRoutes.Barometer}${slug}`
+    const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${Route.Barometer}${slug}`
 
     return {
       title: barometerTitle,

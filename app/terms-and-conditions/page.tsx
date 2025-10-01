@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { appURL, email, FrontRoutes, foundation } from '@/constants'
+import { appURL, email, foundation, Route } from '@/constants'
 
 export const dynamic = 'force-static'
 
@@ -18,7 +18,7 @@ export default function TermsAndConditions() {
         <p className={paragraphStyles}>
           Welcome to the website of {foundation.tradeName}! Please read these Terms and Conditions
           (&quot;Terms&quot;) carefully before accessing or using the website
-          <Link className={linkStyle} href={FrontRoutes.Home}>
+          <Link className={linkStyle} href={Route.Home}>
             {appURL}
           </Link>
           (the &quot;Site&quot;). By accessing or using the Site, you agree to comply with and be

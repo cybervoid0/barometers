@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import './animations.css'
 import Link from 'next/link'
-import { FrontRoutes, foundation } from '@/constants'
+import { foundation, Route } from '@/constants'
 import { customImageLoader } from '@/utils'
 
 export const Hero = () => {
@@ -18,7 +18,7 @@ export const Hero = () => {
       />
       <div className="xs:items-center xs:pb-0 absolute top-0 left-0 z-2 flex h-full w-full animate-[heading-slide-up_1.8s_ease-out,heading-fade-in-content_1.8s_ease-out] items-end pb-12 pl-8 sm:pl-12">
         <div>
-          <Link href={FrontRoutes.Foundation} className="no-underline">
+          <Link href={Route.Foundation} className="no-underline">
             <h2 className="bg-primary text-background inline px-1 text-[1.375rem] leading-relaxed font-medium tracking-wider uppercase">
               Art of weather instruments foundation
             </h2>

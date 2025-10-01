@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { BAROMETERS_PER_CATEGORY_PAGE } from '@/constants/globals'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { SortOptions } from '@/types'
 
 /**
@@ -22,7 +22,7 @@ export async function revalidateCategory(prisma: PrismaClient, categoryId: strin
   const pathsToRevalidate = SortOptions.flatMap(({ value: sort }) =>
     Array.from(
       { length: pagesPerCategory },
-      (_, i) => `${FrontRoutes.Categories}${[categoryName, sort, String(i + 1)].join('/')}`,
+      (_, i) => `${Route.Categories}${[categoryName, sort, String(i + 1)].join('/')}`,
     ),
   )
   for (const path of pathsToRevalidate) {

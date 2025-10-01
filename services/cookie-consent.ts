@@ -1,5 +1,5 @@
 import type { CookieConsentConfig } from 'vanilla-cookieconsent'
-import { email, FrontRoutes } from '@/constants'
+import { email, Route } from '@/constants'
 import type { CookieTable } from '@/types'
 
 const necessaryCookies = [
@@ -211,7 +211,7 @@ const cookieConsentConfig = {
           acceptNecessaryBtn: 'Reject all',
           showPreferencesBtn: 'Manage preferences',
           footer: `
-						<a href="${FrontRoutes.Terms}">Terms & Conditions</a>
+						<a href="${Route.Terms}">Terms & Conditions</a>
 					`,
         },
         preferencesModal: {
@@ -223,7 +223,7 @@ const cookieConsentConfig = {
           sections: [
             {
               title: 'Cookie Usage',
-              description: `I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="${FrontRoutes.Terms}" class="cc__link">terms and conditions</a>.`,
+              description: `I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="${Route.Terms}" class="cc__link">terms and conditions</a>.`,
             },
             {
               title: 'Strictly necessary cookies',

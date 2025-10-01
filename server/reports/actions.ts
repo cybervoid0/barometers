@@ -3,7 +3,7 @@
 import Redis from 'ioredis'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { trimTrailingSlash } from '@/utils'
 
@@ -47,7 +47,7 @@ export const createReport = withPrisma(
         description,
       },
     })
-    revalidatePath(trimTrailingSlash(FrontRoutes.Reports))
+    revalidatePath(trimTrailingSlash(Route.Reports))
     return { id }
   },
 )

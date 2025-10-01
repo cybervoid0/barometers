@@ -2,7 +2,7 @@ import 'server-only'
 
 import { Pagination } from '@/components/ui/pagination'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { searchBarometers } from '@/server/barometers/search'
 import { SearchInfo } from './search-info'
 import { SearchItem } from './search-item'
@@ -36,7 +36,7 @@ export default async function Search(props: SearchProps) {
                 manufacturer={
                   (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
                 }
-                link={FrontRoutes.Barometer + slug}
+                link={Route.Barometer + slug}
                 key={id}
                 dating={dateDescription}
               />

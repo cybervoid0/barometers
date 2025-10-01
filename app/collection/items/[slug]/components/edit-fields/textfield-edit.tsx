@@ -22,7 +22,7 @@ import {
   FormProvider,
   Input,
 } from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import { cn } from '@/utils'
@@ -71,7 +71,7 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
         const { slug, name } = result.data
         // reload the page if property was 'name' or 'slug' and the page URL has changed
         if (property === 'name' || property === 'slug') {
-          router.replace(FrontRoutes.Barometer + slug)
+          router.replace(Route.Barometer + slug)
         }
         toast.success(`${name} updated`)
         setOpen(false)

@@ -2,7 +2,7 @@
 
 import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import type { ActionResult } from '@/types'
 import { slug as slugify, trimTrailingSlash } from '@/utils'
@@ -19,7 +19,7 @@ const createBarometer = withPrisma(
         data,
       })
       await revalidateCategory(prisma, categoryId)
-      revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals)) // regenerate new arrivals page
+      revalidatePath(trimTrailingSlash(Route.NewArrivals)) // regenerate new arrivals page
       return { success: true, data: { id } }
     } catch (error) {
       // Handle unique constraint violations
@@ -54,7 +54,7 @@ const updateBarometer = withPrisma(
           slug,
         },
       })
-      revalidatePath(FrontRoutes.Barometer + slug)
+      revalidatePath(Route.Barometer + slug)
       await revalidateCategory(prisma, (data.categoryId as string) ?? oldBarometer.categoryId)
       const name = (data.name as string) ?? oldBarometer.name
       return { success: true, data: { slug, name } }
@@ -104,8 +104,8 @@ const deleteBarometer = withPrisma(
         })
       })
       await deleteImages(imagesBeforeDbUpdate)
-      revalidatePath(FrontRoutes.Barometer + barometer.slug)
-      revalidatePath(trimTrailingSlash(FrontRoutes.NewArrivals))
+      revalidatePath(Route.Barometer + barometer.slug)
+      revalidatePath(trimTrailingSlash(Route.NewArrivals))
       await revalidateCategory(prisma, barometer.categoryId)
       return { success: true, data: { id: barometer.id } }
     } catch (error) {

@@ -38,7 +38,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { getDocumentByCatNo } from '@/server/documents/queries'
 
 interface Props {
@@ -58,11 +58,11 @@ export default async function Document({ params }: Props) {
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href={FrontRoutes.Home}>Home</BreadcrumbLink>
+            <BreadcrumbLink href={Route.Home}>Home</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={FrontRoutes.Documents}>Documents</BreadcrumbLink>
+            <BreadcrumbLink href={Route.Documents}>Documents</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{doc.catalogueNumber}</BreadcrumbPage>
@@ -253,7 +253,7 @@ export default async function Document({ params }: Props) {
 
           {/* Back to Documents */}
           <Button variant="outline" className="w-full" asChild>
-            <Link href={FrontRoutes.Documents}>← Back to Documents</Link>
+            <Link href={Route.Documents}>← Back to Documents</Link>
           </Button>
         </div>
       </div>

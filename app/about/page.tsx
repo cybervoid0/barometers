@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ShowMore } from '@/components/elements'
 import { Button, Separator } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import type { DynamicOptions } from '@/types'
 import { cn } from '@/utils'
 
@@ -38,7 +38,7 @@ export default function About() {
         century. Since 2020, I have passionately curated a diverse collection of barometers and
         other weather instruments, driven by a deep fascination with the history of meteorology.
         This dedication has also inspired me to write Barometer Odyssey*, a book offering a detailed
-        account of <Link href={FrontRoutes.History}>the major stages in the evolution</Link> of the
+        account of <Link href={Route.History}>the major stages in the evolution</Link> of the
         barometers.
       </p>
 

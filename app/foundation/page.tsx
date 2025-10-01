@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Separator } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { cn } from '@/utils'
 
 const paragraphSx = 'mb-4 indent-8 text-left'
@@ -154,8 +154,7 @@ export default function Foundation() {
             </li>
             <li>
               Provide digital access to the collection via the website{' '}
-              <Link href={FrontRoutes.Home}>www.barometers.info</Link>, including imagery and
-              descriptions
+              <Link href={Route.Home}>www.barometers.info</Link>, including imagery and descriptions
             </li>
             <li>
               Collaborate with museums, archives, private collectors, scientific institutions,

@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { IsAdmin } from '@/components/elements'
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import {
   type AllBrandsDTO,
   type BrandsByCountryDTO,
@@ -72,7 +72,7 @@ const BrandByCountry = ({
                   <BrandEdit brand={brand} countries={countries} brands={allBrands} />
                 </IsAdmin>
 
-                <Link className="flex-1 no-underline" href={FrontRoutes.Brands + slug}>
+                <Link className="flex-1 no-underline" href={Route.Brands + slug}>
                   <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="w-8 h-8 flex items-center justify-center bg-background border rounded-md">
                       {icon ? (

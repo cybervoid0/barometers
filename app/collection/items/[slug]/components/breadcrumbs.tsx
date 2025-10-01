@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui'
-import { FrontRoutes } from '@/constants/routes-front'
+import { Route } from '@/constants/routes'
 import { cn } from '@/utils'
 
 interface BreadcrumbsComponentProps {
@@ -34,7 +34,7 @@ export function BreadcrumbsComponent({ type, catId, className }: BreadcrumbsComp
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link className={bcTextStyle} href={FrontRoutes.Categories + categorySlug}>
+            <Link className={bcTextStyle} href={Route.Categories + categorySlug}>
               {categorySlug}
             </Link>
           </BreadcrumbLink>

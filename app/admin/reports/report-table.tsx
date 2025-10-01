@@ -4,7 +4,7 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Table } from '@/components/elements'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import type { InaccuracyReportsDTO } from '@/server/reports/queries'
 
 interface Props {
@@ -18,7 +18,7 @@ export function ReportTable({ reports }: Props) {
       header: 'Barometer',
       cell: info => (
         <Link
-          href={FrontRoutes.Barometer + info.row.original.barometer.slug}
+          href={Route.Barometer + info.row.original.barometer.slug}
           className="text-foreground hover:text-primary text-sm hover:underline"
         >
           {info.getValue()}

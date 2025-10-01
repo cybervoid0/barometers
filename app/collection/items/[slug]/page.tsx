@@ -20,7 +20,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { IsAdmin, MD, ShowMore } from '@/components/elements'
 import { Card, SeparatorWithText } from '@/components/ui'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/server/barometers/queries'
 import { getAllBrands } from '@/server/brands/queries'
@@ -103,7 +103,7 @@ export default async function Page(props: Props) {
           >
             <Link
               className="block text-sm"
-              href={FrontRoutes.Brands + barometer.manufacturer.slug}
+              href={Route.Brands + barometer.manufacturer.slug}
               /* display manufacturer name and city (or country if city is not specified) */
             >{`${firstName ? `${firstName} ` : ''}${name}, ${city ?? barometer.manufacturer.countries.map(state => state.name).join(', ')}`}</Link>
           </PropertyCard>
@@ -112,7 +112,7 @@ export default async function Page(props: Props) {
             title="Category"
             edit={<CategoryEdit barometer={barometer} categories={categories} />}
           >
-            <Link className="text-sm w-fit" href={FrontRoutes.Categories + barometer.category.name}>
+            <Link className="text-sm w-fit" href={Route.Categories + barometer.category.name}>
               {barometer.category.label}
             </Link>
           </PropertyCard>

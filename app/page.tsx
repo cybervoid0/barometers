@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { CategoryCard, NewArrivals, SearchField } from '@/components/elements'
-import { FrontRoutes } from '@/constants'
+import { Route } from '@/constants'
 import { getCategories } from '@/server/categories/queries'
 import { cn } from '@/utils'
 
@@ -23,7 +23,7 @@ export default async function HomePage() {
             priority={i < 3}
             image={image}
             name={name}
-            link={FrontRoutes.Categories + name}
+            link={Route.Categories + name}
           />
         ))}
       </div>
