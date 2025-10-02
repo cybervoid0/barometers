@@ -16,9 +16,16 @@ interface ImageLightboxProps extends PropsWithChildren {
   name?: string | null | undefined
 }
 
+const defaultImageName = 'Full-size image'
+
 export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
-  name ??= 'Image'
+  const imageName = name ?? defaultImageName
   const [open, setOpen] = useState(false)
+
+  /** Disables context menu */
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -29,31 +36,35 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
             width={250}
             height={250}
             src={customImageLoader({ src, width: 250, quality: 80 })}
-            alt={name}
-            className="cursor-zoom-in"
+            alt={imageName}
+            className="cursor-zoom-in select-none"
+            draggable={false}
+            onContextMenu={handleContextMenu}
           />
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-background">
+      <DialogContent className="max-w-7xl w-full h-[90vh] p-4 bg-background">
         <DialogTitle className="sr-only">{name}</DialogTitle>
         <DialogDescription className="sr-only">Full size view of {name}</DialogDescription>
-        <div className="relative w-full h-full bg-background rounded-lg overflow-hidden">
-          <NextImage
-            unoptimized
-            fill
-            src={customImageLoader({ src, width: 1500, quality: 90 })}
-            alt={name}
-            className="object-contain"
-            loading="lazy"
-          />
-        </div>
-        {name && name !== 'Image' && (
-          <div className="absolute bottom-4 left-4 right-4">
-            <p className="text-foreground bg-background/80 backdrop-blur-sm px-3 py-2 rounded text-center border">
-              {name}
-            </p>
+        <div className="w-full h-full flex flex-col gap-0 overflow-hidden">
+          <div className="flex-1 relative min-h-0">
+            <NextImage
+              unoptimized
+              fill
+              src={customImageLoader({ src, width: 1500, quality: 90 })}
+              alt={imageName}
+              className="object-contain select-none"
+              loading="lazy"
+              draggable={false}
+              onContextMenu={handleContextMenu}
+            />
           </div>
-        )}
+          {name && (
+            <div className="pt-3 flex-shrink-0 bg-background/80 backdrop-blur-sm border-t border-border">
+              <h3 className="text-center">{name}</h3>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   )
