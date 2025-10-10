@@ -15,3 +15,9 @@ export const getBrandSlug = (lastName: string, firstName?: string | undefined | 
 export const trimTrailingSlash = (url: string) => url.replace(/\/+$/, '')
 export const trimLeadingSlashes = (url: string) => url.replace(/^\/+/, '')
 export const trimSlashes = (url: string) => trimTrailingSlash(trimLeadingSlashes(url))
+export function normalizeLocalPath(path: string): string
+export function normalizeLocalPath(path?: string): string | undefined
+export function normalizeLocalPath(path?: string): string | undefined {
+  if (typeof path === 'undefined') return undefined
+  return `/${trimLeadingSlashes(path)}`
+}

@@ -1,7 +1,7 @@
 'use client'
 
-import NextImage from 'next/image'
 import { type PropsWithChildren, useState } from 'react'
+import { Image } from '@/components/elements'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { customImageLoader } from '@/utils'
 
 interface ImageLightboxProps extends PropsWithChildren {
   src: string
@@ -31,11 +30,10 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <NextImage
-            unoptimized
+          <Image
             width={250}
             height={250}
-            src={customImageLoader({ src, width: 250, quality: 80 })}
+            src={src}
             alt={imageName}
             className="cursor-zoom-in select-none"
             draggable={false}
@@ -47,13 +45,13 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
         <DialogTitle className="sr-only">{name}</DialogTitle>
         <DialogDescription className="sr-only">Full size view of {name}</DialogDescription>
         <div className="w-full h-full flex flex-col gap-0 overflow-hidden">
-          <div className="flex-1 relative min-h-0">
-            <NextImage
-              unoptimized
-              fill
-              src={customImageLoader({ src, width: 1500, quality: 90 })}
+          <div className="flex-1 min-h-0">
+            <Image
+              width={1500}
+              height={1500}
+              src={src}
               alt={imageName}
-              className="object-contain select-none"
+              className="object-contain select-none w-full h-full"
               loading="lazy"
               draggable={false}
               onContextMenu={handleContextMenu}

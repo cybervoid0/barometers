@@ -1,8 +1,7 @@
 import 'server-only'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { ShowMore } from '@/components/elements'
+import { Image, ShowMore } from '@/components/elements'
 import { Button, Separator } from '@/components/ui'
 import { Route } from '@/constants'
 import type { DynamicOptions } from '@/types'

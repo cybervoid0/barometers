@@ -40,7 +40,24 @@ try {
 
   console.log('📡 Opening SSH tunnel on port 5433...')
   spawn('ssh', ['-fN', '-L', `5433:${REMOTE_DB_IP}:5432`, `${REMOTE_USER}@${REMOTE_HOST}`])
-  await new Promise(resolve => setTimeout(resolve, 3000)) // Wait for tunnel
+
+  // Wait for tunnel to establish and verify connection
+  let tunnelReady = false
+  for (let i = 0; i < 10; i++) {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      await execAsync('nc -z localhost 5433')
+      tunnelReady = true
+      console.log('✅ SSH tunnel established successfully')
+      break
+    } catch {
+      console.log(`⏳ Waiting for tunnel... (${i + 1}/10)`)
+    }
+  }
+
+  if (!tunnelReady) {
+    throw new Error('Failed to establish SSH tunnel after 10 seconds')
+  }
 
   console.log('💾 Creating database dump...')
   console.log(`Connecting to remote database: ${REMOTE_DB_NAME} as user: ${REMOTE_DB_USER}`)

@@ -2,9 +2,8 @@ import 'server-only'
 
 import { Factory, Globe, MapPin, Users } from 'lucide-react'
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
-import { IsAdmin } from '@/components/elements'
+import { Image, IsAdmin } from '@/components/elements'
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
 import { Route } from '@/constants/routes'
 import {

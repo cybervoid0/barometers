@@ -121,7 +121,7 @@ export default async function Page(props: Props) {
             title="Serial Number"
             edit={<TextFieldEdit barometer={barometer} property="serial" />}
           >
-            {barometer.serial}
+            <span>{barometer.serial}</span>
           </PropertyCard>
           <PropertyCard
             adminOnly
@@ -129,7 +129,7 @@ export default async function Page(props: Props) {
             title="Collection ID"
             edit={<TextFieldEdit barometer={barometer} property="collectionId" />}
           >
-            {barometer.collectionId}
+            <span>{barometer.collectionId}</span>
           </PropertyCard>
           <PropertyCard
             adminOnly
@@ -137,7 +137,7 @@ export default async function Page(props: Props) {
             title="Year"
             edit={<DateEdit barometer={barometer} />}
           >
-            {dayjs(barometer.date).format('YYYY')}
+            <span>{dayjs(barometer.date).format('YYYY')}</span>
           </PropertyCard>
           <PropertyCard
             adminOnly
@@ -145,16 +145,18 @@ export default async function Page(props: Props) {
             title="Purchased"
             edit={<PurchasedAtEdit barometer={barometer} />}
           >
-            {barometer.purchasedAt
-              ? dayjs.utc(barometer.purchasedAt).format('DD/MM/YYYY')
-              : 'Not specified'}
+            <span>
+              {barometer.purchasedAt
+                ? dayjs.utc(barometer.purchasedAt).format('DD/MM/YYYY')
+                : 'Not specified'}
+            </span>
           </PropertyCard>
           <PropertyCard
             icon={CalendarRange}
             title="Dating"
             edit={<TextFieldEdit barometer={barometer} property="dateDescription" />}
           >
-            {barometer?.dateDescription}
+            <span>{barometer?.dateDescription}</span>
           </PropertyCard>
           <PropertyCard
             icon={Star}
@@ -177,9 +179,11 @@ export default async function Page(props: Props) {
             title="Estimated Price"
             edit={<EstimatedPriceEdit barometer={barometer} />}
           >
-            {barometer.estimatedPrice !== null
-              ? `€${barometer.estimatedPrice.toFixed(2)}`
-              : undefined}
+            <span>
+              {barometer.estimatedPrice !== null
+                ? `€${barometer.estimatedPrice.toFixed(2)}`
+                : undefined}
+            </span>
           </PropertyCard>
           <PropertyCard
             adminOnly={dimensions.length === 0}

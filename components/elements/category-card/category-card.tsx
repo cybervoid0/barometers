@@ -1,8 +1,8 @@
-import NextImage from 'next/image'
 import NextLink from 'next/link'
 import type { FC } from 'react'
+import { Image } from '@/components/elements'
 import type { CategoryDTO } from '@/server/categories/queries'
-import { cn, customImageLoader } from '@/utils'
+import { cn } from '@/utils'
 import { CategoryIcon } from '../category-icon'
 
 interface CategoryCardProps {
@@ -27,15 +27,16 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
         >
           <CategoryIcon category={name} className="absolute top-4 right-4 z-10" />
           {image && (
-            <NextImage
-              unoptimized
-              fill
+            <Image
+              width={509}
+              height={509}
               priority={priority}
               fetchPriority={priority ? 'high' : 'auto'}
               loading={priority ? 'eager' : 'lazy'}
-              src={customImageLoader({ src: image.url, quality: 90, width: 509 })}
+              src={image.url}
               alt={name}
               className={cn(
+                'w-full h-full',
                 'transition-all duration-5000 hover:scale-150 active:scale-150',
                 'ease-out',
               )}

@@ -2,13 +2,16 @@ import type { AccessRole } from '@prisma/client'
 
 declare namespace NodeJS {
   interface ProcessEnv {
+    NODE_ENV: 'development' | 'production'
     AUTH_SECRET: string
     NEXTAUTH_SECRET: string
     NEXTAUTH_URL: string
     NEXT_PUBLIC_BASE_URL: string
-    GCP_BUCKET_NAME: string
-    GCP_CLIENT_EMAIL: string
-    GCP_PRIVATE_KEY: string
+    MINIO_ENDPOINT: string
+    MINIO_ACCESS_KEY: string
+    MINIO_SECRET_KEY: string
+    NEXT_PUBLIC_MINIO_BUCKET: string
+    NEXT_PUBLIC_MINIO_URL: string
   }
 }
 

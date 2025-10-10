@@ -1,11 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { Navigation, Pagination, Zoom } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { IsAdmin } from '@/components/elements'
+import { Image, IsAdmin } from '@/components/elements'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { customImageLoader } from '@/utils'
 import { ImagesEdit } from './edit-fields/images-edit'
 import 'swiper/css'
 import 'swiper/css/zoom'
@@ -37,19 +35,20 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
       >
         {barometer.images.map((image, i) => (
           <SwiperSlide key={image.id}>
-            <div className="swiper-zoom-container relative">
+            <div className="swiper-zoom-container">
               <Image
-                unoptimized
+                width={1500}
+                height={1500}
                 priority={i === 0}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                fill
-                src={customImageLoader({ src: image.url, quality: 90, width: 1500 })}
+                src={image.url}
                 alt={barometer.name}
                 placeholder="blur"
                 blurDataURL={image.blurData}
                 style={{
                   objectFit: 'contain',
                 }}
+                className="w-full h-full"
               />
             </div>
           </SwiperSlide>

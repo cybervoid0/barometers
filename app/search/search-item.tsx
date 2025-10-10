@@ -1,8 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
+import { Image } from '@/components/elements'
 import { Card } from '@/components/ui'
 import type { SearchResultsDTO } from '@/server/barometers/search'
-import { customImageLoader } from '@/utils'
 
 interface ItemProps {
   image: SearchResultsDTO['barometers'][number]['image']
@@ -21,11 +20,11 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
           <div className="relative h-20 min-h-20 w-20 min-w-20 shrink-0">
             {image && (
               <Image
-                unoptimized
-                fill
+                width={100}
+                height={100}
                 alt={name}
-                src={customImageLoader({ src: image.url, width: 100, quality: 80 })}
-                style={{ objectFit: 'contain' }}
+                src={image.url}
+                className="w-full h-full object-contain"
                 placeholder="blur"
                 blurDataURL={image.blurData}
               />

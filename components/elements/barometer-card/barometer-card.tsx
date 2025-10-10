@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import type { HTMLAttributes } from 'react'
-import { cn, customImageLoader } from '@/utils'
+import { Image } from '@/components/elements'
+import { cn } from '@/utils'
 
 interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {
   name: string
@@ -33,15 +33,15 @@ export async function BarometerCard({
         )}
         href={link}
       >
-        <div className="relative h-60 w-full bg-contain bg-center bg-no-repeat">
+        <div className="h-60 w-full bg-contain bg-center bg-no-repeat">
           {image ? (
             <Image
-              unoptimized
+              width={300}
+              height={300}
               priority={priority}
-              src={customImageLoader({ src: image.url, quality: 95, width: 300 })}
+              src={image.url}
               alt={name}
-              fill
-              className="object-contain"
+              className="w-full h-full object-contain"
               placeholder="blur"
               blurDataURL={image.blurData ?? undefined}
             />

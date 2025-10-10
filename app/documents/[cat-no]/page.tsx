@@ -13,11 +13,10 @@ import {
   User,
   ZoomIn,
 } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { ImageLightbox } from '@/components/elements'
+import { Image, ImageLightbox } from '@/components/elements'
 import {
   Badge,
   Breadcrumb,
@@ -78,7 +77,7 @@ export default async function Document({ params }: Props) {
               <div className="space-y-2">
                 <Badge variant="outline" className="w-fit">
                   <FileText className="w-3 h-3 mr-1" />
-                  {doc.documentType}
+                  <span>{doc.documentType}</span>
                 </Badge>
                 <h2 className="tracking-tight text-secondary">{doc.title}</h2>
                 <p className="text-lg text-muted-foreground">Cat. No. {doc.catalogueNumber}</p>
@@ -242,7 +241,7 @@ export default async function Document({ params }: Props) {
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/collection/items/${barometer.slug}`}>
                         <LinkIcon className="w-3 h-3 mr-1" />
-                        View
+                        <span>View</span>
                       </Link>
                     </Button>
                   </div>

@@ -1,7 +1,5 @@
 'use client'
 
-import { imageStorage } from '@/constants/globals'
-
 export function FooterVideo() {
   return (
     <video
@@ -14,7 +12,7 @@ export function FooterVideo() {
         e.preventDefault()
       }}
     >
-      <source src={`${imageStorage}shared/Baro_small.mp4`} type="video/mp4" />
+      <source src="/shared/Baro_small.mp4" type="video/mp4" />
     </video>
   )
 }

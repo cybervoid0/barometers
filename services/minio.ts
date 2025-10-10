@@ -2,7 +2,8 @@ import { Client as Minio } from 'minio'
 
 export const minioClient = new Minio({
   endPoint: process.env.MINIO_ENDPOINT ?? '',
-  useSSL: true,
+  port: Number(process.env.MINIO_PORT),
+  useSSL: process.env.NODE_ENV === 'production',
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
 })

@@ -6,6 +6,10 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const isLocal = process.env.NODE_ENV === 'development'
+const minioUrl = process.env.NEXT_PUBLIC_MINIO_URL
+const minioBucket = process.env.NEXT_PUBLIC_MINIO_BUCKET
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
@@ -16,10 +20,35 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    loader: 'custom',
-    loaderFile: './utils/image-loader.ts',
+    ...(isLocal
+      ? {}
+      : {
+          loader: 'custom',
+          loaderFile: './utils/image-loader.ts',
+        }),
+
     deviceSizes: [640, 1080, 1920],
     imageSizes: [640, 1080, 1920],
+    formats: ['image/webp', 'image/avif'],
+    qualities: [100],
+    // Allow images from MinIO for Next.js optimization in development
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: process.env.MINIO_ENDPOINT ?? '',
+        port: process.env.MINIO_PORT,
+        pathname: '/**',
+      },
+    ],
+  },
+  rewrites: async () => {
+    if (!minioBucket || !minioUrl) return []
+    return [
+      {
+        source: '/:prefix(categories|gallery|history|shared|temp)/:path*',
+        destination: `${minioUrl}/${minioBucket}/:prefix/:path*`,
+      },
+    ]
   },
   webpack: config => {
     config.resolve.alias['@'] = path.resolve('./')

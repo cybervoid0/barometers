@@ -10,7 +10,7 @@ datasource db {
 model Image {
   id            String         @id @default(uuid())
   url           String
-  blurData      String
+  blurData      String?
   description   String?
   name          String?
   order         Int?

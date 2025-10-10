@@ -1,5 +1,4 @@
-import Image from 'next/image'
-import { CheckConsent, PayPalStackedButton } from '@/components/elements'
+import { CheckConsent, Image, PayPalStackedButton } from '@/components/elements'
 import { CopyButton } from '@/components/ui'
 import { foundation } from '@/constants'
 import { cn } from '@/utils'
@@ -38,14 +37,14 @@ export default function Donate() {
       <div className="mt-20 flex flex-col items-center justify-evenly gap-6 md:flex-row md:items-start">
         <div className="flex h-full w-[240px] flex-col items-center gap-4">
           <Image
-            src="shared/bitcoin_qr-code_black.png"
+            src="/shared/bitcoin_qr-code_black.png"
             width={240}
             height={240}
             className="hidden rounded-sm shadow-lg dark:block"
             alt="Bitcoin"
           />
           <Image
-            src="shared/bitcoin_qr-code_white.png"
+            src="/shared/bitcoin_qr-code_white.png"
             width={240}
             height={240}
             className="block rounded-sm shadow-lg dark:hidden"
@@ -61,14 +60,14 @@ export default function Donate() {
         </div>
         <div className="flex h-full w-[240px] flex-col items-center gap-4">
           <Image
-            src="shared/eth_qr-code_black.png"
+            src="/shared/eth_qr-code_black.png"
             width={240}
             height={240}
             className="hidden rounded-sm shadow-lg dark:block"
             alt="Ethereum"
           />
           <Image
-            src="shared/eth_qr-code_white.png"
+            src="/shared/eth_qr-code_white.png"
             width={240}
             height={240}
             className="block rounded-sm shadow-lg dark:hidden"

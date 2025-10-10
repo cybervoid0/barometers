@@ -1,8 +1,7 @@
 import 'server-only'
 
-import NextImage from 'next/image'
-import { ShowMore } from '@/components/elements'
-import { cn, customImageLoader } from '@/utils'
+import { Image, ShowMore } from '@/components/elements'
+import { cn } from '@/utils'
 
 export const dynamic = 'force-static'
 
@@ -13,9 +12,8 @@ function Figure({ src, className, ...props }: { src: string } & React.ComponentP
   const imageUrl = src.trim()
   return (
     <div className={cn('float-left mb-4 w-full sm:mr-4 sm:mb-0 sm:w-auto', className)} {...props}>
-      <NextImage
-        unoptimized
-        src={customImageLoader({ src: `/history/${imageUrl}`, width: 400, quality: 80 })}
+      <Image
+        src={`/history/${imageUrl}`}
         width={400}
         height={400}
         alt="Figure"

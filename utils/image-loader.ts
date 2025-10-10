@@ -1,13 +1,20 @@
+import { trimLeadingSlashes } from './text'
+
 interface Props {
   src: string
   width: number
   quality: number
 }
 
-export default function customImageLoader({ src, width, quality }: Props) {
+export default function customImageLoader({ src, width = 512, quality = 100 }: Props) {
   const base = process.env.NEXT_PUBLIC_MINIO_URL
-  if (!base) throw new Error('Image storage URL is not set')
-  const widthValue = width || 512
-  const qualityValue = quality || 75
-  return `${base}/cdn-cgi/image/width=${widthValue},quality=${qualityValue},format=auto/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${src}`
+  const bucket = process.env.NEXT_PUBLIC_MINIO_BUCKET
+  if (!base || !bucket) throw new Error('Unknown Minio parameters')
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const cleanPath = trimLeadingSlashes(src)
+  // Next.js images format
+  if (isDevelopment) return `${base}/${bucket}/${cleanPath}`
+
+  // Cloudflare CDN format
+  return `${base}/cdn-cgi/image/width=${width},quality=${quality},format=auto/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${cleanPath}`
 }
