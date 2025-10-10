@@ -12,7 +12,7 @@ interface Props extends React.ComponentProps<'div'> {
   image: {
     url: string
     order: number | null
-    blurData: string
+    blurData: string | null
   }
 }
 

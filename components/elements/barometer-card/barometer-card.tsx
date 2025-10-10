@@ -11,7 +11,7 @@ interface BarometerCardProps extends HTMLAttributes<HTMLDivElement> {
   image?: {
     url: string
     order: number | null
-    blurData: string
+    blurData: string | null
   }
 }
 
