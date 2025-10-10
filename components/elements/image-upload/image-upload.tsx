@@ -1,7 +1,7 @@
 'use client'
 
-import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { closestCorners, DndContext, type DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useTransition } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -39,7 +39,8 @@ function ImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps
   useEffect(() => {
     return () => {
       // Get current form state at cleanup time
-      const currentImages: string[] = getValues(imagesField)
+      const currentImages = getValues(imagesField) as string[] | undefined
+      if (!Array.isArray(currentImages) || currentImages.length === 0) return
       // Only delete temporary images (not existing ones)
       const tempImages = currentImages.filter(img => img.startsWith('temp/'))
       if (tempImages.length > 0) deleteImages(tempImages).catch(console.error)
@@ -107,8 +108,8 @@ function ImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps
               />
 
               {formImages.length > 0 && (
-                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={formImages} strategy={horizontalListSortingStrategy}>
+                <DndContext collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+                  <SortableContext items={formImages} strategy={rectSortingStrategy}>
                     <div className="flex gap-4 flex-wrap">
                       {formImages.map((fileName, i) => (
                         <SortableImage

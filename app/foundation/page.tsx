@@ -1,5 +1,5 @@
-import Image from 'next/image'
 import Link from 'next/link'
+import { Image } from '@/components/elements'
 import { Separator } from '@/components/ui'
 import { Route } from '@/constants'
 import { cn } from '@/utils'
@@ -23,7 +23,7 @@ export default function Foundation() {
           alt="Art of Weather Instruments Foundation"
           width={300}
           height={120}
-          src="shared/logo-awif_square_back.png"
+          src="/shared/logo-awif_square_back.png"
           className={cn(
             'xs:ml-3 mx-auto mb-10 sm:ml-4',
             'xs:float-right block object-contain',
@@ -94,7 +94,7 @@ export default function Foundation() {
           <div className="mb-10 flex flex-col items-center justify-evenly gap-6 sm:flex-row sm:items-start">
             <div className="flex h-full w-[240px] flex-col items-center gap-4">
               <Image
-                src="shared/leo-founder.png"
+                src="/shared/leo-founder.png"
                 width={240}
                 height={300}
                 className="rounded-sm shadow-lg"
@@ -104,7 +104,7 @@ export default function Foundation() {
             </div>
             <div className="flex h-full w-[240px] flex-col gap-4">
               <Image
-                src="shared/alex-founder.png"
+                src="/shared/alex-founder.png"
                 width={240}
                 height={300}
                 className="rounded-sm shadow-lg"
@@ -122,7 +122,7 @@ export default function Foundation() {
             alt="Culture code"
             width={100}
             height={120}
-            src="shared/culture-code.png"
+            src="/shared/culture-code.png"
             className="border-border float-left my-3 mr-6 overflow-hidden rounded-md border object-contain shadow-md"
           />
           <p className={paragraphSx}>
@@ -229,7 +229,7 @@ export default function Foundation() {
         <section className="mt-16">
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="flex flex-col items-center justify-center gap-2">
-              <Image unoptimized src="/favicon.svg" alt="Logo" width={100} height={100} />
+              <Image src="/favicon.svg" alt="Logo" width={100} height={100} />
               <p className="text-muted-foreground text-4xl font-medium tracking-wide uppercase">
                 awif
               </p>

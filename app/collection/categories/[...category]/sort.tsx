@@ -31,7 +31,7 @@ export default function Sort({ sortBy, className }: SortProps) {
   return (
     <div className={cn('space-y-1', className)}>
       <label htmlFor={triggerId} className="text-muted-foreground text-xs font-medium">
-        Sort by
+        <span>Sort by</span>
       </label>
       <Select value={sortBy} onValueChange={handleSortChange}>
         <SelectTrigger id={triggerId} className="w-full text-xs capitalize">
@@ -44,7 +44,7 @@ export default function Sort({ sortBy, className }: SortProps) {
               value={typeof option === 'string' ? option : option.value}
               className="capitalize"
             >
-              {typeof option === 'string' ? option : option.label}
+              <span>{typeof option === 'string' ? option : option.label}</span>
             </SelectItem>
           ))}
         </SelectContent>

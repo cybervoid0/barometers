@@ -1,9 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { X } from 'lucide-react'
-import Image from 'next/image'
+import { Image } from '@/components/elements'
 import { Button } from '@/components/ui'
-import { customImageLoader } from '@/utils'
 
 /**
  * Draggable image item with delete button
@@ -31,13 +30,13 @@ function SortableImage({
       }}
       {...attributes}
     >
-      <div className="aspect-square relative" {...listeners}>
+      <div className="aspect-square" {...listeners}>
         <Image
-          unoptimized
+          width={100}
+          height={100}
           alt={`Upload ${index + 1}`}
-          src={customImageLoader({ src: fileName, width: 100, quality: 90 })}
-          fill
-          className="object-cover rounded-lg absolute"
+          src={fileName}
+          className="w-full h-full object-cover rounded-lg absolute"
         />
       </div>
       <Button

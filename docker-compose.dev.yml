@@ -1,0 +1,27 @@
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: barometers-minio-dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      # Fail if accidentally run in production
+      NODE_ENV: ${NODE_ENV:-development}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # Prevent accidental startup on production
+    profiles:
+      - dev
+
+volumes:
+  minio-data:
+    driver: local

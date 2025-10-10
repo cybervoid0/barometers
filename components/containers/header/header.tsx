@@ -1,9 +1,9 @@
 import 'server-only'
 
-import NextImage from 'next/image'
 import NextLink from 'next/link'
-import { getMenuData } from '@/constants'
-import { cn, customImageLoader } from '@/utils'
+import { Image } from '@/components/elements'
+import { getMenuData } from '@/server/menu/queries'
+import { cn } from '@/utils'
 import { MobileMenu } from './mobile-menu'
 import { Subheader } from './subheader'
 import { WideScreenTabs } from './tabs'
@@ -34,14 +34,10 @@ export async function Header() {
                 </div>
                 {/* Logo image */}
                 <div className="relative aspect-square h-12">
-                  <NextImage
-                    unoptimized
-                    fill
-                    src={customImageLoader({
-                      src: '/shared/compass-logo.svg',
-                      quality: 60,
-                      width: 48,
-                    })}
+                  <Image
+                    width={48}
+                    height={48}
+                    src="/shared/compass-logo.svg"
                     alt="logo"
                     className="object-contain"
                   />
