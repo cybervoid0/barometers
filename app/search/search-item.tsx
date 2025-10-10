@@ -26,7 +26,7 @@ export function SearchItem({ image, link, name, manufacturer, dating }: ItemProp
                 src={image.url}
                 className="w-full h-full object-contain"
                 placeholder="blur"
-                blurDataURL={image.blurData}
+                blurDataURL={image.blurData ?? undefined}
               />
             )}
           </div>

@@ -44,7 +44,7 @@ export function ImageCarousel({ barometer }: ImageCarouselProps) {
                 src={image.url}
                 alt={barometer.name}
                 placeholder="blur"
-                blurDataURL={image.blurData}
+                blurDataURL={image.blurData ?? undefined}
                 style={{
                   objectFit: 'contain',
                 }}

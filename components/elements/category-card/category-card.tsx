@@ -44,7 +44,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
                 objectFit: name === 'Recorders' ? 'cover' : 'contain',
               }}
               placeholder="blur"
-              blurDataURL={image.blurData}
+              blurDataURL={image.blurData ?? undefined}
             />
           )}
           <h3
