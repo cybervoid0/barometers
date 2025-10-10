@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 1080, 1920],
     imageSizes: [640, 1080, 1920],
     formats: ['image/webp', 'image/avif'],
-    qualities: [100],
+    qualities: [95],
     // Allow images from MinIO for Next.js optimization in development
     remotePatterns: [
       {

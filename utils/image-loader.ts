@@ -6,7 +6,7 @@ interface Props {
   quality: number
 }
 
-export default function customImageLoader({ src, width = 512, quality = 100 }: Props) {
+export default function customImageLoader({ src, width = 512, quality = 95 }: Props) {
   const base = process.env.NEXT_PUBLIC_MINIO_URL
   const bucket = process.env.NEXT_PUBLIC_MINIO_BUCKET
   if (!base || !bucket) throw new Error('Unknown Minio parameters')
