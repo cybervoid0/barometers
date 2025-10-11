@@ -4,7 +4,7 @@ import { AccessRole } from '@prisma/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
-import { useState } from 'react'
+import { type ComponentProps, useState } from 'react'
 import { Hamburger, isAdmin } from '@/components/elements'
 import {
   Accordion,
@@ -21,7 +21,7 @@ import type { MenuItem } from '@/types'
 import { cn } from '@/utils'
 import { SocialButtons } from '../footer'
 
-interface Props {
+interface Props extends ComponentProps<'div'> {
   menu: MenuItem[]
 }
 
@@ -100,7 +100,7 @@ const LazyMenuContent = dynamic(() => Promise.resolve({ default: MenuContent }),
   loading: () => <div className="animate-pulse bg-muted h-full w-full" />,
 })
 
-export function MobileMenu({ menu }: Props) {
+export function MobileMenu({ menu, ...props }: Props) {
   const [isOpen, setOpen] = useState(false)
   const closeMenu = () => setOpen(false)
   const [shouldLoad, setShouldLoad] = useState(false)
@@ -111,11 +111,13 @@ export function MobileMenu({ menu }: Props) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Hamburger isOpen={isOpen} onClick={toggle} className="scale-x-120 md:hidden" />
-      </SheetTrigger>
-      {shouldLoad && <LazyMenuContent menu={menu} closeMenu={closeMenu} />}
-    </Sheet>
+    <div {...props}>
+      <Sheet open={isOpen} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Hamburger isOpen={isOpen} onClick={toggle} className="scale-x-120" />
+        </SheetTrigger>
+        {shouldLoad && <LazyMenuContent menu={menu} closeMenu={closeMenu} />}
+      </Sheet>
+    </div>
   )
 }

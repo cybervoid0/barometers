@@ -20,10 +20,8 @@ export async function Header() {
           )}
         >
           <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">
-            <div className="flex items-center">
-              <WideScreenTabs menu={menu} className="hidden md:block" />
-              <MobileMenu menu={menu} />
-            </div>
+            <WideScreenTabs menu={menu} className="hidden md:block" />
+            <MobileMenu menu={menu} className="md:hidden" />
             <NextLink className="no-underline" href="/">
               <div className="flex items-center gap-4">
                 <div className="flex flex-col gap-2">
