@@ -51,7 +51,7 @@ interface LoadingOverlayProps extends ComponentProps<'div'> {
 export function LoadingOverlay({ spinnerProps, className, ...props }: LoadingOverlayProps) {
   return (
     <div
-      className={cn('absolute inset-0 flex items-center justify-center bg-card/80 z-50', className)}
+      className={cn('fixed inset-0 flex items-center justify-center bg-card/80 z-50', className)}
       {...props}
     >
       <Spinner size={spinnerProps?.size ?? 'large'} {...spinnerProps} />

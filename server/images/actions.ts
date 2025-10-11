@@ -1,8 +1,11 @@
 'use server'
 
 import path from 'node:path'
+import { after } from 'next/server'
+import { withPrisma } from '@/prisma/prismaClient'
 import { minioBucket, minioClient } from '@/services/minio'
 import type { ImageType } from '@/types'
+import { generateBlurData } from './blur'
 
 async function deleteImages(fileNames?: string[]) {
   if (!Array.isArray(fileNames) || fileNames.length === 0) return
@@ -36,4 +39,44 @@ async function saveTempImage(tempUrl: string, type: ImageType, idSuffix: string)
   return permanentName
 }
 
-export { deleteImages, deleteImage, createTempImage, saveTempImage }
+/** Costly image processing operations which are executed after the images are stored in the DB */
+const createBlurData = withPrisma(
+  async (
+    prisma,
+    images: {
+      url: string
+      id: string
+    }[],
+  ) => {
+    await Promise.all(
+      images.map(async ({ id, url }) => {
+        const blurData = await generateBlurData(url)
+        if (blurData) {
+          await prisma.image.update({
+            where: { id },
+            data: {
+              blurData,
+            },
+          })
+        }
+      }),
+    )
+  },
+)
+
+const createImagesInDb = withPrisma(async (prisma, urls: string[], name: string) => {
+  const images = await prisma.image.createManyAndReturn({
+    data: urls.map((url, order) => ({ url, order, name })),
+    select: {
+      id: true,
+      url: true,
+    },
+  })
+
+  // attach blur data to created images after return
+  after(() => createBlurData(images))
+
+  return images
+})
+
+export { deleteImages, deleteImage, createTempImage, saveTempImage, createImagesInDb }

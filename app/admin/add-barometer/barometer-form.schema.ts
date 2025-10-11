@@ -2,10 +2,9 @@ import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { imageStorage } from '@/constants/globals'
-import { saveTempImage } from '@/server/images/actions'
+import { createImagesInDb, saveTempImage } from '@/server/images/actions'
 import { ImageType } from '@/types'
-import { getThumbnailBase64, slug } from '@/utils'
+import { slug } from '@/utils'
 
 dayjs.extend(utc)
 
@@ -115,18 +114,13 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
     images:
       formData.images.length > 0
         ? {
-            create: await Promise.all(
-              formData.images.map(async (url, i) => {
-                const newUrl = await saveTempImage(url, ImageType.Barometer, formData.collectionId)
-                return {
-                  url: newUrl,
-                  order: i,
-                  name: formData.name,
-                  // ! это будет долго качать уже загруженные фотки. изменить алгоритм
-                  // хорошо бы чтобы в форме были сами файлы чтобы не качать картинки
-                  blurData: await getThumbnailBase64(imageStorage + newUrl),
-                }
-              }),
+            connect: await createImagesInDb(
+              await Promise.all(
+                formData.images.map(url =>
+                  saveTempImage(url, ImageType.Barometer, formData.collectionId),
+                ),
+              ),
+              formData.name,
             ),
           }
         : undefined,

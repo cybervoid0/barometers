@@ -2,10 +2,8 @@ import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { imageStorage } from '@/constants/globals'
-import { saveTempImage } from '@/server/images/actions'
+import { createImagesInDb, saveTempImage } from '@/server/images/actions'
 import { ImageType } from '@/types'
-import { getThumbnailBase64 } from '@/utils'
 
 dayjs.extend(utc)
 
@@ -89,20 +87,13 @@ export const DocumentFormTransformSchema = DocumentFormValidationSchema.transfor
       images:
         images.length > 0
           ? {
-              create: await Promise.all(
-                images.map(async (url, i) => {
-                  const permanentUrl = await saveTempImage(
-                    url,
-                    ImageType.Document,
-                    values.catalogueNumber,
-                  )
-                  return {
-                    url: permanentUrl,
-                    order: i,
-                    name: formValues.title,
-                    blurData: await getThumbnailBase64(imageStorage + permanentUrl),
-                  }
-                }),
+              connect: await createImagesInDb(
+                await Promise.all(
+                  values.images.map(url =>
+                    saveTempImage(url, ImageType.Document, values.catalogueNumber),
+                  ),
+                ),
+                values.title,
               ),
             }
           : undefined,

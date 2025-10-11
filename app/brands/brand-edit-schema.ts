@@ -1,9 +1,8 @@
 import { z } from 'zod'
-import { imageStorage } from '@/constants'
 import type { updateBrand } from '@/server/brands/actions'
-import { saveTempImage } from '@/server/images/actions'
+import { createImagesInDb, saveTempImage } from '@/server/images/actions'
 import { ImageType } from '@/types'
-import { getBrandSlug, getThumbnailBase64 } from '@/utils'
+import { getBrandSlug } from '@/utils'
 
 // Schema for form validation (input)
 export const BrandEditSchema = z.object({
@@ -39,19 +38,13 @@ export const BrandEditTransformSchema = BrandEditSchema.transform(
       slug,
       images: {
         deleteMany: {},
-        create: await Promise.all(
-          images.map(async (url, i) => {
-            const imageUrl = url.startsWith('temp/')
-              ? await saveTempImage(url, ImageType.Brand, slug)
-              : url
-            const blurData = await getThumbnailBase64(imageStorage + imageUrl)
-            return {
-              url: imageUrl,
-              order: i,
-              name: values.name,
-              blurData,
-            }
-          }),
+        connect: await createImagesInDb(
+          await Promise.all(
+            images.map(async url =>
+              url.startsWith('temp/') ? await saveTempImage(url, ImageType.Brand, slug) : url,
+            ),
+          ),
+          values.name,
         ),
       },
       successors: {

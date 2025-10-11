@@ -18,12 +18,11 @@ import {
   FormProvider,
   LoadingOverlay,
 } from '@/components/ui'
-import { imageStorage } from '@/constants/globals'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { deleteImages, saveTempImage } from '@/server/images/actions'
+import { createImagesInDb, deleteImages, saveTempImage } from '@/server/images/actions'
 import { ImageType } from '@/types'
-import { cn, getThumbnailBase64 } from '@/utils'
+import { cn } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -44,19 +43,15 @@ const TransformSchema = ImagesEditSchema.transform(
       id: values.id,
       images: {
         deleteMany: {},
-        create: await Promise.all(
-          images.map(async (url, i) => {
-            const imageUrl = url.startsWith('temp/')
-              ? await saveTempImage(url, ImageType.Barometer, values.collectionId)
-              : url
-            const blurData = await getThumbnailBase64(imageStorage + imageUrl)
-            return {
-              url: imageUrl,
-              order: i,
-              name: values.name,
-              blurData,
-            }
-          }),
+        connect: await createImagesInDb(
+          await Promise.all(
+            images.map(async url =>
+              url.startsWith('temp/')
+                ? await saveTempImage(url, ImageType.Barometer, values.collectionId)
+                : url,
+            ),
+          ),
+          values.name,
         ),
       },
     }
@@ -91,13 +86,16 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         return setOpen(false)
       }
       try {
+        // old images that are no longer in the form - prepare to delete
         const deletedImages = savedImages.filter(img => !values.images.includes(img))
-        if (deletedImages.length > 0) await deleteImages(deletedImages)
 
         const result = await updateBarometer(await TransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
+
         setOpen(false)
         toast.success(`Updated images in ${result.data.name}.`)
+
+        if (deletedImages.length > 0) await deleteImages(deletedImages)
       } catch (error) {
         console.error(error)
         toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
