@@ -38,6 +38,7 @@ import {
   FormMessage,
   FormProvider,
   Input,
+  LoadingOverlay,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -47,7 +48,7 @@ import { deleteBrand, updateBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/server/brands/queries'
 import type { CountryListDTO } from '@/server/counties/queries'
 import { deleteImages } from '@/server/images/actions'
-import { generateIcon } from '@/utils'
+import { cn, generateIcon } from '@/utils'
 import { type BrandEditForm, BrandEditSchema, BrandEditTransformSchema } from './brand-edit-schema'
 
 interface Props {
@@ -96,18 +97,20 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           setOpenBrandDialog(false)
           return
         }
-        // delete images from cloud
+        // old images that are no longer in the form - prepare to delete
         const deletedImages = brandImages.filter(img => !values.images.includes(img))
-        if (deletedImages.length > 0) {
-          await deleteImages(deletedImages)
-        }
+
         // update images in DB
         const result = await updateBrand(await BrandEditTransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
         toast.success(`Brand ${result.data.name} was updated`)
-        setLoading(false)
+
         // prevents dialog blinking
-        setTimeout(() => setOpenBrandDialog(false), 100)
+        setTimeout(() => {
+          setLoading(false)
+          setOpenBrandDialog(false)
+          if (deletedImages.length > 0) deleteImages(deletedImages)
+        }, 100)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : `Error updating brand ${values.name}.`)
         setLoading(false)
@@ -153,174 +156,174 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           <Edit className="text-destructive" size={18} />
         </Button>
       </DialogTrigger>
-      <div>
-        <DialogContent>
-          <DialogHeader>
-            <div className="flex items-center gap-4">
-              <DialogTitle>Edit {brand.name}</DialogTitle>
-              <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    aria-label="Delete manufacturer"
-                    className="w-6 h-6"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Brand</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete "{brand.name}"? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-            <DialogDescription>Update manufacturer details.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Last name <RequiredFieldMark />
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="countries"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Countries <RequiredFieldMark />
-                    </FormLabel>
-                    <FormControl>
-                      <CountriesMultiSelect
-                        selected={(field.value as number[]) ?? []}
-                        options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
-                        onChange={vals => field.onChange(vals)}
-                        placeholder={
-                          ((field.value as number[]) ?? []).length === 0
-                            ? 'Select countries'
-                            : undefined
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>External URL</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="successors"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Successors</FormLabel>
-                    <FormControl>
-                      <SuccessorsMultiSelect
-                        selected={(field.value as string[]) ?? []}
-                        options={brands.map(({ id, name }) => ({ id, name }))}
-                        onChange={vals => field.onChange(vals)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div>
-                <FormLabel>Icon</FormLabel>
-                <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
-              </div>
-
-              <ImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea autoResize {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter className="mt-6">
-                <Button disabled={loading} type="submit" variant="outline" className="w-full">
-                  Update
+      <DialogContent className={cn({ 'overflow-hidden': loading })}>
+        {loading && <LoadingOverlay />}
+        <DialogHeader>
+          <div className="flex items-center gap-4">
+            <DialogTitle>Edit {brand.name}</DialogTitle>
+            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  aria-label="Delete manufacturer"
+                  className="w-6 h-6"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </div>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete "{brand.name}"? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onDelete}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+          <DialogDescription>Update manufacturer details.</DialogDescription>
+        </DialogHeader>
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(onUpdate)} noValidate className="space-y-4">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Last name <RequiredFieldMark />
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="countries"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Countries <RequiredFieldMark />
+                  </FormLabel>
+                  <FormControl>
+                    <CountriesMultiSelect
+                      selected={(field.value as number[]) ?? []}
+                      options={countries?.map(({ id, name }) => ({ id, name })) ?? []}
+                      onChange={vals => field.onChange(vals)}
+                      placeholder={
+                        ((field.value as number[]) ?? []).length === 0
+                          ? 'Select countries'
+                          : undefined
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>External URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="successors"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Successors</FormLabel>
+                  <FormControl>
+                    <SuccessorsMultiSelect
+                      selected={(field.value as string[]) ?? []}
+                      options={brands.map(({ id, name }) => ({ id, name }))}
+                      onChange={vals => field.onChange(vals)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div>
+              <FormLabel>Icon</FormLabel>
+              <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
+            </div>
+
+            <ImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea autoResize {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter className="mt-6">
+              <Button disabled={loading} type="submit" variant="outline" className="w-full">
+                Update
+              </Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
+      </DialogContent>
     </Dialog>
   )
 }

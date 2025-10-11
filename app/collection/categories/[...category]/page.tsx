@@ -30,6 +30,7 @@ export async function generateMetadata(props: CollectionProps): Promise<Metadata
   const { description } = await getCategory(categoryName)
   const { barometers } = await getBarometersByParams(categoryName, 1, 5, 'date')
   const collectionTitle = `${title}: ${capitalize(categoryName)} Barometers Collection`
+  // TODO: Load scaled image rather that full size
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({

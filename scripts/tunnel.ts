@@ -35,7 +35,7 @@ try {
   tunnelCreatedByThisScript = true
 
   // Wait for tunnel to establish
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  await new Promise(resolve => setTimeout(resolve, 5000))
 }
 
 // Cleanup function

@@ -18,6 +18,7 @@ export async function generateMetadata(props: {
     const [image] = images
 
     // create full image URL
+    // todo: load processed (scaled) image
     const imageUrl = image ? `${imageStorage}${image.url}` : undefined
     const imageData = imageUrl
       ? {
