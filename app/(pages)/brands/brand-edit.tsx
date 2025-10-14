@@ -71,9 +71,6 @@ export function BrandEdit({ brand, countries, brands }: Props) {
     () => (brand.pdfFiles ?? []).map(pdf => ({ name: pdf.name, url: pdf.url }) as MediaFile),
     [brand.pdfFiles],
   )
-  /**
-   * TODO: глючит изменение имени в файлах PDF при редактировании производителя
-   */
 
   const form = useForm<BrandEditForm>({
     resolver: zodResolver(BrandEditSchema),
@@ -157,6 +154,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       url: brand.url ?? '',
       description: brand.description ?? '',
       images: brand.images.map(({ url, name }) => ({ url, name: name ?? undefined })),
+      pdfFiles: brand.pdfFiles?.map(({ url, name }) => ({ url, name: name ?? '' })) ?? [],
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
       icon: brand.icon,

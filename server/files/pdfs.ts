@@ -4,7 +4,7 @@ import type { MediaFile } from '@/types'
 import { slug } from '@/utils'
 import { saveFile } from './actions'
 
-async function savePdfs(files: MediaFile[]) {
+async function savePdfs(files: MediaFile[]): Promise<MediaFile[]> {
   return await Promise.all(
     files.map(async ({ url, name }) => ({
       url: await savePdf(url, name),

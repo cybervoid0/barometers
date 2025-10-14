@@ -59,13 +59,10 @@ export const BrandEditTransformSchema = BrandEditSchema.transform(
       countries: {
         set: countries.map(id => ({ id })),
       },
-      pdfFiles:
-        pdfFiles.length > 0
-          ? {
-              deleteMany: {},
-              create: await savePdfs(pdfFiles),
-            }
-          : undefined,
+      pdfFiles: {
+        deleteMany: {},
+        create: await savePdfs(pdfFiles),
+      },
     }
   },
 )

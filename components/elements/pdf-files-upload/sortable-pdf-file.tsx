@@ -31,7 +31,7 @@ export function SortablePdfFile({ file, index, onDelete, fieldName }: Props) {
       const currentFiles = getValues(fieldName) as MediaFile[]
       const updatedFiles = [...currentFiles]
       updatedFiles[index] = { ...file, name: editedName.trim() }
-      setValue(fieldName, updatedFiles)
+      setValue(fieldName, updatedFiles, { shouldDirty: true })
     }
     setIsEditing(false)
   }
