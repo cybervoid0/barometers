@@ -1,6 +1,5 @@
 // client function
 
-import { basename, extname } from 'node:path'
 import type { MediaFile } from '@/types'
 import { createTempFile } from './actions'
 
@@ -24,7 +23,7 @@ function storeFiles(files: File[]): Promise<MediaFile[]> {
       // take last two segments of the path: temp/filename.jpg
       return {
         url: new URL(tempSignedUrl).pathname.split('/').slice(-2).join('/'),
-        name: basename(file.name, extname(file.name)), // name w/o extension
+        name: file.name.replace(/\.[^.]+$/, '') || file.name, // name w/o extension
       }
     }),
   )
