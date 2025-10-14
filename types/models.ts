@@ -47,3 +47,8 @@ export enum ImageType {
   Category = 'c',
   Document = 'd',
 }
+
+export interface MediaFile {
+  url: string
+  name: string
+}

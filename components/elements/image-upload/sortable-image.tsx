@@ -22,7 +22,7 @@ function SortableImage({
 
   return (
     <div
-      className="relative w-[100px] h-[100px]"
+      className="relative w-[100px] h-[100px] cursor-grab active:cursor-grabbing"
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),

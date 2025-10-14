@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { createImagesInDb, saveTempImage } from '@/server/images/actions'
+import { createImagesInDb } from '@/server/files/images'
 import { ImageType } from '@/types'
 
 dayjs.extend(utc)
@@ -63,7 +63,12 @@ export const DocumentFormValidationSchema = z.object({
     ),
   description: z.string(),
   conditionId: z.string(),
-  images: z.array(z.string()),
+  images: z.array(
+    z.object({
+      url: z.string().min(1, 'URL is required'),
+      name: z.string(),
+    }),
+  ),
   relatedBarometers: z.array(z.string()),
 })
 
@@ -87,14 +92,7 @@ export const DocumentFormTransformSchema = DocumentFormValidationSchema.transfor
       images:
         images.length > 0
           ? {
-              connect: await createImagesInDb(
-                await Promise.all(
-                  values.images.map(url =>
-                    saveTempImage(url, ImageType.Document, values.catalogueNumber),
-                  ),
-                ),
-                values.title,
-              ),
+              connect: await createImagesInDb(images, ImageType.Document, values.catalogueNumber),
             }
           : undefined,
       relatedBarometers:

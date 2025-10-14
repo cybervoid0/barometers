@@ -5,7 +5,7 @@ import { Edit, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { IconUpload, ImageUpload, RequiredFieldMark } from '@/components/elements'
+import { IconUpload, ImageUpload, PdfFilesUpload, RequiredFieldMark } from '@/components/elements'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,7 +47,8 @@ import {
 import { deleteBrand, updateBrand } from '@/server/brands/actions'
 import type { AllBrandsDTO, BrandDTO } from '@/server/brands/queries'
 import type { CountryListDTO } from '@/server/counties/queries'
-import { deleteImages } from '@/server/images/actions'
+import { deleteFiles } from '@/server/files/actions'
+import type { MediaFile } from '@/types'
 import { cn, generateIcon } from '@/utils'
 import { type BrandEditForm, BrandEditSchema, BrandEditTransformSchema } from './brand-edit-schema'
 
@@ -61,7 +62,18 @@ export function BrandEdit({ brand, countries, brands }: Props) {
   const [loading, setLoading] = useState(false)
   const [openBrandDialog, setOpenBrandDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-  const brandImages = useMemo(() => brand.images.map(img => img.url), [brand.images])
+  const brandImages = useMemo(
+    () => (brand.images ?? []).map(img => ({ name: img.name, url: img.url }) as MediaFile),
+    [brand.images],
+  )
+
+  const pdfFiles = useMemo(
+    () => (brand.pdfFiles ?? []).map(pdf => ({ name: pdf.name, url: pdf.url }) as MediaFile),
+    [brand.pdfFiles],
+  )
+  /**
+   * TODO: глючит изменение имени в файлах PDF при редактировании производителя
+   */
 
   const form = useForm<BrandEditForm>({
     resolver: zodResolver(BrandEditSchema),
@@ -98,7 +110,9 @@ export function BrandEdit({ brand, countries, brands }: Props) {
           return
         }
         // old images that are no longer in the form - prepare to delete
-        const deletedImages = brandImages.filter(img => !values.images.includes(img))
+        const deletedImages = brandImages.filter(
+          img => !values.images.some(({ url }) => img.url === url),
+        )
 
         // update images in DB
         const result = await updateBrand(await BrandEditTransformSchema.parseAsync(values))
@@ -109,7 +123,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
         setTimeout(() => {
           setLoading(false)
           setOpenBrandDialog(false)
-          if (deletedImages.length > 0) deleteImages(deletedImages)
+          if (deletedImages.length > 0) deleteFiles(deletedImages)
         }, 100)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : `Error updating brand ${values.name}.`)
@@ -142,7 +156,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       city: brand.city ?? '',
       url: brand.url ?? '',
       description: brand.description ?? '',
-      images: brand.images.map(({ url }) => url),
+      images: brand.images.map(({ url, name }) => ({ url, name: name ?? undefined })),
       successors: brand.successors.map(({ id }) => id),
       countries: brand.countries.map(({ id }) => id),
       icon: brand.icon,
@@ -295,12 +309,14 @@ export function BrandEdit({ brand, countries, brands }: Props) {
               )}
             />
 
+            <ImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
+
             <div>
               <FormLabel>Icon</FormLabel>
               <IconUpload onFileChange={handleIconChange} currentIcon={form.watch('icon')} />
             </div>
 
-            <ImageUpload existingImages={brandImages} isDialogOpen={openBrandDialog} />
+            <PdfFilesUpload existingFiles={pdfFiles} isDialogOpen={openBrandDialog} />
 
             <FormField
               control={form.control}

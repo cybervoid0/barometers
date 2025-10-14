@@ -1,7 +1,7 @@
 import capitalize from 'lodash/capitalize'
 import type { Metadata } from 'next/types'
 import type { PropsWithChildren } from 'react'
-import { imageStorage } from '@/constants/globals'
+import { fileStorage } from '@/constants/globals'
 import { keywords, openGraph, title, twitter } from '@/constants/metadata'
 import { Route } from '@/constants/routes'
 import { getBarometer } from '@/server/barometers/queries'
@@ -19,7 +19,7 @@ export async function generateMetadata(props: {
 
     // create full image URL
     // todo: load processed (scaled) image
-    const imageUrl = image ? `${imageStorage}${image.url}` : undefined
+    const imageUrl = image ? `${fileStorage}${image.url}` : undefined
     const imageData = imageUrl
       ? {
           url: imageUrl,

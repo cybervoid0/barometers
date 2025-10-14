@@ -63,6 +63,7 @@ export default function BarometerForm({
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<BarometerFormData>({
+    mode: 'onChange',
     resolver: zodResolver(BarometerFormValidationSchema),
     defaultValues: {
       collectionId: '',
@@ -83,7 +84,13 @@ export default function BarometerForm({
     },
   })
 
-  const { handleSubmit, setValue, reset, control } = form
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    control,
+    formState: { isValid },
+  } = form
 
   const submitForm = (values: BarometerFormData) => {
     startTransition(async () => {
@@ -434,7 +441,7 @@ export default function BarometerForm({
           )}
         />
 
-        <Button type="submit" disabled={isPending} className="mt-6 w-full">
+        <Button type="submit" disabled={isPending || !isValid} className="mt-6 w-full">
           {isPending ? 'Adding...' : 'Add new barometer'}
         </Button>
       </form>

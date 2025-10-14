@@ -37,6 +37,7 @@ interface Props {
 
 export function DocumentForm({ conditions, allBarometers }: Props) {
   const methods = useForm<DocumentFormData>({
+    mode: 'onChange',
     resolver: zodResolver(DocumentFormValidationSchema),
     defaultValues: {
       title: '',
@@ -59,7 +60,12 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
     },
   })
 
-  const { handleSubmit, setValue, reset } = methods
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { isValid },
+  } = methods
 
   const [isPending, startTransition] = useTransition()
 
@@ -94,7 +100,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="catalogueNumber"
@@ -110,7 +115,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="documentType"
@@ -126,7 +130,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="subject"
@@ -140,7 +143,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="creator"
@@ -154,7 +156,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="date"
@@ -185,7 +186,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="dateDescription"
@@ -199,7 +199,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="placeOfOrigin"
@@ -213,7 +212,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="language"
@@ -227,7 +225,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="physicalDescription"
@@ -246,7 +243,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="annotations"
@@ -265,7 +261,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="provenance"
@@ -284,7 +279,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="acquisitionDate"
@@ -341,9 +335,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <ImageUpload />
-
         <FormField
           control={methods.control}
           name="description"
@@ -357,7 +349,6 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
         <FormField
           control={methods.control}
           name="relatedBarometers"
@@ -378,8 +369,7 @@ export function DocumentForm({ conditions, allBarometers }: Props) {
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={isPending} className="mt-6 w-full">
+        <Button type="submit" disabled={isPending || !isValid} className="mt-6 w-full">
           {isPending ? 'Adding...' : 'Add new document'}
         </Button>
       </form>

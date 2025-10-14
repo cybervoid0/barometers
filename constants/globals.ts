@@ -15,7 +15,7 @@ export const twitterAccount = '@barometer_realm'
 export const appURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://barometers.info'
 
 // External links
-export const imageStorage = `${process.env.NEXT_PUBLIC_MINIO_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/`
+export const fileStorage = `${process.env.NEXT_PUBLIC_MINIO_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/`
 export const github = 'https://github.com/cybervoid0/barometers'
 
 export const BAROMETERS_PER_CATEGORY_PAGE = 12

@@ -1,11 +1,12 @@
 import 'server-only'
 
+import { BookText } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
 import { Card } from '@/components/ui'
-import { Route } from '@/constants'
+import { fileStorage, Route } from '@/constants'
 import { title } from '@/constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
@@ -57,10 +58,11 @@ export default async function Manufacturer(props: Props) {
   const manufacturer = await getBrand(slug)
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
+  const pdfs = manufacturer.pdfFiles ?? []
   return (
     <>
       <div className="mt-6 mb-4">
-        <h2>{fullName}</h2>
+        <h2 className="text-secondary">{fullName}</h2>
         <Connections label="Successor" brands={manufacturer.successors} />
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
       </div>
@@ -69,6 +71,26 @@ export default async function Manufacturer(props: Props) {
           <ImageLightbox src={image.url} name={image.name} key={image.id} />
         ))}
       </div>
+      {pdfs.length > 0 && (
+        <div>
+          <h3 className="mb-3">PDF files</h3>
+          <ul className="space-y-2">
+            {pdfs.map(({ id, name, url }) => (
+              <li key={id}>
+                <a
+                  className="flex gap-2 items-center w-fit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={fileStorage + url}
+                >
+                  <BookText size={14} />
+                  <p>{name}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <MD className="my-8">{manufacturer.description}</MD>
       {barometers.length > 0 && (
         <Card className="p-4 shadow-md">

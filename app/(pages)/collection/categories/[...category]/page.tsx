@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 import { FooterVideo } from '@/components/containers'
 import { BarometerCard, ShowMore } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
-import { DEFAULT_PAGE_SIZE, imageStorage } from '@/constants'
+import { DEFAULT_PAGE_SIZE, fileStorage } from '@/constants'
 import { openGraph, title, twitter } from '@/constants/metadata'
 import { Route } from '@/constants/routes'
 import { withPrisma } from '@/prisma/prismaClient'
@@ -34,7 +34,7 @@ export async function generateMetadata(props: CollectionProps): Promise<Metadata
   const barometerImages = barometers
     .filter(({ images }) => images && images.length > 0)
     .map(({ images, name }) => ({
-      url: imageStorage + (images.at(0)?.url ?? ''),
+      url: fileStorage + (images.at(0)?.url ?? ''),
       alt: name,
     }))
   const url = `${Route.Categories}${category.join('/')}`

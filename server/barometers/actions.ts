@@ -4,10 +4,10 @@ import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { Route } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
-import type { ActionResult } from '@/types'
+import type { ActionResult, MediaFile } from '@/types'
 import { slug as slugify, trimTrailingSlash } from '@/utils'
 import { revalidateCategory } from '@/utils/revalidate'
-import { deleteImages } from '../images/actions'
+import { deleteFiles } from '../files/actions'
 
 const createBarometer = withPrisma(
   async (
@@ -87,14 +87,13 @@ const deleteBarometer = withPrisma(
         where: { barometers: { some: { id: barometer.id } } },
       }
       // save deleting images info
-      const imagesBeforeDbUpdate = (
-        await prisma.image.findMany({
-          ...args,
-          select: {
-            url: true,
-          },
-        })
-      ).map(({ url }) => url)
+      const imagesBeforeDbUpdate = (await prisma.image.findMany({
+        ...args,
+        select: {
+          url: true,
+          name: true,
+        },
+      })) as MediaFile[]
       await prisma.$transaction(async tx => {
         await tx.image.deleteMany(args)
         await tx.barometer.delete({
@@ -103,7 +102,7 @@ const deleteBarometer = withPrisma(
           },
         })
       })
-      await deleteImages(imagesBeforeDbUpdate)
+      await deleteFiles(imagesBeforeDbUpdate)
       revalidatePath(Route.Barometer + barometer.slug)
       revalidatePath(trimTrailingSlash(Route.NewArrivals))
       await revalidateCategory(prisma, barometer.categoryId)

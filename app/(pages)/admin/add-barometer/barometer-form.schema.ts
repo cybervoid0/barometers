@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { createImagesInDb, saveTempImage } from '@/server/images/actions'
+import { createImagesInDb } from '@/server/files/images'
 import { ImageType } from '@/types'
 import { slug } from '@/utils'
 
@@ -72,7 +72,14 @@ export const BarometerFormValidationSchema = z.object({
 
   materials: z.array(z.number().int()).optional(),
 
-  images: z.array(z.string()).nonempty('At least one image is required'),
+  images: z
+    .array(
+      z.object({
+        url: z.string().min(1, 'URL is required'),
+        name: z.string(),
+      }),
+    )
+    .min(1, 'At least one image is required'),
 })
 
 /**
@@ -80,7 +87,17 @@ export const BarometerFormValidationSchema = z.object({
  * This does ALL the transformations and type conversions!
  */
 export const BarometerFormTransformSchema = BarometerFormValidationSchema.transform(
-  async (formData): Promise<Prisma.BarometerUncheckedCreateInput> => ({
+  async ({
+    images,
+    materials,
+    dimensions,
+    purchasedAt,
+    estimatedPrice,
+    date,
+    serial,
+    description,
+    ...formData
+  }): Promise<Prisma.BarometerUncheckedCreateInput> => ({
     // Direct mappings
     ...formData,
 
@@ -88,13 +105,12 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
     slug: slug(formData.name),
 
     // Transformed fields
-    description: formData.description || '',
-    serial: formData.serial || null,
-    date: dayjs(`${formData.date}-01-01`).toDate(),
-    estimatedPrice: formData.estimatedPrice ? parseFloat(formData.estimatedPrice) : null,
-    purchasedAt: formData.purchasedAt ? dayjs(formData.purchasedAt).toDate() : null,
-    dimensions:
-      formData.dimensions && formData.dimensions.length > 0 ? formData.dimensions : undefined,
+    description: description || '',
+    serial: serial || null,
+    date: dayjs(`${date}-01-01`).toDate(),
+    estimatedPrice: estimatedPrice ? parseFloat(estimatedPrice) : null,
+    purchasedAt: purchasedAt ? dayjs(purchasedAt).toDate() : null,
+    dimensions: dimensions && dimensions.length > 0 ? dimensions : undefined,
 
     // Optional subcategory
     subCategoryId:
@@ -104,24 +120,17 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
 
     // Materials relation
     materials:
-      formData.materials && formData.materials.length > 0
+      materials && materials.length > 0
         ? {
-            connect: formData.materials.map(id => ({ id })),
+            connect: materials.map(id => ({ id })),
           }
         : undefined,
 
     // Images relation - with async processing
     images:
-      formData.images.length > 0
+      images.length > 0
         ? {
-            connect: await createImagesInDb(
-              await Promise.all(
-                formData.images.map(url =>
-                  saveTempImage(url, ImageType.Barometer, formData.collectionId),
-                ),
-              ),
-              formData.name,
-            ),
+            connect: await createImagesInDb(images, ImageType.Barometer, formData.collectionId),
           }
         : undefined,
   }),

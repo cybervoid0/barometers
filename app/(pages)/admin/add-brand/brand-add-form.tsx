@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { IconUpload, ImageUpload, MultiSelect, RequiredFieldMark } from '@/components/elements'
+import { PdfFilesUpload } from '@/components/elements/pdf-files-upload'
 import {
   Button,
   FormControl,
@@ -33,6 +34,7 @@ function BrandAddForm({ countries, brands }: Props) {
 
   const form = useForm<BrandFormData>({
     resolver: zodResolver(brandSchema),
+    mode: 'onChange',
     defaultValues: {
       firstName: '',
       name: '',
@@ -43,9 +45,10 @@ function BrandAddForm({ countries, brands }: Props) {
       successors: [],
       images: [],
       icon: null,
+      pdfFiles: [],
     },
   })
-  const { handleSubmit, setValue, reset, control, watch } = form
+  const { handleSubmit, setValue, reset, control, watch, formState } = form
 
   const onSubmit = useCallback(
     (values: BrandFormData) => {
@@ -56,6 +59,7 @@ function BrandAddForm({ countries, brands }: Props) {
           toast.success(`Brand ${result.data.name} was created`)
           reset()
         } catch (error) {
+          console.error('Form submission error:', error)
           toast.error(
             error instanceof Error ? error.message : `Error creating brand ${values.name}.`,
           )
@@ -210,8 +214,10 @@ function BrandAddForm({ countries, brands }: Props) {
           <IconUpload onFileChange={handleIconChange} currentIcon={watch('icon')} />
         </div>
 
+        <PdfFilesUpload />
+
         <div className="flex items-center justify-between pt-4">
-          <Button type="submit" disabled={isPending} className="w-full">
+          <Button type="submit" disabled={isPending || !formState.isValid} className="w-full">
             {isPending ? 'Creating...' : 'Create Brand'}
           </Button>
         </div>

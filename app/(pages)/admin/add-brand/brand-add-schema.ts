@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { createImagesInDb, saveTempImage } from '@/server/images/actions'
+import { createImagesInDb } from '@/server/files/images'
+import { savePdfs } from '@/server/files/pdfs'
 import { ImageType } from '@/types'
 import { getBrandSlug } from '@/utils'
 
@@ -18,14 +19,25 @@ const brandSchema = z.object({
   url: z.url('URL should be valid internet domain').or(z.literal('')),
   description: z.string(),
   successors: z.array(z.string()),
-  images: z.array(z.string()),
+  images: z.array(
+    z.object({
+      url: z.string().min(1, 'Image URL is required'),
+      name: z.string(),
+    }),
+  ),
   icon: z.string().nullable(),
+  pdfFiles: z.array(
+    z.object({
+      url: z.string().min(1, 'PDF URL is required'),
+      name: z.string().min(1, 'PDF file must have a name'),
+    }),
+  ),
 })
 
 type BrandFormData = z.infer<typeof brandSchema>
 
 const brandTransformSchema = brandSchema.transform(
-  async ({ countries, successors, images, ...formData }) => {
+  async ({ countries, successors, images, pdfFiles, ...formData }) => {
     const slug = getBrandSlug(formData.name, formData.firstName)
     return {
       ...formData,
@@ -39,10 +51,13 @@ const brandTransformSchema = brandSchema.transform(
       images:
         images.length > 0
           ? {
-              connect: await createImagesInDb(
-                await Promise.all(images.map(url => saveTempImage(url, ImageType.Brand, slug))),
-                formData.name,
-              ),
+              connect: await createImagesInDb(images, ImageType.Brand, slug),
+            }
+          : undefined,
+      pdfFiles:
+        pdfFiles.length > 0
+          ? {
+              create: await savePdfs(pdfFiles),
             }
           : undefined,
     }

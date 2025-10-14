@@ -3,26 +3,30 @@
 import { Upload } from 'lucide-react'
 import { useCallback } from 'react'
 
-interface DragImagesProps {
+interface Props {
   onFileSelect: (files: FileList | null) => void
   disabled?: boolean
-  maxImages?: number
+  maxFiles?: number
   currentCount?: number
   acceptedTypes?: string[]
   children?: React.ReactNode
+  message?: string
+  icon?: typeof Upload
 }
 
 /**
  * Drag & drop area for uploading image files
  */
-export function DragImages({
+export function DragFiles({
   onFileSelect,
   disabled = false,
-  maxImages = 10,
+  maxFiles = 10,
   currentCount = 0,
-  acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+  message = 'Drop files here or click to select',
+  icon: Icon = Upload,
+  acceptedTypes,
   children,
-}: DragImagesProps) {
+}: Props) {
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -46,7 +50,7 @@ export function DragImages({
       const input = document.createElement('input')
       input.type = 'file'
       input.multiple = true
-      input.accept = acceptedTypes.join(',')
+      input.accept = acceptedTypes?.join(',') ?? ''
       input.onchange = e => {
         const target = e.target as HTMLInputElement
         onFileSelect(target.files)
@@ -63,20 +67,16 @@ export function DragImages({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onClick={handleClick}
-      aria-label="Upload images"
+      aria-label="Upload files"
     >
-      <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+      <Icon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">
-          {disabled ? 'Processing...' : 'Drop images here or click to select'}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          PNG, JPG, WEBP {maxImages && ` (max ${maxImages} images)`}
-        </p>
-        {typeof currentCount === 'number' && maxImages && (
+        <p className="text-sm font-medium">{disabled ? 'Processing...' : message}</p>
+        <p className="text-xs text-muted-foreground">{maxFiles && ` (max ${maxFiles} files)`}</p>
+        {typeof currentCount === 'number' && maxFiles && (
           <p className="text-xs text-muted-foreground">
-            {currentCount}/{maxImages} images selected
+            {currentCount}/{maxFiles} files selected
           </p>
         )}
       </div>

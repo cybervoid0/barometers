@@ -20,7 +20,8 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { createImagesInDb, deleteImages, saveTempImage } from '@/server/images/actions'
+import { deleteFiles } from '@/server/files/actions'
+import { createImagesInDb } from '@/server/files/images'
 import { ImageType } from '@/types'
 import { cn } from '@/utils'
 
@@ -33,7 +34,12 @@ const ImagesEditSchema = z.object({
   id: z.string(),
   name: z.string(),
   collectionId: z.string(),
-  images: z.array(z.string()),
+  images: z.array(
+    z.object({
+      url: z.string().min(1, 'Image URL is required'),
+      name: z.string(),
+    }),
+  ),
 })
 type ImagesForm = z.output<typeof ImagesEditSchema>
 
@@ -43,23 +49,21 @@ const TransformSchema = ImagesEditSchema.transform(
       id: values.id,
       images: {
         deleteMany: {},
-        connect: await createImagesInDb(
-          await Promise.all(
-            images.map(async url =>
-              url.startsWith('temp/')
-                ? await saveTempImage(url, ImageType.Barometer, values.collectionId)
-                : url,
-            ),
-          ),
-          values.name,
-        ),
+        connect: await createImagesInDb(images, ImageType.Barometer, values.collectionId),
       },
     }
   },
 )
 
 export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
-  const savedImages = useMemo(() => barometer.images.map(img => img.url), [barometer.images])
+  const savedImages = useMemo(
+    () =>
+      barometer.images.map(img => ({
+        url: img.url,
+        name: img.name ?? '',
+      })),
+    [barometer.images],
+  )
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -95,7 +99,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         setOpen(false)
         toast.success(`Updated images in ${result.data.name}.`)
 
-        if (deletedImages.length > 0) await deleteImages(deletedImages)
+        if (deletedImages.length > 0) await deleteFiles(deletedImages)
       } catch (error) {
         console.error(error)
         toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')

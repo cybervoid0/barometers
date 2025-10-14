@@ -69,6 +69,13 @@ export const getBrands = unstable_cache(
               slug: true,
             },
           },
+          pdfFiles: {
+            select: {
+              name: true,
+              url: true,
+              id: true,
+            },
+          },
         },
       }),
       prisma.manufacturer.count(),
@@ -113,6 +120,13 @@ export const getBrand = unstable_cache(
         },
         images: true,
         countries: true,
+        pdfFiles: {
+          select: {
+            name: true,
+            url: true,
+            id: true,
+          },
+        },
       },
     })
     return {
@@ -159,6 +173,13 @@ export const getBrandsByCountry = unstable_cache(
             },
             images: true,
             countries: true,
+            pdfFiles: {
+              select: {
+                name: true,
+                url: true,
+                id: true,
+              },
+            },
           },
         },
       },

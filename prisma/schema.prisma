@@ -109,6 +109,16 @@ enum InaccuracyReportStatus {
   RESOLVED
 }
 
+model PdfFile {
+  id             String       @id @default(uuid())
+  name           String
+  url            String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  manufacturerId String
+  manufacturer   Manufacturer @relation("PdfFiles", fields: [manufacturerId], references: [id], onDelete: Cascade)
+}
+
 model Manufacturer {
   id           String         @id @default(uuid())
   firstName    String?
@@ -127,6 +137,7 @@ model Manufacturer {
   // some brands may have multiple successors and/or predecessors
   successors   Manufacturer[] @relation("ManufacturerSuccessors")
   predecessors Manufacturer[] @relation("ManufacturerSuccessors")
+  pdfFiles     PdfFile[]      @relation("PdfFiles")
 }
 
 model Country {
