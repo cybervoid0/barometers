@@ -2,7 +2,7 @@
 
 import { ChevronDown } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { MD } from '@/components/elements'
 import { Button } from '@/components/ui'
 import { cn } from '@/utils'
@@ -24,7 +24,14 @@ export function ShowMore({
   ...props
 }: ShowMoreProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-
+  const [contentHeight, setContentHeight] = useState(0)
+  const contentRef = useRef<HTMLDivElement>(null)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: needs to reflect the changes in children
+  useLayoutEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight)
+    }
+  }, [children])
   const renderContent = () => {
     if (md) {
       if (typeof children === 'string') return <MD>{children}</MD>
@@ -33,34 +40,38 @@ export function ShowMore({
     return children
   }
   if (!children) return null
-  const height = `${maxHeight}px`
+  const height = Math.floor(Math.min(contentHeight, maxHeight))
+  const applyShowMore = maxHeight < contentHeight
   return (
     <div className={cn('space-y-2', className)} {...props}>
       <motion.div
+        ref={contentRef}
         initial={{ height }}
-        animate={{ height: isExpanded ? '100%' : height }}
+        animate={{ height: isExpanded ? contentHeight : height }}
         className="relative overflow-hidden"
       >
         {renderContent()}
 
         {/* Gradient overlay when collapsed - only over content */}
-        {!isExpanded && (
+        {!isExpanded && applyShowMore && (
           <div className="from-background via-background/80 pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-linear-to-t to-transparent" />
         )}
       </motion.div>
-      <Button
-        variant="ghost"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="text-foreground h-auto p-0 font-semibold hover:bg-transparent"
-      >
-        {isExpanded ? hideLabel : showLabel}
-        <ChevronDown
-          className={cn(
-            'ml-1 h-4 w-4 transition-transform duration-200',
-            isExpanded && 'rotate-180',
-          )}
-        />
-      </Button>
+      {applyShowMore && (
+        <Button
+          variant="ghost"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-foreground h-auto p-0 font-semibold hover:bg-transparent"
+        >
+          {isExpanded ? hideLabel : showLabel}
+          <ChevronDown
+            className={cn(
+              'ml-1 h-4 w-4 transition-transform duration-200',
+              isExpanded && 'rotate-180',
+            )}
+          />
+        </Button>
+      )}
     </div>
   )
 }

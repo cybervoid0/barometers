@@ -35,7 +35,7 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
             height={250}
             src={src}
             alt={imageName}
-            className="cursor-zoom-in select-none"
+            className="h-60 border rounded object-cover object-top-left cursor-zoom-in select-none"
             draggable={false}
             onContextMenu={handleContextMenu}
           />

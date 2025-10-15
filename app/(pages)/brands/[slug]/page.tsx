@@ -67,42 +67,44 @@ export default async function Manufacturer(props: Props) {
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
       </div>
       {manufacturer.images.length > 0 && (
-        <div className="mb-8 flex flex-col items-center gap-8 sm:flex-row">
+        <div className="mb-8 flex flex-col items-center gap-5 sm:flex-row">
           {manufacturer.images.map(image => (
             <ImageLightbox src={image.url} name={image.name} key={image.id} />
           ))}
         </div>
       )}
       {manufacturer.description && (
-        <ShowMore md maxHeight={400} className="mb-10">
+        <ShowMore md maxHeight={400} className="mb-10 mx-auto max-w-5xl">
           {manufacturer.description}
         </ShowMore>
       )}
-      <Separator />
       {pdfs.length > 0 && (
-        <div className="mb-8 mt-8">
-          <h3 className="mb-3 text-secondary">PDF files</h3>
-          <ul className="space-y-2">
-            {pdfs.map(({ id, name, url }) => (
-              <li key={id}>
-                <a
-                  className="flex gap-2 items-center w-fit"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={fileStorage + url}
-                >
-                  <BookText size={14} className="text-red-900" />
-                  <p>{name}</p>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <>
+          <Separator />
+          <div className="mb-8 mt-8">
+            <h3 className="mb-3 text-secondary">PDF files</h3>
+            <ul className="space-y-2">
+              {pdfs.map(({ id, name, url }) => (
+                <li key={id}>
+                  <a
+                    className="flex gap-2 items-center w-fit"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={fileStorage + url}
+                  >
+                    <BookText size={14} className="text-red-900" />
+                    <p>{name}</p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
       {barometers.length > 0 && (
         <Card className="p-4 shadow-md">
           <h3 className="text-secondary">{`Instruments by ${fullName} in the collection`}</h3>
-          <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
               <div key={id}>
                 <BarometerCardWithIcon

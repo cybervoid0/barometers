@@ -90,7 +90,7 @@ const BrandByCountry = ({
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm capitalize truncate group-hover:text-primary transition-colors">
+                      <p className="font-medium text-sm capitalize group-hover:text-primary transition-colors">
                         {name + (firstName ? `, ${firstName}` : '')}
                       </p>
                     </div>
