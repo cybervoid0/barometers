@@ -30,15 +30,17 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <Image
-            width={250}
-            height={250}
-            src={src}
-            alt={imageName}
-            className="h-60 border rounded object-cover object-top-left cursor-zoom-in select-none"
-            draggable={false}
-            onContextMenu={handleContextMenu}
-          />
+          <div className="rounded-md p-4 sm:h-[20rem] sm:w-sm to-card-gradient-from from-card-gradient-to bg-linear-to-b">
+            <Image
+              width={250}
+              height={250}
+              src={src}
+              alt={imageName}
+              className="object-contain h-full w-full max-w-sm sm:max-w-none max-h-[30rem] cursor-zoom-in select-none"
+              draggable={false}
+              onContextMenu={handleContextMenu}
+            />
+          </div>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-7xl w-full h-[90vh] p-4 bg-background">
