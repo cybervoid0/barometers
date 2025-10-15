@@ -13,11 +13,16 @@ async function savePdfs(files: MediaFile[]): Promise<MediaFile[]> {
   )
 }
 
-async function savePdf(tempUrl: string, name: string): Promise<string> {
+async function savePdf(tempUrl: string, title: string): Promise<string> {
   if (!tempUrl.startsWith('temp/')) return tempUrl
-  const permanentUrl = `pdf/${slug(name)}.pdf`
+  const permanentUrl = generatePdfName(title)
   await saveFile(tempUrl, permanentUrl)
   return permanentUrl
+}
+
+function generatePdfName(title: string): string {
+  const random = crypto.randomUUID().slice(0, 8)
+  return `pdf/${slug(title)}__${random}.pdf`
 }
 
 export { savePdfs }

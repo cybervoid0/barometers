@@ -4,8 +4,8 @@ import { BookText } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { BarometerCardWithIcon, ImageLightbox, MD } from '@/components/elements'
-import { Card } from '@/components/ui'
+import { BarometerCardWithIcon, ImageLightbox, ShowMore } from '@/components/elements'
+import { Card, Separator } from '@/components/ui'
 import { fileStorage, Route } from '@/constants'
 import { title } from '@/constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
@@ -61,19 +61,27 @@ export default async function Manufacturer(props: Props) {
   const pdfs = manufacturer.pdfFiles ?? []
   return (
     <>
-      <div className="mt-6 mb-4">
+      <div className="mt-6 mb-8">
         <h2 className="text-secondary">{fullName}</h2>
         <Connections label="Successor" brands={manufacturer.successors} />
         <Connections label="Predecessor" brands={manufacturer.predecessors} />
       </div>
-      <div className="my-8 flex flex-col items-center gap-8 sm:flex-row">
-        {manufacturer.images.map(image => (
-          <ImageLightbox src={image.url} name={image.name} key={image.id} />
-        ))}
-      </div>
+      {manufacturer.images.length > 0 && (
+        <div className="mb-8 flex flex-col items-center gap-8 sm:flex-row">
+          {manufacturer.images.map(image => (
+            <ImageLightbox src={image.url} name={image.name} key={image.id} />
+          ))}
+        </div>
+      )}
+      {manufacturer.description && (
+        <ShowMore md maxHeight={400} className="mb-10">
+          {manufacturer.description}
+        </ShowMore>
+      )}
+      <Separator />
       {pdfs.length > 0 && (
-        <div>
-          <h3 className="mb-3">PDF files</h3>
+        <div className="mb-8 mt-8">
+          <h3 className="mb-3 text-secondary">PDF files</h3>
           <ul className="space-y-2">
             {pdfs.map(({ id, name, url }) => (
               <li key={id}>
@@ -83,7 +91,7 @@ export default async function Manufacturer(props: Props) {
                   rel="noopener noreferrer"
                   href={fileStorage + url}
                 >
-                  <BookText size={14} />
+                  <BookText size={14} className="text-red-900" />
                   <p>{name}</p>
                 </a>
               </li>
@@ -91,10 +99,9 @@ export default async function Manufacturer(props: Props) {
           </ul>
         </div>
       )}
-      <MD className="my-8">{manufacturer.description}</MD>
       {barometers.length > 0 && (
         <Card className="p-4 shadow-md">
-          <h3>{`Instruments by ${fullName} in the collection`}</h3>
+          <h3 className="text-secondary">{`Instruments by ${fullName} in the collection`}</h3>
           <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {barometers.map(({ name, id, images, slug: barometerSlug, category }) => (
               <div key={id}>
