@@ -30,7 +30,7 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <div className="rounded-md p-4 sm:h-[20rem] sm:w-sm to-card-gradient-from from-card-gradient-to bg-linear-to-b">
+          <div className="rounded-md p-4 sm:h-[20rem] sm:w-sm border">
             <Image
               width={250}
               height={250}
