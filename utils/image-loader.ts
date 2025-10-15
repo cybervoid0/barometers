@@ -16,5 +16,5 @@ export default function customImageLoader({ src, width = 512, quality = 95 }: Pr
   if (isDevelopment) return `${base}/${bucket}/${cleanPath}`
 
   // Cloudflare CDN format
-  return `${base}/cdn-cgi/image/width=${width},quality=${quality},format=auto/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${cleanPath}`
+  return `${base}/cdn-cgi/image/width=${width},quality=${quality},format=avif/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${cleanPath}`
 }

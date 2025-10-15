@@ -141,9 +141,12 @@ export const getBrand = unstable_cache(
 export const getBrandsByCountry = unstable_cache(
   withPrisma(async prisma => {
     const countries = await prisma.country.findMany({
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        { id: 'asc' },
+      ],
       where: {
         manufacturers: {
           some: {},
