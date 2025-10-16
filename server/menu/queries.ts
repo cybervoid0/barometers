@@ -17,18 +17,18 @@ export async function getMenuData(): Promise<MenuItem[]> {
       id: 1,
       label: 'Foundation',
       link: Route.Foundation,
-      /* children: [
+      children: [
         {
           id: 6,
           label: 'About Us',
-          link: FrontRoutes.Foundation,
+          link: Route.Foundation,
         },
         {
           id: 7,
           label: 'Donate',
-          link: FrontRoutes.Donate,
+          link: Route.Donate,
         },
-      ], */
+      ],
     },
     {
       id: 2,

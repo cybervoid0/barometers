@@ -7,9 +7,10 @@ const { bitcoinAddress, ethereumAddress } = foundation
 const paragraphSx = 'mb-4 indent-8 text-left'
 const listSx = cn(
   'mb-1 ml-12 space-y-2 -indent-6', //layout
-  "[&>li]:before:mr-2 [&>li]:before:content-['—']", // dash-bullets
-  '[&>li]:after:content-[";"] [&>li]:last-of-type:after:content-["."]', // colons and full stop
+  "[&>li]:before:mr-2 [&>li]:before:content-['•']", // dash-bullets
 )
+const contactTxSx = 'text-sm text-muted-foreground'
+const tabHeaderSx = 'text-center'
 
 export default function Donate() {
   return (
@@ -22,16 +23,13 @@ export default function Donate() {
       </p>
       <p className={paragraphSx}>You can support the Foundation through the following channels:</p>
       <ul className={listSx}>
+        <li>€ IBAN — NL88 REVO 5564 9490 48</li>
         <li>Bitcoin (BTC) — wallet address and QR code below</li>
         <li>
           Ethereum Network — this includes ETH, USDT, USDC, and any other ERC-20 tokens (wallet
           address and QR code below)
         </li>
         <li>PayPal — secure online donations via PayPal or credit card</li>
-        <li>
-          Additional giving options will be available soon, including direct bank transfers and
-          other convenient methods
-        </li>
       </ul>
 
       <div className="mt-20 flex flex-col items-center justify-evenly gap-6 md:flex-row md:items-start">
@@ -86,6 +84,28 @@ export default function Donate() {
       <CheckConsent service="payPal" category="functional" placeholder>
         <PayPalStackedButton className="mt-20" />
       </CheckConsent>
+      <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1">
+          <div className={tabHeaderSx}>€ EURO</div>
+          <p className={contactTxSx}>NL88 REVO 5564 9490 48</p>
+          <p className={contactTxSx}>Beneficiary — Leonid Shirokov</p>
+          <p className={contactTxSx}>BIC/SWIFT — REVONL22</p>
+          <p className={contactTxSx}>
+            Revolut Bank UAB Barbara Strozzilaan 201, 1083 HN, Amsterdam, Netherlands
+          </p>
+          <p className={contactTxSx}>BIC of the correspondent bank — CHASDEFX</p>
+        </div>
+        <div className="grid grid-cols-1">
+          <div className={tabHeaderSx}>$ USD</div>
+          <p className={contactTxSx}>NL89 REVO 4933 5459 60</p>
+          <p className={contactTxSx}>Beneficiary — Leonid Shirokov</p>
+          <p className={contactTxSx}>BIC/SWIFT — REVONL22</p>
+          <p className={contactTxSx}>
+            Revolut Bank UAB Barbara Strozzilaan 201, 1083 HN, Amsterdam, Netherlands
+          </p>
+          <p className={contactTxSx}>BIC of the correspondent bank — CHASGB2L</p>
+        </div>
+      </div>
     </article>
   )
 }
