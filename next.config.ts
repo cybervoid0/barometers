@@ -29,8 +29,9 @@ const nextConfig: NextConfig = {
 
     deviceSizes: [640, 1080, 1920],
     imageSizes: [640, 1080, 1920],
-    formats: ['image/webp', 'image/avif'],
+    formats: ['image/avif'],
     qualities: [95],
+    minimumCacheTTL: 2678400,
     // Allow images from MinIO for Next.js optimization in development
     remotePatterns: [
       {
