@@ -3,19 +3,14 @@ import 'server-only'
 import NextLink from 'next/link'
 import { Image } from '@/components/elements'
 import { getMenuData } from '@/server/menu/queries'
-import { cn } from '@/utils'
+import { AnimatedHeader } from './animated-header'
 import { MobileMenu } from './mobile-menu'
 import { WideScreenTabs } from './tabs'
 
 export async function Header() {
   const menu = await getMenuData()
   return (
-    <header
-      className={cn(
-        'fixed top-0 z-50 h-24 min-h-24 w-full',
-        'from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to bg-linear-to-t',
-      )}
-    >
+    <AnimatedHeader>
       <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">
         <WideScreenTabs menu={menu} className="hidden md:block" />
         <MobileMenu menu={menu} className="md:hidden" />
@@ -40,6 +35,6 @@ export async function Header() {
           </div>
         </NextLink>
       </div>
-    </header>
+    </AnimatedHeader>
   )
 }
