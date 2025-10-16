@@ -33,7 +33,7 @@ function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }
   return (
     <SheetContent
       side="left"
-      className="z-[100] w-68 overflow-y-auto data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_200ms_both]"
+      className="z-[100] w-68 overflow-y-auto data-[state=open]:animate-[slide-in-from-left_500ms_ease-in-out_both]"
       onOpenAutoFocus={e => e.preventDefault()} // Prevent auto-focus to avoid focus outline on accordion
     >
       <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
