@@ -42,6 +42,11 @@ export function AnimatedHeader({
   return (
     <motion.header
       style={{ y: headerY }}
+      transition={{
+        type: 'tween',
+        ease: 'linear',
+        duration: 0.15,
+      }}
       className={cn(
         'fixed top-0 z-50 h-24 min-h-24 w-full',
         'bg-gradient-to-t from-layout-gradient-from via-layout-gradient-to to-layout-gradient-to',
