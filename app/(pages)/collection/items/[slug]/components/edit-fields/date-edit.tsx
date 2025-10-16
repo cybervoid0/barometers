@@ -78,7 +78,7 @@ export function DateEdit({ size = 18, barometer, className, ...props }: DateEdit
   useEffect(() => {
     if (!open) return
     form.reset({ date: dayjs(barometer.date).format('YYYY') })
-  }, [open, form.reset, barometer.date])
+  }, [open, form, barometer.date])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

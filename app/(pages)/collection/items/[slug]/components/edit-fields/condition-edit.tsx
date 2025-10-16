@@ -55,7 +55,7 @@ export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
   useEffect(() => {
     if (!open) return
     form.reset()
-  }, [open, form.reset])
+  }, [open, form])
 
   const update = useCallback(
     (values: ConditionForm) => {

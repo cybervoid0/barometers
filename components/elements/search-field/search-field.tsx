@@ -57,7 +57,7 @@ export function SearchField(props: React.ComponentProps<'div'>) {
         }
       })
     },
-    [form.formState.isDirty, router.push, searchParams],
+    [form.formState.isDirty, searchParams, router],
   )
 
   const handleClear = () => {

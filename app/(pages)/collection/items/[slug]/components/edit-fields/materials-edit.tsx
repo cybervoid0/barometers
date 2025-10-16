@@ -60,7 +60,7 @@ export function MaterialsEdit({ barometer, materials, className, ...props }: Mat
   useEffect(() => {
     if (!open) return
     form.reset({ materials: barometer.materials.map(({ id }) => id) })
-  }, [open, form.reset, barometer.materials.map])
+  }, [open, form, barometer.materials])
 
   const handleUpdateBarometer = (values: MaterialsForm) => {
     startTransition(async () => {

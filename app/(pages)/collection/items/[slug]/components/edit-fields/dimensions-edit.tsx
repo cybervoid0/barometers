@@ -57,7 +57,7 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
   useEffect(() => {
     if (!open) return
     form.reset({ dimensions: (barometer.dimensions as Dimensions) || [] })
-  }, [open, form.reset, barometer.dimensions])
+  }, [open, form, barometer.dimensions])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

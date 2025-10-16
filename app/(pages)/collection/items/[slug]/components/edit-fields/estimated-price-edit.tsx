@@ -56,7 +56,7 @@ export function EstimatedPriceEdit({
   useEffect(() => {
     if (!open) return
     form.reset({ estimatedPrice: barometer.estimatedPrice ? String(barometer.estimatedPrice) : '' })
-  }, [open, form.reset, barometer.estimatedPrice])
+  }, [open, form, barometer.estimatedPrice])
 
   const update = (values: EstimatedPriceForm) => {
     startTransition(async () => {

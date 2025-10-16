@@ -53,7 +53,7 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
   useEffect(() => {
     if (!open) return
     form.reset({ value: String(barometer[property] || '') })
-  }, [open, form.reset, barometer[property], property])
+  }, [open, form, barometer[property], property])
 
   const onSubmit = (values: FormData) => {
     // Check if value actually changed

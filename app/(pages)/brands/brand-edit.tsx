@@ -159,7 +159,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
       countries: brand.countries.map(({ id }) => id),
       icon: brand.icon,
     })
-  }, [brand, form.reset])
+  }, [brand, form])
 
   return (
     <Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>

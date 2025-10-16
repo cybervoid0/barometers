@@ -80,7 +80,7 @@ export function InaccuracyReport({ barometer, ...props }: Props) {
   useEffect(() => {
     if (!isOpened) return
     form.reset()
-  }, [form.reset, isOpened])
+  }, [form, isOpened])
 
   return (
     <>

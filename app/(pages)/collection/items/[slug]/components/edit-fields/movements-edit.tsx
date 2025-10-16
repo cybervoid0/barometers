@@ -65,7 +65,7 @@ export function MovementsEdit({
     form.reset({
       subCategoryId: barometer.subCategoryId ? String(barometer.subCategoryId) : NONE_VALUE,
     })
-  }, [open, form.reset, barometer.subCategoryId])
+  }, [open, form, barometer.subCategoryId])
 
   const update = (values: SubcategoryForm) => {
     startTransition(async () => {

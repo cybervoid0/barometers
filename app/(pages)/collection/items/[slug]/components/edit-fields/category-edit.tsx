@@ -76,7 +76,7 @@ export function CategoryEdit({ barometer, categories }: Props) {
   useEffect(() => {
     if (!open) return
     form.reset({ categoryId: barometer.categoryId })
-  }, [open, form.reset, barometer.categoryId])
+  }, [open, barometer.categoryId, form])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -68,7 +68,7 @@ export function PurchasedAtEdit({
         ? dayjs.utc(barometer.purchasedAt).format('YYYY-MM-DD')
         : '',
     })
-  }, [open, barometer.purchasedAt, form.reset])
+  }, [open, barometer.purchasedAt, form])
 
   const update = (values: PurchasedAtForm) => {
     startTransition(async () => {
