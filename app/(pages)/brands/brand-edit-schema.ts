@@ -3,7 +3,7 @@ import type { updateBrand } from '@/server/brands/actions'
 import { createImagesInDb } from '@/server/files/images'
 import { savePdfs } from '@/server/files/pdfs'
 import { ImageType } from '@/types'
-import { getBrandSlug } from '@/utils'
+import { getBrandFileSlug, getBrandSlug } from '@/utils'
 
 // Schema for form validation (input)
 export const BrandEditSchema = z.object({
@@ -45,13 +45,14 @@ export const BrandEditTransformSchema = BrandEditSchema.transform(
     ...values
   }): Promise<Parameters<typeof updateBrand>[0]> => {
     const slug = getBrandSlug(values.name, values.firstName)
+    const fileSlug = getBrandFileSlug(values.name, values.firstName)
 
     return {
       ...values,
       slug,
       images: {
         deleteMany: {},
-        connect: await createImagesInDb(images, ImageType.Brand, slug),
+        connect: await createImagesInDb(images, ImageType.Brand, fileSlug),
       },
       successors: {
         set: successors.map(id => ({ id })),

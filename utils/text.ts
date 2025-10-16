@@ -1,13 +1,26 @@
 import slugify from 'slugify'
 
+export function fileSlug(text: string): string {
+  // Extend charmap to replace slashes with underscores
+  slugify.extend({ '/': '_' })
+
+  return slugify(text, {
+    trim: true,
+    lower: true,
+    replacement: '_',
+    remove: /[,.'"]/g,
+  })
+}
+
 export function slug(text: string): string {
-  return encodeURIComponent(
-    slugify(text, { trim: true, lower: true, replacement: '_', remove: /[,.'"]/g }),
-  )
+  return encodeURIComponent(fileSlug(text))
 }
 
 export const getBrandSlug = (lastName: string, firstName?: string | undefined | null) =>
   slug(`${firstName ? `${firstName}_` : ''}${lastName}`)
+
+export const getBrandFileSlug = (lastName: string, firstName?: string | undefined | null) =>
+  fileSlug(`${firstName ? `${firstName}_` : ''}${lastName}`)
 
 /**
  * Removes slashes at the beginning/end of API route URL

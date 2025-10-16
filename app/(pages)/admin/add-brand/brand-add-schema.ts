@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { createImagesInDb } from '@/server/files/images'
 import { savePdfs } from '@/server/files/pdfs'
 import { ImageType } from '@/types'
-import { getBrandSlug } from '@/utils'
+import { getBrandFileSlug, getBrandSlug } from '@/utils'
 
 // Zod validation schema
 const brandSchema = z.object({
@@ -39,6 +39,7 @@ type BrandFormData = z.infer<typeof brandSchema>
 const brandTransformSchema = brandSchema.transform(
   async ({ countries, successors, images, pdfFiles, ...formData }) => {
     const slug = getBrandSlug(formData.name, formData.firstName)
+    const fileSlug = getBrandFileSlug(formData.name, formData.firstName)
     return {
       ...formData,
       slug,
@@ -51,7 +52,7 @@ const brandTransformSchema = brandSchema.transform(
       images:
         images.length > 0
           ? {
-              connect: await createImagesInDb(images, ImageType.Brand, slug),
+              connect: await createImagesInDb(images, ImageType.Brand, fileSlug),
             }
           : undefined,
       pdfFiles:
