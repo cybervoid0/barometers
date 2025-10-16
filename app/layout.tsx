@@ -8,7 +8,7 @@ import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
 import { Footer, Header } from '@/components/containers'
-import { CheckConsent, CookieConsent } from '@/components/elements'
+import { CheckConsent, CookieConsent, ScrollToTop } from '@/components/elements'
 import { withPrisma } from '@/prisma/prismaClient'
 import { CountryProvider } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
@@ -91,6 +91,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           )}
         >
           <Providers>
+            <ScrollToTop />
             <CookieConsent />
             <Toaster position="top-center" richColors />
             <div className="flex h-screen flex-col">
