@@ -222,6 +222,12 @@
   * {
     @apply border-border;
   }
+
+  /* Smooth scroll behavior for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* Typography styles */
 
   /* H1 is used only once in the site layout header */

@@ -141,23 +141,27 @@ export const getBrand = unstable_cache(
 export const getBrandsByCountry = unstable_cache(
   withPrisma(async prisma => {
     const countries = await prisma.country.findMany({
-      orderBy: [
-        {
-          name: 'asc',
-        },
-        { id: 'asc' },
-      ],
       where: {
         manufacturers: {
           some: {},
         },
       },
       include: {
+        _count: {
+          select: {
+            manufacturers: true,
+          },
+        },
         manufacturers: {
           orderBy: {
             name: 'asc',
           },
           include: {
+            _count: {
+              select: {
+                barometers: true,
+              },
+            },
             predecessors: {
               select: {
                 id: true,
@@ -187,17 +191,19 @@ export const getBrandsByCountry = unstable_cache(
         },
       },
     })
-    return countries.map(country => {
-      return {
-        ...country,
-        manufacturers: country.manufacturers.map(({ icon, ...brand }) => {
-          return {
-            ...brand,
-            icon: bufferToBase64Url(icon),
-          }
-        }),
-      }
-    })
+    return countries
+      .map(country => {
+        return {
+          ...country,
+          manufacturers: country.manufacturers.map(({ icon, ...brand }) => {
+            return {
+              ...brand,
+              icon: bufferToBase64Url(icon),
+            }
+          }),
+        }
+      })
+      .sort((a, b) => b._count.manufacturers - a._count.manufacturers)
   }),
   ['getBrandsByCountry'],
   { tags: [Tag.brands] },

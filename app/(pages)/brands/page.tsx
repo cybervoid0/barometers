@@ -27,41 +27,29 @@ const BrandByCountry = ({
   country,
   countries,
   allBrands,
-  leading,
 }: {
   country: BrandsByCountryDTO[number]
   countries: CountryListDTO
   allBrands: AllBrandsDTO
-  leading?: number
 }) => {
   const manufacturerCount = country.manufacturers.length
 
   return (
-    <Card className={`overflow-hidden mb-6 ${leading ? 'ring-2 ring-primary/20' : ''}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{country.flag || '🏭'}</span>
-            <div>
-              <CardTitle className="text-lg">{country.name}</CardTitle>
-              <CardDescription className="flex items-center gap-1">
-                <Factory className="w-3 h-3" />
-                {manufacturerCount} manufacturer{manufacturerCount !== 1 ? 's' : ''}
-              </CardDescription>
-            </div>
+    <Card id={country.code?.toLowerCase() ?? undefined} className="overflow-hidden">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{country.flag || '🏭'}</span>
+          <div>
+            <CardTitle className="text-lg">{country.name}</CardTitle>
+            <CardDescription className="flex items-center gap-1">
+              <Factory className="w-3 h-3" />
+              {manufacturerCount} manufacturer{manufacturerCount !== 1 ? 's' : ''}
+            </CardDescription>
           </div>
-          {typeof leading !== 'undefined' && (
-            <Badge
-              variant="secondary"
-              className="text-xs text-primary-foreground hover:bg-secondary cursor-default"
-            >
-              Leading Region {leading}
-            </Badge>
-          )}
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent>
         <div className="space-y-3">
           {country.manufacturers.map(brand => {
             const { id, firstName, name, slug, icon } = brand
@@ -115,13 +103,8 @@ export default async function Brands() {
   const totalManufacturers = allBrands.length
   const totalCountries = brandsByCountry.length
 
-  // Get top countries by manufacturer count
-  const topCountries = brandsByCountry
-    .sort((a, b) => b.manufacturers.length - a.manufacturers.length)
-    .slice(0, 3)
-
   return (
-    <article className="mt-6 space-y-8">
+    <article className="mt-6 space-y-6">
       {/* Header */}
       <header>
         <div className="flex items-center gap-3 mb-6">
@@ -134,59 +117,63 @@ export default async function Brands() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Manufacturers</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalManufacturers}</div>
-              <p className="text-xs text-muted-foreground">Craftsmen in collection</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Countries</CardTitle>
-              <Globe className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalCountries}</div>
-              <p className="text-xs text-muted-foreground">Different regions</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Leading Regions</CardTitle>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                {topCountries.map(country => (
-                  <div key={country.id} className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1">
-                      <span>{country.flag || '🏭'}</span>
+        {/* Countries Table */}
+        <Card className="mb-0">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-0">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <CardTitle>All Regions</CardTitle>
+                </div>
+                <CardDescription>Browse manufacturers by country</CardDescription>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <div className="font-bold text-lg">{totalManufacturers}</div>
+                    <div className="text-xs text-muted-foreground">Manufacturers</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <div className="font-bold text-lg">{totalCountries}</div>
+                    <div className="text-xs text-muted-foreground">Countries</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-1.5 gap-x-3">
+              {brandsByCountry.map(country => (
+                <a
+                  key={country.id}
+                  href={`#${country.code?.toLowerCase()}`}
+                  className="group flex items-center justify-between py-0.5 px-2 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all duration-200 no-underline"
+                >
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-xl flex-shrink-0">{country.flag || '🏭'}</span>
+                    <span className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                       {country.name}
                     </span>
-                    <Badge variant="outline" className="text-xs">
-                      {country.manufacturers.length}
-                    </Badge>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <Badge variant="secondary" className="ml-2 flex-shrink-0">
+                    <span className="text-background">{country._count.manufacturers}</span>
+                  </Badge>
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </header>
 
       {/* Manufacturers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {brandsByCountry.map((country, i) => (
+        {brandsByCountry.map(country => (
           <BrandByCountry
-            leading={[0, 1, 2].includes(i) ? i + 1 : undefined}
             allBrands={allBrands}
             key={country.id}
             country={country}
