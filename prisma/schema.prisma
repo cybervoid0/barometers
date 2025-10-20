@@ -167,6 +167,7 @@ model User {
   avatarURL String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  Customer  Customer?
 }
 
 model Document {
@@ -203,4 +204,137 @@ enum AccessRole {
   USER
   OWNER
   ADMIN
+}
+
+/// SHOP
+
+model Customer {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  orders           Order[]
+}
+
+model Product {
+  id               String         @id @default(uuid())
+  name             String
+  slug             String         @unique
+  description      String?
+  stripeProductId  String         @unique
+  stripePriceIdEUR String? // Stripe Price ID для EUR
+  stripePriceIdUSD String? // Stripe Price ID для USD
+  priceEUR         Int? // Цена в центах (евро)
+  priceUSD         Int? // Цена в центах (доллары)
+  stock            Int            @default(0)
+  isActive         Boolean        @default(true)
+  weight           Int? // Вес в граммах
+  dimensions       Json? // Размеры для доставки
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  images           ProductImage[]
+  orderItems       OrderItem[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id                    String          @id @default(uuid())
+  orderNumber           String          @unique
+  customerId            String
+  customer              Customer        @relation(fields: [customerId], references: [id])
+  shippingAddressId     String
+  shippingAddress       ShippingAddress @relation(fields: [shippingAddressId], references: [id])
+  status                OrderStatus     @default(PENDING)
+  currency              Currency
+  subtotal              Int // Сумма в центах
+  shippingCost          Int             @default(0) // В центах
+  tax                   Int             @default(0) // В центах
+  total                 Int // Итого в центах
+  stripeSessionId       String?         @unique
+  stripePaymentIntentId String?         @unique
+  notes                 String?
+  trackingNumber        String?
+  shippedAt             DateTime?
+  deliveredAt           DateTime?
+  cancelledAt           DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  items                 OrderItem[]
+  payment               Payment?
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Int
+  priceAtTime Int // Цена в центах на момент покупки
+  createdAt   DateTime @default(now())
+}
+
+model ShippingAddress {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  address    String
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  orderId               String        @unique
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  stripePaymentIntentId String        @unique
+  amount                Int // sum in cents
+  currency              Currency
+  status                PaymentStatus @default(PENDING)
+  paidAt                DateTime?
+  refundedAt            DateTime?
+  refundAmount          Int? // in cents
+  failureMessage        String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+enum OrderStatus {
+  PENDING // created, waiting for payment
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum Currency {
+  EUR
+  USD
 }
