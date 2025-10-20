@@ -1,4 +1,4 @@
-import type { AccessRole } from '@prisma/client'
+import type { AccessRole, Prisma } from '@prisma/client'
 
 export interface MenuItem {
   id: number | string
@@ -52,3 +52,5 @@ export interface MediaFile {
   url: string
   name: string
 }
+
+export type ProductWithImages = Prisma.ProductGetPayload<{ include: { images: true } }>
