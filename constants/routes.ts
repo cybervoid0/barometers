@@ -8,6 +8,8 @@ const root = {
   Terms: '/terms-and-conditions/',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
+  Documents: '/documents/',
+  Signin: '/signin/',
 } as const
 
 const foundation = '/foundation'
@@ -39,10 +41,17 @@ const adminRoutes = {
   AddBarometer: `${admin}/add-barometer/`,
   AddBrand: `${admin}/add-brand/`,
   AddDocument: `${admin}/add-document/`,
+  AddProduct: `${admin}/add-product/`,
   AddEssay: `${admin}/add-essay/`,
   Reports: `${admin}/reports/`,
   Materials: `${admin}/materials/`,
   Movements: `${admin}/movements/`,
+} as const
+
+const shop = '/shop'
+const shopRoutes = {
+  Shop: `${shop}/`,
+  Cart: `${shop}/cart`,
 } as const
 
 export const Route = {
@@ -50,6 +59,7 @@ export const Route = {
   ...foundationRoutes,
   ...collectionRoutes,
   ...adminRoutes,
+  ...shopRoutes,
 } as const
 export function isRouteKey(value: string): value is keyof typeof Route {
   return value in Route

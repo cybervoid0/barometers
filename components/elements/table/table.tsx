@@ -36,10 +36,15 @@ export function Table<T>({ table, onRowClick, ...props }: Props<T>) {
                   }}
                 >
                   {header.isPlaceholder ? null : (
-                    <div className="flex items-center gap-2">
-                      <p className="capitalize">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </p>
+                    <div
+                      style={{
+                        justifyContent:
+                          (header.column.columnDef.meta as { justifyContent?: string })
+                            ?.justifyContent ?? 'flex-start',
+                      }}
+                      className="flex items-center gap-2 first-letter:capitalize"
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                       {canSort && (
                         <Button
                           variant="ghost"
