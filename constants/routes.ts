@@ -13,10 +13,14 @@ export const Route = {
   AddBarometer: '/admin/add-barometer/',
   AddBrand: '/admin/add-brand/',
   AddDocument: '/admin/add-document/',
+  AddProduct: '/admin/add-product/',
   Reports: '/admin/reports/',
+  Shop: '/shop/',
+  Cart: '/shop/cart',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
   Documents: '/documents/',
+  Signin: '/signin/',
 } as const
 
 export type Route = (typeof Route)[keyof typeof Route]
