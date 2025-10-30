@@ -8,10 +8,8 @@ import { Image } from '@/components/elements'
 import { Button } from '@/components/ui'
 import { formatPrice } from '@/utils'
 
-type Product = NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>
-
 interface Props {
-  product: Product
+  product: NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>
 }
 
 export function ProductDetails({ product }: Props) {
@@ -22,6 +20,13 @@ export function ProductDetails({ product }: Props) {
     const res = addItem(product.id, product.stock)
     if (!res.success) {
       toast.error(res.error, { id: 'add-item-error' })
+    }
+  }
+
+  const handleSubtractItem = () => {
+    const res = subtractItem(product.id, product.stock)
+    if (!res.success) {
+      toast.error(res.error, { id: 'subtract-item-error' })
     }
   }
 
@@ -47,7 +52,7 @@ export function ProductDetails({ product }: Props) {
         <Button
           className="rounded-none first:rounded-l-md last:rounded-r-md"
           size="sm"
-          onClick={() => subtractItem(product.id)}
+          onClick={handleSubtractItem}
         >
           <Minus />
         </Button>
