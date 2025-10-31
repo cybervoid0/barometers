@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type ComponentProps, useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -29,8 +29,7 @@ import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { MovementsDTO } from '@/server/movements/queries'
 
-interface SubcategoryEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
+interface SubcategoryEditProps {
   barometer: NonNullable<BarometerDTO>
   movements: MovementsDTO
 }
@@ -85,7 +84,7 @@ export function MovementsEdit({ barometer, movements }: SubcategoryEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit movement type" />
+      <EditButton title="Edit movement type" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

@@ -1,11 +1,17 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit, Trash2, X } from 'lucide-react'
+import { Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { IconUpload, ImageUpload, PdfFilesUpload, RequiredFieldMark } from '@/components/elements'
+import {
+  EditButton,
+  IconUpload,
+  ImageUpload,
+  PdfFilesUpload,
+  RequiredFieldMark,
+} from '@/components/elements'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +36,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -163,12 +168,7 @@ export function BrandEdit({ brand, countries, brands }: Props) {
 
   return (
     <Dialog open={openBrandDialog} onOpenChange={setOpenBrandDialog}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" aria-label="Edit manufacturer" className="h-fit w-fit p-1">
-          <Edit className="text-destructive" size={18} />
-        </Button>
-      </DialogTrigger>
-
+      <EditButton title={`Edit ${brand.name}`} />
       <DialogContent className={cn({ 'overflow-hidden': loading })}>
         {loading && <LoadingOverlay />}
         <DialogHeader>

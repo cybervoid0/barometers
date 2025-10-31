@@ -8,8 +8,8 @@ interface CartState {
   items: Record<string, number>
 }
 interface CartStateActions {
-  addItem: (productId: string, stock: number, inStock?: number) => ActionResult
-  subtractItem: (productId: string, inStock?: number) => ActionResult
+  addItem: (productId: string, inStock: number) => ActionResult
+  subtractItem: (productId: string) => ActionResult
   removeItem: (productId: string) => ActionResult
   clearCart: () => void
   getTotalItems: () => number
@@ -27,24 +27,29 @@ const createCartStore = () =>
     persist(
       immer((set, get) => ({
         ...defaultCartState,
-        addItem: (productId, stock, inStock = 1) => {
+        addItem: (productId, inStock) => {
           const items = get().items
-          const newQuantity = (items[productId] ?? 0) + inStock
-          if (newQuantity > stock) return { success: false, error: 'Not enough items in stock' }
+          const newQuantity = (items[productId] ?? 0) + 1
+
+          if (newQuantity > inStock) return { success: false, error: 'Not enough items in stock' }
           set(state => {
             state.items[productId] = newQuantity
           })
           return { success: true }
         },
 
-        subtractItem: (productId, inStock = 1) => {
+        subtractItem: productId => {
           const items = get().items
           if (!(productId in items)) {
             return { success: false, error: 'Subtracting from unknown product' }
           }
           set(state => {
-            const newQuantity = (state.items[productId] ?? 0) - inStock
-            state.items[productId] = newQuantity <= 0 ? 0 : newQuantity
+            const newQuantity = (state.items[productId] ?? 0) - 1
+            if (newQuantity <= 0) {
+              delete state.items[productId]
+            } else {
+              state.items[productId] = newQuantity
+            }
           })
           return { success: true }
         },

@@ -1,7 +1,8 @@
 import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
-import { getOrderBySessionId } from '@/app/(pages)/shop/server/actions'
 import { Button } from '@/components/ui'
+import { Route } from '@/constants'
+import { getOrderBySessionId } from '../../server/queries'
 
 interface Props {
   searchParams: Promise<{ session_id?: string }>
@@ -23,9 +24,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
     )
   }
 
-  const result = await getOrderBySessionId(sessionId)
+  const order = await getOrderBySessionId(sessionId)
 
-  if (!result.success || !result.order) {
+  if (!order) {
     return (
       <div className="container mx-auto py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
@@ -36,8 +37,6 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </div>
     )
   }
-
-  const { order } = result
 
   return (
     <div className="container mx-auto py-16 max-w-2xl">
@@ -108,7 +107,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/shop">
+        <Link href={Route.Shop}>
           <Button>Continue Shopping</Button>
         </Link>
       </div>

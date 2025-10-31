@@ -151,33 +151,23 @@ export const getAllOrders = withPrisma(async (prisma, status?: OrderStatus) => {
 })
 
 /**
- * Update order status
+ * Get order by session ID
  */
-export const updateOrderStatus = withPrisma(
-  async (prisma, orderId: string, status: OrderStatus, trackingNumber?: string) => {
-    const data: {
-      status: OrderStatus
-      trackingNumber?: string
-      shippedAt?: Date
-      deliveredAt?: Date
-      cancelledAt?: Date
-    } = { status }
-
-    if (trackingNumber) {
-      data.trackingNumber = trackingNumber
-    }
-
-    if (status === 'SHIPPED') {
-      data.shippedAt = new Date()
-    } else if (status === 'DELIVERED') {
-      data.deliveredAt = new Date()
-    } else if (status === 'CANCELLED') {
-      data.cancelledAt = new Date()
-    }
-
-    return prisma.order.update({
-      where: { id: orderId },
-      data,
-    })
-  },
+export const getOrderBySessionId = withPrisma(async (prisma, sessionId: string) =>
+  prisma.order.findUnique({
+    where: { stripeSessionId: sessionId },
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+      shippingAddress: true,
+      customer: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  }),
 )
