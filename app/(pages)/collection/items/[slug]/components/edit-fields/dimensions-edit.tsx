@@ -98,7 +98,7 @@ export function DimensionEdit({ barometer }: DimensionEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit dimensions" />
+      <EditButton title="Edit dimensions" />
       <DialogContent className="sm:max-w-2xl">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>

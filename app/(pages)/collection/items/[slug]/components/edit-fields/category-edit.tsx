@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { EditButton } from '@/components/elements/EditButton'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -80,7 +80,7 @@ export function CategoryEdit({ barometer, categories }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit category" />
+      <EditButton title="Edit Category" />
       <DialogContent>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)}>

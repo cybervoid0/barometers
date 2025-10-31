@@ -26,10 +26,8 @@ import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 
 interface TextFieldEditProps {
-  size?: number
   barometer: NonNullable<BarometerDTO>
   property: keyof NonNullable<BarometerDTO>
-  className?: string
 }
 
 const textFieldSchema = z.object({
@@ -81,7 +79,7 @@ export function TextFieldEdit({ barometer, property }: TextFieldEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label={`Edit ${property}`} />
+      <EditButton title={`Edit ${property}`} />
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-medium capitalize">
