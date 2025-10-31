@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { EditButton } from '@/components/elements/EditButton'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -82,7 +82,7 @@ export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit condition" />
+      <EditButton title="Edit Condition" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

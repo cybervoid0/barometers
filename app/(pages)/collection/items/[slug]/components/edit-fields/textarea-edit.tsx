@@ -26,7 +26,6 @@ import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 
 interface TextAreaEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
   barometer: NonNullable<BarometerDTO>
   property: keyof NonNullable<BarometerDTO>
   label?: string
@@ -79,7 +78,7 @@ export function TextAreaEdit({ barometer, property, label }: TextAreaEditProps) 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label={`Edit ${property}`} />
+      <EditButton title={`Edit ${property}`} />
       <DialogContent className="sm:max-w-2xl">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)} noValidate>

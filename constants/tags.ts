@@ -6,5 +6,7 @@ export const Tag = {
   conditions: 'conditions',
   materials: 'materials',
   movements: 'movements',
+  products: 'products',
+  orders: 'orders',
 } as const
 export type Tag = (typeof Tag)[keyof typeof Tag]
