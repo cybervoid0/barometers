@@ -1,6 +1,6 @@
 'use server'
 
-import type { Currency, Product } from '@prisma/client'
+import type { Currency, OrderStatus, Product } from '@prisma/client'
 import slugify from 'slugify'
 import { withPrisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
@@ -384,33 +384,45 @@ export const createCheckoutSession = withPrisma(
 )
 
 /**
- * Get order by session ID
+ * Update order status
  */
-export const getOrderBySessionId = withPrisma(async (prisma, sessionId: string) => {
-  try {
-    const order = await prisma.order.findUnique({
-      where: { stripeSessionId: sessionId },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-        shippingAddress: true,
-        customer: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    })
+export const updateOrderStatus = withPrisma(
+  async (prisma, orderId: string, status: OrderStatus, trackingNumber?: string) => {
+    try {
+      const data: {
+        status: OrderStatus
+        trackingNumber?: string
+        shippedAt?: Date
+        deliveredAt?: Date
+        cancelledAt?: Date
+      } = { status }
 
-    return { success: true, order }
-  } catch (error) {
-    console.error('Error getting order:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      if (trackingNumber) {
+        data.trackingNumber = trackingNumber
+      }
+
+      if (status === 'SHIPPED') {
+        data.shippedAt = new Date()
+      } else if (status === 'DELIVERED') {
+        data.deliveredAt = new Date()
+      } else if (status === 'CANCELLED') {
+        data.cancelledAt = new Date()
+      }
+
+      const order = prisma.order.update({
+        where: { id: orderId },
+        data,
+      })
+
+      return {
+        success: true,
+        order,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unable to update order',
+      }
     }
-  }
-})
+  },
+)

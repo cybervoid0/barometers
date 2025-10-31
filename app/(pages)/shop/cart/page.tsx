@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react'
+import { ShoppingBag, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -18,6 +18,8 @@ import { Button, Separator } from '@/components/ui'
 import { Route } from '@/constants'
 import type { ProductWithImages } from '@/types'
 import { formatPrice } from '@/utils'
+import { ContinueShopping } from '../components/continue-shopping'
+import { QuantityChange } from '../components/quantity-change'
 import { useCartStore } from '../providers/CartStoreProvider'
 import { fetchProductsByIds } from '../server/query-actions'
 
@@ -28,8 +30,9 @@ export default function Cart() {
   const { data: session } = useSession()
   const user = session?.user.name
   const role = session?.user.role
-  const { items, addItem, subtractItem, removeItem, clearCart, getProductAmount, getTotalItems } =
-    useCartStore(state => state)
+  const { items, removeItem, clearCart, getProductAmount, getTotalItems } = useCartStore(
+    state => state,
+  )
 
   const [products, setProducts] = useState<ProductWithImages[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -95,9 +98,9 @@ export default function Cart() {
       id: 'image',
       header: '',
       enableSorting: false,
-      cell: info => {
-        const image = info.getValue()
-        const product = info.row.original
+      cell: ({ row, getValue }) => {
+        const image = getValue()
+        const product = row.original
         return (
           <Link href={`${Route.Shop}/${product.slug}`}>
             {image ? (
@@ -125,17 +128,17 @@ export default function Cart() {
       id: 'name',
       header: 'Product',
       enableSorting: true,
-      cell: info => (
+      cell: ({ row, getValue }) => (
         <div>
-          <Link href={`${Route.Shop}/${info.row.original.slug}`}>
-            <p className="font-medium hover:underline">{info.getValue()}</p>
+          <Link href={`${Route.Shop}/${row.original.slug}`}>
+            <p className="font-medium hover:underline">{getValue()}</p>
           </Link>
           <p className="text-sm text-muted-foreground">
-            Stock: {info.row.original.stock}
-            {info.row.original.stock < 5 && info.row.original.stock > 0 && (
+            Stock: {row.original.stock}
+            {row.original.stock < 5 && row.original.stock > 0 && (
               <span className="text-orange-500 ml-2">Low stock!</span>
             )}
-            {info.row.original.stock === 0 && (
+            {row.original.stock === 0 && (
               <span className="text-destructive ml-2">Out of stock</span>
             )}
           </p>
@@ -146,7 +149,7 @@ export default function Cart() {
       id: 'price-eur',
       header: 'Price EUR',
       enableSorting: true,
-      cell: info => <p>{info.getValue() ? formatPrice(info.getValue() ?? 0, 'EUR') : '—'}</p>,
+      cell: ({ getValue }) => <p>{getValue() ? formatPrice(getValue() ?? 0, 'EUR') : '—'}</p>,
       meta: {
         headerAlign: 'right',
         cellAlign: 'right',
@@ -156,51 +159,20 @@ export default function Cart() {
       id: 'price-usd',
       header: 'Price USD',
       enableSorting: true,
-      cell: info => <p>{info.getValue() ? formatPrice(info.getValue() ?? 0, 'USD') : '—'}</p>,
+      cell: ({ getValue }) => <p>{getValue() ? formatPrice(getValue() ?? 0, 'USD') : '—'}</p>,
       meta: {
         headerAlign: 'right',
         cellAlign: 'right',
       },
     }),
-    accessor('id', {
+    accessor(({ id, stock }) => ({ id, stock }), {
       id: 'quantity',
       header: 'Quantity',
       enableSorting: true,
       sortingFn: (a, b) => getProductAmount(a.original.id) - getProductAmount(b.original.id),
-      cell: ({ getValue, row }) => {
-        const { id, stock } = row.original
-        const quantity = getProductAmount(getValue())
-
-        const handleAddItem = () => {
-          const res = addItem(id, stock)
-          if (!res.success) {
-            toast.error(res.error, { id: 'add-item-error' })
-          }
-        }
-
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => subtractItem(id)}
-              disabled={quantity <= 1}
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-8 text-center font-medium">{quantity}</span>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleAddItem}
-              disabled={quantity >= stock}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        )
+      cell: ({ getValue }) => {
+        const { id, stock } = getValue()
+        return <QuantityChange productId={id} stock={stock} min={1} />
       },
       meta: {
         headerAlign: 'center',
@@ -216,8 +188,8 @@ export default function Cart() {
         const subB = (b.original.priceEUR ?? 0) * getProductAmount(b.original.id)
         return subA - subB
       },
-      cell: info => {
-        const { priceEUR, id } = info.row.original
+      cell: ({ row }) => {
+        const { priceEUR, id } = row.original
         const quantity = getProductAmount(id)
         const subtotal = (priceEUR ?? 0) * quantity
         return <p className="font-medium">{formatPrice(subtotal, 'EUR')}</p>
@@ -236,8 +208,8 @@ export default function Cart() {
         const subB = (b.original.priceUSD ?? 0) * getProductAmount(b.original.id)
         return subA - subB
       },
-      cell: info => {
-        const { priceUSD, id } = info.row.original
+      cell: ({ row }) => {
+        const { priceUSD, id } = row.original
         const quantity = getProductAmount(id)
         const subtotal = (priceUSD ?? 0) * quantity
         return <p className="font-medium">{formatPrice(subtotal, 'USD')}</p>
@@ -251,8 +223,8 @@ export default function Cart() {
       id: 'remove',
       header: '',
       enableSorting: false,
-      cell: info => {
-        const { id, name } = info.row.original
+      cell: ({ row }) => {
+        const { id, name } = row.original
         return (
           <Button
             variant="ghost"
@@ -335,9 +307,7 @@ export default function Cart() {
         <Separator />
 
         <div className="flex justify-between items-start">
-          <Link href={Route.Shop}>
-            <Button variant="outline">Continue Shopping</Button>
-          </Link>
+          <ContinueShopping />
 
           <div className="space-y-3 min-w-[300px]">
             <div className="flex justify-between text-sm">

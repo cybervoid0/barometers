@@ -91,7 +91,7 @@ export function MaterialsEdit({ barometer, materials }: MaterialsEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit materials" />
+      <EditButton title="Edit materials" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type ComponentProps, useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -23,8 +23,7 @@ import { createImagesInDb } from '@/server/files/images'
 import { ImageType } from '@/types'
 import { cn } from '@/utils'
 
-interface ImagesEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
+interface ImagesEditProps {
   barometer: NonNullable<BarometerDTO>
 }
 
@@ -110,7 +109,7 @@ export function ImagesEdit({ barometer }: ImagesEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit images" />
+      <EditButton title="Edit images" />
       <DialogContent className={cn('sm:max-w-4xl', { 'overflow-hidden': isPending })}>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(update)} noValidate>

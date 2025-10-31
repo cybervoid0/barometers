@@ -1,9 +1,16 @@
+import 'server-only'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { getProducts } from '@/app/(pages)/shop/server/queries'
+import { IsAdmin } from '@/components/elements'
 import { Button } from '@/components/ui'
-import { Route } from '@/constants'
+import type { DynamicOptions } from '@/types'
 import { formatPrice } from '@/utils/currency'
+import { ViewShoppingCart } from './components/view-shopping-cart'
+import { EditProduct } from './edit-product'
+
+export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function ShopPage() {
   const products = await getProducts()
@@ -11,9 +18,7 @@ export default async function ShopPage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-4">Shop</h1>
-      <Link className="block mb-6" href={Route.Cart}>
-        <Button>View shopping cart</Button>
-      </Link>
+      <ViewShoppingCart className="mb-6" />
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">No products available yet.</p>
@@ -26,8 +31,11 @@ export default async function ShopPage() {
           {products.map(product => (
             <div
               key={product.id}
-              className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
             >
+              <IsAdmin>
+                <EditProduct product={product} />
+              </IsAdmin>
               <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
                 {product.images.length > 0 ? (
                   <Image
