@@ -80,14 +80,27 @@ export async function createImagesInDb(
   return images
 }
 
-function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
-  if (!tempUrl.startsWith('temp/')) return Promise.resolve(tempUrl)
+/**
+ * Renames temp image and moves to `gallery` folder in the MinIO storage
+ * @param tempUrl temporary random URL in the MinIO `temp` folder
+ * @param type specifies image type (manufacturer, barometer, document)
+ * @param idSuffix specifies a word for image identification (manuf. slug, barom. ID, etc)
+ * different for every image type
+ * @returns permanent image URL in `gallery` MinIO folder
+ */
+async function saveImage(tempUrl: string, type: ImageType, idSuffix: string): Promise<string> {
+  if (!tempUrl.startsWith('temp/')) return tempUrl
   const permanentUrl = generatePermanentImageName(tempUrl, type, idSuffix)
-  return saveFileToStorage(tempUrl, permanentUrl).then(() => permanentUrl)
+  await saveFileToStorage(tempUrl, permanentUrl)
+  return permanentUrl
+}
+
+function getRandomSuffix(): string {
+  return crypto.randomUUID().slice(0, 8)
 }
 
 function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: string): string {
   const extension = path.extname(tempUrl)
-  const random = crypto.randomUUID().slice(0, 8)
+  const random = getRandomSuffix()
   return `gallery/${type}-${idSuffix}__${random}${extension}`
 }

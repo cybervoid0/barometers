@@ -55,7 +55,7 @@ const nextConfig: NextConfig = {
     if (!minioBucket || !minioUrl) return []
     return [
       {
-        source: '/:prefix(categories|gallery|history|shared|temp)/:path*',
+        source: '/:prefix(categories|gallery|history|shared|temp|products)/:path*',
         destination: `${minioUrl}/${minioBucket}/:prefix/:path*`,
       },
     ]

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { saveProductImages } from '@/server/files/images'
 
 export const productSchema = z
   .object({
@@ -47,6 +48,12 @@ export const productSchema = z
         },
         { message: 'Weight must be a valid non-negative integer' },
       ),
+    images: z.array(
+      z.object({
+        url: z.string().min(1, 'URL is required'),
+        name: z.string(),
+      }),
+    ),
   })
   .refine(
     data => {
@@ -61,11 +68,12 @@ export const productSchema = z
 
 export type ProductFormData = z.infer<typeof productSchema>
 
-export const productTransformSchema = productSchema.transform(data => ({
+export const productTransformSchema = productSchema.transform(async data => ({
   name: data.name,
   description: data.description || undefined,
   priceEUR: data.priceEUR ? Math.round(Number.parseFloat(data.priceEUR) * 100) : undefined,
   priceUSD: data.priceUSD ? Math.round(Number.parseFloat(data.priceUSD) * 100) : undefined,
   stock: Number.parseInt(data.stock, 10),
   weight: data.weight ? Number.parseInt(data.weight, 10) : undefined,
+  images: await saveProductImages(data.images),
 }))
