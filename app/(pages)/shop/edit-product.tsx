@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Product } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -16,13 +15,14 @@ import {
   DialogTitle,
   FormProvider,
 } from '@/components/ui'
+import type { ProductWithImages } from '@/types'
 import { centsToAmount } from '@/utils/currency'
 import { type ProductFormData, productSchema, productTransformSchema } from '../admin/add-product'
 import { ProductForm } from '../admin/add-product/product-form'
 import { updateProduct } from './server/actions'
 
 interface Props {
-  product: Product
+  product: ProductWithImages
 }
 function EditProduct({ product }: Props) {
   const router = useRouter()
@@ -41,6 +41,10 @@ function EditProduct({ product }: Props) {
       priceEUR: centsToAmount(product.priceEUR ?? 0).toString(),
       stock: String(product.stock),
       weight: String(product.weight),
+      images: product.images.map(({ url, name }) => ({
+        url,
+        name: name ?? product.name,
+      })),
     })
   }, [open, product, reset])
 

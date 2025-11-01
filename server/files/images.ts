@@ -6,6 +6,7 @@ import sharp from 'sharp'
 import { withPrisma } from '@/prisma/prismaClient'
 import { minioBucket, minioClient } from '@/services/minio'
 import type { ImageType, MediaFile } from '@/types'
+import { fileSlug } from '@/utils'
 import { saveFile } from './actions'
 
 /**
@@ -70,15 +71,12 @@ const createBlurData = withPrisma(
   },
 )
 
+/**
+ * Save image files to MinIO storage and create corresponding database records
+ */
 const createImagesInDb = withPrisma(
   async (prisma, imageFiles: MediaFile[], imageType: ImageType, idSuffix: string) => {
-    const savedImages = await Promise.all(
-      imageFiles.map(async ({ url, name }, order) => ({
-        url: await saveImage(url, imageType, idSuffix),
-        name,
-        order,
-      })),
-    )
+    const savedImages = await saveImages(imageFiles, imageType, idSuffix)
     const images = await prisma.image.createManyAndReturn({
       data: savedImages,
       select: {
@@ -93,18 +91,64 @@ const createImagesInDb = withPrisma(
     return images
   },
 )
+function saveImages(imageFiles: MediaFile[], imageType: ImageType, idSuffix: string) {
+  return Promise.all(
+    imageFiles.map(async ({ url, name }, order) => ({
+      url: await saveImage(url, imageType, idSuffix),
+      name,
+      order,
+    })),
+  )
+}
 
-async function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
+/**
+ * Renames temp image and moves to `gallery` folder in the MinIO storage
+ * @param tempUrl temporary random URL in the MinIO `temp` folder
+ * @param type specifies image type (manufacturer, barometer, document)
+ * @param idSuffix specifies a word for image identification (manuf. slug, barom. ID, etc)
+ * different for every image type
+ * @returns permanent image URL in `gallery` MinIO folder
+ */
+async function saveImage(tempUrl: string, type: ImageType, idSuffix: string): Promise<string> {
   if (!tempUrl.startsWith('temp/')) return tempUrl
   const permanentUrl = generatePermanentImageName(tempUrl, type, idSuffix)
   await saveFile(tempUrl, permanentUrl)
   return permanentUrl
 }
 
+function getRandomSuffix(): string {
+  return crypto.randomUUID().slice(0, 8)
+}
+
 function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: string): string {
   const extension = path.extname(tempUrl)
-  const random = crypto.randomUUID().slice(0, 8)
+  const random = getRandomSuffix()
   return `gallery/${type}-${idSuffix}__${random}${extension}`
 }
 
-export { createImagesInDb, saveImage }
+/******* Handle Product images *******/
+
+function generatePermanentProductImageName(tempUrl: string, name: string): string {
+  const extension = path.extname(tempUrl)
+  const random = getRandomSuffix()
+  return `products/${fileSlug(name)}__${random}${extension}`
+}
+
+async function saveProductImage({ url, name }: { url: string; name: string }) {
+  const newUrl = generatePermanentProductImageName(url, name)
+  await saveFile(url, newUrl)
+  return {
+    name,
+    url: newUrl,
+  }
+}
+
+/**
+ * Give constant names to temp product images and save to MinIO storage
+ */
+async function saveProductImages(images: { url: string; name: string }[]) {
+  if (images.length === 0) return []
+  return await Promise.all(images.map(saveProductImage))
+}
+
+export { createImagesInDb, saveImage, saveProductImages }

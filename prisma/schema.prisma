@@ -243,7 +243,7 @@ model ProductImage {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String
-  alt       String?
+  name      String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
 }

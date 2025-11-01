@@ -1,6 +1,6 @@
 'use server'
 
-import type { Currency, OrderStatus, Product } from '@prisma/client'
+import type { Currency, OrderStatus, Prisma, Product } from '@prisma/client'
 import slugify from 'slugify'
 import { withPrisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
@@ -17,6 +17,7 @@ interface CreateProductInput {
     width?: number
     height?: number
   }
+  images?: Prisma.ProductImageCreateManyProductInput[]
 }
 
 interface CreateCheckoutSessionInput {
@@ -76,6 +77,16 @@ export const createProduct = withPrisma(async (prisma, input: CreateProductInput
       stripePriceIdUSD = priceUSD.id
     }
 
+    const images = input.images
+      ? {
+          images: {
+            createMany: {
+              data: input.images,
+            },
+          },
+        }
+      : {}
+
     // Create product in database
     const product = await prisma.product.create({
       data: {
@@ -91,6 +102,7 @@ export const createProduct = withPrisma(async (prisma, input: CreateProductInput
         weight: input.weight,
         dimensions: input.dimensions,
         isActive: true,
+        ...images,
       },
     })
 
@@ -162,6 +174,17 @@ export const updateProduct = withPrisma(
         updatedStripePriceIdUSD = priceUSD.id
       }
 
+      const images = input.images
+        ? {
+            images: {
+              deleteMany: {},
+              createMany: {
+                data: input.images,
+              },
+            },
+          }
+        : {}
+
       // Update in database
       const updatedProduct = await prisma.product.update({
         where: { id: productId },
@@ -176,6 +199,7 @@ export const updateProduct = withPrisma(
           stock: input.stock,
           weight: input.weight,
           dimensions: input.dimensions,
+          ...images,
         },
       })
 

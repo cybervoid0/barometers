@@ -109,7 +109,7 @@ export default function Cart() {
                 height={80}
                 className="rounded object-cover hover:opacity-80 transition-opacity"
                 src={image.url}
-                alt={image.alt ?? product.name}
+                alt={image.name ?? product.name}
               />
             ) : (
               <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
