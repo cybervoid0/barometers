@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { RequiredFieldMark } from '@/components/elements'
+import { ImageUpload, RequiredFieldMark } from '@/components/elements'
 import {
   FormControl,
   FormField,
@@ -115,6 +115,8 @@ function ProductForm({ onSubmit, children = null }: Props) {
           )}
         />
       </div>
+
+      <ImageUpload />
 
       {children}
     </form>
