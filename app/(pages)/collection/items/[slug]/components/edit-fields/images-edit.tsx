@@ -91,7 +91,9 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
       }
       try {
         // old images that are no longer in the form - prepare to delete
-        const deletedImages = savedImages.filter(img => !values.images.includes(img))
+        const deletedImages = savedImages.filter(
+          savedImg => !values.images.some(newImg => newImg.url === savedImg.url),
+        )
 
         const result = await updateBarometer(await TransformSchema.parseAsync(values))
         if (!result.success) throw new Error(result.error)
@@ -100,6 +102,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
         toast.success(`Updated images in ${result.data.name}.`)
 
         if (deletedImages.length > 0) await deleteFiles(deletedImages)
+        console.info('Deleted images from storage: ', deletedImages)
       } catch (error) {
         console.error(error)
         toast.error(error instanceof Error ? error.message : 'editImages: Error updating barometer')
