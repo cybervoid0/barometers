@@ -39,12 +39,15 @@ import {
 } from '@/components/ui'
 import { Route } from '@/constants'
 import { getDocumentByCatNo } from '@/server/documents/queries'
+import type { DynamicOptions } from '@/types'
 
 interface Props {
   params: Promise<{
     'cat-no': string
   }>
 }
+
+export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function Document({ params }: Props) {
   const { 'cat-no': catNo } = await params

@@ -4,12 +4,15 @@ import { Archive, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
 import { getAllDocuments } from '@/server/documents/queries'
+import type { DynamicOptions } from '@/types'
 import { DocumentTable } from './DocumentTable'
 
 export const metadata: Metadata = {
   title: 'Document Archive',
   description: 'Browse our collection of historical documents and manuscripts',
 }
+
+export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function Documents() {
   const archive = await getAllDocuments()
