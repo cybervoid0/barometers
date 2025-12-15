@@ -1,7 +1,7 @@
 'use server'
 
 import { Prisma } from '@prisma/client'
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { Tag } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 import type { ActionResult } from '@/types'
@@ -23,7 +23,7 @@ const createBrand = withPrisma(
           icon: iconBuffer,
         },
       })
-      revalidateTag(Tag.brands)
+      updateTag(Tag.brands)
       return { success: true, data: { id, name } }
     } catch (error) {
       // Handle unique constraint violations
@@ -56,7 +56,7 @@ const updateBrand = withPrisma(
         },
       })
 
-      revalidateTag(Tag.brands)
+      updateTag(Tag.brands)
       return { success: true, data: { slug, name } }
     } catch (error) {
       console.error('Error updating brand:', error)
@@ -72,7 +72,7 @@ const deleteBrand = withPrisma(async (prisma, slug: string) => {
       id: manufacturer.id,
     },
   })
-  revalidateTag(Tag.brands)
+  updateTag(Tag.brands)
 })
 
 export { createBrand, updateBrand, deleteBrand }

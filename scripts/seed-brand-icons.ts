@@ -74,7 +74,7 @@ const main = withPrisma(async prisma => {
           // Сохраняем в базу данных как Buffer (подходит для типа Bytes)
           await prisma.manufacturer.update({
             where: { id: image.id },
-            data: { icon: resizedBuffer },
+            data: { icon: new Uint8Array(resizedBuffer) },
           })
 
           console.log(
