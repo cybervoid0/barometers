@@ -28,9 +28,9 @@
     "dump": "bun ./scripts/tunnel.ts bun ./scripts/db-backup.ts",
     "minio:dev": "docker-compose -f docker-compose.dev.yml --profile dev up -d",
     "minio:stop": "docker-compose -f docker-compose.dev.yml --profile dev down",
-    "minio:backup:local": "bun ./scripts/minio-backup.ts --local",
-    "minio:backup:filesystem": "bun ./scripts/minio-backup.ts --filesystem",
-    "minio:backup:all": "bun ./scripts/minio-backup.ts --local --filesystem",
+    "minio:backup:local": "mc mirror prod/barometers local/barometers-dev",
+    "minio:backup:filesystem": "mc mirror prod/barometers ./backups/minio",
+    "minio:backup:all": "mc mirror prod/barometers local/barometers-dev && mc mirror prod/barometers ./backups/minio",
     "prepare": "husky",
     "migrate:remote": "bun ./scripts/tunnel.ts npx prisma migrate deploy"
   },
