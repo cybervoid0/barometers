@@ -1,6 +1,7 @@
 import 'server-only'
 
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import type { LucideIcon } from 'lucide-react'
 import {
   Archive,
@@ -48,6 +49,7 @@ interface Props {
 }
 
 export const dynamic: DynamicOptions = 'force-dynamic'
+dayjs.extend(utc)
 
 export default async function Document({ params }: Props) {
   const { 'cat-no': catNo } = await params
@@ -145,7 +147,7 @@ export default async function Document({ params }: Props) {
                   {doc.annotations.map((annotation, index) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: items not gonna change order
                     <li key={index} className="flex items-start gap-2">
-                      <Tag className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                      <Tag className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
                       <span>{annotation}</span>
                     </li>
                   ))}
@@ -195,7 +197,7 @@ export default async function Document({ params }: Props) {
                 <MiniCard
                   name="Date"
                   value={
-                    doc.dateDescription || (doc.date && dayjs(doc.date).format('MMMM D, YYYY'))
+                    doc.dateDescription || (doc.date && dayjs.utc(doc.date).format('MMMM D, YYYY'))
                   }
                   Icon={Calendar}
                 />
@@ -210,7 +212,7 @@ export default async function Document({ params }: Props) {
               {doc.acquisitionDate && (
                 <MiniCard
                   name="Acquired"
-                  value={dayjs(doc.acquisitionDate).format('MMMM D, YYYY')}
+                  value={dayjs.utc(doc.acquisitionDate).format('MMMM D, YYYY')}
                   Icon={Archive}
                 />
               )}

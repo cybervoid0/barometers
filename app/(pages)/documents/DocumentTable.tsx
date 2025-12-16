@@ -9,6 +9,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { FileText } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -17,6 +18,7 @@ import { Badge, Pagination } from '@/components/ui'
 import { DEFAULT_PAGE_SIZE, Route } from '@/constants'
 import type { AllDocumentsDTO } from '@/server/documents/queries'
 
+dayjs.extend(utc)
 interface Props {
   archive: AllDocumentsDTO
 }
@@ -69,10 +71,11 @@ const columns = [
     id: 'created',
     cell: info => (
       <div className="text-sm text-muted-foreground">
-        {dayjs(info.getValue()).format('MMM D, YYYY')}
+        {dayjs.utc(info.getValue()).format('MMM D, YYYY')}
       </div>
     ),
-    sortingFn: (a, b) => dayjs(a.original.createdAt).unix() - dayjs(b.original.createdAt).unix(),
+    sortingFn: (a, b) =>
+      dayjs.utc(a.original.createdAt).unix() - dayjs.utc(b.original.createdAt).unix(),
   }),
 ]
 
