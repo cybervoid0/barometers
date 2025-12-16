@@ -1,7 +1,7 @@
 'use server'
 
 import type { Prisma } from '@prisma/client'
-import { revalidatePath } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import { Tag } from '@/constants'
 import { withPrisma } from '@/prisma/prismaClient'
 
@@ -9,7 +9,7 @@ const createDocument = withPrisma(async (prisma, data: Prisma.DocumentUncheckedC
   const { id, title } = await prisma.document.create({
     data,
   })
-  revalidatePath(Tag.documents)
+  revalidateTag(Tag.documents, 'max')
   return { id, title }
 })
 
