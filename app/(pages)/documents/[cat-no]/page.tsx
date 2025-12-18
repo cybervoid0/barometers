@@ -12,12 +12,12 @@ import {
   MapPin,
   Tag,
   User,
-  ZoomIn,
+  /* ZoomIn, */
 } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Image, ImageLightbox } from '@/components/elements'
+import { Image /* , ImageLightbox  */ } from '@/components/elements'
 import {
   Badge,
   Breadcrumb,
@@ -101,29 +101,40 @@ export default async function Document({ params }: Props) {
               <CardContent>
                 <Carousel className="w-full">
                   <CarouselContent>
-                    {doc.images.map((image, index) => (
-                      <CarouselItem key={image.id}>
-                        <ImageLightbox src={image.url} name={image.name}>
-                          <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group">
-                            <Image
-                              src={image.url}
-                              alt={image.name || `${doc.title} - Image ${index + 1}`}
-                              fill
-                              className="object-contain transition-transform group-hover:scale-105"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
-                            />
-                            <div className="absolute inset-0 bg-transparent group-hover:bg-muted/40 transition-colors flex items-center justify-center">
-                              <ZoomIn className="w-8 h-8 text-foreground opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                    {doc.images.map((image, _index) => {
+                      console.log('🚀 ~ Document ~ image:', image)
+
+                      return (
+                        <CarouselItem key={image.id}>
+                          <Image
+                            width={500}
+                            height={500}
+                            src={image.url}
+                            alt={image.name ?? 'Document'}
+                          />
+                          <p>{image.url}</p>
+                          {/* <ImageLightbox src={image.url} name={image.name}>
+                            <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group">
+                              <Image
+                                src={image.url}
+                                alt={image.name || `${doc.title} - Image ${index + 1}`}
+                                fill
+                                className="object-contain transition-transform group-hover:scale-105"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                              />
+                              <div className="absolute inset-0 bg-transparent group-hover:bg-muted/40 transition-colors flex items-center justify-center">
+                                <ZoomIn className="w-8 h-8 text-foreground opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                              </div>
                             </div>
-                          </div>
-                        </ImageLightbox>
-                        {image.name && (
-                          <p className="text-sm text-muted-foreground mt-2 text-center">
-                            {image.name}
-                          </p>
-                        )}
-                      </CarouselItem>
-                    ))}
+                          </ImageLightbox> */}
+                          {image.name && (
+                            <p className="text-sm text-muted-foreground mt-2 text-center">
+                              {image.name}
+                            </p>
+                          )}
+                        </CarouselItem>
+                      )
+                    })}
                   </CarouselContent>
                   {doc.images.length > 1 && (
                     <>
