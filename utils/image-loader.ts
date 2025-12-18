@@ -15,7 +15,7 @@ export default function customImageLoader({ src, width = 512, quality = 95 }: Pr
   // Next.js images format
   if (isDevelopment) return `${base}/${bucket}/${cleanPath}`
 
-  // Cloudflare CDN format (using / separator to avoid srcset comma parsing issues)
+  // Cloudflare CDN format
   // https://developers.cloudflare.com/images/transform-images/transform-via-url/
-  return `${base}/cdn-cgi/image/width=${width}/quality=${quality}/format=avif/${bucket}/${cleanPath}`
+  return `${base}/cdn-cgi/image/width=${width},quality=${quality},format=avif/${bucket}/${cleanPath}`
 }
