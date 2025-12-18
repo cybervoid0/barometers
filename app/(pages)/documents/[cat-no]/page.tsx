@@ -12,12 +12,12 @@ import {
   MapPin,
   Tag,
   User,
-  /* ZoomIn, */
+  ZoomIn,
 } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Image /* , ImageLightbox  */ } from '@/components/elements'
+import { Image, ImageLightbox } from '@/components/elements'
 import {
   Badge,
   Breadcrumb,
@@ -101,19 +101,10 @@ export default async function Document({ params }: Props) {
               <CardContent>
                 <Carousel className="w-full">
                   <CarouselContent>
-                    {doc.images.map((image, _index) => {
-                      console.log('🚀 ~ Document ~ image:', image)
-
-                      return (
-                        <CarouselItem key={image.id}>
-                          <Image
-                            width={500}
-                            height={500}
-                            src={image.url}
-                            alt={image.name ?? 'Document'}
-                          />
-                          <p>{image.url}</p>
-                          {/* <ImageLightbox src={image.url} name={image.name}>
+                    {doc.images.map((image, index) => (
+                      <CarouselItem key={image.id}>
+                        <ImageLightbox src={image.url} name={image.name}>
+                          <div>
                             <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group">
                               <Image
                                 src={image.url}
@@ -126,15 +117,15 @@ export default async function Document({ params }: Props) {
                                 <ZoomIn className="w-8 h-8 text-foreground opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                               </div>
                             </div>
-                          </ImageLightbox> */}
-                          {image.name && (
-                            <p className="text-sm text-muted-foreground mt-2 text-center">
-                              {image.name}
-                            </p>
-                          )}
-                        </CarouselItem>
-                      )
-                    })}
+                          </div>
+                        </ImageLightbox>
+                        {image.name && (
+                          <p className="text-sm text-muted-foreground mt-2 text-center">
+                            {image.name}
+                          </p>
+                        )}
+                      </CarouselItem>
+                    ))}
                   </CarouselContent>
                   {doc.images.length > 1 && (
                     <>
