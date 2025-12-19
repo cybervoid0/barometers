@@ -261,7 +261,7 @@ const MiniCard = ({
   Icon: LucideIcon
 }) => (
   <div className="flex items-center gap-3">
-    <Icon className="w-4 h-4 text-muted-foreground" />
+    <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
     <div>
       <p className="text-sm font-medium">{name}</p>
       <p className="text-sm text-muted-foreground">{value}</p>
