@@ -1,12 +1,12 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -14,7 +14,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -25,7 +24,6 @@ import {
 import { Route } from '@/constants/routes'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { cn } from '@/utils'
 
 interface TextFieldEditProps {
   size?: number
@@ -40,7 +38,7 @@ const textFieldSchema = z.object({
 
 type FormData = z.infer<typeof textFieldSchema>
 
-export function TextFieldEdit({ size = 18, barometer, property, className }: TextFieldEditProps) {
+export function TextFieldEdit({ barometer, property }: TextFieldEditProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -83,17 +81,7 @@ export function TextFieldEdit({ size = 18, barometer, property, className }: Tex
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          aria-label="Edit field"
-          variant="ghost"
-          size="icon"
-          className={cn('h-fit w-fit p-1', className)}
-        >
-          <Edit size={size} className="text-destructive" />
-        </Button>
-      </DialogTrigger>
-
+      <EditButton label={`Edit ${property}`} />
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-medium capitalize">

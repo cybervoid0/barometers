@@ -2,11 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { Edit } from 'lucide-react'
 import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -14,7 +14,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { cn } from '@/utils'
 
 interface DateEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -47,7 +45,7 @@ const validationSchema = z.object({
 
 type DateForm = z.output<typeof validationSchema>
 
-export function DateEdit({ size = 18, barometer, className, ...props }: DateEditProps) {
+export function DateEdit({ barometer }: DateEditProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const form = useForm<DateForm>({
@@ -82,16 +80,7 @@ export function DateEdit({ size = 18, barometer, className, ...props }: DateEdit
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit year"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit year" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

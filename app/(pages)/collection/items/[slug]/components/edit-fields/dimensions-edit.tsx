@@ -2,11 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isEqual } from 'lodash'
-import { Edit, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { type ComponentProps, useCallback, useEffect, useState, useTransition } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -14,7 +15,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -25,7 +25,6 @@ import {
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { Dimensions } from '@/types'
-import { cn } from '@/utils'
 
 interface DimensionEditProps extends ComponentProps<'button'> {
   barometer: NonNullable<BarometerDTO>
@@ -46,7 +45,7 @@ const validationSchema = z.object({
 
 type DimensionsForm = z.output<typeof validationSchema>
 
-export function DimensionEdit({ barometer, className, ...props }: DimensionEditProps) {
+export function DimensionEdit({ barometer }: DimensionEditProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const form = useForm<DimensionsForm>({
@@ -99,16 +98,7 @@ export function DimensionEdit({ barometer, className, ...props }: DimensionEditP
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit dimensions"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit dimensions" />
       <DialogContent className="sm:max-w-2xl">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdateBarometer)} noValidate>

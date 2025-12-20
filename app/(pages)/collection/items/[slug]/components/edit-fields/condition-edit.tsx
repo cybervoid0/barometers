@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements/EditButton'
 import {
   Button,
   Dialog,
@@ -27,7 +28,6 @@ import {
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { ConditionsDTO } from '@/server/conditions/queries'
-import { EditButton } from './edit-button'
 
 interface ConditionEditProps {
   barometer: NonNullable<BarometerDTO>
@@ -82,7 +82,7 @@ export function ConditionEdit({ barometer, conditions }: ConditionEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton />
+      <EditButton label="Edit condition" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

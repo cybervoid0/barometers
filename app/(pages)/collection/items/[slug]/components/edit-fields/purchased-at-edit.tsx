@@ -3,11 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { Edit } from 'lucide-react'
 import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -15,7 +15,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -26,7 +25,6 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { cn } from '@/utils'
 
 dayjs.extend(utc)
 interface PurchasedAtEditProps extends ComponentProps<'button'> {
@@ -48,12 +46,7 @@ const validationSchema = z.object({
 
 type PurchasedAtForm = z.output<typeof validationSchema>
 
-export function PurchasedAtEdit({
-  size = 18,
-  barometer,
-  className,
-  ...props
-}: PurchasedAtEditProps) {
+export function PurchasedAtEdit({ barometer }: PurchasedAtEditProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const form = useForm<PurchasedAtForm>({
@@ -101,16 +94,7 @@ export function PurchasedAtEdit({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit purchase date"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit purchase date" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

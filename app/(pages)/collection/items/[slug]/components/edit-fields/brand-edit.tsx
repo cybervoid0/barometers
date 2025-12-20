@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { ClearButton, RequiredFieldMark } from '@/components/elements'
+import { ClearButton, EditButton, RequiredFieldMark } from '@/components/elements'
 import {
   Button,
   Command,
@@ -29,7 +29,6 @@ import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { AllBrandsDTO } from '@/server/brands/queries'
 import { cn } from '@/utils'
-import { EditButton } from './edit-button'
 
 interface Props {
   barometer: NonNullable<BarometerDTO>
@@ -97,7 +96,7 @@ function BrandEdit({ brands, barometer }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton />
+      <EditButton label="Edit brand" />
       <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-visible">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>
