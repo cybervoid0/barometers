@@ -1,11 +1,11 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit } from 'lucide-react'
 import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -13,7 +13,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
-import { cn } from '@/utils'
 
 interface EstimatedPriceEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -40,12 +38,7 @@ const validationSchema = z.object({
 
 type EstimatedPriceForm = z.output<typeof validationSchema>
 
-export function EstimatedPriceEdit({
-  size = 18,
-  barometer,
-  className,
-  ...props
-}: EstimatedPriceEditProps) {
+export function EstimatedPriceEdit({ barometer }: EstimatedPriceEditProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const form = useForm<EstimatedPriceForm>({
@@ -84,16 +77,7 @@ export function EstimatedPriceEdit({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit estimated price"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit estimated price" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

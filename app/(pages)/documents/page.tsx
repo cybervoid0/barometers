@@ -3,6 +3,8 @@ import 'server-only'
 import { Archive, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
+import { getAllBarometers } from '@/server/barometers/queries'
+import { getConditions } from '@/server/conditions/queries'
 import { getAllDocuments } from '@/server/documents/queries'
 import type { DynamicOptions } from '@/types'
 import { DocumentTable } from './DocumentTable'
@@ -15,7 +17,11 @@ export const metadata: Metadata = {
 export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function Documents() {
-  const archive = await getAllDocuments()
+  const [archive, conditions, allBarometers] = await Promise.all([
+    getAllDocuments(),
+    getConditions(),
+    getAllBarometers(),
+  ])
   const totalDocuments = archive.length
   const documentTypes = [...new Set(archive.map(doc => doc.documentType))]
 
@@ -83,7 +89,7 @@ export default async function Documents() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DocumentTable archive={archive} />
+          <DocumentTable archive={archive} conditions={conditions} allBarometers={allBarometers} />
         </CardContent>
       </Card>
     </article>

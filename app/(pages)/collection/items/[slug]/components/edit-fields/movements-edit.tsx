@@ -1,11 +1,11 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit } from 'lucide-react'
 import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -13,7 +13,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -29,7 +28,6 @@ import {
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { MovementsDTO } from '@/server/movements/queries'
-import { cn } from '@/utils'
 
 interface SubcategoryEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -45,13 +43,7 @@ const validationSchema = z.object({
 
 type SubcategoryForm = z.output<typeof validationSchema>
 
-export function MovementsEdit({
-  size = 18,
-  barometer,
-  movements,
-  className,
-  ...props
-}: SubcategoryEditProps) {
+export function MovementsEdit({ barometer, movements }: SubcategoryEditProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -93,16 +85,7 @@ export function MovementsEdit({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit movement type"
-          className={cn('h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit movement type" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

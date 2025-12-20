@@ -1,12 +1,11 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit } from 'lucide-react'
 import { type ComponentProps, useEffect, useMemo, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { ImageUpload } from '@/components/elements'
+import { EditButton, ImageUpload } from '@/components/elements'
 import {
   Button,
   Dialog,
@@ -14,7 +13,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   FormProvider,
   LoadingOverlay,
 } from '@/components/ui'
@@ -55,7 +53,7 @@ const TransformSchema = ImagesEditSchema.transform(
   },
 )
 
-export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditProps) {
+export function ImagesEdit({ barometer }: ImagesEditProps) {
   const savedImages = useMemo(
     () =>
       barometer.images.map(img => ({
@@ -112,16 +110,7 @@ export function ImagesEdit({ barometer, size, className, ...props }: ImagesEditP
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          aria-label="Edit images"
-          className={cn('absolute top-0 right-20 z-10 h-fit w-fit p-1', className)}
-          {...props}
-        >
-          <Edit className="text-destructive" size={Number(size) || 18} />
-        </Button>
-      </DialogTrigger>
+      <EditButton label="Edit images" />
       <DialogContent className={cn('sm:max-w-4xl', { 'overflow-hidden': isPending })}>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(update)} noValidate>

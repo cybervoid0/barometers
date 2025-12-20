@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { EditButton } from '@/components/elements/EditButton'
 import {
   Button,
   Dialog,
@@ -26,7 +27,6 @@ import {
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import type { CategoriesDTO } from '@/server/categories/queries'
-import { EditButton } from './edit-button'
 
 interface Props {
   barometer: NonNullable<BarometerDTO>
@@ -80,7 +80,7 @@ export function CategoryEdit({ barometer, categories }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton />
+      <EditButton label="Edit category" />
       <DialogContent>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)}>

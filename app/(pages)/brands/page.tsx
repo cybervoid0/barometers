@@ -155,12 +155,12 @@ export default async function Brands() {
                   className="group flex items-center justify-between py-0.5 px-2 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all duration-200 no-underline"
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-xl flex-shrink-0">{country.flag || '🏭'}</span>
+                    <span className="text-xl shrink-0">{country.flag || '🏭'}</span>
                     <span className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                       {country.name}
                     </span>
                   </div>
-                  <Badge variant="secondary" className="ml-2 flex-shrink-0">
+                  <Badge variant="secondary" className="ml-2 shrink-0">
                     <span className="text-background">{country._count.manufacturers}</span>
                   </Badge>
                 </a>
