@@ -18,6 +18,11 @@ const getAllDocuments = cache(
             name: true,
           },
         },
+        relatedBarometers: {
+          select: {
+            id: true,
+          },
+        },
       },
     }),
   ),
