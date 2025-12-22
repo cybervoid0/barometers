@@ -14,6 +14,7 @@ const productOptionSchema = z.object({
  * Schema for product variant
  */
 const productVariantSchema = z.object({
+  id: z.string().optional(), // existing variant ID for editing
   sku: z.string().min(1, 'SKU is required'),
   options: z.record(z.string(), z.string()), // { "Size": "A5", "Color": "Red" }
   priceEUR: z

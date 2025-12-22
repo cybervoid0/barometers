@@ -14,6 +14,7 @@ export const Route = {
   AddBrand: '/admin/add-brand/',
   AddDocument: '/admin/add-document/',
   AddProduct: '/admin/add-product/',
+  EditProduct: '/admin/edit-product/',
   Reports: '/admin/reports/',
   Shop: '/shop/',
   Cart: '/shop/cart',
