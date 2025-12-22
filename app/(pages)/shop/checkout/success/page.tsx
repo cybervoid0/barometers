@@ -78,7 +78,13 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             {order.items.map(item => (
               <li key={item.id} className="flex justify-between">
                 <span>
-                  {item.product.name} × {item.quantity}
+                  {item.product.name}
+                  {item.variant && item.variantInfo && (
+                    <span className="text-muted-foreground text-sm ml-1">
+                      ({formatVariantInfo(item.variantInfo as Record<string, string>)})
+                    </span>
+                  )}
+                  <span className="text-muted-foreground"> × {item.quantity}</span>
                 </span>
                 <span>
                   {new Intl.NumberFormat('en-US', {
@@ -98,7 +104,8 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             <br />
             {order.shippingAddress.address}
             <br />
-            {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
+            {order.shippingAddress.city}
+            {order.shippingAddress.state && `, ${order.shippingAddress.state}`}{' '}
             {order.shippingAddress.postalCode}
             <br />
             {order.shippingAddress.country}
@@ -113,4 +120,10 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </div>
     </div>
   )
+}
+
+function formatVariantInfo(info: Record<string, string>): string {
+  return Object.entries(info)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')
 }

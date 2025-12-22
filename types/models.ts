@@ -53,4 +53,10 @@ export interface MediaFile {
   name: string
 }
 
-export type ProductWithImages = Prisma.ProductGetPayload<{ include: { images: true } }>
+export type ProductWithImages = Prisma.ProductGetPayload<{
+  include: { images: true; variants: true; options: true }
+}>
+
+export type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
+  include: { product: { include: { images: true } }; images: true }
+}>

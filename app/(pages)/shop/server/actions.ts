@@ -1,29 +1,16 @@
 'use server'
 
-import type { Currency, OrderStatus, Prisma, Product } from '@prisma/client'
+import type { Currency, OrderStatus, ProductVariant } from '@prisma/client'
 import slugify from 'slugify'
+import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
 import { withPrisma } from '@/prisma/prismaClient'
+import { saveProductImages } from '@/server/files/images'
 import { stripe } from '@/services/stripe'
-
-interface CreateProductInput {
-  name: string
-  description?: string
-  priceEUR?: number // in cents
-  priceUSD?: number // in cents
-  stock: number
-  weight?: number // in grams
-  dimensions?: {
-    length?: number
-    width?: number
-    height?: number
-  }
-  images?: Prisma.ProductImageCreateManyProductInput[]
-}
 
 interface CreateCheckoutSessionInput {
   userId: string
   items: Array<{
-    productId: string
+    variantId: string
     quantity: number
   }>
   currency: Currency
@@ -41,171 +28,99 @@ interface CreateCheckoutSessionInput {
 }
 
 /**
- * Create a product in Stripe and local database
+ * Create a product with variants in Stripe and local database
  */
-export const createProduct = withPrisma(async (prisma, input: CreateProductInput) => {
-  try {
-    // Create product in Stripe
-    const stripeProduct = await stripe.products.create({
-      name: input.name,
-      description: input.description,
-      metadata: {
-        stock: input.stock.toString(),
-        weight: input.weight?.toString() || '',
-      },
-    })
-
-    // Create prices in Stripe
-    let stripePriceIdEUR: string | undefined
-    let stripePriceIdUSD: string | undefined
-
-    if (input.priceEUR) {
-      const priceEUR = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: input.priceEUR,
-        currency: 'eur',
-      })
-      stripePriceIdEUR = priceEUR.id
-    }
-
-    if (input.priceUSD) {
-      const priceUSD = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: input.priceUSD,
-        currency: 'usd',
-      })
-      stripePriceIdUSD = priceUSD.id
-    }
-
-    const images = input.images
-      ? {
-          images: {
-            createMany: {
-              data: input.images,
-            },
-          },
-        }
-      : {}
-
-    // Create product in database
-    const product = await prisma.product.create({
-      data: {
-        name: input.name,
-        slug: slugify(input.name, { lower: true, strict: true }),
-        description: input.description,
-        stripeProductId: stripeProduct.id,
-        stripePriceIdEUR,
-        stripePriceIdUSD,
-        priceEUR: input.priceEUR,
-        priceUSD: input.priceUSD,
-        stock: input.stock,
-        weight: input.weight,
-        dimensions: input.dimensions,
-        isActive: true,
-        ...images,
-      },
-    })
-
-    return { success: true, product }
-  } catch (error) {
-    console.error('Error creating product:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }
-  }
-})
-
-/**
- * Update product in Stripe and local database
- */
-export const updateProduct = withPrisma(
-  async (prisma, productId: string, input: Partial<CreateProductInput>) => {
+export const createProductWithVariants = withPrisma(
+  async (prisma, input: TransformedProductData) => {
     try {
-      const product = await prisma.product.findUnique({
-        where: { id: productId },
-      })
+      // Save images to storage
+      const savedImages = await saveProductImages(input.images)
 
-      if (!product) {
-        return { success: false, error: 'Product not found' }
-      }
-
-      // Update in Stripe
-      await stripe.products.update(product.stripeProductId, {
+      // Create product in Stripe
+      const stripeProduct = await stripe.products.create({
         name: input.name,
         description: input.description,
-        metadata: {
-          stock: input.stock?.toString() || product.stock.toString(),
-          weight: input.weight?.toString() || product.weight?.toString() || '',
-        },
       })
 
-      // Update prices if changed
-      let updatedStripePriceIdEUR = product.stripePriceIdEUR
-      let updatedStripePriceIdUSD = product.stripePriceIdUSD
+      const slug = slugify(input.name, { lower: true, strict: true })
 
-      if (input.priceEUR && input.priceEUR !== product.priceEUR) {
-        // Archive old price
-        if (product.stripePriceIdEUR) {
-          await stripe.prices.update(product.stripePriceIdEUR, {
-            active: false,
-          })
-        }
-        // Create new price
-        const priceEUR = await stripe.prices.create({
-          product: product.stripeProductId,
-          unit_amount: input.priceEUR,
-          currency: 'eur',
-        })
-        updatedStripePriceIdEUR = priceEUR.id
-      }
-
-      if (input.priceUSD && input.priceUSD !== product.priceUSD) {
-        if (product.stripePriceIdUSD) {
-          await stripe.prices.update(product.stripePriceIdUSD, {
-            active: false,
-          })
-        }
-        const priceUSD = await stripe.prices.create({
-          product: product.stripeProductId,
-          unit_amount: input.priceUSD,
-          currency: 'usd',
-        })
-        updatedStripePriceIdUSD = priceUSD.id
-      }
-
-      const images = input.images
-        ? {
-            images: {
-              deleteMany: {},
-              createMany: {
-                data: input.images,
-              },
-            },
-          }
-        : {}
-
-      // Update in database
-      const updatedProduct = await prisma.product.update({
-        where: { id: productId },
+      // Create product in database
+      const product = await prisma.product.create({
         data: {
           name: input.name,
-          slug: input.name ? slugify(input.name, { lower: true, strict: true }) : undefined,
+          slug,
           description: input.description,
-          stripePriceIdEUR: updatedStripePriceIdEUR,
-          stripePriceIdUSD: updatedStripePriceIdUSD,
-          priceEUR: input.priceEUR,
-          priceUSD: input.priceUSD,
-          stock: input.stock,
-          weight: input.weight,
-          dimensions: input.dimensions,
-          ...images,
+          stripeProductId: stripeProduct.id,
+          isActive: true,
+          images: savedImages.length > 0 ? { createMany: { data: savedImages } } : undefined,
+          options:
+            input.options.length > 0
+              ? {
+                  createMany: {
+                    data: input.options.map(opt => ({
+                      name: opt.name,
+                      values: opt.values,
+                      position: opt.position,
+                    })),
+                  },
+                }
+              : undefined,
         },
       })
 
-      return { success: true, product: updatedProduct }
+      // Create variants with Stripe prices
+      const createdVariants: ProductVariant[] = []
+
+      for (const variant of input.variants) {
+        let stripePriceIdEUR: string | undefined
+        let stripePriceIdUSD: string | undefined
+
+        // Create Stripe prices for each variant
+        if (variant.priceEUR) {
+          const priceEUR = await stripe.prices.create({
+            product: stripeProduct.id,
+            unit_amount: variant.priceEUR,
+            currency: 'eur',
+            metadata: { sku: variant.sku },
+          })
+          stripePriceIdEUR = priceEUR.id
+        }
+
+        if (variant.priceUSD) {
+          const priceUSD = await stripe.prices.create({
+            product: stripeProduct.id,
+            unit_amount: variant.priceUSD,
+            currency: 'usd',
+            metadata: { sku: variant.sku },
+          })
+          stripePriceIdUSD = priceUSD.id
+        }
+
+        // Create variant in database
+        const createdVariant = await prisma.productVariant.create({
+          data: {
+            productId: product.id,
+            sku: variant.sku,
+            options: variant.options,
+            priceEUR: variant.priceEUR,
+            priceUSD: variant.priceUSD,
+            stock: variant.stock,
+            weight: variant.weight,
+            stripePriceIdEUR,
+            stripePriceIdUSD,
+            isActive: true,
+          },
+        })
+
+        createdVariants.push(createdVariant)
+      }
+
+      return {
+        success: true,
+        product: { ...product, variants: createdVariants },
+      }
     } catch (error) {
-      console.error('Error updating product:', error)
+      console.error('Error creating product with variants:', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -215,7 +130,7 @@ export const updateProduct = withPrisma(
 )
 
 /**
- * Create Stripe Checkout Session
+ * Create Stripe Checkout Session (works with variants)
  */
 export const createCheckoutSession = withPrisma(
   async (prisma, input: CreateCheckoutSessionInput) => {
@@ -241,9 +156,7 @@ export const createCheckoutSession = withPrisma(
           stripeCustomer = await stripe.customers.create({
             email: user.email,
             name: user.name,
-            metadata: {
-              userId: user.id,
-            },
+            metadata: { userId: user.id },
           })
         } catch (error) {
           console.error('Failed to create Stripe customer:', error)
@@ -277,37 +190,35 @@ export const createCheckoutSession = withPrisma(
         }
       }
 
-      // Validate products and calculate total
-      // Use transaction with optimistic locking to prevent race conditions
+      // Validate variants and calculate total
       const stockCheck = await prisma.$transaction(async tx => {
-        const products = await tx.product.findMany({
+        const variants = await tx.productVariant.findMany({
           where: {
-            id: { in: input.items.map(item => item.productId) },
+            id: { in: input.items.map(item => item.variantId) },
           },
+          include: { product: true },
         })
 
         // Check stock availability
         for (const item of input.items) {
-          const product = products.find((p: Product) => p.id === item.productId)
-          if (!product) {
-            throw new Error(`Product ${item.productId} not found`)
+          const variant = variants.find(v => v.id === item.variantId)
+          if (!variant) {
+            throw new Error(`Variant ${item.variantId} not found`)
           }
-          if (!product.isActive) {
-            throw new Error(`Product ${product.name} is not available`)
+          if (!variant.isActive || !variant.product.isActive) {
+            throw new Error(`Product ${variant.product.name} is not available`)
           }
-          if (product.stock < item.quantity) {
-            throw new Error(`Insufficient stock for ${product.name}. Available: ${product.stock}`)
+          if (variant.stock < item.quantity) {
+            throw new Error(
+              `Insufficient stock for ${variant.product.name} (${JSON.stringify(variant.options)}). Available: ${variant.stock}`,
+            )
           }
         }
 
-        return products
+        return variants
       })
 
-      const products = stockCheck
-
-      // NOTE: There's still a small race condition window here between stock check
-      // and order creation. For production, consider implementing a reservation system
-      // where stock is temporarily reserved during checkout.
+      const variants = stockCheck
 
       // Create shipping address
       const shippingAddress = await prisma.shippingAddress.create({
@@ -316,15 +227,14 @@ export const createCheckoutSession = withPrisma(
 
       // Calculate totals
       const subtotal = input.items.reduce((sum, item) => {
-        const product = products.find((p: Product) => p.id === item.productId)
-        if (!product) return sum
-        const price = input.currency === 'EUR' ? product.priceEUR : product.priceUSD
+        const variant = variants.find(v => v.id === item.variantId)
+        if (!variant) return sum
+        const price = input.currency === 'EUR' ? variant.priceEUR : variant.priceUSD
         return sum + (price || 0) * item.quantity
       }, 0)
 
-      // TODO: Calculate shipping cost based on weight/dimensions
-      const shippingCost = 0
-      const tax = 0
+      const shippingCost = 0 // TODO: Calculate shipping cost
+      const tax = 0 // TODO: Calculate tax
       const total = subtotal + shippingCost + tax
 
       // Generate order number
@@ -342,28 +252,37 @@ export const createCheckoutSession = withPrisma(
           shippingCost,
           tax,
           total,
-          items: {
-            create: input.items.map(item => {
-              const product = products.find((p: Product) => p.id === item.productId)
-              const price = input.currency === 'EUR' ? product?.priceEUR : product?.priceUSD
-              return {
-                productId: item.productId,
-                quantity: item.quantity,
-                priceAtTime: price || 0,
-              }
-            }),
-          },
         },
+        include: { items: true },
       })
+
+      // Create order items separately
+      for (const item of input.items) {
+        const variant = variants.find(v => v.id === item.variantId)
+        if (!variant) throw new Error(`Variant ${item.variantId} not found`)
+        const price = input.currency === 'EUR' ? variant.priceEUR : variant.priceUSD
+
+        await prisma.orderItem.create({
+          data: {
+            orderId: order.id,
+            productId: variant.productId,
+            variantId: variant.id,
+            quantity: item.quantity,
+            priceAtTime: price || 0,
+            currency: input.currency,
+            variantInfo: variant.options as Record<string, string>,
+          },
+        })
+      }
 
       // Create Stripe Checkout Session
       const lineItems = input.items.map(item => {
-        const product = products.find((p: Product) => p.id === item.productId)
+        const variant = variants.find(v => v.id === item.variantId)
         const priceId =
-          input.currency === 'EUR' ? product?.stripePriceIdEUR : product?.stripePriceIdUSD
+          input.currency === 'EUR' ? variant?.stripePriceIdEUR : variant?.stripePriceIdUSD
 
         if (!priceId) {
-          throw new Error(`Price not found for product ${product?.name} in ${input.currency}`)
+          throw new Error(`Price not found for variant ${variant?.sku} in ${input.currency}`)
         }
 
         return {
@@ -376,11 +295,9 @@ export const createCheckoutSession = withPrisma(
         customer: customer.stripeCustomerId,
         line_items: lineItems,
         mode: 'payment',
-        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/cancel`,
-        metadata: {
-          orderId: order.id,
-        },
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
+        metadata: { orderId: order.id },
         shipping_address_collection: {
           allowed_countries: ['US', 'CA', 'GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE'],
         },
@@ -433,15 +350,12 @@ export const updateOrderStatus = withPrisma(
         data.cancelledAt = new Date()
       }
 
-      const order = prisma.order.update({
+      const order = await prisma.order.update({
         where: { id: orderId },
         data,
       })
 
-      return {
-        success: true,
-        order,
-      }
+      return { success: true, order }
     } catch (error) {
       return {
         success: false,

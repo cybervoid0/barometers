@@ -1,80 +1,80 @@
-import { createStore } from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '@/types'
+
+interface CartItem {
+  variantId: string
+  productId: string
+  quantity: number
+}
 
 interface CartState {
-  /** product ID => quantity */
-  items: Record<string, number>
+  items: CartItem[]
 }
-interface CartStateActions {
-  addItem: (productId: string, inStock: number) => ActionResult
-  subtractItem: (productId: string) => ActionResult
-  removeItem: (productId: string) => ActionResult
+
+interface CartActions {
+  addItem: (item: { variantId: string; productId: string; quantity: number }) => void
+  updateQuantity: (variantId: string, quantity: number) => void
+  removeItem: (variantId: string) => void
   clearCart: () => void
   getTotalItems: () => number
-  getProductAmount: (id: string) => number
+  getVariantQuantity: (variantId: string) => number
 }
 
-type CartStore = CartState & CartStateActions
+type CartStore = CartState & CartActions
 
-const defaultCartState: CartState = {
-  items: {},
-}
+const useShopCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
 
-const createCartStore = () =>
-  createStore<CartStore>()(
-    persist(
-      immer((set, get) => ({
-        ...defaultCartState,
-        addItem: (productId, inStock) => {
-          const items = get().items
-          const newQuantity = (items[productId] ?? 0) + 1
-
-          if (newQuantity > inStock) return { success: false, error: 'Not enough items in stock' }
-          set(state => {
-            state.items[productId] = newQuantity
-          })
-          return { success: true }
-        },
-
-        subtractItem: productId => {
-          const items = get().items
-          if (!(productId in items)) {
-            return { success: false, error: 'Subtracting from unknown product' }
-          }
-          set(state => {
-            const newQuantity = (state.items[productId] ?? 0) - 1
-            if (newQuantity <= 0) {
-              delete state.items[productId]
-            } else {
-              state.items[productId] = newQuantity
+      addItem: ({ variantId, productId, quantity }) => {
+        set(state => {
+          const existing = state.items.find(i => i.variantId === variantId)
+          if (existing) {
+            return {
+              items: state.items.map(i =>
+                i.variantId === variantId ? { ...i, quantity: i.quantity + quantity } : i,
+              ),
             }
-          })
-          return { success: true }
-        },
+          }
+          return {
+            items: [...state.items, { variantId, productId, quantity }],
+          }
+        })
+      },
 
-        removeItem: productId => {
-          const items = get().items
-          if (!(productId in items)) return { success: false, error: 'Unknown product' }
-          set(state => {
-            delete state.items[productId]
-          })
-          return { success: true }
-        },
+      updateQuantity: (variantId, quantity) => {
+        set(state => {
+          if (quantity <= 0) {
+            return { items: state.items.filter(i => i.variantId !== variantId) }
+          }
+          return {
+            items: state.items.map(i => (i.variantId === variantId ? { ...i, quantity } : i)),
+          }
+        })
+      },
 
-        clearCart: () =>
-          set(state => {
-            state.items = {}
-          }),
+      removeItem: variantId => {
+        set(state => ({
+          items: state.items.filter(i => i.variantId !== variantId),
+        }))
+      },
 
-        getTotalItems: () => Object.values(get().items).reduce((sum, item) => sum + item, 0),
+      clearCart: () => set({ items: [] }),
 
-        getProductAmount: id => get().items[id] ?? 0,
-      })),
-      { name: 'cart-storage', partialize: state => state.items, skipHydration: true },
-    ),
-  )
+      getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
 
-export type { CartState, CartStateActions, CartStore }
-export { defaultCartState, createCartStore }
+      getVariantQuantity: variantId => {
+        const item = get().items.find(i => i.variantId === variantId)
+        return item?.quantity ?? 0
+      },
+    }),
+    {
+      name: 'barometers-cart',
+      skipHydration: true,
+    },
+  ),
+)
+
+export { useShopCartStore }
+export type { CartItem, CartState, CartActions, CartStore }
