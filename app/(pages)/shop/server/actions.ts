@@ -60,7 +60,7 @@ export const createProductWithVariants = withPrisma(
         let stripePriceIdEUR: string | undefined
         let stripePriceIdUSD: string | undefined
 
-        if (variant.priceEUR) {
+        if (variant.priceEUR !== undefined) {
           const priceEUR = await stripe.prices.create({
             product: stripeProduct.id,
             unit_amount: variant.priceEUR,
@@ -71,7 +71,7 @@ export const createProductWithVariants = withPrisma(
           createdStripePriceIds.push(priceEUR.id)
         }
 
-        if (variant.priceUSD) {
+        if (variant.priceUSD !== undefined) {
           const priceUSD = await stripe.prices.create({
             product: stripeProduct.id,
             unit_amount: variant.priceUSD,
