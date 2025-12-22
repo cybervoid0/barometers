@@ -155,7 +155,7 @@ export function DocumentEdit({ document, conditions, allBarometers }: Props) {
     // biome-ignore lint/a11y/noStaticElementInteractions: wrapper to stop event propagation to table row
     <div role="presentation" onClick={e => e.stopPropagation()}>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <EditButton label="Edit document" />
+        <EditButton title="Edit document" />
         <DialogContent
           className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', { 'overflow-hidden': loading })}
         >
