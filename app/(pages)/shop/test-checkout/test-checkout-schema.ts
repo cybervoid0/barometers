@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const testCheckoutSchema = z.object({
   userId: z.uuid('Invalid User ID format'),
-  productId: z.uuid('Invalid Product ID format'),
+  variantId: z.uuid('Invalid Variant ID format'),
   quantity: z
     .string()
     .min(1, 'Quantity is required')
@@ -19,6 +19,6 @@ export type TestCheckoutFormData = z.infer<typeof testCheckoutSchema>
 
 export const testCheckoutTransformSchema = testCheckoutSchema.transform(data => ({
   userId: data.userId,
-  productId: data.productId,
+  variantId: data.variantId,
   quantity: Number.parseInt(data.quantity, 10),
 }))
