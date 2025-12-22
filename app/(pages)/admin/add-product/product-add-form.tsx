@@ -1,38 +1,44 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useCallback, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { createProduct } from '@/app/(pages)/shop/server/actions'
+import { createProductWithVariants } from '@/app/(pages)/shop/server/actions'
 import { Button, FormProvider } from '@/components/ui'
-import { type ProductFormData, productSchema, productTransformSchema } from './product-add-schema'
+import { Route } from '@/constants'
+import { type ProductFormData, productSchema, transformProductData } from './product-add-schema'
 import { ProductForm } from './product-form'
 
 function ProductAddForm() {
+  const router = useRouter()
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     mode: 'onChange',
     defaultValues: {
       name: '',
       description: '',
-      priceEUR: '',
-      priceUSD: '',
-      stock: '',
-      weight: '',
+      images: [],
+      options: [],
+      variants: [],
     },
   })
   const { reset, formState } = form
   const [isPending, startTransition] = useTransition()
+
   const onSubmit = useCallback(
     (values: ProductFormData) => {
       startTransition(async () => {
         try {
-          const transformedData = await productTransformSchema.parseAsync(values)
-          const result = await createProduct(transformedData)
+          const transformedData = transformProductData(values)
+          const result = await createProductWithVariants(transformedData)
           if (!result.success) throw new Error(result.error)
-          toast.success(`Product ${result.product?.name} was created`)
+          toast.success(
+            `Product "${result.product?.name}" was created with ${result.product?.variants.length} variant(s)`,
+          )
           reset()
+          router.push(Route.Shop)
         } catch (error) {
           console.error('Form submission error:', error)
           toast.error(
@@ -41,7 +47,7 @@ function ProductAddForm() {
         }
       })
     },
-    [reset],
+    [reset, router],
   )
 
   return (
@@ -54,13 +60,13 @@ function ProductAddForm() {
         </div>
       </ProductForm>
       <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-        <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">Note:</h3>
+        <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">How to use:</h3>
         <ul className="text-sm text-yellow-800 dark:text-yellow-200 space-y-1">
-          <li>• Prices should be entered as decimal numbers (e.g., 19.99)</li>
-          <li>• They will be stored in cents in the database</li>
-          <li>• Weight is in grams for shipping calculations</li>
-          <li>• Product will be created in Stripe automatically</li>
-          <li>• At least one price (EUR or USD) must be provided</li>
+          <li>1. Enter product name and description</li>
+          <li>2. Add options (e.g., Size, Color) with values (e.g., A5, A4)</li>
+          <li>3. Click "Generate Variants" to create all combinations</li>
+          <li>4. Fill in prices and stock for each variant</li>
+          <li>5. At least one price (EUR or USD) required per variant</li>
         </ul>
       </div>
     </FormProvider>

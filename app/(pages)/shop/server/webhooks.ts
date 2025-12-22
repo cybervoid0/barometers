@@ -54,7 +54,7 @@ export const handleCheckoutSessionCompleted = withPrisma(
           },
         })
 
-        // Decrease stock for ordered items
+        // Decrease stock for ordered items (on variants)
         const order = await tx.order.findUnique({
           where: { id: orderId },
           include: { items: true },
@@ -62,14 +62,17 @@ export const handleCheckoutSessionCompleted = withPrisma(
 
         if (order) {
           for (const item of order.items) {
-            await tx.product.update({
-              where: { id: item.productId },
-              data: {
-                stock: {
-                  decrement: item.quantity,
+            // Update variant stock if variantId exists
+            if (item.variantId) {
+              await tx.productVariant.update({
+                where: { id: item.variantId },
+                data: {
+                  stock: {
+                    decrement: item.quantity,
+                  },
                 },
-              },
-            })
+              })
+            }
           }
         }
       })
@@ -221,17 +224,19 @@ export const handleChargeRefunded = withPrisma(async (prisma, charge: Stripe.Cha
         },
       })
 
-      // Restore stock only for full refund
+      // Restore stock only for full refund (on variants)
       if (isFullRefund) {
         for (const item of order.items) {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: {
-              stock: {
-                increment: item.quantity,
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: {
+                stock: {
+                  increment: item.quantity,
+                },
               },
-            },
-          })
+            })
+          }
         }
       }
     })

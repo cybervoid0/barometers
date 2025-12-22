@@ -4,7 +4,7 @@ import type { OrderStatus } from '@prisma/client'
 import { withPrisma } from '@/prisma/prismaClient'
 
 /**
- * Get all products
+ * Get all products with variants and options
  */
 export const getProducts = withPrisma(async prisma => {
   return prisma.product.findMany({
@@ -13,33 +13,72 @@ export const getProducts = withPrisma(async prisma => {
       images: {
         orderBy: { order: 'asc' },
       },
+      variants: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+      },
+      options: {
+        orderBy: { position: 'asc' },
+      },
     },
     orderBy: { createdAt: 'desc' },
   })
 })
 
 /**
- * Get product list by IDs array
+ * Get product list by IDs array with variants
  */
 export const getProductsByIds = withPrisma(async (prisma, productIds: string[]) => {
   return prisma.product.findMany({
     where: {
-      id: {
-        in: productIds,
-      },
+      id: { in: productIds },
       isActive: true,
     },
     include: {
       images: {
         orderBy: { order: 'asc' },
       },
+      variants: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+      },
+      options: {
+        orderBy: { position: 'asc' },
+      },
     },
     orderBy: { createdAt: 'desc' },
   })
 })
 
 /**
- * Get product by ID
+ * Get variants by IDs array (for cart)
+ */
+export const getVariantsByIds = withPrisma(async (prisma, variantIds: string[]) => {
+  return prisma.productVariant.findMany({
+    where: {
+      id: { in: variantIds },
+      isActive: true,
+      product: { isActive: true },
+    },
+    include: {
+      product: {
+        include: {
+          images: {
+            orderBy: { order: 'asc' },
+            take: 1,
+          },
+        },
+      },
+      images: {
+        orderBy: { order: 'asc' },
+        take: 1,
+      },
+    },
+  })
+})
+
+/**
+ * Get product by ID with variants and options
  */
 export const getProductById = withPrisma(async (prisma, id: string) => {
   return prisma.product.findUnique({
@@ -48,12 +87,24 @@ export const getProductById = withPrisma(async (prisma, id: string) => {
       images: {
         orderBy: { order: 'asc' },
       },
+      variants: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+        include: {
+          images: {
+            orderBy: { order: 'asc' },
+          },
+        },
+      },
+      options: {
+        orderBy: { position: 'asc' },
+      },
     },
   })
 })
 
 /**
- * Get product by slug
+ * Get product by slug with variants and options
  */
 export const getProductBySlug = withPrisma(async (prisma, slug: string) => {
   return prisma.product.findUnique({
@@ -61,6 +112,18 @@ export const getProductBySlug = withPrisma(async (prisma, slug: string) => {
     include: {
       images: {
         orderBy: { order: 'asc' },
+      },
+      variants: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+        include: {
+          images: {
+            orderBy: { order: 'asc' },
+          },
+        },
+      },
+      options: {
+        orderBy: { position: 'asc' },
       },
     },
   })
@@ -91,6 +154,7 @@ export const getOrdersByUserId = withPrisma(async (prisma, userId: string) => {
               },
             },
           },
+          variant: true,
         },
       },
       shippingAddress: true,
@@ -113,6 +177,7 @@ export const getOrderById = withPrisma(async (prisma, id: string) => {
               images: true,
             },
           },
+          variant: true,
         },
       },
       shippingAddress: true,
@@ -136,6 +201,7 @@ export const getAllOrders = withPrisma(async (prisma, status?: OrderStatus) => {
       items: {
         include: {
           product: true,
+          variant: true,
         },
       },
       shippingAddress: true,
@@ -160,6 +226,7 @@ export const getOrderBySessionId = withPrisma(async (prisma, sessionId: string) 
       items: {
         include: {
           product: true,
+          variant: true,
         },
       },
       shippingAddress: true,

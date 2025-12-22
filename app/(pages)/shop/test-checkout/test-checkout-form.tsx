@@ -30,7 +30,7 @@ function TestCheckoutForm() {
     mode: 'onChange',
     defaultValues: {
       userId: '',
-      productId: '',
+      variantId: '',
       quantity: '1',
     },
   })
@@ -45,7 +45,7 @@ function TestCheckoutForm() {
           userId: transformedData.userId,
           items: [
             {
-              productId: transformedData.productId,
+              variantId: transformedData.variantId,
               quantity: transformedData.quantity,
             },
           ],
@@ -101,17 +101,17 @@ function TestCheckoutForm() {
 
           <FormField
             control={control}
-            name="productId"
+            name="variantId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Product ID <RequiredFieldMark />
+                  Variant ID <RequiredFieldMark />
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Paste product ID from database" />
+                  <Input {...field} placeholder="Paste variant ID from database" />
                 </FormControl>
                 <p className="text-sm text-muted-foreground">
-                  Get product ID from database (Product table)
+                  Get variant ID from database (ProductVariant table)
                 </p>
                 <FormMessage />
               </FormItem>
