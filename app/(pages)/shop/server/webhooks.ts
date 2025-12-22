@@ -28,21 +28,32 @@ export const handleCheckoutSessionCompleted = withPrisma(
           return
         }
 
+        // Extract payment intent ID (can be string, object, or null)
+        const paymentIntentId =
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : session.payment_intent?.id
+
+        if (!paymentIntentId) {
+          console.error(`No payment_intent in session ${session.id}`)
+          return
+        }
+
         // Update order status
         await tx.order.update({
           where: { id: orderId },
           data: {
             status: 'PAID',
-            stripePaymentIntentId: session.payment_intent as string,
+            stripePaymentIntentId: paymentIntentId,
           },
         })
 
         // Create payment record (upsert for idempotency)
         await tx.payment.upsert({
-          where: { stripePaymentIntentId: session.payment_intent as string },
+          where: { stripePaymentIntentId: paymentIntentId },
           create: {
             orderId,
-            stripePaymentIntentId: session.payment_intent as string,
+            stripePaymentIntentId: paymentIntentId,
             amount: session.amount_total || 0,
             currency: session.currency?.toUpperCase() as 'EUR' | 'USD',
             status: 'SUCCEEDED',
@@ -181,15 +192,22 @@ export const handlePaymentIntentFailed = withPrisma(
  */
 export const handleChargeRefunded = withPrisma(async (prisma, charge: Stripe.Charge) => {
   try {
-    const paymentIntent = charge.payment_intent as string
+    // Extract payment intent ID (can be string, object, or null)
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id
+
+    if (!paymentIntentId) {
+      console.error(`No payment_intent in charge ${charge.id}`)
+      return
+    }
 
     const order = await prisma.order.findUnique({
-      where: { stripePaymentIntentId: paymentIntent },
+      where: { stripePaymentIntentId: paymentIntentId },
       include: { items: true },
     })
 
     if (!order) {
-      console.error(`Order not found for payment intent ${paymentIntent}`)
+      console.error(`Order not found for payment intent ${paymentIntentId}`)
       return
     }
 
@@ -216,7 +234,7 @@ export const handleChargeRefunded = withPrisma(async (prisma, charge: Stripe.Cha
 
       // Update payment record
       await tx.payment.update({
-        where: { stripePaymentIntentId: paymentIntent },
+        where: { stripePaymentIntentId: paymentIntentId },
         data: {
           status: isFullRefund ? 'REFUNDED' : 'SUCCEEDED',
           refundedAt: new Date(),
