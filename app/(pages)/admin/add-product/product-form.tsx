@@ -108,6 +108,7 @@ function ProductForm({ onSubmit, children = null }: Props) {
 
   const handleGenerateVariants = () => {
     const options = getValues('options') || []
+    const existingVariants = getValues('variants') || []
     const productName = getValues('name') || 'PROD'
 
     // Filter out empty options
@@ -115,29 +116,54 @@ function ProductForm({ onSubmit, children = null }: Props) {
 
     const combinations = generateVariantCombinations(validOptions)
 
-    const newVariants: ProductVariantInput[] = combinations.map(combo => ({
-      sku: generateSku(productName, combo),
-      options: combo,
-      priceEUR: '',
-      priceUSD: '',
-      stock: '0',
-      weight: '',
-    }))
+    // Helper to compare options objects
+    const optionsMatch = (a: Record<string, string>, b: Record<string, string>) => {
+      const keysA = Object.keys(a).sort()
+      const keysB = Object.keys(b).sort()
+      if (keysA.length !== keysB.length) return false
+      return keysA.every(key => a[key] === b[key])
+    }
 
-    // If no options, create one default variant
-    if (
-      newVariants.length === 0 ||
-      (newVariants.length === 1 && Object.keys(newVariants[0].options).length === 0)
-    ) {
-      newVariants.length = 0
-      newVariants.push({
-        sku: generateSku(productName, {}),
-        options: {},
+    const newVariants: ProductVariantInput[] = combinations.map(combo => {
+      // Find existing variant with matching options
+      const existing = existingVariants.find(v => optionsMatch(v.options, combo))
+
+      if (existing) {
+        // Preserve existing data, update SKU if options changed
+        return {
+          ...existing,
+          options: combo,
+        }
+      }
+
+      // New variant with default values
+      return {
+        sku: generateSku(productName, combo),
+        options: combo,
         priceEUR: '',
         priceUSD: '',
         stock: '0',
         weight: '',
-      })
+      }
+    })
+
+    // If no options, create one default variant (preserve existing if exists)
+    if (
+      newVariants.length === 0 ||
+      (newVariants.length === 1 && Object.keys(newVariants[0].options).length === 0)
+    ) {
+      const existingDefault = existingVariants.find(v => Object.keys(v.options).length === 0)
+      newVariants.length = 0
+      newVariants.push(
+        existingDefault || {
+          sku: generateSku(productName, {}),
+          options: {},
+          priceEUR: '',
+          priceUSD: '',
+          stock: '0',
+          weight: '',
+        },
+      )
     }
 
     replaceVariants(newVariants)
