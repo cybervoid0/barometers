@@ -1,79 +1,73 @@
 'use client'
 
 import type { AccessRole } from '@prisma/client'
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
 import { ShoppingBag, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Image, Table } from '@/components/elements'
+import { Image } from '@/components/elements'
 import { Button, Separator } from '@/components/ui'
 import { Route } from '@/constants'
-import type { ProductWithImages } from '@/types'
+import type { ProductVariantWithProduct } from '@/types'
 import { formatPrice } from '@/utils'
 import { ContinueShopping } from '../components/continue-shopping'
-import { QuantityChange } from '../components/quantity-change'
-import { useCartStore } from '../providers/CartStoreProvider'
-import { fetchProductsByIds } from '../server/query-actions'
-
-const { accessor, display } = createColumnHelper<ProductWithImages>()
+import { fetchVariantsByIds } from '../server/query-actions'
+import { useShopCartStore } from '../stores/shop-cart-store'
 
 export default function Cart() {
   const router = useRouter()
   const { data: session } = useSession()
   const user = session?.user.name
   const role = session?.user.role
-  const { items, removeItem, clearCart, getProductAmount, getTotalItems } = useCartStore(
-    state => state,
-  )
 
-  const [products, setProducts] = useState<ProductWithImages[]>([])
+  const { items, updateQuantity, removeItem, clearCart, getTotalItems } = useShopCartStore()
+
+  const [variants, setVariants] = useState<ProductVariantWithProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const cartProdIds = useMemo(() => Object.keys(items).sort().join(','), [items])
+  const variantIds = useMemo(
+    () =>
+      items
+        .map(i => i.variantId)
+        .sort()
+        .join(','),
+    [items],
+  )
 
   useEffect(() => {
-    if (!cartProdIds) {
-      setProducts([])
+    if (!variantIds) {
+      setVariants([])
       return
     }
 
     setIsLoading(true)
-    ;(async () => {
-      try {
-        const result = await fetchProductsByIds(cartProdIds.split(','))
+    fetchVariantsByIds(variantIds.split(','))
+      .then(result => {
         if (result.success) {
-          setProducts(result.data)
+          setVariants(result.data)
         } else {
-          toast.error(result.error, { id: 'cart-error' })
+          toast.error(result.error)
         }
-      } finally {
-        setIsLoading(false)
-      }
-    })()
-  }, [cartProdIds])
+      })
+      .finally(() => setIsLoading(false))
+  }, [variantIds])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: add `items` dependency to update sum on q-ty change
   const totals = useMemo(() => {
-    const eur = products.reduce((sum, { id, priceEUR }) => {
-      const quantity = getProductAmount(id)
-      return sum + (priceEUR ?? 0) * quantity
-    }, 0)
+    let eur = 0
+    let usd = 0
 
-    const usd = products.reduce((sum, { id, priceUSD }) => {
-      const quantity = getProductAmount(id)
-      return sum + (priceUSD ?? 0) * quantity
-    }, 0)
+    for (const item of items) {
+      const variant = variants.find(v => v.id === item.variantId)
+      if (variant) {
+        eur += (variant.priceEUR ?? 0) * item.quantity
+        usd += (variant.priceUSD ?? 0) * item.quantity
+      }
+    }
 
     return { eur, usd }
-  }, [products, getProductAmount, items])
+  }, [items, variants])
 
   const handleClearCart = () => {
     if (confirm('Are you sure you want to clear the cart?')) {
@@ -88,170 +82,9 @@ export default function Cart() {
       router.push(Route.Signin)
       return
     }
-
     // TODO: Redirect to checkout page
     toast.info('Checkout coming soon...')
   }
-
-  const columns = [
-    accessor(({ images }) => images.at(0), {
-      id: 'image',
-      header: '',
-      enableSorting: false,
-      cell: ({ row, getValue }) => {
-        const image = getValue()
-        const product = row.original
-        return (
-          <Link href={`${Route.Shop}/${product.slug}`}>
-            {image ? (
-              <Image
-                width={80}
-                height={80}
-                className="rounded object-cover hover:opacity-80 transition-opacity"
-                src={image.url}
-                alt={image.name ?? product.name}
-              />
-            ) : (
-              <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
-                <ShoppingBag className="w-8 h-8 text-muted-foreground" />
-              </div>
-            )}
-          </Link>
-        )
-      },
-      meta: {
-        headerAlign: 'center',
-        cellAlign: 'center',
-      },
-    }),
-    accessor('name', {
-      id: 'name',
-      header: 'Product',
-      enableSorting: true,
-      cell: ({ row, getValue }) => (
-        <div>
-          <Link href={`${Route.Shop}/${row.original.slug}`}>
-            <p className="font-medium hover:underline">{getValue()}</p>
-          </Link>
-          <p className="text-sm text-muted-foreground">
-            Stock: {row.original.stock}
-            {row.original.stock < 5 && row.original.stock > 0 && (
-              <span className="text-orange-500 ml-2">Low stock!</span>
-            )}
-            {row.original.stock === 0 && (
-              <span className="text-destructive ml-2">Out of stock</span>
-            )}
-          </p>
-        </div>
-      ),
-    }),
-    accessor('priceEUR', {
-      id: 'price-eur',
-      header: 'Price EUR',
-      enableSorting: true,
-      cell: ({ getValue }) => <p>{getValue() ? formatPrice(getValue() ?? 0, 'EUR') : '—'}</p>,
-      meta: {
-        headerAlign: 'right',
-        cellAlign: 'right',
-      },
-    }),
-    accessor('priceUSD', {
-      id: 'price-usd',
-      header: 'Price USD',
-      enableSorting: true,
-      cell: ({ getValue }) => <p>{getValue() ? formatPrice(getValue() ?? 0, 'USD') : '—'}</p>,
-      meta: {
-        headerAlign: 'right',
-        cellAlign: 'right',
-      },
-    }),
-    accessor(({ id, stock }) => ({ id, stock }), {
-      id: 'quantity',
-      header: 'Quantity',
-      enableSorting: true,
-      sortingFn: (a, b) => getProductAmount(a.original.id) - getProductAmount(b.original.id),
-      cell: ({ getValue }) => {
-        const { id, stock } = getValue()
-        return <QuantityChange productId={id} stock={stock} min={1} />
-      },
-      meta: {
-        headerAlign: 'center',
-        cellAlign: 'center',
-      },
-    }),
-    display({
-      id: 'subtotal-eur',
-      header: 'Subtotal EUR',
-      enableSorting: true,
-      sortingFn: (a, b) => {
-        const subA = (a.original.priceEUR ?? 0) * getProductAmount(a.original.id)
-        const subB = (b.original.priceEUR ?? 0) * getProductAmount(b.original.id)
-        return subA - subB
-      },
-      cell: ({ row }) => {
-        const { priceEUR, id } = row.original
-        const quantity = getProductAmount(id)
-        const subtotal = (priceEUR ?? 0) * quantity
-        return <p className="font-medium">{formatPrice(subtotal, 'EUR')}</p>
-      },
-      meta: {
-        headerAlign: 'right',
-        cellAlign: 'right',
-      },
-    }),
-    display({
-      id: 'subtotal-usd',
-      header: 'Subtotal USD',
-      enableSorting: true,
-      sortingFn: (a, b) => {
-        const subA = (a.original.priceUSD ?? 0) * getProductAmount(a.original.id)
-        const subB = (b.original.priceUSD ?? 0) * getProductAmount(b.original.id)
-        return subA - subB
-      },
-      cell: ({ row }) => {
-        const { priceUSD, id } = row.original
-        const quantity = getProductAmount(id)
-        const subtotal = (priceUSD ?? 0) * quantity
-        return <p className="font-medium">{formatPrice(subtotal, 'USD')}</p>
-      },
-      meta: {
-        headerAlign: 'right',
-        cellAlign: 'right',
-      },
-    }),
-    display({
-      id: 'remove',
-      header: '',
-      enableSorting: false,
-      cell: ({ row }) => {
-        const { id, name } = row.original
-        return (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              removeItem(id)
-              toast.success(`${name} removed from cart`)
-            }}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        )
-      },
-      meta: {
-        headerAlign: 'center',
-        cellAlign: 'center',
-      },
-    }),
-  ]
-
-  const table = useReactTable({
-    columns,
-    data: products,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    enableSorting: true,
-  })
 
   if (isLoading) {
     return (
@@ -264,7 +97,7 @@ export default function Cart() {
     )
   }
 
-  if (products.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="container py-8">
         <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
@@ -302,7 +135,103 @@ export default function Cart() {
       </div>
 
       <div className="space-y-6">
-        <Table table={table} />
+        {/* Cart items */}
+        <div className="space-y-4">
+          {items.map(item => {
+            const variant = variants.find(v => v.id === item.variantId)
+            if (!variant) return null
+
+            const image = variant.images?.[0] ?? variant.product.images?.[0]
+            const optionsLabel = formatVariantOptions(variant.options as Record<string, string>)
+
+            return (
+              <div key={item.variantId} className="flex gap-4 p-4 border rounded-lg">
+                {/* Image */}
+                <Link href={`${Route.Shop}/${variant.product.slug}`} className="shrink-0">
+                  {image ? (
+                    <Image
+                      width={80}
+                      height={80}
+                      className="rounded object-cover hover:opacity-80 transition-opacity"
+                      src={image.url}
+                      alt={image.name ?? variant.product.name}
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-muted rounded flex items-center justify-center">
+                      <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </Link>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <Link href={`${Route.Shop}/${variant.product.slug}`}>
+                    <h3 className="font-medium hover:underline">{variant.product.name}</h3>
+                  </Link>
+                  {optionsLabel && <p className="text-sm text-muted-foreground">{optionsLabel}</p>}
+                  <p className="text-xs text-muted-foreground">SKU: {variant.sku}</p>
+                  <div className="mt-1">
+                    {variant.priceEUR && (
+                      <span className="font-medium">{formatPrice(variant.priceEUR, 'EUR')}</span>
+                    )}
+                    {variant.priceEUR && variant.priceUSD && ' / '}
+                    {variant.priceUSD && (
+                      <span className="text-muted-foreground">
+                        {formatPrice(variant.priceUSD, 'USD')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quantity */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                  >
+                    -
+                  </Button>
+                  <span className="w-8 text-center">{item.quantity}</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={item.quantity >= variant.stock}
+                    onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                  >
+                    +
+                  </Button>
+                </div>
+
+                {/* Subtotal */}
+                <div className="text-right min-w-[100px]">
+                  {variant.priceEUR && (
+                    <p className="font-bold">
+                      {formatPrice(variant.priceEUR * item.quantity, 'EUR')}
+                    </p>
+                  )}
+                  {variant.priceUSD && (
+                    <p className="text-sm text-muted-foreground">
+                      {formatPrice(variant.priceUSD * item.quantity, 'USD')}
+                    </p>
+                  )}
+                </div>
+
+                {/* Remove */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    removeItem(item.variantId)
+                    toast.success(`${variant.product.name} removed from cart`)
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            )
+          })}
+        </div>
 
         <Separator />
 
@@ -336,6 +265,12 @@ export default function Cart() {
       </div>
     </div>
   )
+}
+
+function formatVariantOptions(options: Record<string, string>): string {
+  return Object.entries(options)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')
 }
 
 const roleDescriptions: Record<AccessRole, string> = {

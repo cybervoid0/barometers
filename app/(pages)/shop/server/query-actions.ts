@@ -1,7 +1,7 @@
 'use server'
 
-import type { ActionResult, ProductWithImages } from '@/types'
-import { getProductsByIds } from './queries'
+import type { ActionResult, ProductVariantWithProduct, ProductWithImages } from '@/types'
+import { getProductsByIds, getVariantsByIds } from './queries'
 
 async function fetchProductsByIds(
   productIds: string[],
@@ -19,4 +19,20 @@ async function fetchProductsByIds(
   }
 }
 
-export { fetchProductsByIds }
+async function fetchVariantsByIds(
+  variantIds: string[],
+): Promise<ActionResult<ProductVariantWithProduct[]>> {
+  try {
+    return {
+      success: true,
+      data: await getVariantsByIds(variantIds),
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to fetch variants',
+    }
+  }
+}
+
+export { fetchProductsByIds, fetchVariantsByIds }
