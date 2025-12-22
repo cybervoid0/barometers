@@ -29,53 +29,37 @@ interface CreateCheckoutSessionInput {
 
 /**
  * Create a product with variants in Stripe and local database
+ * Uses rollback pattern to clean up Stripe resources on failure
  */
 export const createProductWithVariants = withPrisma(
   async (prisma, input: TransformedProductData) => {
+    let stripeProductId: string | undefined
+    const createdStripePriceIds: string[] = []
+
     try {
       // Save images to storage
       const savedImages = await saveProductImages(input.images)
 
-      // Create product in Stripe
+      // Create product in Stripe first
       const stripeProduct = await stripe.products.create({
         name: input.name,
         description: input.description,
       })
+      stripeProductId = stripeProduct.id
 
       const slug = slugify(input.name, { lower: true, strict: true })
 
-      // Create product in database
-      const product = await prisma.product.create({
-        data: {
-          name: input.name,
-          slug,
-          description: input.description,
-          stripeProductId: stripeProduct.id,
-          isActive: true,
-          images: savedImages.length > 0 ? { createMany: { data: savedImages } } : undefined,
-          options:
-            input.options.length > 0
-              ? {
-                  createMany: {
-                    data: input.options.map(opt => ({
-                      name: opt.name,
-                      values: opt.values,
-                      position: opt.position,
-                    })),
-                  },
-                }
-              : undefined,
-        },
-      })
-
-      // Create variants with Stripe prices
-      const createdVariants: ProductVariant[] = []
+      // Create all Stripe prices before DB operations
+      const variantPrices: Array<{
+        variant: (typeof input.variants)[number]
+        stripePriceIdEUR?: string
+        stripePriceIdUSD?: string
+      }> = []
 
       for (const variant of input.variants) {
         let stripePriceIdEUR: string | undefined
         let stripePriceIdUSD: string | undefined
 
-        // Create Stripe prices for each variant
         if (variant.priceEUR) {
           const priceEUR = await stripe.prices.create({
             product: stripeProduct.id,
@@ -84,6 +68,7 @@ export const createProductWithVariants = withPrisma(
             metadata: { sku: variant.sku },
           })
           stripePriceIdEUR = priceEUR.id
+          createdStripePriceIds.push(priceEUR.id)
         }
 
         if (variant.priceUSD) {
@@ -94,33 +79,82 @@ export const createProductWithVariants = withPrisma(
             metadata: { sku: variant.sku },
           })
           stripePriceIdUSD = priceUSD.id
+          createdStripePriceIds.push(priceUSD.id)
         }
 
-        // Create variant in database
-        const createdVariant = await prisma.productVariant.create({
+        variantPrices.push({ variant, stripePriceIdEUR, stripePriceIdUSD })
+      }
+
+      // Now create everything in database within a transaction
+      const result = await prisma.$transaction(async tx => {
+        const product = await tx.product.create({
           data: {
-            productId: product.id,
-            sku: variant.sku,
-            options: variant.options,
-            priceEUR: variant.priceEUR,
-            priceUSD: variant.priceUSD,
-            stock: variant.stock,
-            weight: variant.weight,
-            stripePriceIdEUR,
-            stripePriceIdUSD,
+            name: input.name,
+            slug,
+            description: input.description,
+            stripeProductId: stripeProduct.id,
             isActive: true,
+            images: savedImages.length > 0 ? { createMany: { data: savedImages } } : undefined,
+            options:
+              input.options.length > 0
+                ? {
+                    createMany: {
+                      data: input.options.map(opt => ({
+                        name: opt.name,
+                        values: opt.values,
+                        position: opt.position,
+                      })),
+                    },
+                  }
+                : undefined,
           },
         })
 
-        createdVariants.push(createdVariant)
-      }
+        const createdVariants: ProductVariant[] = []
+
+        for (const { variant, stripePriceIdEUR, stripePriceIdUSD } of variantPrices) {
+          const createdVariant = await tx.productVariant.create({
+            data: {
+              productId: product.id,
+              sku: variant.sku,
+              options: variant.options,
+              priceEUR: variant.priceEUR,
+              priceUSD: variant.priceUSD,
+              stock: variant.stock,
+              weight: variant.weight,
+              stripePriceIdEUR,
+              stripePriceIdUSD,
+              isActive: true,
+            },
+          })
+          createdVariants.push(createdVariant)
+        }
+
+        return { product, variants: createdVariants }
+      })
 
       return {
         success: true,
-        product: { ...product, variants: createdVariants },
+        product: { ...result.product, variants: result.variants },
       }
     } catch (error) {
       console.error('Error creating product with variants:', error)
+
+      // Rollback: archive Stripe prices and product
+      if (stripeProductId) {
+        try {
+          // Archive prices first (can't delete, only archive)
+          for (const priceId of createdStripePriceIds) {
+            await stripe.prices.update(priceId, { active: false })
+          }
+          // Archive the product
+          await stripe.products.update(stripeProductId, { active: false })
+          console.log(`Rolled back Stripe product ${stripeProductId}`)
+        } catch (rollbackError) {
+          console.error('Failed to rollback Stripe resources:', rollbackError)
+        }
+      }
+
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -323,6 +357,275 @@ export const createCheckoutSession = withPrisma(
     }
   },
 )
+
+/**
+ * Input for updating a product with variants
+ */
+interface UpdateProductInput {
+  id: string
+  name: string
+  description?: string
+  images: Array<{ url: string; name: string }>
+  options: Array<{ name: string; values: string[]; position: number }>
+  variants: Array<{
+    id?: string // existing variant ID (undefined = new variant)
+    sku: string
+    options: Record<string, string>
+    priceEUR?: number
+    priceUSD?: number
+    stock: number
+    weight?: number
+  }>
+}
+
+/**
+ * Update a product with variants, syncing with Stripe
+ * - New variants: create Stripe prices
+ * - Deleted variants: archive Stripe prices and soft-delete in DB
+ * - Price changes: create new Stripe prices (prices are immutable), archive old ones
+ */
+export const updateProductWithVariants = withPrisma(async (prisma, input: UpdateProductInput) => {
+  const newStripePriceIds: string[] = []
+
+  try {
+    // Fetch existing product with variants
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: input.id },
+      include: {
+        variants: true,
+        options: true,
+        images: true,
+      },
+    })
+
+    if (!existingProduct) {
+      return { success: false, error: 'Product not found' }
+    }
+
+    // Determine which variants are new, updated, or deleted
+    const existingVariantIds = existingProduct.variants.map(v => v.id)
+    const inputVariantIds = input.variants.filter(v => v.id).map(v => v.id as string)
+    const deletedVariantIds = existingVariantIds.filter(id => !inputVariantIds.includes(id))
+
+    // Archive Stripe prices for deleted variants
+    for (const variantId of deletedVariantIds) {
+      const variant = existingProduct.variants.find(v => v.id === variantId)
+      if (variant) {
+        if (variant.stripePriceIdEUR) {
+          await stripe.prices.update(variant.stripePriceIdEUR, { active: false })
+        }
+        if (variant.stripePriceIdUSD) {
+          await stripe.prices.update(variant.stripePriceIdUSD, { active: false })
+        }
+      }
+    }
+
+    // Prepare variant updates with new Stripe prices where needed
+    const variantUpdates: Array<{
+      variant: (typeof input.variants)[number]
+      stripePriceIdEUR?: string
+      stripePriceIdUSD?: string
+      needsNewEURPrice: boolean
+      needsNewUSDPrice: boolean
+    }> = []
+
+    for (const inputVariant of input.variants) {
+      const existingVariant = inputVariant.id
+        ? existingProduct.variants.find(v => v.id === inputVariant.id)
+        : undefined
+
+      let stripePriceIdEUR = existingVariant?.stripePriceIdEUR ?? undefined
+      let stripePriceIdUSD = existingVariant?.stripePriceIdUSD ?? undefined
+
+      // Check if EUR price changed or is new
+      const needsNewEURPrice =
+        inputVariant.priceEUR !== undefined &&
+        (!existingVariant || existingVariant.priceEUR !== inputVariant.priceEUR)
+
+      // Check if USD price changed or is new
+      const needsNewUSDPrice =
+        inputVariant.priceUSD !== undefined &&
+        (!existingVariant || existingVariant.priceUSD !== inputVariant.priceUSD)
+
+      // Archive old prices and create new ones if price changed
+      if (needsNewEURPrice) {
+        if (stripePriceIdEUR) {
+          await stripe.prices.update(stripePriceIdEUR, { active: false })
+        }
+        if (inputVariant.priceEUR) {
+          const newPrice = await stripe.prices.create({
+            product: existingProduct.stripeProductId,
+            unit_amount: inputVariant.priceEUR,
+            currency: 'eur',
+            metadata: { sku: inputVariant.sku },
+          })
+          stripePriceIdEUR = newPrice.id
+          newStripePriceIds.push(newPrice.id)
+        } else {
+          stripePriceIdEUR = undefined
+        }
+      }
+
+      if (needsNewUSDPrice) {
+        if (stripePriceIdUSD) {
+          await stripe.prices.update(stripePriceIdUSD, { active: false })
+        }
+        if (inputVariant.priceUSD) {
+          const newPrice = await stripe.prices.create({
+            product: existingProduct.stripeProductId,
+            unit_amount: inputVariant.priceUSD,
+            currency: 'usd',
+            metadata: { sku: inputVariant.sku },
+          })
+          stripePriceIdUSD = newPrice.id
+          newStripePriceIds.push(newPrice.id)
+        } else {
+          stripePriceIdUSD = undefined
+        }
+      }
+
+      variantUpdates.push({
+        variant: inputVariant,
+        stripePriceIdEUR,
+        stripePriceIdUSD,
+        needsNewEURPrice,
+        needsNewUSDPrice,
+      })
+    }
+
+    // Update Stripe product name/description if changed
+    if (existingProduct.name !== input.name || existingProduct.description !== input.description) {
+      await stripe.products.update(existingProduct.stripeProductId, {
+        name: input.name,
+        description: input.description ?? undefined,
+      })
+    }
+
+    // Handle images - determine new and deleted
+    const existingImageUrls = existingProduct.images.map(i => i.url)
+    const inputImageUrls = input.images.map(i => i.url)
+    const newImages = input.images.filter(i => !existingImageUrls.includes(i.url))
+    const deletedImageIds = existingProduct.images
+      .filter(i => !inputImageUrls.includes(i.url))
+      .map(i => i.id)
+
+    // Database transaction
+    const result = await prisma.$transaction(async tx => {
+      // Delete removed images
+      if (deletedImageIds.length > 0) {
+        await tx.productImage.deleteMany({
+          where: { id: { in: deletedImageIds } },
+        })
+      }
+
+      // Create new images
+      if (newImages.length > 0) {
+        await tx.productImage.createMany({
+          data: newImages.map((img, index) => ({
+            productId: input.id,
+            url: img.url,
+            name: img.name,
+            order: existingProduct.images.length + index,
+          })),
+        })
+      }
+
+      // Delete old options and create new ones
+      await tx.productOption.deleteMany({
+        where: { productId: input.id },
+      })
+
+      if (input.options.length > 0) {
+        await tx.productOption.createMany({
+          data: input.options.map(opt => ({
+            productId: input.id,
+            name: opt.name,
+            values: opt.values,
+            position: opt.position,
+          })),
+        })
+      }
+
+      // Soft-delete removed variants
+      if (deletedVariantIds.length > 0) {
+        await tx.productVariant.updateMany({
+          where: { id: { in: deletedVariantIds } },
+          data: { isActive: false },
+        })
+      }
+
+      // Update or create variants
+      for (const { variant, stripePriceIdEUR, stripePriceIdUSD } of variantUpdates) {
+        if (variant.id) {
+          // Update existing variant
+          await tx.productVariant.update({
+            where: { id: variant.id },
+            data: {
+              sku: variant.sku,
+              options: variant.options,
+              priceEUR: variant.priceEUR,
+              priceUSD: variant.priceUSD,
+              stock: variant.stock,
+              weight: variant.weight,
+              stripePriceIdEUR,
+              stripePriceIdUSD,
+            },
+          })
+        } else {
+          // Create new variant
+          await tx.productVariant.create({
+            data: {
+              productId: input.id,
+              sku: variant.sku,
+              options: variant.options,
+              priceEUR: variant.priceEUR,
+              priceUSD: variant.priceUSD,
+              stock: variant.stock,
+              weight: variant.weight,
+              stripePriceIdEUR,
+              stripePriceIdUSD,
+              isActive: true,
+            },
+          })
+        }
+      }
+
+      // Update product basic info
+      const updatedProduct = await tx.product.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          description: input.description,
+        },
+        include: {
+          images: { orderBy: { order: 'asc' } },
+          variants: { where: { isActive: true }, orderBy: { createdAt: 'asc' } },
+          options: { orderBy: { position: 'asc' } },
+        },
+      })
+
+      return updatedProduct
+    })
+
+    return { success: true, product: result }
+  } catch (error) {
+    console.error('Error updating product with variants:', error)
+
+    // Rollback: archive newly created Stripe prices
+    for (const priceId of newStripePriceIds) {
+      try {
+        await stripe.prices.update(priceId, { active: false })
+      } catch (rollbackError) {
+        console.error('Failed to rollback Stripe price:', rollbackError)
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+})
 
 /**
  * Update order status
