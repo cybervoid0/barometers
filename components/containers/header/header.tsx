@@ -27,8 +27,7 @@ export async function Header() {
               <Image
                 width={48}
                 height={48}
-                quality={80}
-                src="/shared/compass-logo-ny-2026.png"
+                src="/shared/compass-logo.svg"
                 alt="logo"
                 className="object-contain"
               />
