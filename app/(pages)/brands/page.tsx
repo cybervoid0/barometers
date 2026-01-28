@@ -14,10 +14,7 @@ import {
 } from '@/server/brands/queries'
 import { type CountryListDTO, getCountries } from '@/server/counties/queries'
 import { title } from '../../../constants/metadata'
-import type { DynamicOptions } from '../../../types'
 import { BrandEdit } from './brand-edit'
-
-export const dynamic: DynamicOptions = 'auto'
 
 export const metadata: Metadata = {
   title: `${title} - Manufacturers`,

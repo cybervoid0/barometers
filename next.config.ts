@@ -11,6 +11,7 @@ const minioUrl = process.env.NEXT_PUBLIC_MINIO_URL
 const minioBucket = process.env.NEXT_PUBLIC_MINIO_BUCKET
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   compiler: {
