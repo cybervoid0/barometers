@@ -15,6 +15,20 @@ import { cn } from '@/utils'
 import { jsonLd, meta } from '../constants/metadata'
 import Providers from '../providers'
 
+async function getCategoryImages() {
+  'use cache'
+  return prisma.category.findMany({
+    select: {
+      name: true,
+      images: {
+        select: {
+          url: true,
+        },
+      },
+    },
+  })
+}
+
 const raleway = Raleway({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
@@ -33,18 +47,8 @@ export const viewport: Viewport = {
 const gtag = process.env.NEXT_PUBLIC_GTAG ?? ''
 
 export async function generateMetadata() {
-  const images = (
-    await prisma.category.findMany({
-      select: {
-        name: true,
-        images: {
-          select: {
-            url: true,
-          },
-        },
-      },
-    })
-  ).map(({ images: [image], name }) => ({
+  const categories = await getCategoryImages()
+  const images = categories.map(({ images: [image], name }) => ({
     url: image.url,
     alt: name,
   }))

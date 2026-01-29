@@ -23,7 +23,7 @@ async function saveFile(tempUrl: string, filename: string) {
   await minioClient.removeObject(minioBucket, tempUrl)
 }
 
-function createTempFile(fileName: string) {
+async function createTempFile(fileName: string) {
   const tempImageName = `temp/${crypto.randomUUID()}${path.extname(fileName)}`
   return minioClient.presignedPutObject(minioBucket, tempImageName)
 }
