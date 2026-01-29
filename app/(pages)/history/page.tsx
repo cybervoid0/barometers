@@ -3,8 +3,6 @@ import 'server-only'
 import { Image, ShowMore } from '@/components/elements'
 import { cn } from '@/utils'
 
-export const dynamic = 'force-static'
-
 const paragraphStyles = 'indent-8 text-justify sm:text-left'
 const headerStyles = 'mt-12 first-of-type:mt-6 mb-4'
 

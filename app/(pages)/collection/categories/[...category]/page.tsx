@@ -11,11 +11,8 @@ import { Route } from '@/constants/routes'
 import { withPrisma } from '@/prisma/prismaClient'
 import { getBarometersByParams } from '@/server/barometers/queries'
 import { getCategory } from '@/server/categories/queries'
-import { type DynamicOptions, SortOptions, type SortValue } from '@/types'
+import { SortOptions, type SortValue } from '@/types'
 import Sort from './sort'
-
-export const dynamicParams = true
-export const dynamic: DynamicOptions = 'force-static'
 
 interface CollectionProps {
   params: Promise<{

@@ -1,9 +1,7 @@
 import { Pagination } from '@/components/ui'
 import { getInaccuracyReports } from '@/server/reports/queries'
-import type { DynamicOptions } from '@/types'
 import { ReportTable } from './report-table'
 
-export const dynamic: DynamicOptions = 'force-dynamic'
 const itemsOnPage = 12
 
 interface Props {

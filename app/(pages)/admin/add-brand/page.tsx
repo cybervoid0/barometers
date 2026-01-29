@@ -2,10 +2,7 @@ import 'server-only'
 
 import { getAllBrands } from '@/server/brands/queries'
 import { getCountries } from '@/server/counties/queries'
-import type { DynamicOptions } from '@/types'
 import BrandAddForm from './brand-add-form'
-
-export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function AddBrand() {
   const [countries, brands] = await Promise.all([getCountries(), getAllBrands()])

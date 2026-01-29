@@ -49,8 +49,6 @@ import { TextFieldEdit } from './components/edit-fields/textfield-edit'
 import { InaccuracyReport } from './components/inaccuracy-report'
 import { PropertyCard } from './components/property-card/property-card'
 
-export const dynamic = 'force-static'
-export const dynamicParams = true
 dayjs.extend(utc)
 
 interface Props {

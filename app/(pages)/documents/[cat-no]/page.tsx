@@ -39,7 +39,6 @@ import {
 } from '@/components/ui'
 import { Route } from '@/constants'
 import { getDocumentByCatNo } from '@/server/documents/queries'
-import type { DynamicOptions } from '@/types'
 
 interface Props {
   params: Promise<{
@@ -47,7 +46,6 @@ interface Props {
   }>
 }
 
-export const dynamic: DynamicOptions = 'force-dynamic'
 dayjs.extend(utc)
 
 export default async function Document({ params }: Props) {

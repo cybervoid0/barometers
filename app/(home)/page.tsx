@@ -5,8 +5,6 @@ import { Route } from '@/constants'
 import { getCategories } from '@/server/categories/queries'
 import { cn } from '@/utils'
 
-export const dynamic = 'force-static'
-
 export default async function HomePage() {
   const categories = await getCategories()
   return (

@@ -10,15 +10,12 @@ import { fileStorage, Route } from '@/constants'
 import { title } from '@/constants/metadata'
 import { withPrisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
-import type { DynamicOptions } from '@/types'
 
 interface Props {
   params: Promise<{
     slug: string
   }>
 }
-
-export const dynamic: DynamicOptions = 'force-static'
 
 const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
   prisma.barometer.findMany({

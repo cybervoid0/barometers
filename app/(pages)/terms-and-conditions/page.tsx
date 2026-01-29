@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { appURL, email, foundation, Route } from '@/constants'
 
-export const dynamic = 'force-static'
-
 const paragraphStyles = 'mb-4 indent-8'
 const sectionStyle = 'mb-10 mt-10'
 const headerStyle = 'mb-3 leading-tight'

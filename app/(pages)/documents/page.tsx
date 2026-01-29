@@ -6,15 +6,12 @@ import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from
 import { getAllBarometers } from '@/server/barometers/queries'
 import { getConditions } from '@/server/conditions/queries'
 import { getAllDocuments } from '@/server/documents/queries'
-import type { DynamicOptions } from '@/types'
 import { DocumentTable } from './DocumentTable'
 
 export const metadata: Metadata = {
   title: 'Document Archive',
   description: 'Browse our collection of historical documents and manuscripts',
 }
-
-export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function Documents() {
   const [archive, conditions, allBarometers] = await Promise.all([

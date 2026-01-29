@@ -2,10 +2,7 @@ import 'server-only'
 
 import { getAllBarometers } from '@/server/barometers/queries'
 import { getConditions } from '@/server/conditions/queries'
-import type { DynamicOptions } from '@/types'
 import { DocumentForm } from './document-form'
-
-export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function AddDocument() {
   const conditions = await getConditions()

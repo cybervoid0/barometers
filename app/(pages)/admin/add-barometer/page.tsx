@@ -5,10 +5,7 @@ import { getCategories } from '@/server/categories/queries'
 import { getConditions } from '@/server/conditions/queries'
 import { getMaterials } from '@/server/materials/queries'
 import { getMovements } from '@/server/movements/queries'
-import type { DynamicOptions } from '@/types'
 import BarometerForm from './barometer-form'
-
-export const dynamic: DynamicOptions = 'force-dynamic'
 
 export default async function AddBarometer() {
   const [conditions, categories, movements, brands, materials] = await Promise.all([
