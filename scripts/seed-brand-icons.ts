@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import pLimit from 'p-limit'
 import sharp from 'sharp'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
 dotenv.config()
 const limit = pLimit(10)
@@ -9,7 +9,7 @@ const limit = pLimit(10)
 const baseUrl = process.env.NEXT_PUBLIC_MINIO_URL
 const bucket = process.env.NEXT_PUBLIC_MINIO_BUCKET
 
-const main = withPrisma(async prisma => {
+async function main() {
   const res = await prisma.manufacturer.findMany({
     select: {
       id: true,
@@ -103,7 +103,7 @@ const main = withPrisma(async prisma => {
       console.log(`- ${result.name}: ${result.error}`)
     })
   }
-})
+}
 
 main().catch(err => {
   console.error(err)

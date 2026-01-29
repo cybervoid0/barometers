@@ -2,9 +2,9 @@ import 'server-only'
 
 import { cacheLife, cacheTag } from 'next/cache'
 import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
-const getAllDocuments = withPrisma(async prisma => {
+export async function getAllDocuments() {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.documents)
@@ -28,59 +28,57 @@ const getAllDocuments = withPrisma(async prisma => {
       },
     },
   })
-})
-type AllDocumentsDTO = Awaited<ReturnType<typeof getAllDocuments>>
+}
+export type AllDocumentsDTO = Awaited<ReturnType<typeof getAllDocuments>>
 
-const getDocuments = withPrisma(
-  async (prisma, pageNo: number = 1, pageSize: number = DEFAULT_PAGE_SIZE) => {
-    'use cache'
-    cacheLife('max')
-    cacheTag(Tag.documents)
+export async function getDocuments(pageNo: number = 1, pageSize: number = DEFAULT_PAGE_SIZE) {
+  'use cache'
+  cacheLife('max')
+  cacheTag(Tag.documents)
 
-    const skip = (pageNo - 1) * pageSize
-    const [documents, docCount] = await Promise.all([
-      prisma.document.findMany({
-        include: {
-          images: {
-            orderBy: {
-              order: 'asc',
-            },
-          },
-          condition: {
-            select: {
-              name: true,
-            },
+  const skip = (pageNo - 1) * pageSize
+  const [documents, docCount] = await Promise.all([
+    prisma.document.findMany({
+      include: {
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
-        skip,
-        take: pageSize,
-        orderBy: {
-          createdAt: 'asc',
+        condition: {
+          select: {
+            name: true,
+          },
         },
-      }),
-      prisma.document.count(),
-    ])
-    return {
-      documents,
-      page: pageNo,
-      totalPages: Math.ceil(docCount / pageSize),
-      totalItems: docCount,
-      pageSize,
-    }
-  },
-)
-type DocumentsDTO = Awaited<ReturnType<typeof getDocuments>>
+      },
+      skip,
+      take: pageSize,
+      orderBy: {
+        createdAt: 'asc',
+      },
+    }),
+    prisma.document.count(),
+  ])
+  return {
+    documents,
+    page: pageNo,
+    totalPages: Math.ceil(docCount / pageSize),
+    totalItems: docCount,
+    pageSize,
+  }
+}
+export type DocumentsDTO = Awaited<ReturnType<typeof getDocuments>>
 
-const getDocument = withPrisma(async (prisma, id: string) => {
+export async function getDocument(id: string) {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.documents)
 
   return prisma.document.findUnique({ where: { id } })
-})
-type DocumentDTO = Awaited<ReturnType<typeof getDocument>>
+}
+export type DocumentDTO = Awaited<ReturnType<typeof getDocument>>
 
-const getDocumentByCatNo = withPrisma(async (prisma, catNo: string) => {
+export async function getDocumentByCatNo(catNo: string) {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.documents)
@@ -105,8 +103,5 @@ const getDocumentByCatNo = withPrisma(async (prisma, catNo: string) => {
       },
     },
   })
-})
-type DocumentByCatNoDTO = Awaited<ReturnType<typeof getDocumentByCatNo>>
-
-export { getDocuments, getDocument, getAllDocuments, getDocumentByCatNo }
-export type { AllDocumentsDTO, DocumentsDTO, DocumentDTO, DocumentByCatNoDTO }
+}
+export type DocumentByCatNoDTO = Awaited<ReturnType<typeof getDocumentByCatNo>>

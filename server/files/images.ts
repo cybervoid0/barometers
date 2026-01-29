@@ -3,7 +3,7 @@
 import path from 'node:path'
 import { after } from 'next/server'
 import sharp from 'sharp'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { minioBucket, minioClient } from '@/services/minio'
 import type { ImageType, MediaFile } from '@/types'
 import { saveFile } from './actions'
@@ -46,53 +46,52 @@ async function generateBlurData(imageUrl: string): Promise<string | null> {
 }
 
 /** Costly image processing operations which are executed after the images are stored in the DB */
-const createBlurData = withPrisma(
-  async (
-    prisma,
-    images: {
-      url: string
-      id: string
-    }[],
-  ) => {
-    await Promise.all(
-      images.map(async ({ id, url }) => {
-        const blurData = await generateBlurData(url)
-        if (blurData) {
-          await prisma.image.update({
-            where: { id },
-            data: {
-              blurData,
-            },
-          })
-        }
-      }),
-    )
-  },
-)
+async function createBlurData(
+  images: {
+    url: string
+    id: string
+  }[],
+) {
+  await Promise.all(
+    images.map(async ({ id, url }) => {
+      const blurData = await generateBlurData(url)
+      if (blurData) {
+        await prisma.image.update({
+          where: { id },
+          data: {
+            blurData,
+          },
+        })
+      }
+    }),
+  )
+}
 
-const createImagesInDb = withPrisma(
-  async (prisma, imageFiles: MediaFile[], imageType: ImageType, idSuffix: string) => {
-    const savedImages = await Promise.all(
-      imageFiles.map(async ({ url, name }, order) => ({
-        url: await saveImage(url, imageType, idSuffix),
-        name,
-        order,
-      })),
-    )
-    const images = await prisma.image.createManyAndReturn({
-      data: savedImages,
-      select: {
-        id: true,
-        url: true,
-      },
-    })
+export async function createImagesInDb(
+  imageFiles: MediaFile[],
+  imageType: ImageType,
+  idSuffix: string,
+) {
+  const savedImages = await Promise.all(
+    imageFiles.map(async ({ url, name }, order) => ({
+      url: await saveImage(url, imageType, idSuffix),
+      name,
+      order,
+    })),
+  )
+  const images = await prisma.image.createManyAndReturn({
+    data: savedImages,
+    select: {
+      id: true,
+      url: true,
+    },
+  })
 
-    // attach blur data to created images after return
-    after(() => createBlurData(images))
+  // attach blur data to created images after return
+  after(() => createBlurData(images))
 
-    return images
-  },
-)
+  return images
+}
 
 async function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
   if (!tempUrl.startsWith('temp/')) return tempUrl
@@ -107,4 +106,4 @@ function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: 
   return `gallery/${type}-${idSuffix}__${random}${extension}`
 }
 
-export { createImagesInDb, saveImage }
+export { saveImage }

@@ -8,7 +8,7 @@ import { Card, Pagination } from '@/components/ui'
 import { DEFAULT_PAGE_SIZE, fileStorage } from '@/constants'
 import { openGraph, title, twitter } from '@/constants/metadata'
 import { Route } from '@/constants/routes'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { getBarometersByParams } from '@/server/barometers/queries'
 import { getCategory } from '@/server/categories/queries'
 import { SortOptions, type SortValue } from '@/types'
@@ -101,7 +101,7 @@ export default async function Collection(props: CollectionProps) {
   )
 }
 
-export const generateStaticParams = withPrisma(async prisma => {
+export async function generateStaticParams() {
   const categories = await prisma.category.findMany({ select: { name: true, id: true } })
   const categoriesWithCount = await prisma.barometer.groupBy({
     by: ['categoryId'],
@@ -126,4 +126,4 @@ export const generateStaticParams = withPrisma(async prisma => {
     }
   }
   return params
-})
+}

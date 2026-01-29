@@ -21,7 +21,7 @@ import { notFound } from 'next/navigation'
 import { IsAdmin, MD, ShowMore } from '@/components/elements'
 import { Card, SeparatorWithText } from '@/components/ui'
 import { Route } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { getBarometer } from '@/server/barometers/queries'
 import { getAllBrands } from '@/server/brands/queries'
 import { getCategories } from '@/server/categories/queries'
@@ -61,9 +61,9 @@ interface Props {
  * This function fetches all barometers from the API and maps their slugs
  * to be used as static parameters for Next.js static generation.
  */
-export const generateStaticParams = withPrisma(prisma =>
-  prisma.barometer.findMany({ select: { slug: true } }),
-)
+export async function generateStaticParams() {
+  return prisma.barometer.findMany({ select: { slug: true } })
+}
 
 export default async function Page(props: Props) {
   const { slug } = await props.params

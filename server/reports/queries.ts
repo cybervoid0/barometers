@@ -1,9 +1,9 @@
 import 'server-only'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
-export const getInaccuracyReports = withPrisma(async (prisma, pageNo: number, pageSize: number) => {
+export async function getInaccuracyReports(pageNo: number, pageSize: number) {
   const size = Math.max(pageSize || DEFAULT_PAGE_SIZE, 1)
   const page = Math.max(pageNo || 1, 1)
   const [reports, totalItems] = await Promise.all([
@@ -29,6 +29,6 @@ export const getInaccuracyReports = withPrisma(async (prisma, pageNo: number, pa
     pageSize: size,
     totalPages: Math.ceil(totalItems / size),
   }
-})
+}
 
 export type InaccuracyReportsDTO = Awaited<ReturnType<typeof getInaccuracyReports>>

@@ -3,115 +3,105 @@
 import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { Route } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import type { ActionResult, MediaFile } from '@/types'
 import { slug as slugify, trimTrailingSlash } from '@/utils'
 import { revalidateCategory } from '@/utils/revalidate'
 import { deleteFiles } from '../files/actions'
 
-const createBarometer = withPrisma(
-  async (
-    prisma,
-    data: Prisma.BarometerUncheckedCreateInput,
-  ): Promise<ActionResult<{ id: string }>> => {
-    try {
-      const { id, categoryId } = await prisma.barometer.create({
-        data,
-      })
-      await revalidateCategory(prisma, categoryId)
-      revalidatePath(trimTrailingSlash(Route.NewArrivals)) // regenerate new arrivals page
-      return { success: true, data: { id } }
-    } catch (error) {
-      // Handle unique constraint violations
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return {
-          success: false,
-          error: `Barometer with name "${data.name}" and cat.no. "${data.collectionId}" already exists`,
-        }
+export async function createBarometer(
+  data: Prisma.BarometerUncheckedCreateInput,
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    const { id, categoryId } = await prisma.barometer.create({
+      data,
+    })
+    await revalidateCategory(categoryId)
+    revalidatePath(trimTrailingSlash(Route.NewArrivals)) // regenerate new arrivals page
+    return { success: true, data: { id } }
+  } catch (error) {
+    // Handle unique constraint violations
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return {
+        success: false,
+        error: `Barometer with name "${data.name}" and cat.no. "${data.collectionId}" already exists`,
       }
-
-      console.error('Error creating barometer:', error)
-      return { success: false, error: 'Failed to create barometer. Please try again.' }
     }
-  },
-)
 
-const updateBarometer = withPrisma(
-  async (
-    prisma,
-    data: Prisma.BarometerUncheckedUpdateInput,
-  ): Promise<ActionResult<{ slug: string; name: string }>> => {
-    try {
-      const oldBarometer = await prisma.barometer.findUniqueOrThrow({
-        where: { id: data.id as string },
-      })
-      // create new slug if name changed
-      const slug = data.name ? slugify(data.name as string) : oldBarometer.slug
-      await prisma.barometer.update({
-        where: { id: data.id as string },
-        data: {
-          ...data,
-          slug,
+    console.error('Error creating barometer:', error)
+    return { success: false, error: 'Failed to create barometer. Please try again.' }
+  }
+}
+
+export async function updateBarometer(
+  data: Prisma.BarometerUncheckedUpdateInput,
+): Promise<ActionResult<{ slug: string; name: string }>> {
+  try {
+    const oldBarometer = await prisma.barometer.findUniqueOrThrow({
+      where: { id: data.id as string },
+    })
+    // create new slug if name changed
+    const slug = data.name ? slugify(data.name as string) : oldBarometer.slug
+    await prisma.barometer.update({
+      where: { id: data.id as string },
+      data: {
+        ...data,
+        slug,
+      },
+    })
+    revalidatePath(Route.Barometer + slug)
+    await revalidateCategory((data.categoryId as string) ?? oldBarometer.categoryId)
+    const name = (data.name as string) ?? oldBarometer.name
+    return { success: true, data: { slug, name } }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return {
+        success: false,
+        error: 'This value is already used in another barometer',
+      }
+    }
+    console.error('Error updating barometer:', error)
+    return { success: false, error: 'Failed to update barometer. Please try again.' }
+  }
+}
+
+export async function deleteBarometer(slug: string): Promise<ActionResult<{ id: string }>> {
+  try {
+    const barometer = await prisma.barometer.findFirstOrThrow({
+      where: {
+        slug: {
+          equals: slug,
+          mode: 'insensitive',
         },
-      })
-      revalidatePath(Route.Barometer + slug)
-      await revalidateCategory(prisma, (data.categoryId as string) ?? oldBarometer.categoryId)
-      const name = (data.name as string) ?? oldBarometer.name
-      return { success: true, data: { slug, name } }
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return {
-          success: false,
-          error: 'This value is already used in another barometer',
-        }
-      }
-      console.error('Error updating barometer:', error)
-      return { success: false, error: 'Failed to update barometer. Please try again.' }
-    }
-  },
-)
+      },
+    })
 
-const deleteBarometer = withPrisma(
-  async (prisma, slug: string): Promise<ActionResult<{ id: string }>> => {
-    try {
-      const barometer = await prisma.barometer.findFirstOrThrow({
+    const args = {
+      where: { barometers: { some: { id: barometer.id } } },
+    }
+    // save deleting images info
+    const imagesBeforeDbUpdate = (await prisma.image.findMany({
+      ...args,
+      select: {
+        url: true,
+        name: true,
+      },
+    })) as MediaFile[]
+    await prisma.$transaction(async tx => {
+      await tx.image.deleteMany(args)
+      await tx.barometer.delete({
         where: {
-          slug: {
-            equals: slug,
-            mode: 'insensitive',
-          },
+          id: barometer.id,
         },
       })
-
-      const args = {
-        where: { barometers: { some: { id: barometer.id } } },
-      }
-      // save deleting images info
-      const imagesBeforeDbUpdate = (await prisma.image.findMany({
-        ...args,
-        select: {
-          url: true,
-          name: true,
-        },
-      })) as MediaFile[]
-      await prisma.$transaction(async tx => {
-        await tx.image.deleteMany(args)
-        await tx.barometer.delete({
-          where: {
-            id: barometer.id,
-          },
-        })
-      })
-      await deleteFiles(imagesBeforeDbUpdate)
-      revalidatePath(Route.Barometer + barometer.slug)
-      revalidatePath(trimTrailingSlash(Route.NewArrivals))
-      await revalidateCategory(prisma, barometer.categoryId)
-      return { success: true, data: { id: barometer.id } }
-    } catch (error) {
-      console.error('Error deleting barometer:', error)
-      return { success: false, error: 'Failed to delete barometer. Please try again.' }
-    }
-  },
-)
-
-export { createBarometer, updateBarometer, deleteBarometer }
+    })
+    await deleteFiles(imagesBeforeDbUpdate)
+    revalidatePath(Route.Barometer + barometer.slug)
+    revalidatePath(trimTrailingSlash(Route.NewArrivals))
+    await revalidateCategory(barometer.categoryId)
+    return { success: true, data: { id: barometer.id } }
+  } catch (error) {
+    console.error('Error deleting barometer:', error)
+    return { success: false, error: 'Failed to delete barometer. Please try again.' }
+  }
+}

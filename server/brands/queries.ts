@@ -2,10 +2,10 @@ import 'server-only'
 
 import { cacheLife, cacheTag } from 'next/cache'
 import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { bufferToBase64Url } from '@/utils'
 
-export const getAllBrands = withPrisma(async prisma => {
+export async function getAllBrands() {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.brands)
@@ -25,9 +25,9 @@ export const getAllBrands = withPrisma(async prisma => {
       },
     ],
   })
-})
+}
 
-export const getBrands = withPrisma(async (prisma, page?: number, size?: number) => {
+export async function getBrands(page?: number, size?: number) {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.brands)
@@ -93,9 +93,9 @@ export const getBrands = withPrisma(async (prisma, page?: number, size?: number)
     totalItems,
     pageSize,
   }
-})
+}
 
-export const getBrand = withPrisma(async (prisma, slug: string) => {
+export async function getBrand(slug: string) {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.brands)
@@ -136,9 +136,9 @@ export const getBrand = withPrisma(async (prisma, slug: string) => {
     ...brand,
     icon: bufferToBase64Url(icon),
   }
-})
+}
 
-export const getBrandsByCountry = withPrisma(async prisma => {
+export async function getBrandsByCountry() {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.brands)
@@ -207,7 +207,7 @@ export const getBrandsByCountry = withPrisma(async prisma => {
       }
     })
     .sort((a, b) => b._count.manufacturers - a._count.manufacturers)
-})
+}
 
 export type BrandDTO = Awaited<ReturnType<typeof getBrand>>
 

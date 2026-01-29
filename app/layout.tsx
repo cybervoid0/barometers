@@ -9,7 +9,7 @@ import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
 import { Footer, Header } from '@/components/containers'
 import { CheckConsent, CookieConsent, ScrollToTop } from '@/components/elements'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { CountryProvider } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
 import { jsonLd, meta } from '../constants/metadata'
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 }
 const gtag = process.env.NEXT_PUBLIC_GTAG ?? ''
 
-export const generateMetadata = withPrisma(async prisma => {
+export async function generateMetadata() {
   const images = (
     await prisma.category.findMany({
       select: {
@@ -59,7 +59,7 @@ export const generateMetadata = withPrisma(async prisma => {
       images,
     },
   }
-})
+}
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (

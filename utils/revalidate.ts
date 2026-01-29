@@ -1,7 +1,7 @@
-import type { PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { BAROMETERS_PER_CATEGORY_PAGE } from '@/constants/globals'
 import { Route } from '@/constants/routes'
+import { prisma } from '@/prisma/prismaClient'
 import { SortOptions } from '@/types'
 
 /**
@@ -9,10 +9,9 @@ import { SortOptions } from '@/types'
  * Call this function after adding/updating a barometer to update the category pages that include the
  * barometer.
  *
- * @param prisma - The PrismaClient instance used to interact with the database.
  * @param categoryId - The ID of the category to revalidate.
  */
-export async function revalidateCategory(prisma: PrismaClient, categoryId: string) {
+export async function revalidateCategory(categoryId: string) {
   const { name: categoryName } = await prisma.category.findUniqueOrThrow({
     where: { id: categoryId },
     select: { name: true },

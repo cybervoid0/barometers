@@ -8,7 +8,7 @@ import { BarometerCardWithIcon, ImageLightbox, ShowMore } from '@/components/ele
 import { Card, Separator } from '@/components/ui'
 import { fileStorage, Route } from '@/constants'
 import { title } from '@/constants/metadata'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
 
 interface Props {
@@ -17,8 +17,8 @@ interface Props {
   }>
 }
 
-const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
-  prisma.barometer.findMany({
+async function getBarometersByManufacturer(slug: string) {
+  return prisma.barometer.findMany({
     where: { manufacturer: { slug } },
     include: {
       category: {
@@ -33,8 +33,8 @@ const getBarometersByManufacturer = withPrisma(async (prisma, slug: string) =>
       },
     },
     orderBy: { name: 'asc' },
-  }),
-)
+  })
+}
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { slug } = await props.params
@@ -44,11 +44,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 }
 
-export const generateStaticParams = withPrisma(async prisma =>
-  prisma.manufacturer.findMany({
+export async function generateStaticParams() {
+  return prisma.manufacturer.findMany({
     select: { slug: true },
-  }),
-)
+  })
+}
 
 export default async function Manufacturer(props: Props) {
   const { slug } = await props.params

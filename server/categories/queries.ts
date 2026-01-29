@@ -1,6 +1,15 @@
-import { withPrisma } from '@/prisma/prismaClient'
+import 'server-only'
 
-const getCategories = withPrisma(async prisma => {
+import { cacheLife, cacheTag } from 'next/cache'
+import { prisma } from '@/prisma/prismaClient'
+
+const CACHE_TAG = 'categories'
+
+export async function getCategories() {
+  'use cache'
+  cacheLife('max')
+  cacheTag(CACHE_TAG)
+
   const categories = await prisma.category.findMany({
     orderBy: {
       order: 'asc',
@@ -22,9 +31,13 @@ const getCategories = withPrisma(async prisma => {
     ...category,
     image,
   }))
-})
+}
 
-const getCategory = withPrisma(async (prisma, name: string) => {
+export async function getCategory(name: string) {
+  'use cache'
+  cacheLife('max')
+  cacheTag(CACHE_TAG)
+
   const {
     images: [image],
     ...category
@@ -53,9 +66,7 @@ const getCategory = withPrisma(async (prisma, name: string) => {
     ...category,
     image,
   }
-})
+}
 
-type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
-type CategoriesDTO = Awaited<ReturnType<typeof getCategories>>
-
-export { type CategoryDTO, type CategoriesDTO, getCategories, getCategory }
+export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
+export type CategoriesDTO = Awaited<ReturnType<typeof getCategories>>

@@ -2,9 +2,9 @@
 
 import type { User } from '@prisma/client'
 import { hash } from 'bcrypt'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
-export const register = withPrisma(async (prisma, values: Partial<User>) => {
+export async function register(values: Partial<User>) {
   const { email, password, name } = values
   if (!password) throw new Error('Password is not defined')
   if (!email) throw new Error('Email is not defined')
@@ -20,4 +20,4 @@ export const register = withPrisma(async (prisma, values: Partial<User>) => {
       role: 'USER',
     },
   })
-})
+}

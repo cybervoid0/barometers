@@ -2,9 +2,9 @@ import 'server-only'
 
 import { cacheLife, cacheTag } from 'next/cache'
 import { Tag } from '@/constants'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
-export const getCountries = withPrisma(async prisma => {
+export async function getCountries() {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.countries)
@@ -14,6 +14,6 @@ export const getCountries = withPrisma(async prisma => {
       name: 'asc',
     },
   })
-})
+}
 
 export type CountryListDTO = Awaited<ReturnType<typeof getCountries>>
