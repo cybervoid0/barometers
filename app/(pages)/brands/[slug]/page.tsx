@@ -18,9 +18,13 @@ interface Props {
 }
 
 async function getBarometersByManufacturer(slug: string) {
+  'use cache'
   return prisma.barometer.findMany({
     where: { manufacturer: { slug } },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
       category: {
         select: {
           name: true,
@@ -29,6 +33,13 @@ async function getBarometersByManufacturer(slug: string) {
       images: {
         orderBy: {
           order: 'asc',
+        },
+        select: {
+          id: true,
+          url: true,
+          blurData: true,
+          name: true,
+          order: true,
         },
       },
     },
@@ -44,10 +55,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 }
 
-export async function generateStaticParams() {
+async function getBrandSlugs() {
+  'use cache'
   return prisma.manufacturer.findMany({
     select: { slug: true },
   })
+}
+
+export async function generateStaticParams() {
+  return getBrandSlugs()
 }
 
 export default async function Manufacturer(props: Props) {

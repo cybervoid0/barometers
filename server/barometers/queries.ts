@@ -116,7 +116,15 @@ export async function getBarometer(slug: string) {
       },
     },
     include: {
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          label: true,
+          description: true,
+          order: true,
+        },
+      },
       condition: {
         select: {
           id: true,
@@ -127,7 +135,13 @@ export async function getBarometer(slug: string) {
       },
       manufacturer: {
         include: {
-          countries: true,
+          countries: {
+            select: {
+              id: true,
+              name: true,
+              code: true,
+            },
+          },
           successors: {
             select: {
               id: true,
@@ -142,7 +156,15 @@ export async function getBarometer(slug: string) {
               slug: true,
             },
           },
-          images: true,
+          images: {
+            select: {
+              id: true,
+              url: true,
+              blurData: true,
+              name: true,
+              order: true,
+            },
+          },
         },
         omit: {
           icon: true,
@@ -152,8 +174,20 @@ export async function getBarometer(slug: string) {
         orderBy: {
           order: 'asc',
         },
+        select: {
+          id: true,
+          url: true,
+          blurData: true,
+          name: true,
+          order: true,
+        },
       },
-      subCategory: true,
+      subCategory: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       materials: {
         select: {
           id: true,

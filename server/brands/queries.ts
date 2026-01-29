@@ -48,7 +48,13 @@ export async function getBrands(page?: number, size?: number) {
       skip,
       take: pageSize || undefined,
       include: {
-        countries: true,
+        countries: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
         images: {
           select: {
             url: true,
@@ -121,8 +127,22 @@ export async function getBrand(slug: string) {
           slug: true,
         },
       },
-      images: true,
-      countries: true,
+      images: {
+        select: {
+          id: true,
+          url: true,
+          blurData: true,
+          name: true,
+          order: true,
+        },
+      },
+      countries: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+        },
+      },
       pdfFiles: {
         select: {
           name: true,
@@ -181,8 +201,22 @@ export async function getBrandsByCountry() {
               slug: true,
             },
           },
-          images: true,
-          countries: true,
+          images: {
+            select: {
+              id: true,
+              url: true,
+              blurData: true,
+              name: true,
+              order: true,
+            },
+          },
+          countries: {
+            select: {
+              id: true,
+              name: true,
+              code: true,
+            },
+          },
           pdfFiles: {
             select: {
               name: true,

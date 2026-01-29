@@ -15,6 +15,13 @@ export async function getAllDocuments() {
         orderBy: {
           order: 'asc',
         },
+        select: {
+          id: true,
+          url: true,
+          blurData: true,
+          name: true,
+          order: true,
+        },
       },
       condition: {
         select: {
@@ -43,6 +50,13 @@ export async function getDocuments(pageNo: number = 1, pageSize: number = DEFAUL
         images: {
           orderBy: {
             order: 'asc',
+          },
+          select: {
+            id: true,
+            url: true,
+            blurData: true,
+            name: true,
+            order: true,
           },
         },
         condition: {
@@ -88,7 +102,15 @@ export async function getDocumentByCatNo(catNo: string) {
       catalogueNumber: catNo,
     },
     include: {
-      images: true,
+      images: {
+        select: {
+          id: true,
+          url: true,
+          blurData: true,
+          name: true,
+          order: true,
+        },
+      },
       condition: {
         select: {
           name: true,
