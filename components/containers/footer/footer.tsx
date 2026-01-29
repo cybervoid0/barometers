@@ -3,6 +3,7 @@ import { ManageCookies } from '@/components/elements'
 import { Separator } from '@/components/ui'
 import { Route } from '@/constants'
 import { cn } from '@/utils'
+import { CurrentYear } from './current-year'
 import { SocialButtons } from './social-buttons'
 
 export function Footer() {
@@ -16,7 +17,7 @@ export function Footer() {
       <div className="relative container mx-auto py-4 sm:py-6">
         <div className="grow text-center">
           <p className="text-xs">
-            &copy; {new Date().getFullYear()}{' '}
+            &copy; <CurrentYear />{' '}
             <span className="xs:inline-block hidden">
               The Art of Weather Instruments Foundation
             </span>
