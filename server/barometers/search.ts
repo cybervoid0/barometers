@@ -1,12 +1,17 @@
 import 'server-only'
 
 import type { Prisma } from '@prisma/client'
+import { cacheLife, cacheTag } from 'next/cache'
+import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 
 /**
  * Search barometers matching a query
  */
 export async function searchBarometers(query: string, page: number, pageSize: number) {
+  'use cache'
+  cacheLife('hours')
+  cacheTag(Tag.barometers)
   const skip = pageSize ? (page - 1) * pageSize : undefined
 
   const where: Prisma.BarometerWhereInput = query.trim()

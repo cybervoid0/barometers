@@ -38,6 +38,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui'
 import { Route } from '@/constants'
+import { prisma } from '@/prisma/prismaClient'
 import { getDocumentByCatNo } from '@/server/documents/queries'
 
 interface Props {
@@ -47,6 +48,18 @@ interface Props {
 }
 
 dayjs.extend(utc)
+
+async function getDocumentCatNos() {
+  'use cache'
+  return prisma.document.findMany({
+    select: { catalogueNumber: true },
+  })
+}
+
+export async function generateStaticParams() {
+  const docs = await getDocumentCatNos()
+  return docs.map(doc => ({ 'cat-no': doc.catalogueNumber }))
+}
 
 export default async function Document({ params }: Props) {
   const { 'cat-no': catNo } = await params

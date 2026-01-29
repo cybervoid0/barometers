@@ -6,6 +6,7 @@ import { getCategories } from '@/server/categories/queries'
 import type { MenuItem } from '@/types'
 
 export async function getMenuData(): Promise<MenuItem[]> {
+  'use cache'
   const categories = await getCategories()
   return [
     {
