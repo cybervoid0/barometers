@@ -34,7 +34,7 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
     (url: string) => {
       const rootPath: string | undefined = `/${pathname.split('/')[1]}`
       const isActive = trimSlashes(url) === trimSlashes(rootPath)
-      return { 'border-b-[0.5px] border-b-foreground': isActive }
+      return { 'border-b-[0.5px] border-b-secondary': isActive }
     },
     [pathname],
   )

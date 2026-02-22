@@ -5,7 +5,7 @@ import './animations.css'
 
 export const Hero = () => {
   return (
-    <div className="xs:h-40 relative h-[50vh] w-full overflow-hidden">
+    <div className="xs:h-40 relative h-[50vh] w-full rounded-b-md overflow-hidden">
       <Image
         width={1920}
         height={606}
@@ -18,7 +18,7 @@ export const Hero = () => {
       <div className="xs:items-center xs:pb-0 absolute top-0 left-0 z-2 flex h-full w-full animate-[heading-slide-up_1.8s_ease-out,heading-fade-in-content_1.8s_ease-out] items-end pb-12 pl-8 sm:pl-12">
         <div>
           <Link href={Route.Foundation} className="no-underline">
-            <h2 className="bg-primary text-background inline px-1 text-[1.375rem] leading-relaxed font-medium tracking-wider uppercase">
+            <h2 className="bg-primary/60 text-background inline px-1 text-[1.375rem] leading-relaxed font-medium tracking-wider uppercase rounded-sm">
               Art of weather instruments foundation
             </h2>
           </Link>

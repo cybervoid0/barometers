@@ -19,7 +19,7 @@ export async function Header() {
             <div className="flex flex-col gap-2">
               <h1 className="leading-none">Barometers Realm</h1>
               <p className="xs:text-xs text-[10px] leading-none lg:text-[0.875rem]">
-                Europe's richest online collection of barometers
+                Preserving the beauty and function of barometers
               </p>
             </div>
             {/* Logo image */}
