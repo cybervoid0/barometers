@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   Boxes,
+  ClipboardList,
   Cog,
   FilePlus2,
   FileText,
@@ -64,6 +65,10 @@ export default function Admin() {
             <Link href={Route.Shop} className={linkStyle}>
               <ShoppingBag className={iconStyle} />
               View Shop
+            </Link>
+            <Link href={Route.AdminOrders} className={linkStyle}>
+              <ClipboardList className={iconStyle} />
+              Manage Orders
             </Link>
           </div>
         </section>

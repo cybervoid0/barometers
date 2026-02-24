@@ -4,12 +4,11 @@ import Link from 'next/link'
 import { getProducts } from '@/app/(pages)/shop/server/queries'
 import { Image, IsAdmin } from '@/components/elements'
 import { Button } from '@/components/ui'
-import type { DynamicOptions } from '@/types'
 import { formatPrice } from '@/utils/currency'
 import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
 
-export const dynamic: DynamicOptions = 'force-dynamic'
+export const revalidate = 60
 
 /**
  * Get price range from variants
