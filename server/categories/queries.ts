@@ -1,16 +1,18 @@
 import 'server-only'
 
+import type { CategoryLocation } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
 import { prisma } from '@/prisma/prismaClient'
 
 const CACHE_TAG = 'categories'
 
-export async function getCategories() {
+export async function getCategories(location?: CategoryLocation) {
   'use cache'
   cacheLife('max')
   cacheTag(CACHE_TAG)
 
   const categories = await prisma.category.findMany({
+    where: location ? { location: { has: location } } : undefined,
     orderBy: {
       order: 'asc',
     },

@@ -7,6 +7,7 @@ import type { PropsWithChildren } from 'react'
 import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
+import type { CategoryLocation } from '@prisma/client'
 import { Footer, Header } from '@/components/containers'
 import { CheckConsent, CookieConsent, ScrollToTop } from '@/components/elements'
 import { prisma } from '@/prisma/prismaClient'
@@ -15,9 +16,10 @@ import { cn } from '@/utils'
 import { jsonLd, meta } from '../constants/metadata'
 import Providers from '../providers'
 
-async function getCategoryImages() {
+async function getCategoryImages(location?: CategoryLocation) {
   'use cache'
   return prisma.category.findMany({
+    where: location ? { location: { has: location } } : undefined,
     select: {
       name: true,
       images: {
@@ -47,7 +49,7 @@ export const viewport: Viewport = {
 const gtag = process.env.NEXT_PUBLIC_GTAG ?? ''
 
 export async function generateMetadata() {
-  const categories = await getCategoryImages()
+  const categories = await getCategoryImages('Landing')
   const images = categories.map(({ images: [image], name }) => ({
     url: image.url,
     alt: name,

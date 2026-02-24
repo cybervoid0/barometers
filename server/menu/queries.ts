@@ -7,7 +7,7 @@ import type { MenuItem } from '@/types'
 
 export async function getMenuData(): Promise<MenuItem[]> {
   'use cache'
-  const categories = await getCategories()
+  const categories = await getCategories('Navigation')
   return [
     {
       id: 0,

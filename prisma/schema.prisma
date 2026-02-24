@@ -22,15 +22,21 @@ model Image {
 }
 
 model Category {
-  id          String      @id @default(uuid())
-  name        String      @unique
+  id          String             @id @default(uuid())
+  name        String             @unique
   description String
   label       String
   order       Int
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  location    CategoryLocation[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   barometers  Barometer[]
-  images      Image[]     @relation("CategoryImages")
+  images      Image[]            @relation("CategoryImages")
+}
+
+enum CategoryLocation {
+  Landing
+  Navigation
 }
 
 /// Movement type

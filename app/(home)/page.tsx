@@ -6,7 +6,7 @@ import { getCategories } from '@/server/categories/queries'
 import { cn } from '@/utils'
 
 export default async function HomePage() {
-  const categories = await getCategories()
+  const categories = await getCategories('Landing')
   return (
     <>
       <Hero />
