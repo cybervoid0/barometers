@@ -11,9 +11,9 @@
   "scripts": {
     "dev": "next dev --turbopack -p 3001",
     "dev:remote": "bun ./scripts/tunnel.ts next dev",
-    "prisma:local": "dotenv -e .env.local prisma studio",
+    "prisma": "dotenv -e .env.local prisma studio",
     "prisma:remote": "bun ./scripts/tunnel.ts prisma studio",
-    "prisma:import": "bun ./scripts/import-data.ts",
+    "import-data": "bun ./scripts/import-data.ts",
     "build": "next build",
     "postinstall": "prisma generate",
     "analyze": "ANALYZE=true next build",
@@ -83,15 +83,12 @@
     "server-only": "^0.0.1",
     "slugify": "^1.6.6",
     "sonner": "^2.0.7",
-
+    "stripe": "^19.3.1",
     "swiper": "^12.1.2",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "vanilla-cookieconsent": "^3.1.0",
     "zod": "^4.3.6",
-
-    "stripe": "^19.3.1",
-
     "zustand": "^5.0.9"
   },
   "lint-staged": {

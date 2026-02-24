@@ -1,4 +1,13 @@
-import { AlertTriangle, FilePlus2, FileText, Package, Plus, ShoppingBag, Store } from 'lucide-react'
+import {
+  AlertTriangle,
+  ClipboardList,
+  FilePlus2,
+  FileText,
+  Package,
+  Plus,
+  ShoppingBag,
+  Store,
+} from 'lucide-react'
 import Link from 'next/link'
 import { Route } from '@/constants/routes'
 
@@ -46,6 +55,10 @@ export default function Admin() {
             <Link href={Route.Shop} className={linkStyle}>
               <ShoppingBag className={iconStyle} />
               View Shop
+            </Link>
+            <Link href={Route.AdminOrders} className={linkStyle}>
+              <ClipboardList className={iconStyle} />
+              Manage Orders
             </Link>
           </div>
         </section>

@@ -8,7 +8,8 @@ import type { Currency } from '@prisma/client'
  */
 export const formatPrice = (cents: number, currency: Currency): string => {
   const amount = cents / 100
-  return new Intl.NumberFormat('en-US', {
+  const locale = currency === 'EUR' ? 'de-DE' : 'en-US'
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
   }).format(amount)

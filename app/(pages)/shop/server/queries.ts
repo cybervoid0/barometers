@@ -1,12 +1,12 @@
 import 'server-only'
 
 import type { OrderStatus } from '@prisma/client'
-import { withPrisma } from '@/prisma/prismaClient'
+import { prisma } from '@/prisma/prismaClient'
 
 /**
  * Get all products with variants and options
  */
-export const getProducts = withPrisma(async prisma => {
+export async function getProducts() {
   return prisma.product.findMany({
     where: { isActive: true },
     include: {
@@ -23,12 +23,12 @@ export const getProducts = withPrisma(async prisma => {
     },
     orderBy: { createdAt: 'desc' },
   })
-})
+}
 
 /**
  * Get product list by IDs array with variants
  */
-export const getProductsByIds = withPrisma(async (prisma, productIds: string[]) => {
+export async function getProductsByIds(productIds: string[]) {
   return prisma.product.findMany({
     where: {
       id: { in: productIds },
@@ -48,12 +48,12 @@ export const getProductsByIds = withPrisma(async (prisma, productIds: string[]) 
     },
     orderBy: { createdAt: 'desc' },
   })
-})
+}
 
 /**
  * Get variants by IDs array (for cart)
  */
-export const getVariantsByIds = withPrisma(async (prisma, variantIds: string[]) => {
+export async function getVariantsByIds(variantIds: string[]) {
   return prisma.productVariant.findMany({
     where: {
       id: { in: variantIds },
@@ -75,12 +75,12 @@ export const getVariantsByIds = withPrisma(async (prisma, variantIds: string[]) 
       },
     },
   })
-})
+}
 
 /**
  * Get product by ID with variants and options
  */
-export const getProductById = withPrisma(async (prisma, id: string) => {
+export async function getProductById(id: string) {
   return prisma.product.findUnique({
     where: { id },
     include: {
@@ -101,12 +101,12 @@ export const getProductById = withPrisma(async (prisma, id: string) => {
       },
     },
   })
-})
+}
 
 /**
  * Get product by slug with variants and options
  */
-export const getProductBySlug = withPrisma(async (prisma, slug: string) => {
+export async function getProductBySlug(slug: string) {
   return prisma.product.findUnique({
     where: { slug },
     include: {
@@ -127,12 +127,12 @@ export const getProductBySlug = withPrisma(async (prisma, slug: string) => {
       },
     },
   })
-})
+}
 
 /**
  * Get orders by user ID
  */
-export const getOrdersByUserId = withPrisma(async (prisma, userId: string) => {
+export async function getOrdersByUserId(userId: string) {
   const customer = await prisma.customer.findUnique({
     where: { userId },
   })
@@ -161,12 +161,12 @@ export const getOrdersByUserId = withPrisma(async (prisma, userId: string) => {
     },
     orderBy: { createdAt: 'desc' },
   })
-})
+}
 
 /**
  * Get order by ID
  */
-export const getOrderById = withPrisma(async (prisma, id: string) => {
+export async function getOrderById(id: string) {
   return prisma.order.findUnique({
     where: { id },
     include: {
@@ -189,12 +189,12 @@ export const getOrderById = withPrisma(async (prisma, id: string) => {
       payment: true,
     },
   })
-})
+}
 
 /**
  * Get all orders (admin)
  */
-export const getAllOrders = withPrisma(async (prisma, status?: OrderStatus) => {
+export async function getAllOrders(status?: OrderStatus) {
   return prisma.order.findMany({
     where: status ? { status } : undefined,
     include: {
@@ -214,13 +214,13 @@ export const getAllOrders = withPrisma(async (prisma, status?: OrderStatus) => {
     },
     orderBy: { createdAt: 'desc' },
   })
-})
+}
 
 /**
  * Get order by session ID
  */
-export const getOrderBySessionId = withPrisma(async (prisma, sessionId: string) =>
-  prisma.order.findUnique({
+export async function getOrderBySessionId(sessionId: string) {
+  return prisma.order.findUnique({
     where: { stripeSessionId: sessionId },
     include: {
       items: {
@@ -236,5 +236,5 @@ export const getOrderBySessionId = withPrisma(async (prisma, sessionId: string) 
         },
       },
     },
-  }),
-)
+  })
+}
