@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui'
 import { Route } from '@/constants'
 import { getOrderBySessionId } from '../../server/queries'
+import { ClearCartOnMount } from './clear-cart'
 
 interface Props {
   searchParams: Promise<{ session_id?: string }>
@@ -17,7 +18,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       <div className="container mx-auto py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Invalid Session</h1>
         <p className="text-muted-foreground mb-8">No session ID provided</p>
-        <Link href="/shop">
+        <Link href={Route.Shop}>
           <Button>Back to Shop</Button>
         </Link>
       </div>
@@ -31,7 +32,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       <div className="container mx-auto py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
         <p className="text-muted-foreground mb-8">Could not find your order</p>
-        <Link href="/shop">
+        <Link href={Route.Shop}>
           <Button>Back to Shop</Button>
         </Link>
       </div>
@@ -40,6 +41,8 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
 
   return (
     <div className="container mx-auto py-16 max-w-2xl">
+      <ClearCartOnMount orderStatus={order.status} />
+
       <div className="text-center mb-8">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
@@ -113,7 +116,10 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-8 flex justify-center gap-4">
+        <Link href={Route.Orders}>
+          <Button variant="outline">View Orders</Button>
+        </Link>
         <Link href={Route.Shop}>
           <Button>Continue Shopping</Button>
         </Link>

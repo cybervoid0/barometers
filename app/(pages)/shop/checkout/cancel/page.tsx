@@ -1,6 +1,7 @@
 import { XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
+import { Route } from '@/constants'
 
 export default function CheckoutCancelPage() {
   return (
@@ -10,11 +11,11 @@ export default function CheckoutCancelPage() {
       <p className="text-muted-foreground mb-8">Your order was cancelled. No charges were made.</p>
 
       <div className="space-x-4">
-        <Link href="/shop">
+        <Link href={Route.Shop}>
           <Button>Back to Shop</Button>
         </Link>
-        <Link href="/shop/test-checkout">
-          <Button variant="outline">Try Again</Button>
+        <Link href={Route.Cart}>
+          <Button variant="outline">Return to Cart</Button>
         </Link>
       </div>
     </div>

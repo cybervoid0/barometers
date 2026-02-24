@@ -46,6 +46,7 @@ export enum ImageType {
   Brand = 'm',
   Category = 'c',
   Document = 'd',
+  Product = 'p',
 }
 
 export interface MediaFile {

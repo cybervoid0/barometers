@@ -45,6 +45,7 @@ const adminRoutes = {
   EditProduct: `${admin}/edit-product/`,
   AddEssay: `${admin}/add-essay/`,
   Reports: `${admin}/reports/`,
+  AdminOrders: `${admin}/orders/`,
   Materials: `${admin}/materials/`,
   Movements: `${admin}/movements/`,
 } as const
@@ -53,6 +54,8 @@ const shop = '/shop'
 const shopRoutes = {
   Shop: `${shop}/`,
   Cart: `${shop}/cart`,
+  Checkout: `${shop}/checkout`,
+  Orders: `${shop}/orders/`,
 } as const
 
 export const Route = {

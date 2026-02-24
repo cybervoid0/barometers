@@ -82,8 +82,7 @@ export default function Cart() {
       router.push(Route.Signin)
       return
     }
-    // TODO: Redirect to checkout page
-    toast.info('Checkout coming soon...')
+    router.push(Route.Checkout)
   }
 
   if (isLoading) {
