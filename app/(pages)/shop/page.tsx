@@ -1,14 +1,13 @@
 import 'server-only'
 
 import Link from 'next/link'
+import { connection } from 'next/server'
 import { getProducts } from '@/app/(pages)/shop/server/queries'
 import { Image, IsAdmin } from '@/components/elements'
 import { Button } from '@/components/ui'
 import { formatPrice } from '@/utils/currency'
 import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
-
-export const revalidate = 60
 
 /**
  * Get price range from variants
@@ -51,6 +50,7 @@ function formatPriceRange(
 }
 
 export default async function ShopPage() {
+  await connection()
   const products = await getProducts()
 
   return (

@@ -26,7 +26,7 @@ import {
   SelectValue,
   Separator,
 } from '@/components/ui'
-import { Route } from '@/constants'
+import { Route, SHIPPING_COUNTRIES } from '@/constants'
 import type { ProductVariantWithProduct } from '@/types'
 import { formatPrice } from '@/utils'
 import { createCheckoutSession } from '../server/actions'
@@ -34,21 +34,9 @@ import { fetchVariantsByIds } from '../server/query-actions'
 import { useShopCartStore } from '../stores/shop-cart-store'
 import { type CheckoutFormData, checkoutSchema } from './checkout-schema'
 
-const COUNTRIES = [
-  { code: 'US', name: 'United States' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'BE', name: 'Belgium' },
-]
-
 export default function CheckoutPage() {
   const router = useRouter()
-  const { data: session, status: authStatus } = useSession()
+  const { data: session } = useSession()
   const { items, getTotalItems } = useShopCartStore()
   const [variants, setVariants] = useState<ProductVariantWithProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -74,20 +62,12 @@ export default function CheckoutPage() {
   const { handleSubmit, control, watch } = form
   const selectedCurrency = watch('currency') as Currency
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (authStatus === 'unauthenticated') {
-      toast.error('Please sign in to checkout')
-      router.push(Route.Signin)
-    }
-  }, [authStatus, router])
-
   // Redirect if cart is empty
   useEffect(() => {
-    if (authStatus === 'authenticated' && items.length === 0) {
+    if (!isLoading && items.length === 0) {
       router.push(Route.Cart)
     }
-  }, [authStatus, items.length, router])
+  }, [isLoading, items.length, router])
 
   // Prefill email from session
   useEffect(() => {
@@ -139,11 +119,6 @@ export default function CheckoutPage() {
 
   const onSubmit = useCallback(
     (values: CheckoutFormData) => {
-      if (!session?.user?.id) {
-        toast.error('Please sign in to checkout')
-        return
-      }
-
       startTransition(async () => {
         try {
           const result = await createCheckoutSession({
@@ -176,10 +151,10 @@ export default function CheckoutPage() {
         }
       })
     },
-    [session, items],
+    [items],
   )
 
-  if (authStatus === 'loading' || isLoading) {
+  if (isLoading) {
     return (
       <div className="container py-8">
         <h1 className="text-3xl font-bold mb-6">Checkout</h1>
@@ -190,7 +165,7 @@ export default function CheckoutPage() {
     )
   }
 
-  if (authStatus === 'unauthenticated' || items.length === 0) {
+  if (items.length === 0) {
     return null
   }
 
@@ -333,7 +308,7 @@ export default function CheckoutPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {COUNTRIES.map(c => (
+                            {SHIPPING_COUNTRIES.map(c => (
                               <SelectItem key={c.code} value={c.code}>
                                 {c.name}
                               </SelectItem>

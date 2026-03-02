@@ -3,6 +3,7 @@
 import type { Product, ProductOption, ProductVariant } from '@prisma/client'
 import { Minus, Plus, ShoppingCart } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { Button, Label } from '@/components/ui'
 import { formatPrice } from '@/utils'
 import { useShopCartStore } from '../stores/shop-cart-store'
@@ -68,8 +69,9 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
       productId: product.id,
       quantity,
     })
+    toast.success(`${product.name} added to cart`)
     setQuantity(1)
-  }, [selectedVariant, quantity, addItem, product.id])
+  }, [selectedVariant, quantity, addItem, product.id, product.name])
 
   return (
     <div className="space-y-6">
