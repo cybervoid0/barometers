@@ -90,8 +90,10 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                     </Link>
                   </td>
                   <td className="p-3">
-                    <div>{order.customer.user.name}</div>
-                    <div className="text-xs text-muted-foreground">{order.customer.user.email}</div>
+                    <div>{order.customer.user?.name ?? order.customer.name ?? 'Guest'}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {order.customer.user?.email ?? order.customer.email}
+                    </div>
                   </td>
                   <td className="p-3 text-muted-foreground">
                     {new Date(order.createdAt).toLocaleDateString()}

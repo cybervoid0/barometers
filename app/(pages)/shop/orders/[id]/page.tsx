@@ -40,7 +40,7 @@ export default async function OrderDetailPage({ params }: Props) {
   }
 
   // Verify the order belongs to this user
-  if (order.customer.user.id !== session.user.id) {
+  if (order.customer.userId !== session.user.id) {
     notFound()
   }
 
