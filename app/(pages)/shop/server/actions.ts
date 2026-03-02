@@ -4,6 +4,12 @@ import type { Currency, OrderStatus, ProductVariant } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import slugify from 'slugify'
 import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
+import {
+  EU_ALPHA2,
+  SHIPPING_COST_EU,
+  SHIPPING_COST_INTERNATIONAL,
+  VALID_ORDER_TRANSITIONS,
+} from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { saveImage } from '@/server/files/images'
 import { authConfig } from '@/services/auth'
@@ -11,14 +17,6 @@ import { stripe } from '@/services/stripe'
 import { ImageType } from '@/types'
 
 // --- Auth helpers ---
-
-async function requireAuth() {
-  const session = await getServerSession(authConfig)
-  if (!session?.user?.id) {
-    return null
-  }
-  return session
-}
 
 async function requireAdmin() {
   const session = await getServerSession(authConfig)
@@ -48,50 +46,6 @@ interface CreateCheckoutSessionInput {
     country: string
   }
 }
-
-// --- Order status transitions ---
-
-const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: ['PAID', 'CANCELLED'],
-  PAID: ['PROCESSING', 'CANCELLED', 'REFUNDED'],
-  PROCESSING: ['SHIPPED', 'CANCELLED', 'REFUNDED'],
-  SHIPPED: ['DELIVERED'],
-  DELIVERED: [],
-  CANCELLED: [],
-  REFUNDED: [],
-}
-
-// --- Shipping ---
-
-const EU_COUNTRIES = [
-  'DE',
-  'FR',
-  'IT',
-  'ES',
-  'NL',
-  'BE',
-  'AT',
-  'PT',
-  'IE',
-  'FI',
-  'GR',
-  'LU',
-  'SK',
-  'SI',
-  'EE',
-  'LV',
-  'LT',
-  'CY',
-  'MT',
-  'HR',
-  'BG',
-  'RO',
-  'CZ',
-  'DK',
-  'HU',
-  'PL',
-  'SE',
-]
 
 /**
  * Create a product with variants in Stripe and local database
@@ -240,69 +194,58 @@ export async function createProductWithVariants(input: TransformedProductData) {
 
 /**
  * Create Stripe Checkout Session (works with variants)
- * userId is derived from server session — not accepted from client input
+ * Supports both authenticated and guest checkout
  */
 export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
-  const session = await requireAuth()
-  if (!session) {
-    return { success: false, error: 'Authentication required' }
-  }
-
-  const userId = session.user.id
+  const session = await getServerSession(authConfig)
+  const userId = session?.user?.id ?? null
 
   try {
-    // Get or create customer
-    let customer = await prisma.customer.findUnique({
-      where: { userId },
-      include: { user: true },
-    })
+    const { email, firstName, lastName } = input.shippingAddress
+    const customerName = `${firstName} ${lastName}`.trim()
+
+    // Find existing customer: by userId for logged-in users, by email for guests
+    let customer = userId
+      ? await prisma.customer.findUnique({
+          where: { userId },
+          select: { id: true, stripeCustomerId: true },
+        })
+      : await prisma.customer.findFirst({
+          where: { email, userId: null },
+          select: { id: true, stripeCustomerId: true },
+        })
 
     if (!customer) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-      })
-
-      if (!user) {
-        return { success: false, error: 'User not found' }
-      }
-
-      // Create Stripe customer first, then save to DB
       let stripeCustomer: { id: string }
       try {
         stripeCustomer = await stripe.customers.create({
-          email: user.email,
-          name: user.name,
-          metadata: { userId: user.id },
+          email,
+          name: customerName,
+          metadata: userId ? { userId } : undefined,
         })
       } catch (error) {
         console.error('Failed to create Stripe customer:', error)
-        return {
-          success: false,
-          error: 'Failed to create customer in payment system',
-        }
+        return { success: false, error: 'Failed to create customer in payment system' }
       }
 
-      // Create customer in database
       try {
         customer = await prisma.customer.create({
           data: {
-            userId: user.id,
+            ...(userId ? { userId } : {}),
+            email,
+            name: customerName,
             stripeCustomerId: stripeCustomer.id,
           },
-          include: { user: true },
+          select: { id: true, stripeCustomerId: true },
         })
       } catch (error) {
-        // Rollback: delete Stripe customer if DB creation fails
         console.error('Failed to save customer to database, rolling back Stripe customer:', error)
         try {
           await stripe.customers.del(stripeCustomer.id)
         } catch (deleteError) {
           console.error('Failed to delete Stripe customer during rollback:', deleteError)
         }
-        return {
-          success: false,
-          error: 'Failed to create customer',
-        }
+        return { success: false, error: 'Failed to create customer' }
       }
     }
 
@@ -342,9 +285,8 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       return sum + (price || 0) * item.quantity
     }, 0)
 
-    // Flat-rate shipping: EU = 500 cents, non-EU = 1500 cents
-    const isEU = EU_COUNTRIES.includes(input.shippingAddress.country)
-    const shippingCost = isEU ? 500 : 1500
+    const isEU = EU_ALPHA2.has(input.shippingAddress.country)
+    const shippingCost = isEU ? SHIPPING_COST_EU : SHIPPING_COST_INTERNATIONAL
     const tax = 0 // Tax handled by Stripe automatic_tax
     const total = subtotal + shippingCost + tax
 
@@ -411,7 +353,20 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     // Create Stripe Checkout Session (external call, outside DB transaction)
     const stripeSession = await stripe.checkout.sessions.create({
       customer: customer.stripeCustomerId,
+      customer_update: { address: 'auto' },
       line_items: lineItems,
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: shippingCost,
+              currency: input.currency.toLowerCase(),
+            },
+            display_name: isEU ? 'EU Standard Shipping' : 'International Shipping',
+          },
+        },
+      ],
       mode: 'payment',
       automatic_tax: { enabled: true },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -744,7 +699,7 @@ export async function updateOrderStatus(
       return { success: false, error: 'Order not found' }
     }
 
-    const allowed = VALID_TRANSITIONS[currentOrder.status]
+    const allowed = VALID_ORDER_TRANSITIONS[currentOrder.status]
     if (!allowed.includes(status)) {
       return {
         success: false,

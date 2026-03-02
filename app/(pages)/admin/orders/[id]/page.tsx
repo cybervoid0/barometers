@@ -156,8 +156,12 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           {/* Customer */}
           <div className="border rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Customer</h2>
-            <p className="font-medium">{order.customer.user.name}</p>
-            <p className="text-sm text-muted-foreground">{order.customer.user.email}</p>
+            <p className="font-medium">
+              {order.customer.user?.name ?? order.customer.name ?? 'Guest'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {order.customer.user?.email ?? order.customer.email}
+            </p>
           </div>
 
           {/* Status management */}
