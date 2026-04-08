@@ -1,23 +1,21 @@
 'use server'
 
 import { Prisma } from '@prisma/client'
-import { revalidatePath } from 'next/cache'
-import { Route } from '@/constants'
+import { updateTag } from 'next/cache'
+import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import type { ActionResult, MediaFile } from '@/types'
-import { slug as slugify, trimTrailingSlash } from '@/utils'
-import { revalidateCategory } from '@/utils/revalidate'
+import { slug as slugify } from '@/utils'
 import { deleteFiles } from '../files/actions'
 
 export async function createBarometer(
   data: Prisma.BarometerUncheckedCreateInput,
 ): Promise<ActionResult<{ id: string }>> {
   try {
-    const { id, categoryId } = await prisma.barometer.create({
+    const { id } = await prisma.barometer.create({
       data,
     })
-    await revalidateCategory(categoryId)
-    revalidatePath(trimTrailingSlash(Route.NewArrivals)) // regenerate new arrivals page
+    updateTag(Tag.barometers)
     return { success: true, data: { id } }
   } catch (error) {
     // Handle unique constraint violations
@@ -49,8 +47,7 @@ export async function updateBarometer(
         slug,
       },
     })
-    revalidatePath(Route.Barometer + slug)
-    await revalidateCategory((data.categoryId as string) ?? oldBarometer.categoryId)
+    updateTag(Tag.barometers)
     const name = (data.name as string) ?? oldBarometer.name
     return { success: true, data: { slug, name } }
   } catch (error) {
@@ -96,9 +93,7 @@ export async function deleteBarometer(slug: string): Promise<ActionResult<{ id: 
       })
     })
     await deleteFiles(imagesBeforeDbUpdate)
-    revalidatePath(Route.Barometer + barometer.slug)
-    revalidatePath(trimTrailingSlash(Route.NewArrivals))
-    await revalidateCategory(barometer.categoryId)
+    updateTag(Tag.barometers)
     return { success: true, data: { id: barometer.id } }
   } catch (error) {
     console.error('Error deleting barometer:', error)

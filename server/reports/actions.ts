@@ -1,11 +1,10 @@
 'use server'
 
 import Redis from 'ioredis'
-import { revalidatePath } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { headers } from 'next/headers'
-import { Route } from '@/constants'
+import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
-import { trimTrailingSlash } from '@/utils'
 
 // inaccuracy report TTL, minutes
 const REPORT_COOL_DOWN = 10
@@ -51,6 +50,6 @@ export async function createReport({
       description,
     },
   })
-  revalidatePath(trimTrailingSlash(Route.Reports))
+  updateTag(Tag.reports)
   return { id }
 }

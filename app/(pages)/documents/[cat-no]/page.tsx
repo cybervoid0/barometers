@@ -13,6 +13,7 @@ import {
   Tag,
   User,
 } from 'lucide-react'
+import { cacheLife, cacheTag } from 'next/cache'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -37,7 +38,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui'
-import { Route } from '@/constants'
+import { Tag as CacheTag, Route } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { getDocumentByCatNo } from '@/server/documents/queries'
 
@@ -51,6 +52,8 @@ dayjs.extend(utc)
 
 async function getDocumentCatNos() {
   'use cache'
+  cacheLife('max')
+  cacheTag(CacheTag.documents)
   return prisma.document.findMany({
     select: { catalogueNumber: true },
   })

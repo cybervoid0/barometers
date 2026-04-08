@@ -25,6 +25,7 @@ export async function createBrand(
       },
     })
     updateTag(Tag.brands)
+    updateTag(Tag.barometers)
     return { success: true, data: { id, name } }
   } catch (error) {
     // Handle unique constraint violations
@@ -55,6 +56,7 @@ export async function updateBrand(
     })
 
     updateTag(Tag.brands)
+    updateTag(Tag.barometers)
     return { success: true, data: { slug, name } }
   } catch (error) {
     console.error('Error updating brand:', error)
@@ -70,4 +72,5 @@ export async function deleteBrand(slug: string) {
     },
   })
   updateTag(Tag.brands)
+  updateTag(Tag.barometers)
 }

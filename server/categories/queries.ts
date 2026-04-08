@@ -2,14 +2,13 @@ import 'server-only'
 
 import type { CategoryLocation } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
+import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
-
-const CACHE_TAG = 'categories'
 
 export async function getCategories(location?: CategoryLocation) {
   'use cache'
   cacheLife('max')
-  cacheTag(CACHE_TAG)
+  cacheTag(Tag.categories)
 
   const categories = await prisma.category.findMany({
     where: location ? { location: { has: location } } : undefined,
@@ -38,7 +37,7 @@ export async function getCategories(location?: CategoryLocation) {
 export async function getCategory(name: string) {
   'use cache'
   cacheLife('max')
-  cacheTag(CACHE_TAG)
+  cacheTag(Tag.categories)
 
   const {
     images: [image],

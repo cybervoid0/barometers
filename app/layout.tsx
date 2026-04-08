@@ -8,8 +8,10 @@ import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
 import type { CategoryLocation } from '@prisma/client'
+import { cacheLife, cacheTag } from 'next/cache'
 import { Footer, Header } from '@/components/containers'
 import { CheckConsent, CookieConsent, ScrollToTop } from '@/components/elements'
+import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { CountryProvider } from '@/providers/CountryProvider'
 import { cn } from '@/utils'
@@ -18,6 +20,8 @@ import Providers from '../providers'
 
 async function getCategoryImages(location?: CategoryLocation) {
   'use cache'
+  cacheLife('max')
+  cacheTag(Tag.categories)
   return prisma.category.findMany({
     where: location ? { location: { has: location } } : undefined,
     select: {

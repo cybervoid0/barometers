@@ -1,12 +1,15 @@
 import 'server-only'
 
 import { AccessRole } from '@prisma/client'
-import { Route } from '@/constants'
+import { cacheLife, cacheTag } from 'next/cache'
+import { Route, Tag } from '@/constants'
 import { getCategories } from '@/server/categories/queries'
 import type { MenuItem } from '@/types'
 
 export async function getMenuData(): Promise<MenuItem[]> {
   'use cache'
+  cacheLife('max')
+  cacheTag(Tag.categories)
   const categories = await getCategories('Navigation')
   return [
     {

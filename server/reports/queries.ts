@@ -1,12 +1,13 @@
 import 'server-only'
 
-import { cacheLife } from 'next/cache'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { cacheLife, cacheTag } from 'next/cache'
+import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 
 export async function getInaccuracyReports(pageNo: number, pageSize: number) {
   'use cache'
   cacheLife('minutes')
+  cacheTag(Tag.reports)
   const size = Math.max(pageSize || DEFAULT_PAGE_SIZE, 1)
   const page = Math.max(pageNo || 1, 1)
   const [reports, totalItems] = await Promise.all([

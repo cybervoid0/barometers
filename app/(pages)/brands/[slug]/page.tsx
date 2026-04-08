@@ -2,11 +2,12 @@ import 'server-only'
 
 import { BookText } from 'lucide-react'
 import type { Metadata } from 'next'
+import { cacheLife, cacheTag } from 'next/cache'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, ShowMore } from '@/components/elements'
 import { Card, Separator } from '@/components/ui'
-import { fileStorage, Route } from '@/constants'
+import { fileStorage, Route, Tag } from '@/constants'
 import { title } from '@/constants/metadata'
 import { prisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
@@ -19,6 +20,8 @@ interface Props {
 
 async function getBarometersByManufacturer(slug: string) {
   'use cache'
+  cacheLife('max')
+  cacheTag(Tag.barometers)
   return prisma.barometer.findMany({
     where: { manufacturer: { slug } },
     select: {
@@ -57,6 +60,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 async function getBrandSlugs() {
   'use cache'
+  cacheLife('max')
+  cacheTag(Tag.brands)
   return prisma.manufacturer.findMany({
     select: { slug: true },
   })
