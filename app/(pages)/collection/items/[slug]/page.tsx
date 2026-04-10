@@ -169,7 +169,7 @@ export default async function Page(props: Props) {
             title="Movement Type"
             edit={<MovementsEdit barometer={barometer} movements={movements} />}
           >
-            <p className="text-sm capitalize">{barometer.subCategory?.name}</p>
+            <p className="text-sm">{barometer.subCategory?.name}</p>
           </PropertyCard>
           <PropertyCard
             adminOnly
@@ -207,9 +207,7 @@ export default async function Page(props: Props) {
             title="Materials"
             edit={<MaterialsEdit materials={materials} barometer={barometer} />}
           >
-            <p className="text-sm capitalize">
-              {barometer.materials.map(item => item.name).join(', ')}
-            </p>
+            <p className="text-sm">{barometer.materials.map(item => item.name).join(', ')}</p>
           </PropertyCard>
         </div>
         <div className="flex flex-row items-center gap-2">
@@ -249,7 +247,6 @@ export default async function Page(props: Props) {
 
 const DimListItem = ({ name, value }: { name: string; value: string }) => (
   <li className="leading-tight">
-    <span className="text-sm font-medium capitalize">{name}:</span>{' '}
-    <span className="text-sm">{value}</span>
+    <span className="text-sm font-medium">{name}:</span> <span className="text-sm">{value}</span>
   </li>
 )
