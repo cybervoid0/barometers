@@ -10,7 +10,7 @@ import './globals.css'
 import type { CategoryLocation } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
 import { Footer, Header } from '@/components/containers'
-import { CheckConsent, CookieConsent, ScrollToTop } from '@/components/elements'
+import { CheckConsent, ChunkErrorRecovery, CookieConsent, ScrollToTop } from '@/components/elements'
 import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { CountryProvider } from '@/providers/CountryProvider'
@@ -101,6 +101,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           )}
         >
           <Providers>
+            <ChunkErrorRecovery />
             <ScrollToTop />
             <CookieConsent />
             <Toaster position="top-center" richColors />
