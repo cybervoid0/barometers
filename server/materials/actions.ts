@@ -6,7 +6,7 @@ import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { requireAdmin } from '@/server/auth'
 import type { ActionResult } from '@/types'
-import { CreateMaterialSchema, DeleteMaterialSchema } from './schemas'
+import { CreateMaterialSchema, DeleteMaterialSchema, UpdateMaterialSchema } from './schemas'
 
 export async function createMaterial(
   rawData: unknown,
@@ -26,6 +26,27 @@ export async function createMaterial(
 
     console.error('Error creating material:', error)
     return { success: false, error: 'Failed to create material. Please try again.' }
+  }
+}
+
+export async function updateMaterial(
+  rawData: unknown,
+): Promise<ActionResult<{ id: number; name: string }>> {
+  await requireAdmin()
+  const { id, ...data } = UpdateMaterialSchema.parse(rawData)
+
+  try {
+    const result = await prisma.material.update({ where: { id }, data })
+    updateTag(Tag.materials)
+    updateTag(Tag.barometers)
+    return { success: true, data: { id: result.id, name: result.name } }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { success: false, error: `Material with name "${data.name}" already exists` }
+    }
+
+    console.error('Error updating material:', error)
+    return { success: false, error: 'Failed to update material. Please try again.' }
   }
 }
 

@@ -6,7 +6,7 @@ jest.mock('@/server/auth', () => require('../../testing/mocks').authMockModule)
 jest.mock('next/cache', () => require('../../testing/mocks').cacheMockModule)
 
 import { Prisma } from '@prisma/client'
-import { createMaterial, deleteMaterial } from '@/server/materials/actions'
+import { createMaterial, deleteMaterial, updateMaterial } from '@/server/materials/actions'
 import { mockPrisma, mockRequireAdmin, mockUpdateTag, resetAllMocks } from '../../testing/mocks'
 
 beforeEach(resetAllMocks)
@@ -66,6 +66,60 @@ describe('createMaterial', () => {
     expect(result).toEqual({
       success: false,
       error: 'Failed to create material. Please try again.',
+    })
+  })
+})
+
+describe('updateMaterial', () => {
+  const validUpdate = { id: 1, name: 'Brass', description: 'Copper-zinc alloy' }
+
+  it('rejects when not admin', async () => {
+    mockRequireAdmin.mockRejectedValue(new Error('Unauthorized: admin access required'))
+    await expect(updateMaterial(validUpdate)).rejects.toThrow('Unauthorized')
+    expect(mockPrisma.material.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects invalid data (missing id)', async () => {
+    await expect(updateMaterial({ name: 'Brass' })).rejects.toThrow()
+  })
+
+  it('updates material and returns id + name', async () => {
+    mockPrisma.material.update.mockResolvedValue({ id: 1, name: 'Brass' })
+    const result = await updateMaterial(validUpdate)
+    expect(result).toEqual({ success: true, data: { id: 1, name: 'Brass' } })
+    expect(mockPrisma.material.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { name: 'Brass', description: 'Copper-zinc alloy' },
+    })
+  })
+
+  it('calls updateTag for materials AND barometers', async () => {
+    mockPrisma.material.update.mockResolvedValue({ id: 1, name: 'Brass' })
+    await updateMaterial(validUpdate)
+    expect(mockUpdateTag).toHaveBeenCalledWith('materials')
+    expect(mockUpdateTag).toHaveBeenCalledWith('barometers')
+  })
+
+  it('handles P2002 unique constraint (duplicate name)', async () => {
+    const p2002 = new Prisma.PrismaClientKnownRequestError('Unique', {
+      code: 'P2002',
+      clientVersion: '5.0.0',
+    })
+    mockPrisma.material.update.mockRejectedValue(p2002)
+    const result = await updateMaterial(validUpdate)
+    expect(result).toEqual({
+      success: false,
+      error: expect.stringContaining('Brass'),
+    })
+  })
+
+  it('returns generic error on unknown failure', async () => {
+    jest.spyOn(console, 'error').mockImplementation()
+    mockPrisma.material.update.mockRejectedValue(new Error('DB error'))
+    const result = await updateMaterial(validUpdate)
+    expect(result).toEqual({
+      success: false,
+      error: 'Failed to update material. Please try again.',
     })
   })
 })

@@ -6,7 +6,7 @@ jest.mock('@/server/auth', () => require('../../testing/mocks').authMockModule)
 jest.mock('next/cache', () => require('../../testing/mocks').cacheMockModule)
 
 import { Prisma } from '@prisma/client'
-import { createMovement, deleteMovement } from '@/server/movements/actions'
+import { createMovement, deleteMovement, updateMovement } from '@/server/movements/actions'
 import { mockPrisma, mockRequireAdmin, mockUpdateTag, resetAllMocks } from '../../testing/mocks'
 
 beforeEach(resetAllMocks)
@@ -66,6 +66,60 @@ describe('createMovement', () => {
     expect(result).toEqual({
       success: false,
       error: 'Failed to create movement type. Please try again.',
+    })
+  })
+})
+
+describe('updateMovement', () => {
+  const validUpdate = { id: 1, name: 'Electronic', description: 'Sensor-based movement' }
+
+  it('rejects when not admin', async () => {
+    mockRequireAdmin.mockRejectedValue(new Error('Unauthorized: admin access required'))
+    await expect(updateMovement(validUpdate)).rejects.toThrow('Unauthorized')
+    expect(mockPrisma.subCategory.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects invalid data (missing id)', async () => {
+    await expect(updateMovement({ name: 'Electronic' })).rejects.toThrow()
+  })
+
+  it('updates movement and returns id + name', async () => {
+    mockPrisma.subCategory.update.mockResolvedValue({ id: 1, name: 'Electronic' })
+    const result = await updateMovement(validUpdate)
+    expect(result).toEqual({ success: true, data: { id: 1, name: 'Electronic' } })
+    expect(mockPrisma.subCategory.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { name: 'Electronic', description: 'Sensor-based movement' },
+    })
+  })
+
+  it('calls updateTag for movements AND barometers', async () => {
+    mockPrisma.subCategory.update.mockResolvedValue({ id: 1, name: 'Electronic' })
+    await updateMovement(validUpdate)
+    expect(mockUpdateTag).toHaveBeenCalledWith('movements')
+    expect(mockUpdateTag).toHaveBeenCalledWith('barometers')
+  })
+
+  it('handles P2002 unique constraint (duplicate name)', async () => {
+    const p2002 = new Prisma.PrismaClientKnownRequestError('Unique', {
+      code: 'P2002',
+      clientVersion: '5.0.0',
+    })
+    mockPrisma.subCategory.update.mockRejectedValue(p2002)
+    const result = await updateMovement(validUpdate)
+    expect(result).toEqual({
+      success: false,
+      error: expect.stringContaining('Electronic'),
+    })
+  })
+
+  it('returns generic error on unknown failure', async () => {
+    jest.spyOn(console, 'error').mockImplementation()
+    mockPrisma.subCategory.update.mockRejectedValue(new Error('DB error'))
+    const result = await updateMovement(validUpdate)
+    expect(result).toEqual({
+      success: false,
+      error: 'Failed to update movement type. Please try again.',
     })
   })
 })
