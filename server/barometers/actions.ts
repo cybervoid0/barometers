@@ -2,18 +2,21 @@
 
 import { Prisma } from '@prisma/client'
 import { updateTag } from 'next/cache'
+import { z } from 'zod'
 import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
+import { requireAdmin } from '@/server/auth'
 import type { ActionResult, MediaFile } from '@/types'
 import { slug as slugify } from '@/utils'
 import { deleteFiles } from '../files/actions'
+import { CreateBarometerSchema, UpdateBarometerSchema } from './schemas'
 
-export async function createBarometer(
-  data: Prisma.BarometerUncheckedCreateInput,
-): Promise<ActionResult<{ id: string }>> {
+export async function createBarometer(rawData: unknown): Promise<ActionResult<{ id: string }>> {
+  await requireAdmin()
+  const data = CreateBarometerSchema.parse(rawData)
   try {
     const { id } = await prisma.barometer.create({
-      data,
+      data: { ...data, description: data.description ?? '' },
     })
     updateTag(Tag.barometers)
     return { success: true, data: { id } }
@@ -32,23 +35,25 @@ export async function createBarometer(
 }
 
 export async function updateBarometer(
-  data: Prisma.BarometerUncheckedUpdateInput,
+  rawData: unknown,
 ): Promise<ActionResult<{ slug: string; name: string }>> {
+  await requireAdmin()
+  const { id, ...data } = UpdateBarometerSchema.parse(rawData)
   try {
     const oldBarometer = await prisma.barometer.findUniqueOrThrow({
-      where: { id: data.id as string },
+      where: { id },
     })
     // create new slug if name changed
-    const slug = data.name ? slugify(data.name as string) : oldBarometer.slug
+    const slug = data.name ? slugify(data.name) : oldBarometer.slug
     await prisma.barometer.update({
-      where: { id: data.id as string },
+      where: { id },
       data: {
         ...data,
         slug,
       },
     })
     updateTag(Tag.barometers)
-    const name = (data.name as string) ?? oldBarometer.name
+    const name = data.name ?? oldBarometer.name
     return { success: true, data: { slug, name } }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -62,8 +67,10 @@ export async function updateBarometer(
   }
 }
 
-export async function deleteBarometer(slug: string): Promise<ActionResult<{ id: string }>> {
+export async function deleteBarometer(rawSlug: unknown): Promise<ActionResult<{ id: string }>> {
   try {
+    await requireAdmin()
+    const slug = z.string().min(1).parse(rawSlug)
     const barometer = await prisma.barometer.findFirstOrThrow({
       where: {
         slug: {

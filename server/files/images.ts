@@ -3,64 +3,50 @@
 import path from 'node:path'
 import { after } from 'next/server'
 import sharp from 'sharp'
+import { z } from 'zod'
 import { prisma } from '@/prisma/prismaClient'
+import { requireAdmin } from '@/server/auth'
 import { minioBucket, minioClient } from '@/services/minio'
-import type { ImageType, MediaFile } from '@/types'
-import { saveFile } from './actions'
+import { ImageType } from '@/types'
+import { mediaFileSchema } from './schemas'
+import { saveFileToStorage } from './storage'
 
-/**
- * Generate blur data for an image stored in MinIO
- * @param imageUrl - The image URL relative to the bucket (e.g., "gallery/image.jpg")
- * @returns Base64 encoded blur data or null if failed
- */
+const imageTypeSchema = z.enum(ImageType)
+
 async function generateBlurData(imageUrl: string): Promise<string | null> {
   try {
-    // Get image from MinIO
     const imageStream = await minioClient.getObject(minioBucket, imageUrl)
-    // Convert stream to buffer
     const chunks: Buffer[] = []
     for await (const chunk of imageStream) {
       chunks.push(chunk)
     }
     const imageBuffer = Buffer.concat(chunks)
 
-    // Generate small blurred thumbnail using Sharp with transparency
     const blurBuffer = await sharp(imageBuffer)
-      .resize(64, 64, { fit: 'inside' }) // Larger size for more detail
-      .blur(1.5) // Slightly less blur to preserve more detail
+      .resize(64, 64, { fit: 'inside' })
+      .blur(1.5)
       .png({
-        quality: 60, // Higher quality for better colors
-        compressionLevel: 6, // Less compression for better quality
+        quality: 60,
+        compressionLevel: 6,
         adaptiveFiltering: true,
       })
       .toBuffer()
 
-    // Convert to base64
-    const base64 = `data:image/png;base64,${blurBuffer.toString('base64')}`
-
-    return base64
+    return `data:image/png;base64,${blurBuffer.toString('base64')}`
   } catch (error) {
     console.error('Failed to generate blur data for', imageUrl, error)
     return null
   }
 }
 
-/** Costly image processing operations which are executed after the images are stored in the DB */
-async function createBlurData(
-  images: {
-    url: string
-    id: string
-  }[],
-) {
+async function createBlurData(images: { url: string; id: string }[]) {
   await Promise.all(
     images.map(async ({ id, url }) => {
       const blurData = await generateBlurData(url)
       if (blurData) {
         await prisma.image.update({
           where: { id },
-          data: {
-            blurData,
-          },
+          data: { blurData },
         })
       }
     }),
@@ -68,10 +54,15 @@ async function createBlurData(
 }
 
 export async function createImagesInDb(
-  imageFiles: MediaFile[],
-  imageType: ImageType,
-  idSuffix: string,
+  rawImageFiles: unknown,
+  rawImageType: unknown,
+  rawIdSuffix: unknown,
 ) {
+  await requireAdmin()
+  const imageFiles = z.array(mediaFileSchema).parse(rawImageFiles)
+  const imageType = imageTypeSchema.parse(rawImageType)
+  const idSuffix = z.string().min(1).parse(rawIdSuffix)
+
   const savedImages = await Promise.all(
     imageFiles.map(async ({ url, name }, order) => ({
       url: await saveImage(url, imageType, idSuffix),
@@ -81,23 +72,18 @@ export async function createImagesInDb(
   )
   const images = await prisma.image.createManyAndReturn({
     data: savedImages,
-    select: {
-      id: true,
-      url: true,
-    },
+    select: { id: true, url: true },
   })
 
-  // attach blur data to created images after return
   after(() => createBlurData(images))
 
   return images
 }
 
-async function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
-  if (!tempUrl.startsWith('temp/')) return tempUrl
+function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
+  if (!tempUrl.startsWith('temp/')) return Promise.resolve(tempUrl)
   const permanentUrl = generatePermanentImageName(tempUrl, type, idSuffix)
-  await saveFile(tempUrl, permanentUrl)
-  return permanentUrl
+  return saveFileToStorage(tempUrl, permanentUrl).then(() => permanentUrl)
 }
 
 function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: string): string {
@@ -105,5 +91,3 @@ function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: 
   const random = crypto.randomUUID().slice(0, 8)
   return `gallery/${type}-${idSuffix}__${random}${extension}`
 }
-
-export { saveImage }

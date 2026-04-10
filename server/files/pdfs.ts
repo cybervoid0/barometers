@@ -1,10 +1,15 @@
 'use server'
 
+import { z } from 'zod'
+import { requireAdmin } from '@/server/auth'
 import type { MediaFile } from '@/types'
 import { slug } from '@/utils'
-import { saveFile } from './actions'
+import { mediaFileSchema } from './schemas'
+import { saveFileToStorage } from './storage'
 
-async function savePdfs(files: MediaFile[]): Promise<MediaFile[]> {
+async function savePdfs(rawFiles: unknown): Promise<MediaFile[]> {
+  await requireAdmin()
+  const files = z.array(mediaFileSchema).parse(rawFiles)
   return await Promise.all(
     files.map(async ({ url, name }) => ({
       url: await savePdf(url, name),
@@ -16,7 +21,7 @@ async function savePdfs(files: MediaFile[]): Promise<MediaFile[]> {
 async function savePdf(tempUrl: string, title: string): Promise<string> {
   if (!tempUrl.startsWith('temp/')) return tempUrl
   const permanentUrl = generatePdfName(title)
-  await saveFile(tempUrl, permanentUrl)
+  await saveFileToStorage(tempUrl, permanentUrl)
   return permanentUrl
 }
 
