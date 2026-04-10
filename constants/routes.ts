@@ -14,6 +14,7 @@ export const Route = {
   AddBrand: '/admin/add-brand/',
   AddDocument: '/admin/add-document/',
   Reports: '/admin/reports/',
+  ReferenceData: '/admin/reference-data/',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
   Documents: '/documents/',

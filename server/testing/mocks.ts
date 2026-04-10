@@ -26,6 +26,8 @@ export const mockPrisma: {
   image: ModelMock
   user: ModelMock
   inaccuracyReport: ModelMock
+  material: ModelMock
+  subCategory: ModelMock
   $transaction: jest.Mock
 } = {
   barometer: modelMock(),
@@ -34,6 +36,8 @@ export const mockPrisma: {
   image: modelMock(),
   user: modelMock(),
   inaccuracyReport: modelMock(),
+  material: modelMock(),
+  subCategory: modelMock(),
   $transaction: jest.fn((fn: (tx: Record<string, ModelMock>) => unknown) =>
     fn({ image: mockPrisma.image, barometer: mockPrisma.barometer }),
   ),

@@ -1,4 +1,4 @@
-import { AlertTriangle, FilePlus2, FileText, Plus, Store } from 'lucide-react'
+import { AlertTriangle, Boxes, FilePlus2, FileText, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { Route } from '@/constants/routes'
 
@@ -29,6 +29,10 @@ export default function Admin() {
         <Link href={Route.Documents} className={linkStyle}>
           <FileText className={iconStyle} />
           View Documents
+        </Link>
+        <Link href={Route.ReferenceData} className={linkStyle}>
+          <Boxes className={iconStyle} />
+          Manage materials &amp; movements
         </Link>
         <Link href={Route.Reports} className={linkStyle}>
           <AlertTriangle className={iconStyle} />
