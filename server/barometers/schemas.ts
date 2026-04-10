@@ -35,7 +35,7 @@ export const UpdateBarometerSchema = z.object({
   subCategoryId: z.number().int().nullable().optional(),
   date: z.union([z.string(), z.date()]).optional(),
   purchasedAt: z.union([z.string(), z.date()]).nullable().optional(),
-  estimatedPrice: z.number().nullable().optional(),
+  estimatedPrice: z.number().positive().nullable().optional(),
   dimensions: z.array(z.object({ dim: z.string(), value: z.string() })).optional(),
   materials: z.object({ set: z.array(z.object({ id: z.number().int() })) }).optional(),
   images: z
