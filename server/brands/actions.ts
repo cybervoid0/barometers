@@ -2,16 +2,19 @@
 
 import { Prisma } from '@prisma/client'
 import { updateTag } from 'next/cache'
+import { z } from 'zod'
 import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
+import { requireAdmin } from '@/server/auth'
 import type { ActionResult } from '@/types'
 import { getIconBuffer } from '@/utils'
-
-type CreateArgs = Omit<Prisma.ManufacturerCreateInput, 'icon'> & { icon: string | null }
+import { CreateBrandSchema, UpdateBrandSchema } from './schemas'
 
 export async function createBrand(
-  data: CreateArgs,
+  rawData: unknown,
 ): Promise<ActionResult<{ id: string; name: string }>> {
+  await requireAdmin()
+  const data = CreateBrandSchema.parse(rawData)
   const { icon, ...createData } = data
 
   // Convert icon string to Buffer if provided
@@ -39,8 +42,10 @@ export async function createBrand(
 }
 
 export async function updateBrand(
-  data: Prisma.ManufacturerUpdateInput & { id: string; icon?: string | null },
+  rawData: unknown,
 ): Promise<ActionResult<{ slug: string; name: string }>> {
+  await requireAdmin()
+  const data = UpdateBrandSchema.parse(rawData)
   const { id, icon, ...updateData } = data
 
   try {
@@ -64,7 +69,9 @@ export async function updateBrand(
   }
 }
 
-export async function deleteBrand(slug: string) {
+export async function deleteBrand(rawSlug: unknown) {
+  await requireAdmin()
+  const slug = z.string().min(1).parse(rawSlug)
   const manufacturer = await prisma.manufacturer.findUniqueOrThrow({ where: { slug } })
   await prisma.manufacturer.delete({
     where: {

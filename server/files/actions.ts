@@ -1,31 +1,34 @@
 'use server'
 
-import path from 'node:path'
-import { minioBucket, minioClient } from '@/services/minio'
-import type { MediaFile } from '@/types'
+import { z } from 'zod'
+import { requireAdmin } from '@/server/auth'
+import { mediaFileSchema } from './schemas'
+import { createPresignedUrl, deleteFileFromStorage, saveFileToStorage } from './storage'
 
-async function deleteFiles(fileNames?: MediaFile[]) {
-  if (!Array.isArray(fileNames) || fileNames.length === 0) return
-  await Promise.all(fileNames.map(deleteFile))
+async function deleteFiles(rawFileNames?: unknown) {
+  await requireAdmin()
+  const parsed = z.array(mediaFileSchema).optional().parse(rawFileNames)
+  if (!parsed || parsed.length === 0) return
+  await Promise.all(parsed.map(deleteFileFromStorage))
 }
 
-async function deleteFile(file: MediaFile) {
-  try {
-    await minioClient.removeObject(minioBucket, file.url)
-  } catch (error) {
-    console.error('Unable to delete image', error)
-    // don't mind if it was not possible to delete the file
-  }
+async function deleteFile(rawFile: unknown) {
+  await requireAdmin()
+  const file = mediaFileSchema.parse(rawFile)
+  await deleteFileFromStorage(file)
 }
 
-async function saveFile(tempUrl: string, filename: string) {
-  await minioClient.copyObject(minioBucket, filename, `/${minioBucket}/${tempUrl}`)
-  await minioClient.removeObject(minioBucket, tempUrl)
+async function saveFile(rawTempUrl: unknown, rawFilename: unknown) {
+  await requireAdmin()
+  const tempUrl = z.string().min(1).parse(rawTempUrl)
+  const filename = z.string().min(1).parse(rawFilename)
+  await saveFileToStorage(tempUrl, filename)
 }
 
-async function createTempFile(fileName: string) {
-  const tempImageName = `temp/${crypto.randomUUID()}${path.extname(fileName)}`
-  return minioClient.presignedPutObject(minioBucket, tempImageName)
+async function createTempFile(rawFileName: unknown) {
+  await requireAdmin()
+  const fileName = z.string().min(1).parse(rawFileName)
+  return createPresignedUrl(fileName)
 }
 
 export { deleteFiles, deleteFile, createTempFile, saveFile }
