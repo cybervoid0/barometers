@@ -2,40 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-
-const RELOAD_KEY = 'chunk-error-reload'
-const RELOAD_COOLDOWN_MS = 10_000
-
-const CHUNK_ERROR_PATTERNS = [
-  'ChunkLoadError',
-  'Loading chunk',
-  'module factory is not available',
-  'Failed to fetch dynamically imported module',
-  'Importing a module script failed',
-  'error loading dynamically imported module',
-] as const
-
-function isChunkError(error: Error): boolean {
-  const message = error.message || ''
-  const name = error.name || ''
-  return CHUNK_ERROR_PATTERNS.some(p => name.includes(p) || message.includes(p))
-}
-
-function tryAutoReload(): boolean {
-  try {
-    const lastReload = sessionStorage.getItem(RELOAD_KEY)
-    const now = Date.now()
-
-    if (!lastReload || now - Number(lastReload) > RELOAD_COOLDOWN_MS) {
-      sessionStorage.setItem(RELOAD_KEY, String(now))
-      window.location.reload()
-      return true
-    }
-  } catch {
-    // sessionStorage may be unavailable
-  }
-  return false
-}
+import { isChunkError, reloadIfAllowed } from '@/utils'
 
 export default function ErrorPage({
   error,
@@ -46,7 +13,7 @@ export default function ErrorPage({
 }) {
   useEffect(() => {
     if (isChunkError(error)) {
-      tryAutoReload()
+      reloadIfAllowed()
     }
   }, [error])
 

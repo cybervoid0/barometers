@@ -1,39 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-
-const RELOAD_KEY = 'chunk-error-reload'
-const RELOAD_COOLDOWN_MS = 10_000
-
-function isChunkError(error: Error): boolean {
-  const message = error.message || ''
-  const name = error.name || ''
-
-  return (
-    name === 'ChunkLoadError' ||
-    message.includes('Loading chunk') ||
-    message.includes('module factory is not available') ||
-    message.includes('Failed to fetch dynamically imported module') ||
-    message.includes('Importing a module script failed') ||
-    message.includes('error loading dynamically imported module')
-  )
-}
-
-function tryAutoReload(): boolean {
-  try {
-    const lastReload = sessionStorage.getItem(RELOAD_KEY)
-    const now = Date.now()
-
-    if (!lastReload || now - Number(lastReload) > RELOAD_COOLDOWN_MS) {
-      sessionStorage.setItem(RELOAD_KEY, String(now))
-      window.location.reload()
-      return true
-    }
-  } catch {
-    // sessionStorage may be unavailable (private browsing, etc.)
-  }
-  return false
-}
+import { isChunkError, reloadIfAllowed } from '@/utils'
 
 export default function GlobalError({
   error,
@@ -44,7 +12,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     if (isChunkError(error)) {
-      tryAutoReload()
+      reloadIfAllowed()
     }
   }, [error])
 
