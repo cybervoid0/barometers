@@ -1,5 +1,6 @@
 import path from 'node:path'
 import bundleAnalyzer from '@next/bundle-analyzer'
+import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
 const withBundleAnalyzer = bundleAnalyzer({
@@ -85,4 +86,16 @@ const nextConfig: NextConfig = {
     : [],
 }
 
-export default withBundleAnalyzer(nextConfig)
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  org: 'alex-shenshin',
+  project: 'barometers',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: '/monitoring',
+  webpack: {
+    automaticVercelMonitors: true,
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+})

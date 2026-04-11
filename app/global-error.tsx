@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 import { isChunkError, reloadIfAllowed } from '@/utils'
 
@@ -11,6 +12,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
+    Sentry.captureException(error)
     if (isChunkError(error)) {
       reloadIfAllowed()
     }

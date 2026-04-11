@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { isChunkError, reloadIfAllowed } from '@/utils'
@@ -12,6 +13,7 @@ export default function ErrorPage({
   reset: () => void
 }) {
   useEffect(() => {
+    Sentry.captureException(error)
     if (isChunkError(error)) {
       reloadIfAllowed()
     }
