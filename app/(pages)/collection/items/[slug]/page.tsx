@@ -135,7 +135,7 @@ export default async function Page(props: Props) {
             title="Year"
             edit={<DateEdit barometer={barometer} />}
           >
-            <span>{dayjs(barometer.date).format('YYYY')}</span>
+            <span>{dayjs.utc(barometer.date).format('YYYY')}</span>
           </PropertyCard>
           <PropertyCard
             adminOnly

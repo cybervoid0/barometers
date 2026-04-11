@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { type ComponentProps, useEffect, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,6 +24,8 @@ import {
 } from '@/components/ui'
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
+
+dayjs.extend(utc)
 
 interface DateEditProps extends ComponentProps<'button'> {
   size?: string | number | undefined
@@ -61,7 +64,7 @@ export function DateEdit({ barometer }: DateEditProps) {
         }
         const result = await updateBarometer({
           id: barometer.id,
-          date: dayjs(`${values.date}-01-01`).toISOString(),
+          date: dayjs.utc(`${values.date}-01-01`).toISOString(),
         })
         if (!result.success) throw new Error(result.error)
         toast.success(`Updated year in ${result.data.name}.`)
@@ -75,7 +78,7 @@ export function DateEdit({ barometer }: DateEditProps) {
   // reset form on open
   useEffect(() => {
     if (!open) return
-    form.reset({ date: dayjs(barometer.date).format('YYYY') })
+    form.reset({ date: dayjs.utc(barometer.date).format('YYYY') })
   }, [open, form, barometer.date])
 
   return (
