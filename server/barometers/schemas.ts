@@ -28,6 +28,7 @@ export const UpdateBarometerSchema = z.object({
   slug: z.string().optional(),
   serial: z.string().max(100).nullable().optional(),
   description: z.string().optional(),
+  provenance: z.string().nullable().optional(),
   categoryId: z.string().min(1).optional(),
   conditionId: z.string().min(1).optional(),
   manufacturerId: z.string().min(1).optional(),
