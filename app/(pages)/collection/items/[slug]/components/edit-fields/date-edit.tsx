@@ -58,7 +58,8 @@ export function DateEdit({ barometer }: DateEditProps) {
   const update = (values: DateForm) => {
     startTransition(async () => {
       try {
-        if (!form.formState.isDirty) {
+        const originalYear = dayjs.utc(barometer.date).format('YYYY')
+        if (values.date === originalYear) {
           toast.info(`Nothing was updated in ${barometer.name}.`)
           return setOpen(false)
         }
