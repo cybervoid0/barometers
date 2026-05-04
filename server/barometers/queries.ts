@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { Prisma } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
-import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
+import { DEFAULT_PAGE_SIZE, isRouteKey, Route, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import type { SortValue } from '@/types'
 
@@ -70,6 +70,7 @@ export async function getBarometersByParams(
         category: {
           select: {
             name: true,
+            label: true,
           },
         },
         images: {
@@ -91,7 +92,17 @@ export async function getBarometersByParams(
   ])
 
   return {
-    barometers,
+    barometers: barometers.map(barometer => {
+      const { label } = barometer.category
+      if (!isRouteKey(label)) throw new Error(`Unknown category name ${label}`)
+      return {
+        ...barometer,
+        category: {
+          ...barometer.category,
+          link: Route[label],
+        },
+      }
+    }),
     // if page size is 0 the DB returns all records in one page
     page: pageSize ? pageNo : 1,
     totalPages: pageSize ? Math.ceil(totalItems / pageSize) : 1,
@@ -108,7 +119,7 @@ export async function getBarometer(slug: string) {
   cacheLife('max')
   cacheTag(Tag.barometers)
 
-  return prisma.barometer.findFirst({
+  const barometer = await prisma.barometer.findFirst({
     where: {
       slug: {
         equals: slug,
@@ -199,6 +210,16 @@ export async function getBarometer(slug: string) {
       },
     },
   })
+  if (!barometer) return null
+  const { label } = barometer.category
+  if (!isRouteKey(label)) throw new Error(`Unknown category ${label}`)
+  return {
+    ...barometer,
+    category: {
+      ...barometer.category,
+      link: Route[label],
+    },
+  }
 }
 
 export async function getAllBarometers() {
@@ -210,6 +231,7 @@ export async function getAllBarometers() {
     select: {
       id: true,
       name: true,
+      slug: true,
     },
     orderBy: {
       name: 'asc',

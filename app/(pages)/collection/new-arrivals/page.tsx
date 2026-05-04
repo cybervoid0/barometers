@@ -39,7 +39,7 @@ export default async function NewArrivals(props: newArrivalsProps) {
               barometerName={name}
               barometerLink={Route.Barometer + slug}
               categoryName={category.name}
-              categoryLink={Route.Categories + category.name}
+              categoryLink={category.link}
               manufacturer={
                 (manufacturer.firstName ? `${manufacturer.firstName} ` : '') + manufacturer.name
               }

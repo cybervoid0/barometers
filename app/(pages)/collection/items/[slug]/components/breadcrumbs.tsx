@@ -7,18 +7,23 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui'
-import { Route } from '@/constants/routes'
 import { cn } from '@/utils'
 
 interface BreadcrumbsComponentProps {
   type: string
   catId: string
+  catLink: string
   className?: string
 }
 
 const bcTextStyle = 'text-base font-medium capitalize'
 
-export function BreadcrumbsComponent({ type, catId, className }: BreadcrumbsComponentProps) {
+export function BreadcrumbsComponent({
+  type,
+  catId,
+  className,
+  catLink,
+}: BreadcrumbsComponentProps) {
   const categorySlug = type.toLowerCase()
 
   return (
@@ -34,7 +39,7 @@ export function BreadcrumbsComponent({ type, catId, className }: BreadcrumbsComp
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link className={bcTextStyle} href={Route.Categories + categorySlug}>
+            <Link className={bcTextStyle} href={catLink}>
               {categorySlug}
             </Link>
           </BreadcrumbLink>

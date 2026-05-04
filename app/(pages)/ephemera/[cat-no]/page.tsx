@@ -79,7 +79,7 @@ export default async function Document({ params }: Props) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={Route.Documents}>Documents</BreadcrumbLink>
+            <BreadcrumbLink href={Route.Ephemera}>Ephemera</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{doc.catalogueNumber}</BreadcrumbPage>
@@ -255,9 +255,9 @@ export default async function Document({ params }: Props) {
             </Card>
           )}
 
-          {/* Back to Documents */}
+          {/* Back to Ephemera */}
           <Button variant="outline" className="w-full" asChild>
-            <Link href={Route.Documents}>← Back to Documents</Link>
+            <Link href={Route.Ephemera}>← Back to Ephemera</Link>
           </Button>
         </div>
       </div>

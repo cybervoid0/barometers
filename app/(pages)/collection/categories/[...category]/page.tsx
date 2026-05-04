@@ -23,8 +23,8 @@ interface CollectionProps {
 
 export async function generateMetadata(props: CollectionProps): Promise<Metadata> {
   const { category } = await props.params
-  const [categoryName] = category
-  const { description } = await getCategory(categoryName)
+  const [categoryName, sortCriteria, pageNo] = category
+  const { description, link } = await getCategory(categoryName)
   const { barometers } = await getBarometersByParams(categoryName, 1, 5, 'date')
   const collectionTitle = `${title}: ${capitalize(categoryName)} Barometers Collection`
   // TODO: Load scaled image rather that full size
@@ -34,7 +34,7 @@ export async function generateMetadata(props: CollectionProps): Promise<Metadata
       url: fileStorage + (images.at(0)?.url ?? ''),
       alt: name,
     }))
-  const url = `${Route.Categories}${category.join('/')}`
+  const url = `${link}/${sortCriteria}/${pageNo}`
   return {
     title: collectionTitle,
     description,

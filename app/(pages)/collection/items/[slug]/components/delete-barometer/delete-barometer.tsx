@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui'
-import { Route } from '@/constants'
 import { deleteBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import { cn } from '@/utils'
@@ -38,7 +37,7 @@ export function DeleteBarometer({ barometer, className }: Props) {
         if (!result.success) throw new Error(result.error)
         toast.success('Barometer deleted successfully')
         setOpen(false)
-        router.replace(Route.Categories + barometer.category.name)
+        router.replace(barometer.category.link)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Error deleting barometer')
       }

@@ -26,9 +26,9 @@ export default function Admin() {
           <FilePlus2 className={iconStyle} />
           Add new document
         </Link>
-        <Link href={Route.Documents} className={linkStyle}>
+        <Link href={Route.Ephemera} className={linkStyle}>
           <FileText className={iconStyle} />
-          View Documents
+          View Ephemerae
         </Link>
         <Link href={Route.Materials} className={linkStyle}>
           <Boxes className={iconStyle} />

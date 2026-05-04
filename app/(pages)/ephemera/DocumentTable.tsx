@@ -130,7 +130,7 @@ function DocumentTable({ archive = [], conditions, allBarometers }: Props) {
   })
 
   const selectRow = (row: TableRow) => {
-    router.push(Route.Documents + encodeURIComponent(row.catalogueNumber))
+    router.push(Route.Ephemera + encodeURIComponent(row.catalogueNumber))
   }
 
   return (

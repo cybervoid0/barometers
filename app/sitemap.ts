@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { Route } from '@/constants/routes'
-import { prisma } from '@/prisma/prismaClient'
+import { getAllBarometers } from '@/server/barometers/queries'
+import { getAllBrands } from '@/server/brands/queries'
+import { getCategories } from '@/server/categories/queries'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -45,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 }
 
 async function getItemPages(baseUrl: string, now: Date): Promise<MetadataRoute.Sitemap> {
-  const barometers = await prisma.barometer.findMany({ select: { slug: true } })
+  const barometers = await getAllBarometers()
   return barometers.map(({ slug }) => ({
     url: baseUrl + Route.Barometer + slug,
     priority: 0.8,
@@ -54,16 +56,16 @@ async function getItemPages(baseUrl: string, now: Date): Promise<MetadataRoute.S
 }
 
 async function getCategoryPages(baseUrl: string, now: Date): Promise<MetadataRoute.Sitemap> {
-  const categories = await prisma.category.findMany({ select: { name: true } })
-  return categories.map(({ name }) => ({
-    url: baseUrl + Route.Categories + name,
+  const categories = await getCategories()
+  return categories.map(({ link }) => ({
+    url: baseUrl + link,
     priority: 0.9,
     lastModified: now,
   }))
 }
 
 async function getBrandPages(baseUrl: string, now: Date): Promise<MetadataRoute.Sitemap> {
-  const brands = await prisma.manufacturer.findMany({ select: { slug: true } })
+  const brands = await getAllBrands()
   return brands.map(({ slug }) => ({
     url: baseUrl + Route.Brands + slug,
     priority: 0.8,
