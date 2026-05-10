@@ -73,7 +73,7 @@ export async function generateMetadata() {
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <CountryProvider>
         <head>
           <CheckConsent service="googleAnalytics" category="analytics">

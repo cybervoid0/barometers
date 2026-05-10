@@ -38,11 +38,7 @@ export async function getMenuData(): Promise<MenuItem[]> {
       id: 2,
       label: 'Collection',
       link: '/collection',
-      children: categories.map(cat => ({
-        id: cat.id,
-        link: Route.Categories + cat.name.toLocaleLowerCase(),
-        label: cat.label,
-      })),
+      children: categories,
     },
     {
       id: 3,

@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { CategoryLocation } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
-import { Tag } from '@/constants'
+import { isRouteKey, Route, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 
 export async function getCategories(location?: CategoryLocation) {
@@ -28,10 +28,15 @@ export async function getCategories(location?: CategoryLocation) {
       },
     },
   })
-  return categories.map(({ images: [image], ...category }) => ({
-    ...category,
-    image,
-  }))
+  return categories.map(({ images: [image], label, ...category }) => {
+    if (!isRouteKey(label)) throw new Error(`A category ${label} doesn't exist in the app`)
+    return {
+      ...category,
+      label,
+      image,
+      link: Route[label],
+    }
+  })
 }
 
 export async function getCategory(name: string) {
@@ -41,6 +46,7 @@ export async function getCategory(name: string) {
 
   const {
     images: [image],
+    label,
     ...category
   } = await prisma.category.findFirstOrThrow({
     where: {
@@ -63,9 +69,12 @@ export async function getCategory(name: string) {
       },
     },
   })
+  if (!isRouteKey(label)) throw new Error(`A category ${label} doesn't exist in the app`)
   return {
     ...category,
     image,
+    label,
+    link: Route[label],
   }
 }
 

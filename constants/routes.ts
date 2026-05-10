@@ -1,24 +1,54 @@
-export const Route = {
+const root = {
   Home: '/',
   History: '/history/',
-  Foundation: '/foundation/',
-  Donate: '/foundation/donate/',
+  Ephemera: '/ephemera/',
   About: '/about/',
   Brands: '/brands/',
   Terms: '/terms-and-conditions/',
-  Categories: '/collection/categories/',
-  Barometer: '/collection/items/',
-  NewArrivals: '/collection/new-arrivals/',
-  Admin: '/admin/',
-  AddBarometer: '/admin/add-barometer/',
-  AddBrand: '/admin/add-brand/',
-  AddDocument: '/admin/add-document/',
-  Reports: '/admin/reports/',
-  Materials: '/admin/materials/',
-  Movements: '/admin/movements/',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
-  Documents: '/documents/',
 } as const
 
-export type Route = (typeof Route)[keyof typeof Route]
+const foundation = '/foundation'
+const foundationRoutes = {
+  Foundation: `${foundation}/`,
+  Donate: `${foundation}/donate/`,
+}
+
+const categories = '/categories'
+const collection = '/collection'
+const collCat = collection + categories
+const collectionRoutes = {
+  Categories: `${collCat}/`,
+  Barometer: `${collection}/items/`,
+  NewArrivals: `${collection}/new-arrivals/`,
+  Forecasters: `${collCat}/forecasters/`,
+  "Friends'": `${collCat}/friends/`,
+  Miscellaneous: `${collCat}/miscellaneous/`,
+  Recorders: `${collCat}/recorders/`,
+  Bourdon: `${collCat}/bourdon/`,
+  Pocket: `${collCat}/pocket/`,
+  Aneroid: `${collCat}/aneroid/`,
+  Mercury: `${collCat}/mercury/`,
+} as const
+
+const admin = '/admin'
+const adminRoutes = {
+  Admin: `${admin}/`,
+  AddBarometer: `${admin}/add-barometer/`,
+  AddBrand: `${admin}/add-brand/`,
+  AddDocument: `${admin}/add-document/`,
+  Reports: `${admin}/reports/`,
+  Materials: `${admin}/materials/`,
+  Movements: `${admin}/movements/`,
+} as const
+
+export const Route = {
+  ...root,
+  ...foundationRoutes,
+  ...collectionRoutes,
+  ...adminRoutes,
+} as const
+export function isRouteKey(value: string): value is keyof typeof Route {
+  return value in Route
+}

@@ -11,9 +11,11 @@
   "scripts": {
     "dev": "next dev --turbopack -p 3001",
     "dev:remote": "bun ./scripts/tunnel.ts next dev",
+    "postgres:local": "brew services start postgresql@16",
     "prisma": "dotenv -e .env.local prisma studio",
     "prisma:remote": "bun ./scripts/tunnel.ts prisma studio",
     "import-data": "bun ./scripts/import-data.ts",
+    "seed-blur": "bun ./scripts/seed-blur-data.ts",
     "build": "next build",
     "postinstall": "prisma generate",
     "analyze": "ANALYZE=true next build",

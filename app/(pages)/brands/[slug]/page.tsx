@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, ShowMore } from '@/components/elements'
 import { Card, Separator } from '@/components/ui'
-import { fileStorage, Route, Tag } from '@/constants'
+import { fileStorage, isRouteKey, Route, Tag } from '@/constants'
 import { title } from '@/constants/metadata'
 import { prisma } from '@/prisma/prismaClient'
 import { type BrandDTO, getBrand } from '@/server/brands/queries'
@@ -22,7 +22,7 @@ async function getBarometersByManufacturer(slug: string) {
   'use cache'
   cacheLife('max')
   cacheTag(Tag.barometers)
-  return prisma.barometer.findMany({
+  const barometers = await prisma.barometer.findMany({
     where: { manufacturer: { slug } },
     select: {
       id: true,
@@ -31,6 +31,7 @@ async function getBarometersByManufacturer(slug: string) {
       category: {
         select: {
           name: true,
+          label: true,
         },
       },
       images: {
@@ -47,6 +48,18 @@ async function getBarometersByManufacturer(slug: string) {
       },
     },
     orderBy: { name: 'asc' },
+  })
+  return barometers.map(barometer => {
+    const { label } = barometer.category
+    if (!isRouteKey(label)) throw new Error(`A category ${label} doesn't exist in the app`)
+    return {
+      ...barometer,
+      category: {
+        ...barometer.category,
+        label,
+        link: Route[label],
+      },
+    }
   })
 }
 
@@ -128,7 +141,7 @@ export default async function Manufacturer(props: Props) {
                 <BarometerCardWithIcon
                   barometerName={name}
                   barometerLink={Route.Barometer + barometerSlug}
-                  categoryLink={Route.Categories + category.name}
+                  categoryLink={category.link}
                   categoryName={category.name}
                   image={images[0]}
                 />

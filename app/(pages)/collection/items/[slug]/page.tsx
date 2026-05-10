@@ -81,7 +81,11 @@ export default async function Page(props: Props) {
   const dimensions = (barometer?.dimensions ?? []) as Dimensions
   return (
     <>
-      <BreadcrumbsComponent catId={barometer.collectionId} type={barometer.category.name} />
+      <BreadcrumbsComponent
+        catId={barometer.collectionId}
+        type={barometer.category.name}
+        catLink={barometer.category.link}
+      />
       <ImageCarousel barometer={barometer} />
       <Card className="p-4 shadow-md">
         <div className="flex flex-row flex-nowrap items-center justify-between">
@@ -110,7 +114,7 @@ export default async function Page(props: Props) {
             title="Category"
             edit={<CategoryEdit barometer={barometer} categories={categories} />}
           >
-            <Link className="text-sm w-fit" href={Route.Categories + barometer.category.name}>
+            <Link className="text-sm w-fit" href={barometer.category.link}>
               {barometer.category.label}
             </Link>
           </PropertyCard>

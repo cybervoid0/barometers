@@ -15,6 +15,7 @@ export async function getAllBrands() {
       name: true,
       firstName: true,
       id: true,
+      slug: true,
     },
     orderBy: [
       {
