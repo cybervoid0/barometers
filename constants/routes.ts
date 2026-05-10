@@ -49,7 +49,6 @@ export const Route = {
   ...collectionRoutes,
   ...adminRoutes,
 } as const
-
 export function isRouteKey(value: string): value is keyof typeof Route {
   return value in Route
 }
