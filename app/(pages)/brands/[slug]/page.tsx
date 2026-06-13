@@ -4,6 +4,7 @@ import { BookText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { cacheLife, cacheTag } from 'next/cache'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
 import { BarometerCardWithIcon, ImageLightbox, ShowMore } from '@/components/elements'
 import { Card, Separator } from '@/components/ui'
@@ -66,6 +67,7 @@ async function getBarometersByManufacturer(slug: string) {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { slug } = await props.params
   const manufacturer = await getBrand(slug)
+  if (!manufacturer) notFound()
   return {
     title: `${title} - Manufacturer: ${manufacturer.name}`,
   }
@@ -87,6 +89,7 @@ export async function generateStaticParams() {
 export default async function Manufacturer(props: Props) {
   const { slug } = await props.params
   const manufacturer = await getBrand(slug)
+  if (!manufacturer) notFound()
   const barometers = await getBarometersByManufacturer(slug)
   const fullName = `${manufacturer.firstName ?? ''} ${manufacturer.name}`
   const pdfs = manufacturer.pdfFiles ?? []

@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { cacheLife, cacheTag } from 'next/cache'
-import { notFound } from 'next/navigation'
 import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { bufferToBase64Url } from '@/utils'
@@ -154,7 +153,7 @@ export async function getBrand(slug: string) {
       },
     },
   })
-  if (!result) notFound()
+  if (!result) return null
   const { icon, ...brand } = result
   return {
     ...brand,
@@ -247,7 +246,7 @@ export async function getBrandsByCountry() {
     .sort((a, b) => b._count.manufacturers - a._count.manufacturers)
 }
 
-export type BrandDTO = Awaited<ReturnType<typeof getBrand>>
+export type BrandDTO = NonNullable<Awaited<ReturnType<typeof getBrand>>>
 
 export type BrandListDTO = Awaited<ReturnType<typeof getBrands>>
 
