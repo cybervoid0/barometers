@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # prisma.config.ts requires this to resolve even for `prisma generate`;
-      # no connection is made, so a dummy value is sufficient in CI.
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      # no connection is made, so a dummy value (repo variable) is sufficient.
+      DATABASE_URL: ${{ vars.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
