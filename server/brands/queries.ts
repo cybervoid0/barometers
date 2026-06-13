@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { cacheLife, cacheTag } from 'next/cache'
+import { notFound } from 'next/navigation'
 import { DEFAULT_PAGE_SIZE, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { bufferToBase64Url } from '@/utils'
@@ -107,7 +108,7 @@ export async function getBrand(slug: string) {
   cacheLife('max')
   cacheTag(Tag.brands)
 
-  const { icon, ...brand } = await prisma.manufacturer.findUniqueOrThrow({
+  const result = await prisma.manufacturer.findUnique({
     where: {
       slug,
     },
@@ -153,6 +154,8 @@ export async function getBrand(slug: string) {
       },
     },
   })
+  if (!result) notFound()
+  const { icon, ...brand } = result
   return {
     ...brand,
     icon: bufferToBase64Url(icon),
