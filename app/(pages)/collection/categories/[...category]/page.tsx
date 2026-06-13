@@ -2,6 +2,7 @@ import 'server-only'
 
 import capitalize from 'lodash/capitalize'
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { FooterVideo } from '@/components/containers'
 import { BarometerCard, ShowMore } from '@/components/elements'
 import { Card, Pagination } from '@/components/ui'
@@ -24,7 +25,9 @@ interface CollectionProps {
 export async function generateMetadata(props: CollectionProps): Promise<Metadata> {
   const { category } = await props.params
   const [categoryName, sortCriteria, pageNo] = category
-  const { description, link } = await getCategory(categoryName)
+  const categoryData = await getCategory(categoryName)
+  if (!categoryData) notFound()
+  const { description, link } = categoryData
   const { barometers } = await getBarometersByParams(categoryName, 1, 5, 'date')
   const collectionTitle = `${title}: ${capitalize(categoryName)} Barometers Collection`
   // TODO: Load scaled image rather that full size
@@ -67,7 +70,9 @@ export default async function Collection(props: CollectionProps) {
     DEFAULT_PAGE_SIZE,
     sort as SortValue,
   )
-  const { description } = await getCategory(categoryName)
+  const categoryData = await getCategory(categoryName)
+  if (!categoryData) notFound()
+  const { description } = categoryData
   return (
     <>
       <div className="flex flex-col gap-4 pt-6">

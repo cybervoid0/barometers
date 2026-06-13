@@ -2,7 +2,6 @@ import 'server-only'
 
 import type { CategoryLocation } from '@prisma/client'
 import { cacheLife, cacheTag } from 'next/cache'
-import { notFound } from 'next/navigation'
 import { isRouteKey, Route, Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 
@@ -66,7 +65,7 @@ export async function getCategory(name: string) {
       },
     },
   })
-  if (!result) notFound()
+  if (!result) return null
   const {
     images: [image],
     label,
@@ -81,5 +80,5 @@ export async function getCategory(name: string) {
   }
 }
 
-export type CategoryDTO = Awaited<ReturnType<typeof getCategory>>
+export type CategoryDTO = NonNullable<Awaited<ReturnType<typeof getCategory>>>
 export type CategoriesDTO = Awaited<ReturnType<typeof getCategories>>
