@@ -1,0 +1,18 @@
+---
+description: Project code conventions (single source of truth)
+alwaysApply: true
+---
+
+Follow the conventions in `AGENTS.md` at the repository root — it is the single
+source of truth for architecture, layering, and code patterns in this repo.
+
+Highest-impact rules (full detail in AGENTS.md):
+
+- Persistence and storage side-effects go in the **server action**, never in a
+  client zod `.transform()`.
+- `'use server'` only on RPC entry points called from the client; internal server
+  helpers are plain modules.
+- New domain logic follows `server/<domain>/{actions,queries,schemas}.ts`; copy
+  `server/barometers/` as the template.
+- Client code never lives under `server/`.
+- `bun run lint && bun run typecheck && bun run jest` must pass before committing.
