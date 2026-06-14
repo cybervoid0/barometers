@@ -5,7 +5,10 @@ Sentry.init({
   integrations: [Sentry.replayIntegration()],
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1,
   enableLogs: true,
-  replaysSessionSampleRate: 0.1,
+  // record replays only for sessions that hit an error — the 50/mo quota is too
+  // small to spend on random sessions (see Sentry billing). Bump session rate
+  // back up only with a larger reserved/PAYG budget.
+  replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
   sendDefaultPii: true,
 })
