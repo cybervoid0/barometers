@@ -1,9 +1,7 @@
 import { z } from 'zod'
-import type { updateBrand } from '@/server/brands/actions'
-import { createImagesInDb } from '@/server/files/images'
+import type { UpdateBrandSchema } from '@/server/brands/schemas'
 import { savePdfs } from '@/server/files/pdfs'
-import { ImageType } from '@/types'
-import { getBrandFileSlug, getBrandSlug } from '@/utils'
+import { getBrandSlug } from '@/utils'
 
 // Schema for form validation (input)
 export const BrandEditSchema = z.object({
@@ -43,17 +41,14 @@ export const BrandEditTransformSchema = BrandEditSchema.transform(
     countries,
     pdfFiles,
     ...values
-  }): Promise<Parameters<typeof updateBrand>[0]> => {
+  }): Promise<z.input<typeof UpdateBrandSchema>> => {
     const slug = getBrandSlug(values.name, values.firstName)
-    const fileSlug = getBrandFileSlug(values.name, values.firstName)
 
     return {
       ...values,
       slug,
-      images: {
-        deleteMany: {},
-        connect: await createImagesInDb(images, ImageType.Brand, fileSlug),
-      },
+      // temp upload refs (full desired set); persisted + replaced server-side
+      images,
       successors: {
         set: successors.map(id => ({ id })),
       },

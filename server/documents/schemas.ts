@@ -41,11 +41,7 @@ export const UpdateDocumentSchema = z.object({
   acquisitionDate: z.date().nullable().optional(),
   description: z.string().optional(),
   conditionId: z.string().optional(),
-  images: z
-    .object({
-      set: z.array(prismaConnect).optional(),
-      connect: z.array(prismaConnect).optional(),
-    })
-    .optional(),
+  // temp upload refs (full desired set); replaces existing images server-side in updateDocument
+  images: z.array(mediaFileSchema).optional(),
   relatedBarometers: z.object({ set: z.array(prismaConnect) }).optional(),
 })

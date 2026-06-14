@@ -41,15 +41,25 @@ export async function updateDocument(
   rawData: unknown,
 ): Promise<ActionResult<{ id: string; title: string }>> {
   await requireAdmin()
-  const data = UpdateDocumentSchema.parse(rawData)
-  const { id, ...updateData } = data
+  const { id, images, ...updateData } = UpdateDocumentSchema.parse(rawData)
 
   try {
+    // when images are provided, replace the whole set: persist temp uploads and
+    // recreate rows atomically with the update (deleteMany drops the old links)
+    const imageRows = images
+      ? await saveTempImages(images, ImageType.Document, updateData.catalogueNumber ?? id)
+      : undefined
+
     const result = await prisma.document.update({
       where: { id },
-      data: updateData as Prisma.DocumentUpdateInput,
+      data: {
+        ...(updateData as Prisma.DocumentUpdateInput),
+        images: imageRows ? { deleteMany: {}, create: imageRows } : undefined,
+      },
+      select: { id: true, title: true, images: { select: { id: true, url: true } } },
     })
 
+    if (imageRows && result.images.length > 0) after(() => createBlurData(result.images))
     revalidateTag(Tag.documents, 'max')
     return { success: true, data: { id: result.id, title: result.title } }
   } catch (error) {

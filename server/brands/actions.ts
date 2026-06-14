@@ -9,7 +9,7 @@ import { prisma } from '@/prisma/prismaClient'
 import { requireAdmin } from '@/server/auth'
 import { createBlurData, saveTempImages } from '@/server/files/persist-images'
 import { type ActionResult, ImageType } from '@/types'
-import { getIconBuffer } from '@/utils'
+import { getBrandFileSlug, getIconBuffer } from '@/utils'
 import { CreateBrandSchema, UpdateBrandSchema } from './schemas'
 
 export async function createBrand(
@@ -24,7 +24,11 @@ export async function createBrand(
   try {
     const imageRows =
       images && images.length > 0
-        ? await saveTempImages(images, ImageType.Brand, createData.slug)
+        ? await saveTempImages(
+            images,
+            ImageType.Brand,
+            getBrandFileSlug(createData.name, createData.firstName),
+          )
         : []
 
     const {
@@ -59,21 +63,37 @@ export async function updateBrand(
   rawData: unknown,
 ): Promise<ActionResult<{ slug: string; name: string }>> {
   await requireAdmin()
-  const data = UpdateBrandSchema.parse(rawData)
-  const { id, icon, ...updateData } = data
+  const { id, icon, images, ...updateData } = UpdateBrandSchema.parse(rawData)
 
   try {
     // Convert icon string to Buffer if provided
     const iconBuffer = getIconBuffer(icon)
 
-    const { slug, name } = await prisma.manufacturer.update({
+    // when images are provided, replace the whole set: persist temp uploads and
+    // recreate rows atomically with the update (deleteMany drops the old links)
+    const imageRows = images
+      ? await saveTempImages(
+          images,
+          ImageType.Brand,
+          updateData.name ? getBrandFileSlug(updateData.name, updateData.firstName) : id,
+        )
+      : undefined
+
+    const {
+      slug,
+      name,
+      images: updatedImages,
+    } = await prisma.manufacturer.update({
       where: { id },
       data: {
         ...updateData,
         icon: iconBuffer,
+        images: imageRows ? { deleteMany: {}, create: imageRows } : undefined,
       },
+      select: { slug: true, name: true, images: { select: { id: true, url: true } } },
     })
 
+    if (imageRows && updatedImages.length > 0) after(() => createBlurData(updatedImages))
     updateTag(Tag.brands)
     updateTag(Tag.barometers)
     return { success: true, data: { slug, name } }

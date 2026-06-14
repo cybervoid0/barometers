@@ -5,10 +5,18 @@ jest.mock('@/prisma/prismaClient', () => require('../../testing/mocks').prismaMo
 jest.mock('@/server/auth', () => require('../../testing/mocks').authMockModule)
 jest.mock('next/cache', () => require('../../testing/mocks').cacheMockModule)
 jest.mock('@/utils', () => require('../../testing/mocks').utilsMockModule)
+jest.mock('next/server', () => require('../../testing/mocks').serverMockModule)
+jest.mock('@/server/files/storage', () => require('../../testing/mocks').storageMockModule)
 
 import { Prisma } from '@prisma/client'
 import { createBrand, deleteBrand, updateBrand } from '@/server/brands/actions'
-import { mockPrisma, mockRequireAdmin, mockUpdateTag, resetAllMocks } from '../../testing/mocks'
+import {
+  mockPrisma,
+  mockRequireAdmin,
+  mockSaveFileToStorage,
+  mockUpdateTag,
+  resetAllMocks,
+} from '../../testing/mocks'
 
 beforeEach(resetAllMocks)
 
@@ -77,6 +85,33 @@ describe('createBrand', () => {
       error: 'Failed to create brand. Please try again.',
     })
   })
+
+  it('persists temp images and nests them into the create', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.manufacturer.create.mockResolvedValue({
+      id: 'm-1',
+      name: 'Negretti',
+      images: [{ id: 'i-1', url: 'gallery/x.jpg' }],
+    })
+
+    await createBrand({ ...validCreateData, images: [{ url: 'temp/abc.jpg', name: 'logo.png' }] })
+
+    expect(mockSaveFileToStorage).toHaveBeenCalledWith(
+      'temp/abc.jpg',
+      expect.stringContaining('gallery/'),
+    )
+    expect(mockPrisma.manufacturer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'logo.png', order: 0 }),
+            ]),
+          },
+        }),
+      }),
+    )
+  })
 })
 
 describe('updateBrand', () => {
@@ -104,6 +139,35 @@ describe('updateBrand', () => {
     expect(mockPrisma.manufacturer.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ icon: expect.any(Buffer) }),
+      }),
+    )
+  })
+
+  it('replaces the whole image set (deleteMany + create) when images are provided', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.manufacturer.update.mockResolvedValue({
+      slug: 's',
+      name: 'N',
+      images: [{ id: 'i-1', url: 'gallery/x.jpg' }],
+    })
+
+    await updateBrand({
+      id: 'm-1',
+      name: 'N',
+      icon: null,
+      images: [{ url: 'temp/new.jpg', name: 'new.png' }],
+    })
+
+    expect(mockPrisma.manufacturer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            deleteMany: {},
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'new.png', order: 0 }),
+            ]),
+          },
+        }),
       }),
     )
   })

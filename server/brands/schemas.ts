@@ -34,12 +34,8 @@ export const UpdateBrandSchema = z.object({
   icon: z.string().nullable().optional(),
   countries: z.object({ set: z.array(prismaConnectInt) }).optional(),
   successors: z.object({ set: z.array(prismaConnect) }).optional(),
-  images: z
-    .object({
-      deleteMany: z.object({}).strict().optional(),
-      connect: z.array(prismaConnect).optional(),
-    })
-    .optional(),
+  // temp upload refs (full desired set); replaces existing images server-side in updateBrand
+  images: z.array(mediaFileSchema).optional(),
   pdfFiles: z
     .object({
       deleteMany: z.object({}).strict().optional(),

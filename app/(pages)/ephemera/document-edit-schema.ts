@@ -1,9 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import type { updateDocument } from '@/server/documents/actions'
-import { createImagesInDb } from '@/server/files/images'
-import { ImageType } from '@/types'
+import type { UpdateDocumentSchema } from '@/server/documents/schemas'
 
 dayjs.extend(utc)
 
@@ -78,14 +76,14 @@ export type DocumentEditForm = z.infer<typeof DocumentEditSchema>
  * Transform schema - converts form data to Prisma update format
  */
 export const DocumentEditTransformSchema = DocumentEditSchema.transform(
-  async ({
+  ({
     images,
     relatedBarometers,
     date,
     acquisitionDate,
     annotations,
     ...values
-  }): Promise<Parameters<typeof updateDocument>[0]> => {
+  }): z.input<typeof UpdateDocumentSchema> => {
     return {
       ...values,
       date: date ? dayjs.utc(date).toDate() : null,
@@ -96,13 +94,8 @@ export const DocumentEditTransformSchema = DocumentEditSchema.transform(
             .map(s => s.trim())
             .filter(Boolean)
         : [],
-      images: {
-        set: [],
-        connect:
-          images.length > 0
-            ? await createImagesInDb(images, ImageType.Document, values.catalogueNumber)
-            : [],
-      },
+      // temp upload refs (full desired set); persisted + replaced server-side
+      images,
       relatedBarometers: {
         set: relatedBarometers.map(id => ({ id })),
       },

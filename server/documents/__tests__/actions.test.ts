@@ -4,9 +4,17 @@
 jest.mock('@/prisma/prismaClient', () => require('../../testing/mocks').prismaMockModule)
 jest.mock('@/server/auth', () => require('../../testing/mocks').authMockModule)
 jest.mock('next/cache', () => require('../../testing/mocks').cacheMockModule)
+jest.mock('next/server', () => require('../../testing/mocks').serverMockModule)
+jest.mock('@/server/files/storage', () => require('../../testing/mocks').storageMockModule)
 
 import { createDocument, deleteDocument, updateDocument } from '@/server/documents/actions'
-import { mockPrisma, mockRequireAdmin, mockRevalidateTag, resetAllMocks } from '../../testing/mocks'
+import {
+  mockPrisma,
+  mockRequireAdmin,
+  mockRevalidateTag,
+  mockSaveFileToStorage,
+  resetAllMocks,
+} from '../../testing/mocks'
 
 beforeEach(resetAllMocks)
 
@@ -48,6 +56,36 @@ describe('createDocument', () => {
     await createDocument(validCreateData)
     expect(mockRevalidateTag).toHaveBeenCalledWith('documents', 'max')
   })
+
+  it('persists temp images and nests them into the create', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.document.create.mockResolvedValue({
+      id: 'd-1',
+      title: 'Test Document',
+      images: [{ id: 'i-1', url: 'gallery/x.jpg' }],
+    })
+
+    await createDocument({
+      ...validCreateData,
+      images: [{ url: 'temp/abc.jpg', name: 'scan.jpg' }],
+    })
+
+    expect(mockSaveFileToStorage).toHaveBeenCalledWith(
+      'temp/abc.jpg',
+      expect.stringContaining('gallery/'),
+    )
+    expect(mockPrisma.document.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'scan.jpg', order: 0 }),
+            ]),
+          },
+        }),
+      }),
+    )
+  })
 })
 
 describe('updateDocument', () => {
@@ -70,6 +108,30 @@ describe('updateDocument', () => {
       success: false,
       error: 'Failed to update document. Please try again.',
     })
+  })
+
+  it('replaces the whole image set (deleteMany + create) when images are provided', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.document.update.mockResolvedValue({
+      id: 'd-1',
+      title: 'X',
+      images: [{ id: 'i-1', url: 'gallery/x.jpg' }],
+    })
+
+    await updateDocument({ id: 'd-1', images: [{ url: 'temp/new.jpg', name: 'scan.jpg' }] })
+
+    expect(mockPrisma.document.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            deleteMany: {},
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'scan.jpg', order: 0 }),
+            ]),
+          },
+        }),
+      }),
+    )
   })
 })
 

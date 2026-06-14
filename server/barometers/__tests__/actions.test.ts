@@ -6,11 +6,19 @@ jest.mock('@/server/auth', () => require('../../testing/mocks').authMockModule)
 jest.mock('next/cache', () => require('../../testing/mocks').cacheMockModule)
 jest.mock('@/utils', () => require('../../testing/mocks').utilsMockModule)
 jest.mock('@/server/files/actions', () => ({ deleteFiles: jest.fn() }))
+jest.mock('next/server', () => require('../../testing/mocks').serverMockModule)
+jest.mock('@/server/files/storage', () => require('../../testing/mocks').storageMockModule)
 
 import { Prisma } from '@prisma/client'
 import { createBarometer, deleteBarometer, updateBarometer } from '@/server/barometers/actions'
 import { deleteFiles } from '@/server/files/actions'
-import { mockPrisma, mockRequireAdmin, mockUpdateTag, resetAllMocks } from '../../testing/mocks'
+import {
+  mockPrisma,
+  mockRequireAdmin,
+  mockSaveFileToStorage,
+  mockUpdateTag,
+  resetAllMocks,
+} from '../../testing/mocks'
 
 const mockDeleteFiles = deleteFiles as jest.Mock
 
@@ -79,6 +87,46 @@ describe('createBarometer', () => {
     mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1', images: [] })
     await createBarometer(validCreateData)
     expect(mockUpdateTag).toHaveBeenCalledWith('barometers')
+  })
+
+  it('persists temp images and nests them into the create', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.barometer.create.mockResolvedValue({
+      id: 'b-1',
+      images: [{ id: 'i-1', url: 'gallery/x.jpg' }],
+    })
+
+    await createBarometer({
+      ...validCreateData,
+      images: [{ url: 'temp/abc.jpg', name: 'photo.jpg' }],
+    })
+
+    expect(mockSaveFileToStorage).toHaveBeenCalledWith(
+      'temp/abc.jpg',
+      expect.stringContaining('gallery/'),
+    )
+    expect(mockPrisma.barometer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'photo.jpg', order: 0 }),
+            ]),
+          },
+        }),
+      }),
+    )
+  })
+
+  it('accepts an image with an empty name (nullable DB column)', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1', images: [{ id: 'i', url: 'u' }] })
+
+    const result = await createBarometer({
+      ...validCreateData,
+      images: [{ url: 'temp/abc.jpg', name: '' }],
+    })
+    expect(result).toEqual({ success: true, data: { id: 'b-1' } })
   })
 })
 
@@ -151,6 +199,37 @@ describe('updateBarometer', () => {
     mockPrisma.barometer.update.mockResolvedValue({})
     await updateBarometer({ id: 'b-1', conditionId: 'c-1' })
     expect(mockUpdateTag).toHaveBeenCalledWith('barometers')
+  })
+
+  it('replaces the whole image set (deleteMany + create) when images are provided', async () => {
+    mockSaveFileToStorage.mockResolvedValue(undefined)
+    mockPrisma.barometer.findUniqueOrThrow.mockResolvedValue({ id: 'b-1', slug: 's', name: 'N' })
+    mockPrisma.barometer.update.mockResolvedValue({ images: [{ id: 'i-1', url: 'gallery/x.jpg' }] })
+
+    await updateBarometer({ id: 'b-1', images: [{ url: 'temp/new.jpg', name: 'new.jpg' }] })
+
+    expect(mockPrisma.barometer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          images: {
+            deleteMany: {},
+            create: expect.arrayContaining([
+              expect.objectContaining({ name: 'new.jpg', order: 0 }),
+            ]),
+          },
+        }),
+      }),
+    )
+  })
+
+  it('leaves images untouched when none are provided', async () => {
+    mockPrisma.barometer.findUniqueOrThrow.mockResolvedValue({ id: 'b-1', slug: 's', name: 'N' })
+    mockPrisma.barometer.update.mockResolvedValue({})
+    await updateBarometer({ id: 'b-1', conditionId: 'c-1' })
+    expect(mockSaveFileToStorage).not.toHaveBeenCalled()
+    expect(mockPrisma.barometer.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ images: undefined }) }),
+    )
   })
 })
 

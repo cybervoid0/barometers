@@ -1,16 +1,13 @@
 // client-side upload transport (Uppy + presigned PUT to MinIO/S3)
 
 import AwsS3, { type AwsBody } from '@uppy/aws-s3'
-import Uppy, { type UppyFile } from '@uppy/core'
+import Uppy from '@uppy/core'
 import CompressorJS from 'compressorjs'
-import type { MediaFile } from '@/types'
 import { createTempFile } from './actions'
+import { extractTempKey, type UploadMeta } from './upload-utils'
 
-// storage object key (e.g. "temp/uuid.jpg"), set once the presigned URL is issued.
-// Must be a type alias (not interface) so it satisfies Uppy's `Meta` index-signature constraint.
-export type UploadMeta = {
-  tempKey?: string
-}
+export type { UploadMeta }
+export { uploadedFileToMediaFile } from './upload-utils'
 
 export type UploadUppy = Uppy<UploadMeta, AwsBody>
 
@@ -20,15 +17,6 @@ const RETRY_DELAYS = [0, 1000, 3000, 5000]
 // only re-encode images above this size; smaller files are uploaded byte-for-byte
 const COMPRESS_THRESHOLD_BYTES = 30 * 1024 * 1024
 const LARGE_IMAGE_QUALITY = 0.92
-
-/** Derive the storage object key (e.g. "temp/uuid.jpg") from a presigned URL. */
-function extractTempKey(presignedUrl: string): string {
-  return new URL(presignedUrl).pathname.split('/').slice(-2).join('/')
-}
-
-function stripExtension(fileName: string): string {
-  return fileName.replace(/\.[^.]+$/, '') || fileName
-}
 
 function compressLargeImage(blob: Blob): Promise<Blob | File> {
   return new Promise((resolve, reject) => {
@@ -96,11 +84,4 @@ export function createUploadUppy(): UploadUppy {
   })
 
   return uppy
-}
-
-/** Map a successfully uploaded Uppy file to the app's `MediaFile` shape. */
-export function uploadedFileToMediaFile(file: UppyFile<UploadMeta, AwsBody>): MediaFile | null {
-  const url = file.meta.tempKey
-  if (!url) return null
-  return { url, name: stripExtension(file.name ?? url) }
 }
