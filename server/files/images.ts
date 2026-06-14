@@ -1,29 +1,96 @@
-'use server'
+// Server-side image persistence: move temp uploads to permanent storage and
+// generate blur placeholders. Invoked from already-authorized server actions
+// (no `'use server'` here — these are internal helpers, not RPC entry points).
 
-import { after } from 'next/server'
+import path from 'node:path'
+import sharp from 'sharp'
+import { z } from 'zod'
 import { prisma } from '@/prisma/prismaClient'
-import { requireAdmin } from '@/server/auth'
-import { createBlurData, saveTempImages } from './persist-images'
+import { minioBucket, minioClient } from '@/services/minio'
+import { ImageType } from '@/types'
+import { mediaFileSchema } from './schemas'
+import { saveFileToStorage } from './storage'
+
+const imageTypeSchema = z.enum(ImageType)
+
+export interface PersistedImage {
+  url: string
+  name: string
+  order: number
+}
+
+async function generateBlurData(imageUrl: string): Promise<string | null> {
+  try {
+    const imageStream = await minioClient.getObject(minioBucket, imageUrl)
+    const chunks: Buffer[] = []
+    for await (const chunk of imageStream) {
+      chunks.push(chunk)
+    }
+    const imageBuffer = Buffer.concat(chunks)
+
+    const blurBuffer = await sharp(imageBuffer)
+      .resize(64, 64, { fit: 'inside' })
+      .blur(1.5)
+      .png({
+        quality: 60,
+        compressionLevel: 6,
+        adaptiveFiltering: true,
+      })
+      .toBuffer()
+
+    return `data:image/png;base64,${blurBuffer.toString('base64')}`
+  } catch (error) {
+    console.error('Failed to generate blur data for', imageUrl, error)
+    return null
+  }
+}
+
+/** Generate and persist blur placeholders for the given images. Run via `after()`. */
+export async function createBlurData(images: { url: string; id: string }[]) {
+  await Promise.all(
+    images.map(async ({ id, url }) => {
+      const blurData = await generateBlurData(url)
+      if (blurData) {
+        await prisma.image.update({
+          where: { id },
+          data: { blurData },
+        })
+      }
+    }),
+  )
+}
+
+function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: string): string {
+  const extension = path.extname(tempUrl)
+  const random = crypto.randomUUID().slice(0, 8)
+  return `gallery/${type}-${idSuffix}__${random}${extension}`
+}
+
+function saveImage(tempUrl: string, type: ImageType, idSuffix: string) {
+  if (!tempUrl.startsWith('temp/')) return Promise.resolve(tempUrl)
+  const permanentUrl = generatePermanentImageName(tempUrl, type, idSuffix)
+  return saveFileToStorage(tempUrl, permanentUrl).then(() => permanentUrl)
+}
 
 /**
- * Save uploaded temp images to permanent storage, create standalone `Image` rows,
- * and schedule blur generation. Returns `{ id, url }[]` suitable for a Prisma
- * `connect`. Kept for edit flows that connect images to an existing entity.
+ * Move uploaded temp objects to their permanent storage location and return rows
+ * ready for a nested Prisma `create`. No DB writes and no auth happen here — this
+ * is a server-internal helper invoked from already-authorized server actions.
  */
-export async function createImagesInDb(
+export async function saveTempImages(
   rawImageFiles: unknown,
   rawImageType: unknown,
   rawIdSuffix: unknown,
-) {
-  await requireAdmin()
-  const savedImages = await saveTempImages(rawImageFiles, rawImageType, rawIdSuffix)
+): Promise<PersistedImage[]> {
+  const imageFiles = z.array(mediaFileSchema).parse(rawImageFiles)
+  const imageType = imageTypeSchema.parse(rawImageType)
+  const idSuffix = z.string().min(1).parse(rawIdSuffix)
 
-  const images = await prisma.image.createManyAndReturn({
-    data: savedImages,
-    select: { id: true, url: true },
-  })
-
-  after(() => createBlurData(images))
-
-  return images
+  return Promise.all(
+    imageFiles.map(async ({ url, name }, order) => ({
+      url: await saveImage(url, imageType, idSuffix),
+      name,
+      order,
+    })),
+  )
 }

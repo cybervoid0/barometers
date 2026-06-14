@@ -3,11 +3,11 @@
 import AwsS3, { type AwsBody } from '@uppy/aws-s3'
 import Uppy from '@uppy/core'
 import CompressorJS from 'compressorjs'
-import { createTempFile } from './actions'
-import { extractTempKey, type UploadMeta } from './upload-utils'
+import { createTempFile } from '@/server/files/actions'
+import { extractTempKey, type UploadMeta } from './upload-helpers'
 
 export type { UploadMeta }
-export { uploadedFileToMediaFile } from './upload-utils'
+export { uploadedFileToMediaFile } from './upload-helpers'
 
 export type UploadUppy = Uppy<UploadMeta, AwsBody>
 

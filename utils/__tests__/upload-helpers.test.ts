@@ -8,7 +8,7 @@ import {
   stripExtension,
   type UploadMeta,
   uploadedFileToMediaFile,
-} from '@/server/files/upload-utils'
+} from '@/utils/upload-helpers'
 
 // Build a minimal UppyFile-shaped object for the bits the helper actually reads.
 function fakeUppyFile(meta: UploadMeta, name?: string) {

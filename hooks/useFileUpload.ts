@@ -6,8 +6,8 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 import { deleteFile, deleteFiles } from '@/server/files/actions'
-import { createUploadUppy, uploadedFileToMediaFile } from '@/server/files/upload'
 import type { MediaFile } from '@/types'
+import { createUploadUppy, uploadedFileToMediaFile } from '@/utils/upload'
 
 interface Props {
   fieldName: string
