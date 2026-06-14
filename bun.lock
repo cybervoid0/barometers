@@ -28,12 +28,12 @@
         "@tanstack/react-table": "^8.21.3",
         "@types/pg": "^8.16.0",
         "@uppy/aws-s3": "^5.1.0",
-        "@uppy/compressor": "^3.1.0",
         "@uppy/core": "^5.2.0",
         "bcrypt": "^6.0.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
+        "compressorjs": "^1.3.0",
         "dayjs": "^1.11.19",
         "dotenv": "^17.3.1",
         "embla-carousel-react": "^8.6.0",
@@ -838,8 +838,6 @@
     "@uppy/aws-s3": ["@uppy/aws-s3@5.1.0", "", { "dependencies": { "@uppy/companion-client": "^5.1.1", "@uppy/utils": "^7.1.4" }, "peerDependencies": { "@uppy/core": "^5.2.0" } }, "sha512-UBz+shrtDbnOf11AboDrkc9Fq2Cdf8HbFftE+gqfxig6fkv5rHpHhBCLkl8wCGAq+X/CxdqvvNhm/OM23Uzw2w=="],
 
     "@uppy/companion-client": ["@uppy/companion-client@5.1.1", "", { "dependencies": { "@uppy/utils": "^7.1.1", "namespace-emitter": "^2.0.1", "p-retry": "^6.1.0" }, "peerDependencies": { "@uppy/core": "^5.1.1" } }, "sha512-DzrOWTbIZHvtgAFXBMYHk2wD27NjpBSVhY2tEiEIUhPd2CxbFRZjHM/N3HOt3VwZEAP471QWFLlJRWPcIY3A2Q=="],
-
-    "@uppy/compressor": ["@uppy/compressor@3.1.0", "", { "dependencies": { "@transloadit/prettier-bytes": "^0.3.4", "@uppy/utils": "^7.1.4", "compressorjs": "^1.2.1", "preact": "^10.5.13", "promise-queue": "^2.2.5" }, "peerDependencies": { "@uppy/core": "^5.2.0" } }, "sha512-EPCU1j/hvey05/ePPzuqaF7p4fORsc3PNvRGDXrT5fiZv0FCAufY5GZf4OUAiKNHkL59wwxAgMySOTJq7WBZtA=="],
 
     "@uppy/core": ["@uppy/core@5.2.0", "", { "dependencies": { "@transloadit/prettier-bytes": "^0.3.4", "@uppy/store-default": "^5.0.0", "@uppy/utils": "^7.1.4", "lodash": "^4.17.21", "mime-match": "^1.0.2", "namespace-emitter": "^2.0.1", "nanoid": "^5.0.9", "preact": "^10.5.13" } }, "sha512-uvfNyz4cnaplt7LYJmEZHuqOuav0tKp4a9WKJIaH6iIj7XiqYvS2J5SEByexAlUFlzefOAyjzj4Ja2dd/8aMrw=="],
 
@@ -1756,8 +1754,6 @@
     "prisma": ["prisma@7.4.1", "", { "dependencies": { "@prisma/config": "7.4.1", "@prisma/dev": "0.20.0", "@prisma/engines": "7.4.1", "@prisma/studio-core": "0.13.1", "mysql2": "3.15.3", "postgres": "3.4.7" }, "peerDependencies": { "better-sqlite3": ">=9.0.0", "typescript": ">=5.4.0" }, "optionalPeers": ["better-sqlite3", "typescript"], "bin": { "prisma": "build/index.js" } }, "sha512-gDKOXwnPiMdB+uYMhMeN8jj4K7Cu3Q2wB/wUsITOoOk446HtVb8T9BZxFJ1Zop6alc89k6PMNdR2FZCpbXp/jw=="],
 
     "progress": ["progress@2.0.3", "", {}, "sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA=="],
-
-    "promise-queue": ["promise-queue@2.2.5", "", {}, "sha512-p/iXrPSVfnqPft24ZdNNLECw/UrtLTpT3jpAAMzl/o5/rDsGCPo3/CQS2611flL6LkoEJ3oQZw7C8Q80ZISXRQ=="],
 
     "proper-lockfile": ["proper-lockfile@4.1.2", "", { "dependencies": { "graceful-fs": "^4.2.4", "retry": "^0.12.0", "signal-exit": "^3.0.2" } }, "sha512-TjNPblN4BwAWMXU8s9AEz4JmQxnD1NNL7bNOY/AKUzyamc379FWASUhc/K1pL2noVb+XmZKLL68cjzLsiOAMaA=="],
 

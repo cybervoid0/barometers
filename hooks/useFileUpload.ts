@@ -20,7 +20,7 @@ export function useFileUpload({ fieldName, existingFiles, update }: Props) {
   const [progress, setProgress] = useState(0)
   const { control, clearErrors, setValue, getValues } = useFormContext()
   const { append, remove } = useFieldArray({ control, name: fieldName })
-  // headless Uppy instance: image compression + presigned PUT with retries
+  // headless Uppy instance: presigned PUT with retries; compress only images > 30 MB
   const uppy = useMemo(() => createUploadUppy(), [])
 
   // track overall upload progress and tear the instance down on unmount
