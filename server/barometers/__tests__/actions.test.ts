@@ -41,12 +41,14 @@ describe('createBarometer', () => {
   })
 
   it('creates barometer on valid input', async () => {
-    mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1' })
+    mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1', images: [] })
     const result = await createBarometer(validCreateData)
     expect(result).toEqual({ success: true, data: { id: 'b-1' } })
-    expect(mockPrisma.barometer.create).toHaveBeenCalledWith({
-      data: { ...validCreateData, description: '' },
-    })
+    expect(mockPrisma.barometer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ ...validCreateData, description: '' }),
+      }),
+    )
   })
 
   it('returns P2002 message with name and collectionId', async () => {
@@ -74,7 +76,7 @@ describe('createBarometer', () => {
   })
 
   it('calls updateTag on success', async () => {
-    mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1' })
+    mockPrisma.barometer.create.mockResolvedValue({ id: 'b-1', images: [] })
     await createBarometer(validCreateData)
     expect(mockUpdateTag).toHaveBeenCalledWith('barometers')
   })

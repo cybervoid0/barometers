@@ -27,7 +27,7 @@ const maxImages = 20
  * Universal image upload component with drag & drop, reordering, and edit mode support
  */
 function ImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps) {
-  const { pending, uploadFiles, handleDeleteFile, handleDragEnd } = useFileUpload({
+  const { pending, progress, uploadFiles, handleDeleteFile, handleDragEnd } = useFileUpload({
     fieldName,
     existingFiles: existingImages,
     update: isDialogOpen,
@@ -41,7 +41,15 @@ function ImageUpload({ existingImages = [], isDialogOpen }: FormImageUploadProps
       name={fieldName}
       render={() => (
         <FormItem className="relative">
-          {pending && <LoadingOverlay />}
+          {pending && (
+            <LoadingOverlay
+              spinnerProps={{
+                children: progress > 0 && (
+                  <span className="mt-2 text-sm font-medium">{Math.round(progress)}%</span>
+                ),
+              }}
+            />
+          )}
           <FormLabel>Images</FormLabel>
           <FormControl>
             <div className="space-y-4">

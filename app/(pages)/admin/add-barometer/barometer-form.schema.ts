@@ -1,9 +1,7 @@
-import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { createImagesInDb } from '@/server/files/images'
-import { ImageType } from '@/types'
+import type { CreateBarometerSchema } from '@/server/barometers/schemas'
 import { slug } from '@/utils'
 
 dayjs.extend(utc)
@@ -87,7 +85,7 @@ export const BarometerFormValidationSchema = z.object({
  * This does ALL the transformations and type conversions!
  */
 export const BarometerFormTransformSchema = BarometerFormValidationSchema.transform(
-  async ({
+  ({
     images,
     materials,
     dimensions,
@@ -97,7 +95,7 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
     serial,
     description,
     ...formData
-  }): Promise<Prisma.BarometerUncheckedCreateInput> => ({
+  }): z.input<typeof CreateBarometerSchema> => ({
     // Direct mappings
     ...formData,
 
@@ -126,13 +124,8 @@ export const BarometerFormTransformSchema = BarometerFormValidationSchema.transf
           }
         : undefined,
 
-    // Images relation - with async processing
-    images:
-      images.length > 0
-        ? {
-            connect: await createImagesInDb(images, ImageType.Barometer, formData.collectionId),
-          }
-        : undefined,
+    // temp upload refs; persisted server-side in createBarometer
+    images: images.length > 0 ? images : undefined,
   }),
 )
 

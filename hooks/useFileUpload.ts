@@ -2,11 +2,11 @@
 
 import type { DragEndEvent } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { useCallback, useEffect, useMemo, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 import { deleteFile, deleteFiles } from '@/server/files/actions'
-import { storeFiles } from '@/server/files/upload'
+import { createUploadUppy, uploadedFileToMediaFile } from '@/server/files/upload'
 import type { MediaFile } from '@/types'
 
 interface Props {
@@ -17,8 +17,22 @@ interface Props {
 
 export function useFileUpload({ fieldName, existingFiles, update }: Props) {
   const [pending, startTransition] = useTransition()
+  const [progress, setProgress] = useState(0)
   const { control, clearErrors, setValue, getValues } = useFormContext()
   const { append, remove } = useFieldArray({ control, name: fieldName })
+  // headless Uppy instance: image compression + presigned PUT with retries
+  const uppy = useMemo(() => createUploadUppy(), [])
+
+  // track overall upload progress and tear the instance down on unmount
+  useEffect(() => {
+    const handleProgress = (value: number) => setProgress(value)
+    uppy.on('progress', handleProgress)
+    return () => {
+      uppy.off('progress', handleProgress)
+      uppy.destroy()
+    }
+  }, [uppy])
+
   // update form
   useEffect(() => {
     if (!update) return
@@ -41,16 +55,40 @@ export function useFileUpload({ fieldName, existingFiles, update }: Props) {
   const uploadFiles = useCallback(
     async (files: FileList | null) => {
       if (!files || files.length === 0) return
+      // add files individually so a single rejected file doesn't drop the rest
+      for (const file of Array.from(files)) {
+        try {
+          uppy.addFile({ name: file.name, type: file.type, data: file })
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : `Could not add ${file.name}`)
+        }
+      }
+      if (uppy.getFiles().length === 0) return
+
       startTransition(async () => {
         try {
-          append(await storeFiles(Array.from(files)))
-          clearErrors(fieldName)
+          const result = await uppy.upload()
+          const uploaded = (result?.successful ?? [])
+            .map(uploadedFileToMediaFile)
+            .filter((media): media is MediaFile => media !== null)
+          if (uploaded.length > 0) {
+            append(uploaded)
+            clearErrors(fieldName)
+          }
+          const failedCount = result?.failed?.length ?? 0
+          if (failedCount > 0) {
+            toast.error(`Failed to upload ${failedCount} file(s). Please retry.`)
+          }
         } catch (error) {
           toast.error(error instanceof Error ? error.message : 'Error uploading files')
+        } finally {
+          // clear so the next batch starts clean (uploaded keys live in the form now)
+          uppy.clear()
+          setProgress(0)
         }
       })
     },
-    [append, clearErrors, fieldName],
+    [uppy, append, clearErrors, fieldName],
   )
 
   const handleDeleteFile = useCallback(
@@ -93,9 +131,10 @@ export function useFileUpload({ fieldName, existingFiles, update }: Props) {
     () => ({
       uploadFiles,
       pending,
+      progress,
       handleDeleteFile,
       handleDragEnd,
     }),
-    [uploadFiles, pending, handleDeleteFile, handleDragEnd],
+    [uploadFiles, pending, progress, handleDeleteFile, handleDragEnd],
   )
 }

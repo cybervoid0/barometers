@@ -38,13 +38,13 @@ describe('createDocument', () => {
   })
 
   it('creates document and returns id + title', async () => {
-    mockPrisma.document.create.mockResolvedValue({ id: 'd-1', title: 'Test Document' })
+    mockPrisma.document.create.mockResolvedValue({ id: 'd-1', title: 'Test Document', images: [] })
     const result = await createDocument(validCreateData)
     expect(result).toEqual({ id: 'd-1', title: 'Test Document' })
   })
 
   it('calls revalidateTag(Tag.documents, "max")', async () => {
-    mockPrisma.document.create.mockResolvedValue({ id: 'd-1', title: 'Test' })
+    mockPrisma.document.create.mockResolvedValue({ id: 'd-1', title: 'Test', images: [] })
     await createDocument(validCreateData)
     expect(mockRevalidateTag).toHaveBeenCalledWith('documents', 'max')
   })

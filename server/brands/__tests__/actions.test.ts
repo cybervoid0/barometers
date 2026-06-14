@@ -37,7 +37,7 @@ describe('createBrand', () => {
   })
 
   it('creates brand with icon buffer', async () => {
-    mockPrisma.manufacturer.create.mockResolvedValue({ id: 'm-1', name: 'Negretti' })
+    mockPrisma.manufacturer.create.mockResolvedValue({ id: 'm-1', name: 'Negretti', images: [] })
     const result = await createBrand({ ...validCreateData, icon: 'svg-data' })
     expect(result).toEqual({ success: true, data: { id: 'm-1', name: 'Negretti' } })
     expect(mockPrisma.manufacturer.create).toHaveBeenCalledWith(
@@ -48,7 +48,7 @@ describe('createBrand', () => {
   })
 
   it('calls updateTag for brands AND barometers', async () => {
-    mockPrisma.manufacturer.create.mockResolvedValue({ id: 'm-1', name: 'Negretti' })
+    mockPrisma.manufacturer.create.mockResolvedValue({ id: 'm-1', name: 'Negretti', images: [] })
     await createBrand(validCreateData)
     expect(mockUpdateTag).toHaveBeenCalledWith('brands')
     expect(mockUpdateTag).toHaveBeenCalledWith('barometers')

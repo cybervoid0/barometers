@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { mediaFileSchema } from '@/server/files/schemas'
 
 const prismaConnect = z.object({ id: z.string() })
 const prismaConnectInt = z.object({ id: z.number().int() })
@@ -13,7 +14,8 @@ export const CreateBrandSchema = z.object({
   icon: z.string().nullable(),
   countries: z.object({ connect: z.array(prismaConnectInt) }),
   successors: z.object({ connect: z.array(prismaConnect) }),
-  images: z.object({ connect: z.array(prismaConnect) }).optional(),
+  // temp upload refs; persisted server-side in createBrand
+  images: z.array(mediaFileSchema).optional(),
   pdfFiles: z
     .object({
       create: z.array(z.object({ url: z.string().min(1), name: z.string().min(1) })),

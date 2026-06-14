@@ -19,8 +19,6 @@ import {
 import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 import { deleteFiles } from '@/server/files/actions'
-import { createImagesInDb } from '@/server/files/images'
-import { ImageType } from '@/types'
 import { cn } from '@/utils'
 
 interface ImagesEditProps extends ComponentProps<'button'> {
@@ -41,17 +39,12 @@ const ImagesEditSchema = z.object({
 })
 type ImagesForm = z.output<typeof ImagesEditSchema>
 
-const TransformSchema = ImagesEditSchema.transform(
-  async ({ images, ...values }): Promise<Parameters<typeof updateBarometer>[0]> => {
-    return {
-      id: values.id,
-      images: {
-        deleteMany: {},
-        connect: await createImagesInDb(images, ImageType.Barometer, values.collectionId),
-      },
-    }
-  },
-)
+const TransformSchema = ImagesEditSchema.transform(({ images, ...values }) => ({
+  id: values.id,
+  collectionId: values.collectionId,
+  // temp upload refs (full desired set); persisted + replaced server-side
+  images,
+}))
 
 export function ImagesEdit({ barometer }: ImagesEditProps) {
   const savedImages = useMemo(

@@ -1,9 +1,7 @@
-import type { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { z } from 'zod'
-import { createImagesInDb } from '@/server/files/images'
-import { ImageType } from '@/types'
+import type { CreateDocumentSchema } from '@/server/documents/schemas'
 
 dayjs.extend(utc)
 
@@ -77,7 +75,7 @@ export const DocumentFormValidationSchema = z.object({
  * This does ALL the transformations and type conversions!
  */
 export const DocumentFormTransformSchema = DocumentFormValidationSchema.transform(
-  async (values): Promise<Prisma.DocumentUncheckedCreateInput> => {
+  (values): z.input<typeof CreateDocumentSchema> => {
     const { images, relatedBarometers, date, acquisitionDate, annotations, ...formValues } = values
     return {
       ...formValues,
@@ -89,12 +87,8 @@ export const DocumentFormTransformSchema = DocumentFormValidationSchema.transfor
             .map(s => s.trim())
             .filter(Boolean)
         : [],
-      images:
-        images.length > 0
-          ? {
-              connect: await createImagesInDb(images, ImageType.Document, values.catalogueNumber),
-            }
-          : undefined,
+      // temp upload refs; persisted server-side in createDocument
+      images: images.length > 0 ? images : undefined,
       relatedBarometers:
         relatedBarometers.length > 0
           ? { connect: relatedBarometers.map(id => ({ id })) }

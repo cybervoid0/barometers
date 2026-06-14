@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { mediaFileSchema } from '@/server/files/schemas'
 
 const prismaConnect = z.object({ id: z.string() })
 
@@ -18,7 +19,8 @@ export const CreateDocumentSchema = z.object({
   acquisitionDate: z.date().nullable().optional(),
   description: z.string(),
   conditionId: z.string(),
-  images: z.object({ connect: z.array(prismaConnect) }).optional(),
+  // temp upload refs; persisted server-side in createDocument
+  images: z.array(mediaFileSchema).optional(),
   relatedBarometers: z.object({ connect: z.array(prismaConnect) }).optional(),
 })
 

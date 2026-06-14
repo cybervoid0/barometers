@@ -2,19 +2,37 @@
 
 import type { Prisma } from '@prisma/client'
 import { revalidateTag } from 'next/cache'
+import { after } from 'next/server'
 import { z } from 'zod'
 import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { requireAdmin } from '@/server/auth'
-import type { ActionResult } from '@/types'
+import { createBlurData, saveTempImages } from '@/server/files/persist-images'
+import { type ActionResult, ImageType } from '@/types'
 import { CreateDocumentSchema, UpdateDocumentSchema } from './schemas'
 
 export async function createDocument(rawData: unknown) {
   await requireAdmin()
-  const data = CreateDocumentSchema.parse(rawData)
-  const { id, title } = await prisma.document.create({
-    data,
+  const { images, ...data } = CreateDocumentSchema.parse(rawData)
+
+  const imageRows =
+    images && images.length > 0
+      ? await saveTempImages(images, ImageType.Document, data.catalogueNumber)
+      : []
+
+  const {
+    id,
+    title,
+    images: createdImages,
+  } = await prisma.document.create({
+    data: {
+      ...data,
+      images: imageRows.length > 0 ? { create: imageRows } : undefined,
+    },
+    select: { id: true, title: true, images: { select: { id: true, url: true } } },
   })
+
+  if (createdImages.length > 0) after(() => createBlurData(createdImages))
   revalidateTag(Tag.documents, 'max')
   return { id, title }
 }

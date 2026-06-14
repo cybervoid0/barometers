@@ -1,6 +1,5 @@
 import { z } from 'zod'
-
-const prismaConnect = z.object({ id: z.string() })
+import { mediaFileSchema } from '@/server/files/schemas'
 
 export const CreateBarometerSchema = z.object({
   collectionId: z.string().min(1).max(100),
@@ -18,7 +17,8 @@ export const CreateBarometerSchema = z.object({
   subCategoryId: z.number().int().nullable().optional(),
   dimensions: z.array(z.object({ dim: z.string(), value: z.string() })).optional(),
   materials: z.object({ connect: z.array(z.object({ id: z.number().int() })) }).optional(),
-  images: z.object({ connect: z.array(prismaConnect) }).optional(),
+  // temp upload refs; persisted server-side in createBarometer
+  images: z.array(mediaFileSchema).optional(),
 })
 
 export const UpdateBarometerSchema = z.object({
@@ -39,10 +39,6 @@ export const UpdateBarometerSchema = z.object({
   estimatedPrice: z.number().positive().nullable().optional(),
   dimensions: z.array(z.object({ dim: z.string(), value: z.string() })).optional(),
   materials: z.object({ set: z.array(z.object({ id: z.number().int() })) }).optional(),
-  images: z
-    .object({
-      deleteMany: z.object({}).strict().optional(),
-      connect: z.array(prismaConnect).optional(),
-    })
-    .optional(),
+  // temp upload refs (full desired set); replaces existing images server-side in updateBarometer
+  images: z.array(mediaFileSchema).optional(),
 })

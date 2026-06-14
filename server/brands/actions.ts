@@ -2,11 +2,13 @@
 
 import { Prisma } from '@prisma/client'
 import { updateTag } from 'next/cache'
+import { after } from 'next/server'
 import { z } from 'zod'
 import { Tag } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
 import { requireAdmin } from '@/server/auth'
-import type { ActionResult } from '@/types'
+import { createBlurData, saveTempImages } from '@/server/files/persist-images'
+import { type ActionResult, ImageType } from '@/types'
 import { getIconBuffer } from '@/utils'
 import { CreateBrandSchema, UpdateBrandSchema } from './schemas'
 
@@ -14,19 +16,31 @@ export async function createBrand(
   rawData: unknown,
 ): Promise<ActionResult<{ id: string; name: string }>> {
   await requireAdmin()
-  const data = CreateBrandSchema.parse(rawData)
-  const { icon, ...createData } = data
+  const { icon, images, ...createData } = CreateBrandSchema.parse(rawData)
 
   // Convert icon string to Buffer if provided
   const iconBuffer = getIconBuffer(icon)
 
   try {
-    const { id, name } = await prisma.manufacturer.create({
+    const imageRows =
+      images && images.length > 0
+        ? await saveTempImages(images, ImageType.Brand, createData.slug)
+        : []
+
+    const {
+      id,
+      name,
+      images: createdImages,
+    } = await prisma.manufacturer.create({
       data: {
         ...createData,
         icon: iconBuffer,
+        images: imageRows.length > 0 ? { create: imageRows } : undefined,
       },
+      select: { id: true, name: true, images: { select: { id: true, url: true } } },
     })
+
+    if (createdImages.length > 0) after(() => createBlurData(createdImages))
     updateTag(Tag.brands)
     updateTag(Tag.barometers)
     return { success: true, data: { id, name } }
