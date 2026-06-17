@@ -21,5 +21,8 @@
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "prisma.pinToPrisma6": false
+  "prisma.pinToPrisma6": false,
+  "cSpell.words": [
+    "standfirst"
+  ]
 }

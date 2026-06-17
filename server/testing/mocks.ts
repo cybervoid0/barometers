@@ -23,6 +23,7 @@ export const mockPrisma: {
   barometer: ModelMock
   manufacturer: ModelMock
   document: ModelMock
+  essay: ModelMock
   image: ModelMock
   user: ModelMock
   inaccuracyReport: ModelMock
@@ -33,6 +34,7 @@ export const mockPrisma: {
   barometer: modelMock(),
   manufacturer: modelMock(),
   document: modelMock(),
+  essay: modelMock(),
   image: modelMock(),
   user: modelMock(),
   inaccuracyReport: modelMock(),

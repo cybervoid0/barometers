@@ -45,18 +45,22 @@ export function DragFiles({
   )
 
   const handleClick = useCallback(() => {
-    if (!disabled) {
-      // Create a temporary file input
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.multiple = true
-      input.accept = acceptedTypes?.join(',') ?? ''
-      input.onchange = e => {
-        const target = e.target as HTMLInputElement
-        onFileSelect(target.files)
-      }
-      input.click()
-    }
+    if (disabled) return
+    // Create a temporary file input
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.multiple = true
+    input.accept = acceptedTypes?.join(',') ?? ''
+    // Safari/WebKit only fires `change` when the input is connected to the DOM;
+    // a detached input opens the picker but silently drops the selection.
+    input.style.display = 'none'
+    input.addEventListener('change', e => {
+      const target = e.target as HTMLInputElement
+      onFileSelect(target.files)
+      input.remove()
+    })
+    document.body.appendChild(input)
+    input.click()
   }, [onFileSelect, disabled, acceptedTypes])
 
   return (

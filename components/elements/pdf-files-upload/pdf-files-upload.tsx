@@ -21,12 +21,25 @@ import { SortablePdfFile } from './sortable-pdf-file'
 interface Props extends ComponentProps<'div'> {
   existingFiles?: MediaFile[]
   isDialogOpen?: boolean
+  /** form field that holds the uploaded files (defaults to `pdfFiles`) */
+  fieldName?: string
+  /** maximum number of files allowed (defaults to 20) */
+  maxFiles?: number
+  /** field label (defaults to `PDF Files`) */
+  label?: string
+  /** drop-zone prompt */
+  message?: string
 }
 
-const fieldName = 'pdfFiles'
-const maxFiles = 20
-
-export function PdfFilesUpload({ existingFiles, isDialogOpen, ...props }: Props) {
+export function PdfFilesUpload({
+  existingFiles,
+  isDialogOpen,
+  fieldName = 'pdfFiles',
+  maxFiles = 20,
+  label = 'PDF Files',
+  message = 'Drop PDFs here or click to select',
+  ...props
+}: Props) {
   const { pending, uploadFiles, handleDeleteFile, handleDragEnd } = useFileUpload({
     fieldName,
     existingFiles,
@@ -43,13 +56,13 @@ export function PdfFilesUpload({ existingFiles, isDialogOpen, ...props }: Props)
         render={() => (
           <FormItem className="relative">
             {pending && <LoadingOverlay />}
-            <FormLabel>PDF Files</FormLabel>
+            <FormLabel>{label}</FormLabel>
             <FormControl>
               <div className="space-y-4">
                 <DragFiles
                   onFileSelect={uploadFiles}
                   icon={FileUp}
-                  message="Drop PDFs here or click to select"
+                  message={message}
                   acceptedTypes={['application/pdf']}
                   currentCount={formFiles.length}
                   maxFiles={maxFiles}

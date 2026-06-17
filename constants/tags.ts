@@ -3,6 +3,7 @@ export const Tag = {
   categories: 'categories',
   countries: 'countries',
   documents: 'documents',
+  essays: 'essays',
   barometers: 'barometers',
   conditions: 'conditions',
   materials: 'materials',

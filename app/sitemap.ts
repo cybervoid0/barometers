@@ -27,6 +27,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: baseUrl + Route.Essays,
+      lastModified: now,
+      priority: 0.7,
+    },
+    {
       url: baseUrl + Route.Foundation,
       lastModified: now,
       priority: 0.9,
