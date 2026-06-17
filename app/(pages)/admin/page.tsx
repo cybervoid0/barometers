@@ -1,4 +1,4 @@
-import { AlertTriangle, Boxes, Cog, FilePlus2, FileText, Plus, Store } from 'lucide-react'
+import { AlertTriangle, Boxes, Cog, FilePlus2, FileText, PenLine, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { Route } from '@/constants/routes'
 
@@ -25,6 +25,10 @@ export default function Admin() {
         <Link href={Route.AddDocument} className={linkStyle}>
           <FilePlus2 className={iconStyle} />
           Add new document
+        </Link>
+        <Link href={Route.AddEssay} className={linkStyle}>
+          <PenLine className={iconStyle} />
+          Add new essay
         </Link>
         <Link href={Route.Ephemera} className={linkStyle}>
           <FileText className={iconStyle} />

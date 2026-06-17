@@ -210,3 +210,32 @@ enum AccessRole {
   OWNER
   ADMIN
 }
+
+/// Popular-science / analytical essay published as a downloadable PDF.
+/// Essays are not rendered as pages on the site — only listed and downloaded.
+model Essay {
+  id         String     @id @default(uuid())
+  /// Essay heading (may be long)
+  title      String
+  /// One-line standfirst / dek shown under the title
+  standfirst String
+  /// Rubric topic shown as a small label
+  topic      EssayTopic
+  /// Storage key of the PDF (e.g. "pdf/slug__1a2b3c4d.pdf")
+  pdfUrl     String
+  /// Original filename of the uploaded PDF
+  pdfName    String
+  /// Publication date, used for sorting (newest first)
+  date       DateTime
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([date])
+}
+
+enum EssayTopic {
+  Instruments
+  Materials
+  Conservation
+  Collecting
+}
