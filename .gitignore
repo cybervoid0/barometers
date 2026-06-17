@@ -140,3 +140,6 @@ backups
 
 # Local documentation
 .docs/
+
+# local editor/agent tooling config
+.cursor/settings.json
