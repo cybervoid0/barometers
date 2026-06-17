@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { after } from 'next/server'
 import { z } from 'zod'
 import { Tag } from '@/constants'
@@ -21,7 +21,7 @@ export async function createEssay(rawData: unknown) {
     select: { id: true, title: true },
   })
 
-  revalidateTag(Tag.essays, 'max')
+  updateTag(Tag.essays)
   return { id, title }
 }
 
@@ -36,10 +36,15 @@ export async function updateEssay(
     let oldPdfUrl: string | undefined
 
     if (pdfFiles) {
-      const existing = await prisma.essay.findUnique({ where: { id }, select: { pdfUrl: true } })
+      // resolve the existing row first: if it's gone, throw before persisting the
+      // new PDF so we don't leave an orphaned object in storage
+      const existing = await prisma.essay.findUniqueOrThrow({
+        where: { id },
+        select: { pdfUrl: true },
+      })
       const [pdf] = await savePdfs(pdfFiles)
       pdfFields = { pdfUrl: pdf.url, pdfName: pdf.name }
-      if (existing && existing.pdfUrl !== pdf.url) oldPdfUrl = existing.pdfUrl
+      if (existing.pdfUrl !== pdf.url) oldPdfUrl = existing.pdfUrl
     }
 
     const result = await prisma.essay.update({
@@ -53,7 +58,7 @@ export async function updateEssay(
       const url = oldPdfUrl
       after(() => deleteFileFromStorage({ url, name: '' }).catch(console.error))
     }
-    revalidateTag(Tag.essays, 'max')
+    updateTag(Tag.essays)
     return { success: true, data: result }
   } catch (error) {
     console.error('Error updating essay:', error)
@@ -70,7 +75,7 @@ export async function deleteEssay(rawId: unknown): Promise<ActionResult<{ id: st
       select: { pdfUrl: true },
     })
     after(() => deleteFileFromStorage({ url: pdfUrl, name: '' }).catch(console.error))
-    revalidateTag(Tag.essays, 'max')
+    updateTag(Tag.essays)
     return { success: true, data: { id } }
   } catch (error) {
     console.error('Error deleting essay:', error)

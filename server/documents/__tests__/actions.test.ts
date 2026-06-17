@@ -11,8 +11,8 @@ import { createDocument, deleteDocument, updateDocument } from '@/server/documen
 import {
   mockPrisma,
   mockRequireAdmin,
-  mockRevalidateTag,
   mockSaveFileToStorage,
+  mockUpdateTag,
   resetAllMocks,
 } from '../../testing/mocks'
 
@@ -51,10 +51,10 @@ describe('createDocument', () => {
     expect(result).toEqual({ id: 'd-1', title: 'Test Document' })
   })
 
-  it('calls revalidateTag(Tag.documents, "max")', async () => {
+  it('calls updateTag(Tag.documents)', async () => {
     mockPrisma.document.create.mockResolvedValue({ id: 'd-1', title: 'Test', images: [] })
     await createDocument(validCreateData)
-    expect(mockRevalidateTag).toHaveBeenCalledWith('documents', 'max')
+    expect(mockUpdateTag).toHaveBeenCalledWith('documents')
   })
 
   it('persists temp images and nests them into the create', async () => {
@@ -149,6 +149,6 @@ describe('deleteDocument', () => {
     mockPrisma.document.delete.mockResolvedValue({})
     const result = await deleteDocument('d-1')
     expect(result).toEqual({ success: true, data: { id: 'd-1' } })
-    expect(mockRevalidateTag).toHaveBeenCalledWith('documents', 'max')
+    expect(mockUpdateTag).toHaveBeenCalledWith('documents')
   })
 })

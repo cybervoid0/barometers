@@ -14,8 +14,8 @@ import {
   mockDeleteFileFromStorage,
   mockPrisma,
   mockRequireAdmin,
-  mockRevalidateTag,
   mockSaveFileToStorage,
+  mockUpdateTag,
   resetAllMocks,
 } from '../../testing/mocks'
 
@@ -65,7 +65,7 @@ describe('createEssay', () => {
       }),
     )
     expect(result).toEqual({ id: 'e-1', title: validCreateData.title })
-    expect(mockRevalidateTag).toHaveBeenCalledWith('essays', 'max')
+    expect(mockUpdateTag).toHaveBeenCalledWith('essays')
   })
 })
 
@@ -79,12 +79,12 @@ describe('updateEssay', () => {
     mockPrisma.essay.update.mockResolvedValue({ id: 'e-1', title: 'New title' })
     const result = await updateEssay({ id: 'e-1', title: 'New title' })
     expect(result).toEqual({ success: true, data: { id: 'e-1', title: 'New title' } })
-    expect(mockPrisma.essay.findUnique).not.toHaveBeenCalled()
+    expect(mockPrisma.essay.findUniqueOrThrow).not.toHaveBeenCalled()
     expect(mockAfter).not.toHaveBeenCalled()
   })
 
   it('keeps an unchanged (already-permanent) PDF without deleting the old object', async () => {
-    mockPrisma.essay.findUnique.mockResolvedValue({ pdfUrl: 'pdf/keep.pdf' })
+    mockPrisma.essay.findUniqueOrThrow.mockResolvedValue({ pdfUrl: 'pdf/keep.pdf' })
     mockPrisma.essay.update.mockResolvedValue({ id: 'e-1', title: 'X' })
 
     await updateEssay({ id: 'e-1', pdfFiles: [{ url: 'pdf/keep.pdf', name: 'keep.pdf' }] })
@@ -96,7 +96,7 @@ describe('updateEssay', () => {
   it('replaces the PDF and schedules deletion of the orphaned object', async () => {
     mockSaveFileToStorage.mockResolvedValue(undefined)
     mockDeleteFileFromStorage.mockResolvedValue(undefined)
-    mockPrisma.essay.findUnique.mockResolvedValue({ pdfUrl: 'pdf/old.pdf' })
+    mockPrisma.essay.findUniqueOrThrow.mockResolvedValue({ pdfUrl: 'pdf/old.pdf' })
     mockPrisma.essay.update.mockResolvedValue({ id: 'e-1', title: 'X' })
 
     await updateEssay({ id: 'e-1', pdfFiles: [{ url: 'temp/new.pdf', name: 'new.pdf' }] })
@@ -109,6 +109,20 @@ describe('updateEssay', () => {
     // run the scheduled cleanup callback
     await mockAfter.mock.calls[0][0]()
     expect(mockDeleteFileFromStorage).toHaveBeenCalledWith({ url: 'pdf/old.pdf', name: '' })
+  })
+
+  it('does not persist a new PDF when the essay no longer exists', async () => {
+    jest.spyOn(console, 'error').mockImplementation()
+    mockPrisma.essay.findUniqueOrThrow.mockRejectedValue(new Error('No Essay found'))
+
+    const result = await updateEssay({
+      id: 'gone',
+      pdfFiles: [{ url: 'temp/x.pdf', name: 'x.pdf' }],
+    })
+
+    expect(mockSaveFileToStorage).not.toHaveBeenCalled()
+    expect(mockPrisma.essay.update).not.toHaveBeenCalled()
+    expect(result).toEqual({ success: false, error: 'Failed to update essay. Please try again.' })
   })
 
   it('returns an ActionResult on error', async () => {
@@ -135,7 +149,7 @@ describe('deleteEssay', () => {
     const result = await deleteEssay('e-1')
 
     expect(result).toEqual({ success: true, data: { id: 'e-1' } })
-    expect(mockRevalidateTag).toHaveBeenCalledWith('essays', 'max')
+    expect(mockUpdateTag).toHaveBeenCalledWith('essays')
     await mockAfter.mock.calls[0][0]()
     expect(mockDeleteFileFromStorage).toHaveBeenCalledWith({ url: 'pdf/gone.pdf', name: '' })
   })

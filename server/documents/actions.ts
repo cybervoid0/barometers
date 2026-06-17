@@ -1,7 +1,7 @@
 'use server'
 
 import type { Prisma } from '@prisma/client'
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { after } from 'next/server'
 import { z } from 'zod'
 import { Tag } from '@/constants'
@@ -33,7 +33,7 @@ export async function createDocument(rawData: unknown) {
   })
 
   if (createdImages.length > 0) after(() => createBlurData(createdImages))
-  revalidateTag(Tag.documents, 'max')
+  updateTag(Tag.documents)
   return { id, title }
 }
 
@@ -60,7 +60,7 @@ export async function updateDocument(
     })
 
     if (imageRows && result.images.length > 0) after(() => createBlurData(result.images))
-    revalidateTag(Tag.documents, 'max')
+    updateTag(Tag.documents)
     return { success: true, data: { id: result.id, title: result.title } }
   } catch (error) {
     console.error('Error updating document:', error)
@@ -75,7 +75,7 @@ export async function deleteDocument(rawId: unknown): Promise<ActionResult<{ id:
     await prisma.document.delete({
       where: { id },
     })
-    revalidateTag(Tag.documents, 'max')
+    updateTag(Tag.documents)
     return { success: true, data: { id } }
   } catch (error) {
     console.error('Error deleting document:', error)
