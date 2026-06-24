@@ -15,6 +15,14 @@ declare namespace NodeJS {
     STRIPE_SECRET_KEY: string
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string
     STRIPE_WEBHOOK_SECRET: string
+    /** Set to "true" only after Stripe Tax is fully configured (active + origin address). */
+    STRIPE_TAX_ENABLED?: string
+    /** Resend API key. When absent, transactional emails are skipped (logged no-op). */
+    RESEND_API_KEY?: string
+    /** Verified sender, e.g. "Barometers Realm <noreply@barometers.info>". */
+    EMAIL_FROM?: string
+    /** Optional reply-to address (e.g. a monitored support inbox). */
+    EMAIL_REPLY_TO?: string
   }
 }
 

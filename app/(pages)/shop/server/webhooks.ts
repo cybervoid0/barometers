@@ -1,5 +1,6 @@
 import type Stripe from 'stripe'
 import { prisma } from '@/prisma/prismaClient'
+import { sendOrderConfirmationEmail } from '@/server/email/order-confirmation'
 import { stripe } from '@/services/stripe'
 
 /**
@@ -15,8 +16,10 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
   }
 
   try {
-    // Use transaction to ensure all operations succeed or fail together
-    await prisma.$transaction(async tx => {
+    // Use transaction to ensure all operations succeed or fail together.
+    // Returns true when the order was newly marked PAID (so we only send the
+    // confirmation email once, even if Stripe retries the webhook).
+    const newlyPaid = await prisma.$transaction(async tx => {
       // Check if already processed (idempotency)
       const existingOrder = await tx.order.findUnique({
         where: { id: orderId },
@@ -25,7 +28,7 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 
       if (existingOrder?.status === 'PAID') {
         console.log(`Order ${orderId} already processed, skipping`)
-        return
+        return false
       }
 
       // Extract payment intent ID (can be string, object, or null)
@@ -36,7 +39,7 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 
       if (!paymentIntentId) {
         console.error(`No payment_intent in session ${session.id}`)
-        return
+        return false
       }
 
       // Update order status
@@ -86,9 +89,18 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
           }
         }
       }
+
+      return true
     })
 
     console.log(`Order ${orderId} marked as PAID`)
+
+    // Send the confirmation email outside the transaction — a mail failure must
+    // never roll back a paid order. `sendOrderConfirmationEmail` never throws,
+    // and its idempotency key prevents duplicates on webhook retries.
+    if (newlyPaid) {
+      await sendOrderConfirmationEmail(orderId)
+    }
   } catch (error) {
     console.error('Error handling checkout.session.completed:', error)
     throw error

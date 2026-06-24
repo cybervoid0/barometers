@@ -10,6 +10,7 @@ const root = {
   PrivacyPolicy: '/privacy/',
   Documents: '/documents/',
   Signin: '/signin/',
+  Register: '/register/',
 } as const
 
 const foundation = '/foundation'
@@ -56,6 +57,7 @@ const shopRoutes = {
   Cart: `${shop}/cart`,
   Checkout: `${shop}/checkout`,
   Orders: `${shop}/orders/`,
+  TrackOrder: `${shop}/orders/track`,
 } as const
 
 export const Route = {

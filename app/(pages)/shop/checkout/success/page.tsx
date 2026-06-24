@@ -39,6 +39,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
     )
   }
 
+  const isGuest = order.customer.userId === null
+  const guestEmail = order.shippingAddress.email
+
   return (
     <div className="container mx-auto py-16 max-w-2xl">
       <ClearCartOnMount orderStatus={order.status} />
@@ -116,10 +119,30 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         </div>
       </div>
 
+      {isGuest && (
+        <div className="mt-8 rounded-lg border bg-muted/30 p-6 text-center">
+          <h3 className="font-semibold mb-1">Keep track of your order</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Create an account with <span className="font-medium">{guestEmail}</span> to see this
+            order under My Orders — or look it up any time with your order number.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href={Route.Register}>
+              <Button>Create account</Button>
+            </Link>
+            <Link href={Route.TrackOrder}>
+              <Button variant="outline">Track order</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 flex justify-center gap-4">
-        <Link href={Route.Orders}>
-          <Button variant="outline">View Orders</Button>
-        </Link>
+        {!isGuest && (
+          <Link href={Route.Orders}>
+            <Button variant="outline">View Orders</Button>
+          </Link>
+        )}
         <Link href={Route.Shop}>
           <Button>Continue Shopping</Button>
         </Link>

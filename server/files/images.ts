@@ -74,7 +74,11 @@ function generatePermanentImageName(tempUrl: string, type: ImageType, idSuffix: 
  * different for every image type
  * @returns permanent image URL in `gallery` MinIO folder
  */
-async function saveImage(tempUrl: string, type: ImageType, idSuffix: string): Promise<string> {
+export async function saveImage(
+  tempUrl: string,
+  type: ImageType,
+  idSuffix: string,
+): Promise<string> {
   if (!tempUrl.startsWith('temp/')) return tempUrl
   const permanentUrl = generatePermanentImageName(tempUrl, type, idSuffix)
   await saveFileToStorage(tempUrl, permanentUrl)

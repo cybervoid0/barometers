@@ -217,6 +217,32 @@ export async function getAllOrders(status?: OrderStatus) {
 }
 
 /**
+ * Look up an order for guest tracking — by order number, gated on a matching
+ * shipping email. Returns null unless both match, so order numbers alone never
+ * leak order details. Email comparison is case-insensitive and trimmed.
+ */
+export async function getOrderByNumberAndEmail(orderNumber: string, email: string) {
+  const order = await prisma.order.findUnique({
+    where: { orderNumber: orderNumber.trim() },
+    include: {
+      items: {
+        include: {
+          product: { include: { images: { take: 1, orderBy: { order: 'asc' } } } },
+          variant: true,
+        },
+      },
+      shippingAddress: true,
+      payment: true,
+    },
+  })
+
+  if (!order) return null
+  if (order.shippingAddress.email.toLowerCase() !== email.trim().toLowerCase()) return null
+
+  return order
+}
+
+/**
  * Get order by session ID
  */
 export async function getOrderBySessionId(sessionId: string) {

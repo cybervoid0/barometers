@@ -36,6 +36,14 @@ jest.mock('@/services/stripe', () => ({
   },
 }))
 
+// --- Email mock ---
+// Prevents loading the real Resend SDK (web-API deps absent in jsdom) and lets
+// us assert the confirmation email is sent exactly once per paid order.
+const mockSendOrderConfirmationEmail = jest.fn()
+jest.mock('@/server/email/order-confirmation', () => ({
+  sendOrderConfirmationEmail: (...args: unknown[]) => mockSendOrderConfirmationEmail(...args),
+}))
+
 import { prisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
 import {
@@ -93,6 +101,20 @@ describe('handleCheckoutSessionCompleted', () => {
     )
   })
 
+  it('sends the confirmation email once after a newly paid order', async () => {
+    mockTx.order.findUnique
+      .mockResolvedValueOnce({ status: 'PENDING' })
+      .mockResolvedValueOnce({ id: 'order-1', items: [{ variantId: 'v1', quantity: 1 }] })
+    mockTx.order.update.mockResolvedValue({})
+    mockTx.payment.upsert.mockResolvedValue({})
+    mockTx.productVariant.update.mockResolvedValue({})
+
+    await handleCheckoutSessionCompleted(baseSession)
+
+    expect(mockSendOrderConfirmationEmail).toHaveBeenCalledTimes(1)
+    expect(mockSendOrderConfirmationEmail).toHaveBeenCalledWith('order-1')
+  })
+
   it('skips if order already PAID (idempotency)', async () => {
     mockTx.order.findUnique.mockResolvedValueOnce({ status: 'PAID' })
 
@@ -100,6 +122,8 @@ describe('handleCheckoutSessionCompleted', () => {
 
     expect(mockTx.order.update).not.toHaveBeenCalled()
     expect(mockTx.payment.upsert).not.toHaveBeenCalled()
+    // No duplicate email on webhook retries of an already-paid order.
+    expect(mockSendOrderConfirmationEmail).not.toHaveBeenCalled()
   })
 
   it('returns early when no orderId in metadata', async () => {

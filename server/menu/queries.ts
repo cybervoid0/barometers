@@ -51,6 +51,11 @@ export async function getMenuData(): Promise<MenuItem[]> {
       link: Route.Essays,
     },
     {
+      id: 9,
+      label: 'Shop',
+      link: Route.Shop,
+    },
+    {
       id: 4,
       label: 'About',
       link: Route.About,

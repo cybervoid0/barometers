@@ -42,4 +42,33 @@ describe('register', () => {
       expect.objectContaining({ data: expect.objectContaining({ role: 'USER' }) }),
     )
   })
+
+  it('links prior guest orders for the new user (by email)', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({ id: 'u-new' })
+    mockPrisma.customer.findMany.mockResolvedValue([{ id: 'guest-1' }])
+    mockPrisma.customer.findUnique.mockResolvedValue(null)
+    mockPrisma.order.count.mockResolvedValue(1)
+
+    await register({ name: 'Test', email: 'guest@test.com', password: 'pass' })
+
+    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith({
+      where: { email: 'guest@test.com', userId: null },
+      select: { id: true },
+    })
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith({
+      where: { id: 'guest-1' },
+      data: { userId: 'u-new' },
+    })
+  })
+
+  it('still succeeds when guest-order linking throws (non-fatal)', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({ id: 'u-new' })
+    mockPrisma.customer.findMany.mockRejectedValue(new Error('db down'))
+
+    await expect(
+      register({ name: 'Test', email: 'guest@test.com', password: 'pass' }),
+    ).resolves.toBeUndefined()
+  })
 })

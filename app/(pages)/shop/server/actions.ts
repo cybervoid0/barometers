@@ -368,7 +368,10 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
         },
       ],
       mode: 'payment',
-      automatic_tax: { enabled: true },
+      // Stripe Tax must be fully configured (active + origin address) or the
+      // session create call fails. Gate it behind an env flag so the shop works
+      // before Tax is set up; flip STRIPE_TAX_ENABLED=true once it's ready.
+      automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
       metadata: { orderId: order.id },
