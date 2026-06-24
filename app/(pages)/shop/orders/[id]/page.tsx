@@ -30,7 +30,7 @@ export default async function OrderDetailPage({ params }: Props) {
   const session = await getServerSession(authConfig)
 
   if (!session?.user?.id) {
-    redirect(Route.Signin)
+    redirect(`${Route.Signin}?callbackUrl=${encodeURIComponent(`${Route.Orders}${id}`)}`)
   }
 
   const order = await getOrderById(id)

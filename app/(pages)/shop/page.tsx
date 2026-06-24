@@ -2,9 +2,12 @@ import 'server-only'
 
 import Link from 'next/link'
 import { connection } from 'next/server'
+import { getServerSession } from 'next-auth'
 import { getProducts } from '@/app/(pages)/shop/server/queries'
 import { Image, IsAdmin } from '@/components/elements'
 import { Button } from '@/components/ui'
+import { Route } from '@/constants'
+import { authConfig } from '@/services/auth'
 import { formatPrice } from '@/utils/currency'
 import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
@@ -52,11 +55,23 @@ function formatPriceRange(
 export default async function ShopPage() {
   await connection()
   const products = await getProducts()
+  const session = await getServerSession(authConfig)
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-4">Shop</h1>
-      <ViewShoppingCart className="mb-6" />
+      <div className="flex flex-wrap gap-3 mb-6">
+        <ViewShoppingCart />
+        {session?.user ? (
+          <Link href={Route.Orders}>
+            <Button variant="outline">My Orders</Button>
+          </Link>
+        ) : (
+          <Link href={Route.TrackOrder}>
+            <Button variant="outline">Track an order</Button>
+          </Link>
+        )}
+      </div>
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">No products available yet.</p>

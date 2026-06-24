@@ -63,9 +63,12 @@ export const authConfig: AuthOptions = {
       return token
     },
     async session({ session, token }) {
-      // Passing role from token to session
-      if (token.role) {
-        session.user.role = token.role
+      if (session.user) {
+        // token.sub holds the user id — expose it so pages can authorize by user
+        session.user.id = token.sub as string
+        if (token.role) {
+          session.user.role = token.role
+        }
       }
       return session
     },

@@ -6,6 +6,21 @@ specific infra and secrets live in the local, gitignored `CLAUDE.md`, not here.
 
 Stack: Next.js (App Router) · React · Prisma/Postgres · zod · Biome · Jest · Bun · MinIO/S3.
 
+## Local development
+
+- **Postgres** runs via Homebrew (`bun run postgres:local`); local DB is `barometers_local`.
+- **Docker runs through [colima](https://github.com/abiosoft/colima)**, not Docker Desktop.
+  Start it once per session before any docker-based script: `colima start`. Without it the
+  daemon is down and `docker`/`docker-compose` commands fail.
+- **MinIO (S3 storage)** is the only thing on Docker here. Start it with `bun run minio:dev`
+  (docker-compose, `--profile dev`) → container `barometers-minio-dev`, API on `:9000`,
+  console on `:9001`, creds `minioadmin`/`minioadmin` (match `MINIO_ACCESS_KEY`/`_SECRET_KEY`
+  in `.env.local`), bucket `barometers-dev`. Stop with `bun run minio:stop`. If it isn't
+  running, image uploads fail with `ECONNREFUSED` on the presigned `PUT`.
+- **App**: `bun run dev` (port `:3001`). **Stripe webhooks**: `stripe listen --api-key
+  $STRIPE_SECRET_KEY --forward-to localhost:3001/api/stripe/webhook`, then put the printed
+  `whsec_…` into `STRIPE_WEBHOOK_SECRET`.
+
 ## Layout
 
 - `server/<domain>/` — one folder per entity (barometers, brands, documents, …):

@@ -36,7 +36,9 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin'
+  // Default to home — `/admin` would 403 a regular (shop) user who signs in
+  // without an explicit callbackUrl. Protected pages pass their own callbackUrl.
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
