@@ -33,6 +33,9 @@ export async function Header() {
                 src="/shared/compass-logo.svg"
                 alt="logo"
                 className="object-contain"
+                // SVG — no point running it through the image optimizer, and
+                // the default (local) optimizer rejects SVG with a 400.
+                unoptimized
               />
             </div>
           </div>
