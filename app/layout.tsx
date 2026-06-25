@@ -106,7 +106,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
               <ScrollToTop />
             </Suspense>
             <CookieConsent />
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-center" richColors closeButton />
             <div className="flex h-screen flex-col">
               <Header />
               <main className="xs:px-0 container max-w-6xl mx-auto grow pb-12 pt-24 ">
