@@ -19,19 +19,16 @@ export default async function ProductDetails({ params }: Props) {
 
   const defaultVariant = product.variants[0]
 
-  // Get price range
+  // Get EUR price range
   const eurPrices = product.variants.map(v => v.priceEUR).filter((p): p is number => p !== null)
-  const usdPrices = product.variants.map(v => v.priceUSD).filter((p): p is number => p !== null)
 
   const minEUR = eurPrices.length > 0 ? Math.min(...eurPrices) : null
   const maxEUR = eurPrices.length > 0 ? Math.max(...eurPrices) : null
-  const minUSD = usdPrices.length > 0 ? Math.min(...usdPrices) : null
-  const maxUSD = usdPrices.length > 0 ? Math.max(...usdPrices) : null
 
-  const formatPriceRange = (min: number | null, max: number | null, currency: 'EUR' | 'USD') => {
+  const formatPriceRange = (min: number | null, max: number | null) => {
     if (min === null || max === null) return null
-    if (min === max) return formatPrice(min, currency)
-    return `${formatPrice(min, currency)} - ${formatPrice(max, currency)}`
+    if (min === max) return formatPrice(min)
+    return `${formatPrice(min)} - ${formatPrice(max)}`
   }
 
   return (
@@ -58,13 +55,8 @@ export default async function ProductDetails({ params }: Props) {
       <div className="flex gap-2 items-center mb-6">
         <p className="text-lg font-medium">Price:</p>
         <div className="flex flex-col">
-          {formatPriceRange(minUSD, maxUSD, 'USD') && (
-            <p className="text-xl font-bold">{formatPriceRange(minUSD, maxUSD, 'USD')}</p>
-          )}
-          {formatPriceRange(minEUR, maxEUR, 'EUR') && (
-            <p className="text-lg text-muted-foreground">
-              {formatPriceRange(minEUR, maxEUR, 'EUR')}
-            </p>
+          {formatPriceRange(minEUR, maxEUR) && (
+            <p className="text-xl font-bold">{formatPriceRange(minEUR, maxEUR)}</p>
           )}
         </div>
       </div>

@@ -4,7 +4,6 @@ const validVariant = {
   sku: 'TEST-001',
   options: { Size: 'M' },
   priceEUR: '19.99',
-  priceUSD: '21.99',
   stock: '10',
   weight: '500',
 }
@@ -28,26 +27,18 @@ describe('productSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects variant without any price', () => {
+  it('rejects variant without a price', () => {
     const result = productSchema.safeParse({
       ...validProduct,
-      variants: [{ ...validVariant, priceEUR: '', priceUSD: '' }],
+      variants: [{ ...validVariant, priceEUR: '' }],
     })
     expect(result.success).toBe(false)
   })
 
-  it('accepts variant with EUR only', () => {
+  it('accepts variant with an EUR price', () => {
     const result = productSchema.safeParse({
       ...validProduct,
-      variants: [{ ...validVariant, priceUSD: '' }],
-    })
-    expect(result.success).toBe(true)
-  })
-
-  it('accepts variant with USD only', () => {
-    const result = productSchema.safeParse({
-      ...validProduct,
-      variants: [{ ...validVariant, priceEUR: '' }],
+      variants: [{ ...validVariant }],
     })
     expect(result.success).toBe(true)
   })
@@ -98,7 +89,6 @@ describe('transformProductData', () => {
     const result = transformProductData(parsed)
 
     expect(result.variants[0].priceEUR).toBe(1999)
-    expect(result.variants[0].priceUSD).toBe(2199)
   })
 
   it('converts stock and weight to integers', () => {
@@ -122,18 +112,6 @@ describe('transformProductData', () => {
 
     expect(result.options[0].position).toBe(0)
     expect(result.options[1].position).toBe(1)
-  })
-
-  it('sets undefined for empty price strings', () => {
-    const data = {
-      ...validProduct,
-      variants: [{ ...validVariant, priceUSD: '' }],
-    }
-    const parsed = productSchema.parse(data)
-    const result = transformProductData(parsed)
-
-    expect(result.variants[0].priceEUR).toBe(1999)
-    expect(result.variants[0].priceUSD).toBeUndefined()
   })
 
   it('sets undefined for empty weight', () => {

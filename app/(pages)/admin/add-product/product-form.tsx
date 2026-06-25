@@ -141,7 +141,6 @@ function ProductForm({ onSubmit, children = null }: Props) {
         sku: generateSku(productName, combo),
         options: combo,
         priceEUR: '',
-        priceUSD: '',
         stock: '0',
         weight: '',
       }
@@ -159,7 +158,6 @@ function ProductForm({ onSubmit, children = null }: Props) {
           sku: generateSku(productName, {}),
           options: {},
           priceEUR: '',
-          priceUSD: '',
           stock: '0',
           weight: '',
         },
@@ -336,7 +334,6 @@ function ProductForm({ onSubmit, children = null }: Props) {
                       </th>
                     ))}
                   <th className="text-left py-2 px-2">€ EUR</th>
-                  <th className="text-left py-2 px-2">$ USD</th>
                   <th className="text-left py-2 px-2">Stock</th>
                   <th className="text-left py-2 px-2">Weight (g)</th>
                 </tr>
@@ -364,22 +361,6 @@ function ProductForm({ onSubmit, children = null }: Props) {
                       <FormField
                         control={control}
                         name={`variants.${index}.priceEUR`}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            className="w-20"
-                            placeholder="0.00"
-                          />
-                        )}
-                      />
-                    </td>
-                    <td className="py-2 px-2">
-                      <FormField
-                        control={control}
-                        name={`variants.${index}.priceUSD`}
                         render={({ field }) => (
                           <Input
                             {...field}

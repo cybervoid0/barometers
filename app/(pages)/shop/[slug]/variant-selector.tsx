@@ -112,14 +112,7 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
           </div>
           <div className="flex items-center gap-4">
             {selectedVariant.priceEUR && (
-              <span className="text-xl font-bold">
-                {formatPrice(selectedVariant.priceEUR, 'EUR')}
-              </span>
-            )}
-            {selectedVariant.priceUSD && (
-              <span className="text-lg text-muted-foreground">
-                {formatPrice(selectedVariant.priceUSD, 'USD')}
-              </span>
+              <span className="text-xl font-bold">{formatPrice(selectedVariant.priceEUR)}</span>
             )}
           </div>
         </div>

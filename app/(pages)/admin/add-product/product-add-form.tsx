@@ -66,7 +66,7 @@ function ProductAddForm() {
           <li>2. Add options (e.g., Size, Color) with values (e.g., A5, A4)</li>
           <li>3. Click "Generate Variants" to create all combinations</li>
           <li>4. Fill in prices and stock for each variant</li>
-          <li>5. At least one price (EUR or USD) required per variant</li>
+          <li>5. An EUR price is required per variant</li>
         </ul>
       </div>
     </FormProvider>

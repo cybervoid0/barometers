@@ -10,7 +10,6 @@ const validData = {
   state: 'BE',
   postalCode: '10115',
   country: 'DE',
-  currency: 'EUR' as const,
 }
 
 describe('checkoutSchema', () => {
@@ -63,20 +62,5 @@ describe('checkoutSchema', () => {
   it('rejects missing city', () => {
     const result = checkoutSchema.safeParse({ ...validData, city: '' })
     expect(result.success).toBe(false)
-  })
-
-  it('rejects invalid currency', () => {
-    const result = checkoutSchema.safeParse({ ...validData, currency: 'GBP' })
-    expect(result.success).toBe(false)
-  })
-
-  it('accepts EUR currency', () => {
-    const result = checkoutSchema.safeParse({ ...validData, currency: 'EUR' })
-    expect(result.success).toBe(true)
-  })
-
-  it('accepts USD currency', () => {
-    const result = checkoutSchema.safeParse({ ...validData, currency: 'USD' })
-    expect(result.success).toBe(true)
   })
 })

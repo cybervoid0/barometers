@@ -56,17 +56,15 @@ export default function Cart() {
 
   const totals = useMemo(() => {
     let eur = 0
-    let usd = 0
 
     for (const item of items) {
       const variant = variants.find(v => v.id === item.variantId)
       if (variant) {
         eur += (variant.priceEUR ?? 0) * item.quantity
-        usd += (variant.priceUSD ?? 0) * item.quantity
       }
     }
 
-    return { eur, usd }
+    return { eur }
   }, [items, variants])
 
   const handleClearCart = () => {
@@ -166,13 +164,7 @@ export default function Cart() {
                   <p className="text-xs text-muted-foreground">SKU: {variant.sku}</p>
                   <div className="mt-1">
                     {variant.priceEUR && (
-                      <span className="font-medium">{formatPrice(variant.priceEUR, 'EUR')}</span>
-                    )}
-                    {variant.priceEUR && variant.priceUSD && ' / '}
-                    {variant.priceUSD && (
-                      <span className="text-muted-foreground">
-                        {formatPrice(variant.priceUSD, 'USD')}
-                      </span>
+                      <span className="font-medium">{formatPrice(variant.priceEUR)}</span>
                     )}
                   </div>
                 </div>
@@ -200,14 +192,7 @@ export default function Cart() {
                 {/* Subtotal */}
                 <div className="text-right min-w-[100px]">
                   {variant.priceEUR && (
-                    <p className="font-bold">
-                      {formatPrice(variant.priceEUR * item.quantity, 'EUR')}
-                    </p>
-                  )}
-                  {variant.priceUSD && (
-                    <p className="text-sm text-muted-foreground">
-                      {formatPrice(variant.priceUSD * item.quantity, 'USD')}
-                    </p>
+                    <p className="font-bold">{formatPrice(variant.priceEUR * item.quantity)}</p>
                   )}
                 </div>
 
@@ -242,12 +227,8 @@ export default function Cart() {
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="font-semibold">Total (EUR):</span>
-                <span className="text-xl font-bold">{formatPrice(totals.eur, 'EUR')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Total (USD):</span>
-                <span className="text-xl font-bold">{formatPrice(totals.usd, 'USD')}</span>
+                <span className="font-semibold">Total:</span>
+                <span className="text-xl font-bold">{formatPrice(totals.eur)}</span>
               </div>
             </div>
 

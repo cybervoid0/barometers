@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Currency } from '@prisma/client'
 import { ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -55,12 +54,10 @@ export default function CheckoutPage() {
       state: '',
       postalCode: '',
       country: '',
-      currency: 'EUR',
     },
   })
 
-  const { handleSubmit, control, watch } = form
-  const selectedCurrency = watch('currency') as Currency
+  const { handleSubmit, control } = form
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -110,12 +107,11 @@ export default function CheckoutPage() {
     for (const item of items) {
       const variant = variants.find(v => v.id === item.variantId)
       if (variant) {
-        const price = selectedCurrency === 'EUR' ? variant.priceEUR : variant.priceUSD
-        amount += (price ?? 0) * item.quantity
+        amount += (variant.priceEUR ?? 0) * item.quantity
       }
     }
     return amount
-  }, [items, variants, selectedCurrency])
+  }, [items, variants])
 
   const onSubmit = useCallback(
     (values: CheckoutFormData) => {
@@ -126,7 +122,6 @@ export default function CheckoutPage() {
               variantId: item.variantId,
               quantity: item.quantity,
             })),
-            currency: values.currency as Currency,
             shippingAddress: {
               firstName: values.firstName,
               lastName: values.lastName,
@@ -322,34 +317,10 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="border rounded-lg p-6 space-y-4">
-                <h2 className="text-lg font-semibold">Payment Currency</h2>
-                <FormField
-                  control={control}
-                  name="currency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="EUR">EUR (Euro)</SelectItem>
-                          <SelectItem value="USD">USD (US Dollar)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               <Button type="submit" size="lg" className="w-full" disabled={isPending}>
                 {isPending
                   ? 'Redirecting to Stripe...'
-                  : `Pay with Stripe — ${formatPrice(totals, selectedCurrency)}`}
+                  : `Pay with Stripe — ${formatPrice(totals)}`}
               </Button>
             </form>
           </FormProvider>
@@ -369,7 +340,7 @@ export default function CheckoutPage() {
                 if (!variant) return null
 
                 const image = variant.images?.[0] ?? variant.product.images?.[0]
-                const price = selectedCurrency === 'EUR' ? variant.priceEUR : variant.priceUSD
+                const price = variant.priceEUR
                 const options = variant.options as Record<string, string>
 
                 return (
@@ -399,7 +370,7 @@ export default function CheckoutPage() {
                       <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                     <p className="text-sm font-medium">
-                      {price ? formatPrice(price * item.quantity, selectedCurrency) : '—'}
+                      {price ? formatPrice(price * item.quantity) : '—'}
                     </p>
                   </div>
                 )
@@ -410,7 +381,7 @@ export default function CheckoutPage() {
 
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span>{formatPrice(totals, selectedCurrency)}</span>
+              <span>{formatPrice(totals)}</span>
             </div>
 
             <Link href={Route.Cart} className="text-sm text-muted-foreground hover:underline block">

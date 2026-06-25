@@ -8,19 +8,20 @@ describe('formatPrice', () => {
     expect(result).toContain('€')
   })
 
-  it('formats USD using en-US locale', () => {
-    const result = formatPrice(2199, 'USD')
-    expect(result).toBe('$21.99')
+  it('defaults to EUR when no currency is given', () => {
+    const result = formatPrice(2199)
+    expect(result).toContain('21,99')
+    expect(result).toContain('€')
   })
 
   it('formats zero correctly', () => {
     expect(formatPrice(0, 'EUR')).toContain('0,00')
-    expect(formatPrice(0, 'USD')).toBe('$0.00')
   })
 
   it('formats large amounts', () => {
-    const result = formatPrice(999999, 'USD')
-    expect(result).toBe('$9,999.99')
+    const result = formatPrice(999999, 'EUR')
+    expect(result).toContain('9.999,99')
+    expect(result).toContain('€')
   })
 })
 

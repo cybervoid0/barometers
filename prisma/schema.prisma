@@ -289,10 +289,8 @@ model ProductVariant {
   sku              String         @unique
   options          Json
   priceEUR         Int?
-  priceUSD         Int?
   stock            Int            @default(0)
   stripePriceIdEUR String?        @unique
-  stripePriceIdUSD String?        @unique
   weight           Int?
   dimensions       Json?
   isActive         Boolean        @default(true)
@@ -417,5 +415,4 @@ enum PaymentStatus {
 
 enum Currency {
   EUR
-  USD
 }

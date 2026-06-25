@@ -13,15 +13,12 @@ import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
 
 /**
- * Get price range from variants
+ * Get EUR price range from variants
  */
 function getPriceRange(
-  variants: Array<{ priceEUR: number | null; priceUSD: number | null }>,
-  currency: 'EUR' | 'USD',
+  variants: Array<{ priceEUR: number | null }>,
 ): { min: number; max: number } | null {
-  const prices = variants
-    .map(v => (currency === 'EUR' ? v.priceEUR : v.priceUSD))
-    .filter((p): p is number => p !== null)
+  const prices = variants.map(v => v.priceEUR).filter((p): p is number => p !== null)
 
   if (prices.length === 0) return null
 
@@ -41,15 +38,12 @@ function getTotalStock(variants: Array<{ stock: number }>): number {
 /**
  * Format price range for display
  */
-function formatPriceRange(
-  range: { min: number; max: number } | null,
-  currency: 'EUR' | 'USD',
-): string {
+function formatPriceRange(range: { min: number; max: number } | null): string {
   if (!range) return '—'
   if (range.min === range.max) {
-    return formatPrice(range.min, currency)
+    return formatPrice(range.min)
   }
-  return `${formatPrice(range.min, currency)} – ${formatPrice(range.max, currency)}`
+  return `${formatPrice(range.min)} – ${formatPrice(range.max)}`
 }
 
 export default async function ShopPage() {
@@ -81,8 +75,7 @@ export default async function ShopPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map(product => {
             const image = product.images.at(0)
-            const priceRangeEUR = getPriceRange(product.variants, 'EUR')
-            const priceRangeUSD = getPriceRange(product.variants, 'USD')
+            const priceRangeEUR = getPriceRange(product.variants)
             const totalStock = getTotalStock(product.variants)
             const variantCount = product.variants.length
 
@@ -119,14 +112,7 @@ export default async function ShopPage() {
 
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="text-lg font-bold">
-                        {formatPriceRange(priceRangeEUR, 'EUR')}
-                      </div>
-                      {priceRangeUSD && (
-                        <div className="text-sm text-muted-foreground">
-                          {formatPriceRange(priceRangeUSD, 'USD')}
-                        </div>
-                      )}
+                      <div className="text-lg font-bold">{formatPriceRange(priceRangeEUR)}</div>
                     </div>
 
                     <div className="text-right text-sm text-muted-foreground">

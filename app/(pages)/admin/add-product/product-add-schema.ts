@@ -28,17 +28,6 @@ const productVariantSchema = z.object({
       },
       { message: 'Price must be a valid positive number' },
     ),
-  priceUSD: z
-    .string()
-    .optional()
-    .refine(
-      val => {
-        if (!val || val === '') return true
-        const num = Number.parseFloat(val)
-        return !Number.isNaN(num) && num >= 0
-      },
-      { message: 'Price must be a valid positive number' },
-    ),
   stock: z
     .string()
     .min(1, 'Stock is required')
@@ -83,11 +72,11 @@ export const productSchema = z
   })
   .refine(
     data => {
-      // Every variant must have at least one price
-      return data.variants.every(v => v.priceEUR || v.priceUSD)
+      // Every variant must have an EUR price
+      return data.variants.every(v => v.priceEUR)
     },
     {
-      message: 'Every variant must have at least one price (EUR or USD)',
+      message: 'Every variant must have an EUR price',
       path: ['variants'],
     },
   )
@@ -113,7 +102,6 @@ export function transformProductData(data: ProductFormData) {
       sku: v.sku,
       options: v.options,
       priceEUR: v.priceEUR ? Math.round(Number.parseFloat(v.priceEUR) * 100) : undefined,
-      priceUSD: v.priceUSD ? Math.round(Number.parseFloat(v.priceUSD) * 100) : undefined,
       stock: Number.parseInt(v.stock, 10),
       weight: v.weight ? Number.parseInt(v.weight, 10) : undefined,
     })),

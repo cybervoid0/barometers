@@ -1,6 +1,6 @@
 'use server'
 
-import type { Currency, OrderStatus, ProductVariant } from '@prisma/client'
+import type { OrderStatus, ProductVariant } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import slugify from 'slugify'
 import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
@@ -34,7 +34,6 @@ interface CreateCheckoutSessionInput {
     variantId: string
     quantity: number
   }>
-  currency: Currency
   shippingAddress: {
     firstName: string
     lastName: string
@@ -84,12 +83,10 @@ export async function createProductWithVariants(input: TransformedProductData) {
     const variantPrices: Array<{
       variant: (typeof input.variants)[number]
       stripePriceIdEUR?: string
-      stripePriceIdUSD?: string
     }> = []
 
     for (const variant of input.variants) {
       let stripePriceIdEUR: string | undefined
-      let stripePriceIdUSD: string | undefined
 
       if (variant.priceEUR !== undefined) {
         const priceEUR = await stripe.prices.create({
@@ -102,18 +99,7 @@ export async function createProductWithVariants(input: TransformedProductData) {
         createdStripePriceIds.push(priceEUR.id)
       }
 
-      if (variant.priceUSD !== undefined) {
-        const priceUSD = await stripe.prices.create({
-          product: stripeProduct.id,
-          unit_amount: variant.priceUSD,
-          currency: 'usd',
-          metadata: { sku: variant.sku },
-        })
-        stripePriceIdUSD = priceUSD.id
-        createdStripePriceIds.push(priceUSD.id)
-      }
-
-      variantPrices.push({ variant, stripePriceIdEUR, stripePriceIdUSD })
+      variantPrices.push({ variant, stripePriceIdEUR })
     }
 
     // Now create everything in database within a transaction
@@ -143,18 +129,16 @@ export async function createProductWithVariants(input: TransformedProductData) {
 
       const createdVariants: ProductVariant[] = []
 
-      for (const { variant, stripePriceIdEUR, stripePriceIdUSD } of variantPrices) {
+      for (const { variant, stripePriceIdEUR } of variantPrices) {
         const createdVariant = await tx.productVariant.create({
           data: {
             productId: product.id,
             sku: variant.sku,
             options: variant.options,
             priceEUR: variant.priceEUR,
-            priceUSD: variant.priceUSD,
             stock: variant.stock,
             weight: variant.weight,
             stripePriceIdEUR,
-            stripePriceIdUSD,
             isActive: true,
           },
         })
@@ -278,12 +262,11 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       return found
     })
 
-    // Calculate totals
+    // Calculate totals (shop sells exclusively in EUR)
     const subtotal = input.items.reduce((sum, item) => {
       const variant = variants.find(v => v.id === item.variantId)
       if (!variant) return sum
-      const price = input.currency === 'EUR' ? variant.priceEUR : variant.priceUSD
-      return sum + (price || 0) * item.quantity
+      return sum + (variant.priceEUR || 0) * item.quantity
     }, 0)
 
     const isEU = EU_ALPHA2.has(input.shippingAddress.country)
@@ -298,13 +281,12 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     const orderItemsData = input.items.map(item => {
       const variant = variants.find(v => v.id === item.variantId)
       if (!variant) throw new Error(`Variant ${item.variantId} not found`)
-      const price = input.currency === 'EUR' ? variant.priceEUR : variant.priceUSD
       return {
         productId: variant.productId,
         variantId: variant.id,
         quantity: item.quantity,
-        priceAtTime: price || 0,
-        currency: input.currency,
+        priceAtTime: variant.priceEUR || 0,
+        currency: 'EUR' as const,
         variantInfo: variant.options as Record<string, string>,
       }
     })
@@ -321,7 +303,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
           customerId: customer.id,
           shippingAddressId: shippingAddress.id,
           status: 'PENDING',
-          currency: input.currency,
+          currency: 'EUR',
           subtotal,
           shippingCost,
           tax,
@@ -335,14 +317,13 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       return createdOrder
     })
 
-    // Prepare Stripe line items
+    // Prepare Stripe line items (EUR only)
     const lineItems = input.items.map(item => {
       const variant = variants.find(v => v.id === item.variantId)
-      const priceId =
-        input.currency === 'EUR' ? variant?.stripePriceIdEUR : variant?.stripePriceIdUSD
+      const priceId = variant?.stripePriceIdEUR
 
       if (!priceId) {
-        throw new Error(`Price not found for variant ${variant?.sku} in ${input.currency}`)
+        throw new Error(`EUR price not found for variant ${variant?.sku}`)
       }
 
       return {
@@ -362,7 +343,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
             type: 'fixed_amount',
             fixed_amount: {
               amount: shippingCost,
-              currency: input.currency.toLowerCase(),
+              currency: 'eur',
             },
             display_name: isEU ? 'EU Standard Shipping' : 'International Shipping',
           },
@@ -415,7 +396,6 @@ interface UpdateProductInput {
     sku: string
     options: Record<string, string>
     priceEUR?: number
-    priceUSD?: number
     stock: number
     weight?: number
   }>
@@ -462,9 +442,6 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
         if (variant.stripePriceIdEUR) {
           await stripe.prices.update(variant.stripePriceIdEUR, { active: false })
         }
-        if (variant.stripePriceIdUSD) {
-          await stripe.prices.update(variant.stripePriceIdUSD, { active: false })
-        }
       }
     }
 
@@ -472,9 +449,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
     const variantUpdates: Array<{
       variant: (typeof input.variants)[number]
       stripePriceIdEUR?: string
-      stripePriceIdUSD?: string
       needsNewEURPrice: boolean
-      needsNewUSDPrice: boolean
     }> = []
 
     for (const inputVariant of input.variants) {
@@ -483,17 +458,11 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
         : undefined
 
       let stripePriceIdEUR = existingVariant?.stripePriceIdEUR ?? undefined
-      let stripePriceIdUSD = existingVariant?.stripePriceIdUSD ?? undefined
 
       // Check if EUR price changed or is new
       const needsNewEURPrice =
         inputVariant.priceEUR !== undefined &&
         (!existingVariant || existingVariant.priceEUR !== inputVariant.priceEUR)
-
-      // Check if USD price changed or is new
-      const needsNewUSDPrice =
-        inputVariant.priceUSD !== undefined &&
-        (!existingVariant || existingVariant.priceUSD !== inputVariant.priceUSD)
 
       // Archive old prices and create new ones if price changed
       if (needsNewEURPrice) {
@@ -514,30 +483,10 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
         }
       }
 
-      if (needsNewUSDPrice) {
-        if (stripePriceIdUSD) {
-          await stripe.prices.update(stripePriceIdUSD, { active: false })
-        }
-        if (inputVariant.priceUSD) {
-          const newPrice = await stripe.prices.create({
-            product: existingProduct.stripeProductId,
-            unit_amount: inputVariant.priceUSD,
-            currency: 'usd',
-            metadata: { sku: inputVariant.sku },
-          })
-          stripePriceIdUSD = newPrice.id
-          newStripePriceIds.push(newPrice.id)
-        } else {
-          stripePriceIdUSD = undefined
-        }
-      }
-
       variantUpdates.push({
         variant: inputVariant,
         stripePriceIdEUR,
-        stripePriceIdUSD,
         needsNewEURPrice,
-        needsNewUSDPrice,
       })
     }
 
@@ -606,7 +555,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       }
 
       // Update or create variants
-      for (const { variant, stripePriceIdEUR, stripePriceIdUSD } of variantUpdates) {
+      for (const { variant, stripePriceIdEUR } of variantUpdates) {
         if (variant.id) {
           // Update existing variant
           await tx.productVariant.update({
@@ -615,11 +564,9 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
               sku: variant.sku,
               options: variant.options,
               priceEUR: variant.priceEUR,
-              priceUSD: variant.priceUSD,
               stock: variant.stock,
               weight: variant.weight,
               stripePriceIdEUR,
-              stripePriceIdUSD,
             },
           })
         } else {
@@ -630,11 +577,9 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
               sku: variant.sku,
               options: variant.options,
               priceEUR: variant.priceEUR,
-              priceUSD: variant.priceUSD,
               stock: variant.stock,
               weight: variant.weight,
               stripePriceIdEUR,
-              stripePriceIdUSD,
               isActive: true,
             },
           })
