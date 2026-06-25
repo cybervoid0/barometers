@@ -19,12 +19,23 @@ import { ImageType } from '@/types'
 
 // --- Auth helpers ---
 
-async function requireAdmin() {
+/**
+ * Admin guard for the shop's client-facing server actions. Unlike the throwing
+ * `requireAdmin` in `server/auth.ts`, these actions are called from the client
+ * and must return a result object the UI can surface as a toast. Returns the
+ * bail-out result to `return` directly, or `null` when the caller is an
+ * admin/owner.
+ *
+ *   const denied = await adminGuard()
+ *   if (denied) return denied
+ */
+async function adminGuard(): Promise<{ success: false; error: string } | null> {
   const session = await getServerSession(authConfig)
-  if (!session?.user?.role || !['ADMIN', 'OWNER'].includes(session.user.role)) {
-    return null
+  const role = session?.user?.role
+  if (!role || !['ADMIN', 'OWNER'].includes(role)) {
+    return { success: false, error: 'Unauthorized' }
   }
-  return session
+  return null
 }
 
 // --- Checkout types ---
@@ -52,10 +63,8 @@ interface CreateCheckoutSessionInput {
  * Uses rollback pattern to clean up Stripe resources on failure
  */
 export async function createProductWithVariants(input: TransformedProductData) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   let stripeProductId: string | undefined
   const createdStripePriceIds: string[] = []
@@ -408,10 +417,8 @@ interface UpdateProductInput {
  * - Price changes: create new Stripe prices (prices are immutable), archive old ones
  */
 export async function updateProductWithVariants(input: UpdateProductInput) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   const newStripePriceIds: string[] = []
 
@@ -632,10 +639,8 @@ export async function updateOrderStatus(
   status: OrderStatus,
   trackingNumber?: string,
 ) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   try {
     // Validate status transition
@@ -707,10 +712,8 @@ export async function updateOrderStatus(
  * non-empty number, the customer (guest or registered) is notified by email.
  */
 export async function updateTrackingNumber(orderId: string, trackingNumber: string) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   try {
     const order = await prisma.order.findUnique({
@@ -766,10 +769,8 @@ export async function updateTrackingNumber(orderId: string, trackingNumber: stri
  * Derives stripePaymentIntentId from the order internally
  */
 export async function refundOrder(orderId: string) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   try {
     const order = await prisma.order.findUnique({
@@ -810,10 +811,8 @@ export async function refundOrder(orderId: string) {
  * REFUNDED, since the refund itself is processed asynchronously by Stripe.
  */
 export async function getOrderStatus(orderId: string) {
-  const admin = await requireAdmin()
-  if (!admin) {
-    return { success: false as const, error: 'Unauthorized' }
-  }
+  const denied = await adminGuard()
+  if (denied) return denied
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
