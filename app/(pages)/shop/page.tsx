@@ -116,7 +116,15 @@ export default async function ShopPage() {
                     </div>
 
                     <div className="text-right text-sm text-muted-foreground">
-                      <div>Stock: {totalStock}</div>
+                      <div
+                        className={
+                          totalStock > 0
+                            ? 'text-green-600 dark:text-green-500'
+                            : 'text-red-800 dark:text-red-700'
+                        }
+                      >
+                        {totalStock > 0 ? 'In stock' : 'Out of stock'}
+                      </div>
                       {variantCount > 1 && <div>{variantCount} variants</div>}
                     </div>
                   </div>
