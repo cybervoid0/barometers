@@ -37,9 +37,17 @@ jest.mock('@/server/files/images', () => ({
   saveImage: jest.fn(),
 }))
 
+// --- Mock email senders (avoids loading resend/react-email under Jest) ---
+const mockSendOrderShippedEmail = jest.fn()
+const mockSendTrackingUpdatedEmail = jest.fn()
+jest.mock('@/server/email/order-shipped', () => ({
+  sendOrderShippedEmail: (...args: unknown[]) => mockSendOrderShippedEmail(...args),
+  sendTrackingUpdatedEmail: (...args: unknown[]) => mockSendTrackingUpdatedEmail(...args),
+}))
+
 import { prisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
-import { refundOrder, updateOrderStatus } from '../actions'
+import { refundOrder, updateOrderStatus, updateTrackingNumber } from '../actions'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -259,6 +267,131 @@ describe('updateOrderStatus — transitions', () => {
         }),
       }),
     )
+  })
+
+  it('sends the shipped notification when transitioning to SHIPPED', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({ status: 'PROCESSING' })
+    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({ id: 'order-1', status: 'SHIPPED' })
+
+    await updateOrderStatus('order-1', 'SHIPPED', 'TRACK-123')
+
+    expect(mockSendOrderShippedEmail).toHaveBeenCalledWith('order-1')
+  })
+
+  it('does not send the shipped notification for non-SHIPPED transitions', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({ status: 'PAID' })
+    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({
+      id: 'order-1',
+      status: 'PROCESSING',
+    })
+
+    await updateOrderStatus('order-1', 'PROCESSING')
+
+    expect(mockSendOrderShippedEmail).not.toHaveBeenCalled()
+  })
+})
+
+// --- updateTrackingNumber ---
+
+describe('updateTrackingNumber', () => {
+  const adminSession = { user: { id: 'u1', role: 'ADMIN' } }
+
+  it('returns Unauthorized when no session', async () => {
+    mockGetServerSession.mockResolvedValueOnce(null)
+
+    const result = await updateTrackingNumber('order-1', 'TRACK-1')
+
+    expect(result).toEqual({ success: false, error: 'Unauthorized' })
+    expect(prisma.order.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('returns error when order not found', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce(null)
+
+    const result = await updateTrackingNumber('order-1', 'TRACK-1')
+
+    expect(result).toEqual({ success: false, error: 'Order not found' })
+  })
+
+  for (const status of ['PENDING', 'PAID', 'PROCESSING', 'CANCELLED'] as OrderStatus[]) {
+    it(`rejects editing tracking for ${status} order`, async () => {
+      mockGetServerSession.mockResolvedValueOnce(adminSession)
+      ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+        status,
+        trackingNumber: null,
+      })
+
+      const result = await updateTrackingNumber('order-1', 'TRACK-1')
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('after the order has shipped')
+      expect(prisma.order.update).not.toHaveBeenCalled()
+    })
+  }
+
+  it('saves a new tracking number and emails the customer', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'SHIPPED',
+      trackingNumber: null,
+    })
+    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({ id: 'order-1' })
+
+    const result = await updateTrackingNumber('order-1', '  TRACK-NEW  ')
+
+    expect(result).toEqual({ success: true })
+    expect(prisma.order.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { trackingNumber: 'TRACK-NEW' } }),
+    )
+    expect(mockSendTrackingUpdatedEmail).toHaveBeenCalledWith('order-1')
+  })
+
+  it('allows editing tracking on a DELIVERED order', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'DELIVERED',
+      trackingNumber: 'OLD',
+    })
+    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({ id: 'order-1' })
+
+    const result = await updateTrackingNumber('order-1', 'NEW')
+
+    expect(result).toEqual({ success: true })
+    expect(mockSendTrackingUpdatedEmail).toHaveBeenCalledWith('order-1')
+  })
+
+  it('clears the tracking number without emailing when set empty', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'SHIPPED',
+      trackingNumber: 'OLD',
+    })
+    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({ id: 'order-1' })
+
+    const result = await updateTrackingNumber('order-1', '   ')
+
+    expect(result).toEqual({ success: true })
+    expect(prisma.order.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { trackingNumber: null } }),
+    )
+    expect(mockSendTrackingUpdatedEmail).not.toHaveBeenCalled()
+  })
+
+  it('is a no-op (no update, no email) when the value is unchanged', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'SHIPPED',
+      trackingNumber: 'SAME',
+    })
+
+    const result = await updateTrackingNumber('order-1', 'SAME')
+
+    expect(result).toEqual({ success: true, unchanged: true })
+    expect(prisma.order.update).not.toHaveBeenCalled()
+    expect(mockSendTrackingUpdatedEmail).not.toHaveBeenCalled()
   })
 })
 

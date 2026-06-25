@@ -11,6 +11,7 @@ import {
   VALID_ORDER_TRANSITIONS,
 } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
+import { sendOrderShippedEmail, sendTrackingUpdatedEmail } from '@/server/email/order-shipped'
 import { saveImage } from '@/server/files/images'
 import { authConfig } from '@/services/auth'
 import { stripe } from '@/services/stripe'
@@ -735,11 +736,82 @@ export async function updateOrderStatus(
       data,
     })
 
+    // Notify the customer (guest or registered) once the order ships. Sent
+    // outside the update and non-fatally — a mail failure must not fail the
+    // status change; the idempotency key guards against duplicate sends.
+    if (status === 'SHIPPED') {
+      try {
+        await sendOrderShippedEmail(orderId)
+      } catch (emailError) {
+        console.error('Failed to send order shipped email:', emailError)
+      }
+    }
+
     return { success: true, order }
   } catch (error) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unable to update order',
+    }
+  }
+}
+
+/**
+ * Add, correct, or clear the tracking number on an already-shipped order,
+ * independently of any status transition. When the value actually changes to a
+ * non-empty number, the customer (guest or registered) is notified by email.
+ */
+export async function updateTrackingNumber(orderId: string, trackingNumber: string) {
+  const admin = await requireAdmin()
+  if (!admin) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { status: true, trackingNumber: true },
+    })
+
+    if (!order) {
+      return { success: false, error: 'Order not found' }
+    }
+
+    // Tracking only makes sense once the parcel is on its way.
+    if (!['SHIPPED', 'DELIVERED'].includes(order.status)) {
+      return {
+        success: false,
+        error: 'Tracking can only be edited after the order has shipped',
+      }
+    }
+
+    // Normalise: trim, and treat an empty string as "no tracking" (null).
+    const next = trackingNumber.trim() || null
+    if (next === order.trackingNumber) {
+      return { success: true, unchanged: true }
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { trackingNumber: next },
+    })
+
+    // Notify only when a real tracking number is now set (not when cleared).
+    // Non-fatal and keyed by value, so a mail failure never blocks the edit
+    // and re-saving the same number does not re-send.
+    if (next) {
+      try {
+        await sendTrackingUpdatedEmail(orderId)
+      } catch (emailError) {
+        console.error('Failed to send tracking updated email:', emailError)
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to update tracking number',
     }
   }
 }

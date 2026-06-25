@@ -1,6 +1,7 @@
 import 'server-only'
 
 import NextLink from 'next/link'
+import { Suspense } from 'react'
 import { Image } from '@/components/elements'
 import { getMenuData } from '@/server/menu/queries'
 import { AnimatedHeader } from './animated-header'
@@ -12,7 +13,9 @@ export async function Header() {
   return (
     <AnimatedHeader>
       <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">
-        <WideScreenTabs menu={menu} className="hidden md:block" />
+        <Suspense fallback={<div className="hidden md:block" />}>
+          <WideScreenTabs menu={menu} className="hidden md:block" />
+        </Suspense>
         <MobileMenu menu={menu} className="md:hidden" />
         <NextLink className="no-underline" href="/">
           <div className="flex items-center gap-4">

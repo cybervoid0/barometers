@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import {
+  refundOrder,
+  updateOrderStatus,
+  updateTrackingNumber,
+} from '@/app/(pages)/shop/server/actions'
+import {
   Button,
   Input,
   Select,
@@ -13,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui'
-import { refundOrder, updateOrderStatus } from '../../../shop/server/actions'
 
 const STATUSES: OrderStatus[] = [
   'PENDING',
@@ -41,8 +45,13 @@ export function OrderStatusForm({
   const router = useRouter()
   const [status, setStatus] = useState<OrderStatus>(currentStatus)
   const [trackingNumber, setTrackingNumber] = useState(currentTrackingNumber ?? '')
+  const [editTracking, setEditTracking] = useState(currentTrackingNumber ?? '')
   const [isPending, startTransition] = useTransition()
   const [isRefunding, startRefundTransition] = useTransition()
+  const [isSavingTracking, startTrackingTransition] = useTransition()
+
+  // Tracking can be edited independently once the order has shipped.
+  const canEditTracking = currentStatus === 'SHIPPED' || currentStatus === 'DELIVERED'
 
   const handleUpdateStatus = () => {
     startTransition(async () => {
@@ -53,6 +62,18 @@ export function OrderStatusForm({
       )
       if (result.success) {
         toast.success(`Order status updated to ${status}`)
+        router.refresh()
+      } else {
+        toast.error(result.error)
+      }
+    })
+  }
+
+  const handleSaveTracking = () => {
+    startTrackingTransition(async () => {
+      const result = await updateTrackingNumber(orderId, editTracking)
+      if (result.success) {
+        toast.success('Tracking number saved')
         router.refresh()
       } else {
         toast.error(result.error)
@@ -104,6 +125,28 @@ export function OrderStatusForm({
       >
         {isPending ? 'Updating...' : 'Update Status'}
       </Button>
+
+      {canEditTracking && (
+        <div className="border-t pt-4 space-y-2">
+          <p className="text-sm font-medium">Tracking number</p>
+          <Input
+            placeholder="Tracking number"
+            value={editTracking}
+            onChange={e => setEditTracking(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Add, correct, or clear the tracking number. Saving a new number emails the customer.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleSaveTracking}
+            disabled={isSavingTracking || editTracking.trim() === (currentTrackingNumber ?? '')}
+          >
+            {isSavingTracking ? 'Saving...' : 'Save Tracking'}
+          </Button>
+        </div>
+      )}
 
       {canRefund && (
         <div className="border-t pt-4">
