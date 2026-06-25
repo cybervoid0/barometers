@@ -803,3 +803,26 @@ export async function refundOrder(orderId: string) {
     }
   }
 }
+
+/**
+ * Read the current status of an order (admin-only). Used by the admin UI to
+ * poll for the refund webhook (`charge.refunded`) flipping the order to
+ * REFUNDED, since the refund itself is processed asynchronously by Stripe.
+ */
+export async function getOrderStatus(orderId: string) {
+  const admin = await requireAdmin()
+  if (!admin) {
+    return { success: false as const, error: 'Unauthorized' }
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { status: true },
+  })
+
+  if (!order) {
+    return { success: false as const, error: 'Order not found' }
+  }
+
+  return { success: true as const, status: order.status }
+}

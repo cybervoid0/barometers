@@ -2,9 +2,10 @@
 
 import type { OrderStatus } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import {
+  getOrderStatus,
   refundOrder,
   updateOrderStatus,
   updateTrackingNumber,
@@ -50,6 +51,18 @@ export function OrderStatusForm({
   const [isRefunding, startRefundTransition] = useTransition()
   const [isSavingTracking, startTrackingTransition] = useTransition()
 
+  // Re-sync local form state when the server props change after router.refresh()
+  // (e.g. once a refund webhook flips the status), so the controls don't keep
+  // showing the pre-mutation values.
+  useEffect(() => {
+    setStatus(currentStatus)
+  }, [currentStatus])
+
+  useEffect(() => {
+    setTrackingNumber(currentTrackingNumber ?? '')
+    setEditTracking(currentTrackingNumber ?? '')
+  }, [currentTrackingNumber])
+
   // Tracking can be edited independently once the order has shipped.
   const canEditTracking = currentStatus === 'SHIPPED' || currentStatus === 'DELIVERED'
 
@@ -86,12 +99,21 @@ export function OrderStatusForm({
 
     startRefundTransition(async () => {
       const result = await refundOrder(orderId)
-      if (result.success) {
-        toast.success('Refund initiated successfully')
-        router.refresh()
-      } else {
+      if (!result.success) {
         toast.error(result.error)
+        return
       }
+
+      // The refund is confirmed asynchronously by Stripe's charge.refunded
+      // webhook, which flips the order to REFUNDED. Poll for that before
+      // refreshing so the page doesn't show a stale status.
+      toast.success('Refund initiated — confirming…')
+      for (let attempt = 0; attempt < 15; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const current = await getOrderStatus(orderId)
+        if (current.success && current.status === 'REFUNDED') break
+      }
+      router.refresh()
     })
   }
 
