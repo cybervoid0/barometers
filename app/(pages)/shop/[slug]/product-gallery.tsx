@@ -50,7 +50,9 @@ export function ProductGallery({ images, productName }: Props) {
               onClick={() => setActive(index)}
               className={cn(
                 'overflow-hidden rounded-md border-2 transition-colors',
-                index === active ? 'border-secondary' : 'border-transparent hover:border-border',
+                index === active
+                  ? 'cursor-default border-secondary'
+                  : 'cursor-zoom-in border-transparent hover:border-border',
               )}
             >
               <Image
