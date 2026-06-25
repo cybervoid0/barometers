@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Label } from '@/components/ui'
 import { formatPrice } from '@/utils'
+import { StockStatus } from '../components/stock-status'
 import { useShopCartStore } from '../stores/shop-cart-store'
 
 interface Props {
@@ -75,6 +76,16 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
 
   return (
     <div className="space-y-6">
+      {/* Price + availability */}
+      {selectedVariant && (
+        <div className="flex items-baseline gap-3">
+          {selectedVariant.priceEUR != null && (
+            <span className="text-2xl font-bold">{formatPrice(selectedVariant.priceEUR)}</span>
+          )}
+          <StockStatus inStock={selectedVariant.stock > 0} />
+        </div>
+      )}
+
       {/* Option selectors */}
       {options.map(option => {
         const values = option.values as string[]
@@ -97,26 +108,6 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
           </div>
         )
       })}
-
-      {/* Selected variant info */}
-      {selectedVariant && (
-        <div className="p-4 border rounded-lg space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">SKU: {selectedVariant.sku}</span>
-            <span className="text-sm">
-              Stock: {availableStock > 0 ? availableStock : 'Out of stock'}
-              {cartQuantity > 0 && (
-                <span className="text-muted-foreground"> ({cartQuantity} in cart)</span>
-              )}
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            {selectedVariant.priceEUR && (
-              <span className="text-xl font-bold">{formatPrice(selectedVariant.priceEUR)}</span>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Quantity and Add to Cart */}
       <div className="flex items-center gap-4">
@@ -145,7 +136,6 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
         <Button
           onClick={handleAddToCart}
           disabled={!selectedVariant || availableStock <= 0 || quantity > availableStock}
-          className="flex-1"
         >
           <ShoppingCart className="w-4 h-4 mr-2" />
           {availableStock <= 0 ? 'Out of Stock' : 'Add to Cart'}

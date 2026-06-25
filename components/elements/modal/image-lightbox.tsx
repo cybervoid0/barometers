@@ -60,7 +60,7 @@ export function ImageLightbox({ src, name, children }: ImageLightboxProps) {
             />
           </div>
           {name && (
-            <div className="pt-3 flex-shrink-0 bg-background/80 backdrop-blur-sm border-t border-border">
+            <div className="pt-3 shrink-0 bg-background/80 backdrop-blur-sm border-t border-border">
               <h3 className="text-center">{name}</h3>
             </div>
           )}

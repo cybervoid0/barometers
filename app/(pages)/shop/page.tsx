@@ -9,6 +9,7 @@ import { Button } from '@/components/ui'
 import { Route } from '@/constants'
 import { authConfig } from '@/services/auth'
 import { formatPrice } from '@/utils/currency'
+import { StockStatus } from './components/stock-status'
 import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
 
@@ -116,15 +117,7 @@ export default async function ShopPage() {
                     </div>
 
                     <div className="text-right text-sm text-muted-foreground">
-                      <div
-                        className={
-                          totalStock > 0
-                            ? 'text-green-600 dark:text-green-500'
-                            : 'text-red-800 dark:text-red-700'
-                        }
-                      >
-                        {totalStock > 0 ? 'In stock' : 'Out of stock'}
-                      </div>
+                      <StockStatus inStock={totalStock > 0} />
                       {variantCount > 1 && <div>{variantCount} variants</div>}
                     </div>
                   </div>
