@@ -3,8 +3,10 @@
 import { AccessRole } from '@prisma/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { type ComponentProps, useState } from 'react'
+import { toast } from 'sonner'
 import { Hamburger, isAdmin } from '@/components/elements'
 import {
   Accordion,
@@ -31,6 +33,19 @@ const menuItemTextStyle =
 
 function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }) {
   const { data: session } = useSession()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    const who = session?.user?.email ?? session?.user?.name ?? 'You'
+    closeMenu()
+    // redirect:false keeps a client navigation so the toast survives
+    // (a full callbackUrl redirect would reload the page and drop it).
+    await signOut({ redirect: false })
+    toast.success(`${who} signed out`)
+    router.push('/')
+    router.refresh()
+  }
+
   return (
     <SheetContent
       side="left"
@@ -102,10 +117,7 @@ function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }
                 </Link>
                 <button
                   type="button"
-                  onClick={() => {
-                    closeMenu()
-                    signOut({ callbackUrl: '/' })
-                  }}
+                  onClick={handleSignOut}
                   className={cn('block text-left no-underline', menuItemTextStyle)}
                 >
                   Sign out
