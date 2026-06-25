@@ -83,7 +83,7 @@ export default async function ShopPage() {
             return (
               <div
                 key={product.id}
-                className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                className="relative flex h-full flex-col border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <IsAdmin>
                   <EditProduct product={product} />
@@ -102,7 +102,7 @@ export default async function ShopPage() {
                   )}
                 </div>
 
-                <div className="p-4">
+                <div className="flex flex-1 flex-col p-4">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
 
                   {product.description && (
@@ -111,22 +111,26 @@ export default async function ShopPage() {
                     </p>
                   )}
 
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-lg font-bold">{formatPriceRange(priceRangeEUR)}</div>
+                  {/* Pinned to the bottom so the price row + button align across
+                      cards of differing content height (e.g. variant counts). */}
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="text-lg font-bold">{formatPriceRange(priceRangeEUR)}</div>
+                      </div>
+
+                      <div className="text-right text-sm text-muted-foreground">
+                        <StockStatus inStock={totalStock > 0} />
+                        {variantCount > 1 && <div>{variantCount} variants</div>}
+                      </div>
                     </div>
 
-                    <div className="text-right text-sm text-muted-foreground">
-                      <StockStatus inStock={totalStock > 0} />
-                      {variantCount > 1 && <div>{variantCount} variants</div>}
-                    </div>
+                    <Link href={`/shop/${product.slug}`} className="block">
+                      <Button variant="default" className="w-full">
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
-
-                  <Link href={`/shop/${product.slug}`} className="block">
-                    <Button variant="default" className="w-full">
-                      View Details
-                    </Button>
-                  </Link>
                 </div>
               </div>
             )
