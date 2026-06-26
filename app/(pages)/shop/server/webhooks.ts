@@ -3,6 +3,7 @@ import { prisma } from '@/prisma/prismaClient'
 import { sendOrderAdminNotification } from '@/server/email/order-admin-notification'
 import { sendOrderConfirmationEmail } from '@/server/email/order-confirmation'
 import { stripe } from '@/services/stripe'
+import { releasePendingOrder } from './order-lifecycle'
 
 /**
  * Handle checkout.session.completed event
@@ -27,8 +28,14 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
         select: { status: true },
       })
 
-      if (existingOrder?.status === 'PAID') {
-        console.log(`Order ${orderId} already processed, skipping`)
+      // Only a still-PENDING order may be promoted to PAID. This both gives
+      // idempotency (a retry sees PAID and skips) and refuses to resurrect an
+      // order that was already CANCELLED/REFUNDED — e.g. one whose checkout was
+      // rolled back but whose Stripe session somehow still got paid.
+      if (existingOrder?.status !== 'PENDING') {
+        console.log(
+          `Order ${orderId} not PENDING (status: ${existingOrder?.status ?? 'missing'}) — skipping`,
+        )
         return false
       }
 
@@ -92,44 +99,6 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
     console.error('Error handling checkout.session.completed:', error)
     throw error
   }
-}
-
-/**
- * Cancel a still-PENDING order and release the stock it reserved at checkout.
- *
- * The status transition is guarded (`updateMany ... where status: 'PENDING'`)
- * so this never clobbers an order that already advanced — e.g. a late
- * `checkout.session.expired` arriving after `checkout.session.completed`, which
- * Stripe does not guarantee the ordering of. Stock is only returned when THIS
- * call performed the transition, which makes it idempotent across webhook
- * retries and duplicate deliveries (no double-restore).
- */
-async function releasePendingOrder(orderId: string, reason: string) {
-  await prisma.$transaction(async tx => {
-    const cancelled = await tx.order.updateMany({
-      where: { id: orderId, status: 'PENDING' },
-      data: { status: 'CANCELLED', cancelledAt: new Date() },
-    })
-
-    if (cancelled.count !== 1) {
-      console.log(`Order ${orderId} not PENDING — no stock to release (${reason})`)
-      return
-    }
-
-    const order = await tx.order.findUnique({
-      where: { id: orderId },
-      include: { items: true },
-    })
-    for (const item of order?.items ?? []) {
-      if (item.variantId) {
-        await tx.productVariant.update({
-          where: { id: item.variantId },
-          data: { stock: { increment: item.quantity } },
-        })
-      }
-    }
-    console.log(`Order ${orderId} CANCELLED, stock released (${reason})`)
-  })
 }
 
 /**
@@ -266,10 +235,21 @@ export async function handleChargeRefunded(charge: Stripe.Charge) {
         })
       }
 
-      // Update payment record
-      await tx.payment.update({
+      // Update payment record. Upsert (not update) so a refund of a charge
+      // whose Payment row is somehow missing can't throw P2025 and wedge the
+      // webhook into an endless retry loop.
+      await tx.payment.upsert({
         where: { stripePaymentIntentId: paymentIntentId },
-        data: {
+        update: {
+          status: isFullRefund ? 'REFUNDED' : 'SUCCEEDED',
+          refundedAt: new Date(),
+          refundAmount: charge.amount_refunded,
+        },
+        create: {
+          orderId: order.id,
+          stripePaymentIntentId: paymentIntentId,
+          amount: charge.amount,
+          currency: 'EUR',
           status: isFullRefund ? 'REFUNDED' : 'SUCCEEDED',
           refundedAt: new Date(),
           refundAmount: charge.amount_refunded,

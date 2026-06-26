@@ -1,6 +1,16 @@
 import type { OrderStatus } from '@prisma/client'
 import { EU_ALPHA2 } from './eu'
 
+// --- Checkout ---
+
+/**
+ * How long a Stripe Checkout session (and therefore the stock it reserves) stays
+ * alive before Stripe expires it and the `checkout.session.expired` webhook
+ * returns the stock. Stripe's minimum is 30 minutes; 60 gives the buyer comfort
+ * while still freeing inventory the same hour instead of the 24h default.
+ */
+export const CHECKOUT_SESSION_TTL_SECONDS = 60 * 60
+
 // --- Shipping ---
 // Weight-based model:  cost = ceil( K × (base + billedKg × perKg) )  in cents.
 // Tuned to sit near DHL NL retail rates (domestic ~€5–9, EU ~€10–14, world ~€13–18)

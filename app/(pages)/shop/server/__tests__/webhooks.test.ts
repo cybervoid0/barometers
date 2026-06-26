@@ -125,6 +125,17 @@ describe('handleCheckoutSessionCompleted', () => {
     expect(mockSendOrderAdminNotification).not.toHaveBeenCalled()
   })
 
+  it('does NOT resurrect a CANCELLED order to PAID', async () => {
+    // e.g. checkout was rolled back, but a lingering session somehow got paid.
+    mockTx.order.findUnique.mockResolvedValueOnce({ status: 'CANCELLED' })
+
+    await handleCheckoutSessionCompleted(baseSession)
+
+    expect(mockTx.order.update).not.toHaveBeenCalled()
+    expect(mockTx.payment.upsert).not.toHaveBeenCalled()
+    expect(mockSendOrderConfirmationEmail).not.toHaveBeenCalled()
+  })
+
   it('returns early when no orderId in metadata', async () => {
     const session = { ...baseSession, metadata: {} } as unknown as Stripe.Checkout.Session
 
@@ -307,7 +318,7 @@ describe('handleChargeRefunded', () => {
       ],
     })
     mockTx.order.update.mockResolvedValue({})
-    mockTx.payment.update.mockResolvedValue({})
+    mockTx.payment.upsert.mockResolvedValue({})
     mockTx.productVariant.update.mockResolvedValue({})
 
     await handleChargeRefunded(baseCharge)
@@ -317,9 +328,9 @@ describe('handleChargeRefunded', () => {
         data: { status: 'REFUNDED' },
       }),
     )
-    expect(mockTx.payment.update).toHaveBeenCalledWith(
+    expect(mockTx.payment.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: 'REFUNDED', refundAmount: 2000 }),
+        update: expect.objectContaining({ status: 'REFUNDED', refundAmount: 2000 }),
       }),
     )
     // Stock restored for both variants
@@ -343,16 +354,16 @@ describe('handleChargeRefunded', () => {
       status: 'PAID',
       items: [{ variantId: 'v1', quantity: 2 }],
     })
-    mockTx.payment.update.mockResolvedValue({})
+    mockTx.payment.upsert.mockResolvedValue({})
 
     await handleChargeRefunded(partialCharge)
 
     // Order status NOT updated (no order.update call for status)
     expect(mockTx.order.update).not.toHaveBeenCalled()
     // Payment updated with partial amount
-    expect(mockTx.payment.update).toHaveBeenCalledWith(
+    expect(mockTx.payment.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: 'SUCCEEDED', refundAmount: 1000 }),
+        update: expect.objectContaining({ status: 'SUCCEEDED', refundAmount: 1000 }),
       }),
     )
     // Stock NOT restored

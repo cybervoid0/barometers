@@ -6,6 +6,7 @@ import slugify from 'slugify'
 import { z } from 'zod'
 import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
 import {
+  CHECKOUT_SESSION_TTL_SECONDS,
   calculateShippingCents,
   DEFAULT_VARIANT_WEIGHT_GRAMS,
   getShippingZone,
@@ -19,6 +20,7 @@ import { authConfig } from '@/services/auth'
 import { stripe } from '@/services/stripe'
 import { ImageType } from '@/types'
 import { isAdminRole } from '@/utils/roles'
+import { releasePendingOrder } from './order-lifecycle'
 
 // --- Auth helpers ---
 
@@ -376,6 +378,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     // the reservation and cancel the order, otherwise a Stripe error would leak
     // inventory and strand a PENDING order that never gets a Stripe lifecycle
     // event to clean it up.
+    let createdSessionId: string | undefined
     try {
       // Prepare Stripe line items (EUR only; priceId presence validated above).
       const lineItems = input.items.map(item => {
@@ -408,6 +411,10 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
         // session create call fails. Gate it behind an env flag so the shop works
         // before Tax is set up; flip STRIPE_TAX_ENABLED=true once it's ready.
         automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
+        // Shorten the default 24h hold so reserved stock is returned (via the
+        // checkout.session.expired webhook) within the hour if the buyer never
+        // pays — important for low-stock / single-item collectibles.
+        expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_SESSION_TTL_SECONDS,
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
         metadata: { orderId: order.id },
@@ -415,6 +422,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
           metadata: { orderId: order.id },
         },
       })
+      createdSessionId = stripeSession.id
 
       if (!stripeSession.url) {
         throw new Error('Stripe session created without a checkout URL')
@@ -433,22 +441,19 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       }
     } catch (stripeError) {
       console.error('Stripe checkout failed, rolling back order + stock:', stripeError)
+      // Expire the session if one was created, so a cancelled order can never be
+      // paid through a lingering live session.
+      if (createdSessionId) {
+        try {
+          await stripe.checkout.sessions.expire(createdSessionId)
+        } catch (expireError) {
+          console.error('Failed to expire Stripe session during rollback:', expireError)
+        }
+      }
+      // Release the reservation + cancel the order via the shared helper (reads
+      // the persisted order.items; idempotent and guarded on PENDING).
       try {
-        await prisma.$transaction(async tx => {
-          const cancelled = await tx.order.updateMany({
-            where: { id: order.id, status: 'PENDING' },
-            data: { status: 'CANCELLED', cancelledAt: new Date() },
-          })
-          // Only return stock if this call performed the cancellation.
-          if (cancelled.count === 1) {
-            for (const item of input.items) {
-              await tx.productVariant.updateMany({
-                where: { id: item.variantId },
-                data: { stock: { increment: item.quantity } },
-              })
-            }
-          }
-        })
+        await releasePendingOrder(order.id, 'stripe checkout failed')
       } catch (rollbackError) {
         console.error('Failed to release reserved stock after Stripe failure:', rollbackError)
       }
@@ -601,7 +606,8 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       .filter(i => !inputImageUrls.includes(i.url))
       .map(i => i.id)
 
-    // Fix #11: Calculate order based on remaining images count after deletions
+    // Base the new images' order on the count AFTER deletions so they don't
+    // collide with existing images' order values.
     const remainingImagesCount = existingProduct.images.length - deletedImageIds.length
 
     // Database transaction
@@ -681,7 +687,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
         }
       }
 
-      // Fix #10: Update slug when product name changes
+      // Keep the slug in sync when the product name changes
       const updatedProduct = await tx.product.update({
         where: { id: input.id },
         data: {

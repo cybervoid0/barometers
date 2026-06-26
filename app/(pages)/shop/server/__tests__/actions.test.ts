@@ -32,6 +32,7 @@ jest.mock('@/prisma/prismaClient', () => {
     productVariant: {
       findMany: jest.fn(),
       updateMany: jest.fn(),
+      update: jest.fn(),
     },
     shippingAddress: {
       create: jest.fn(),
@@ -48,7 +49,7 @@ jest.mock('@/services/stripe', () => ({
   stripe: {
     refunds: { create: jest.fn() },
     customers: { create: jest.fn(), del: jest.fn() },
-    checkout: { sessions: { create: jest.fn() } },
+    checkout: { sessions: { create: jest.fn(), expire: jest.fn() } },
   },
 }))
 
@@ -616,23 +617,30 @@ describe('createCheckoutSession', () => {
     mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1' } })
     mockPrisma.customer.findUnique.mockResolvedValueOnce({ id: 'c1', stripeCustomerId: 'cus_1' })
     mockPrisma.productVariant.findMany.mockResolvedValueOnce([activeVariant])
-    mockPrisma.productVariant.updateMany.mockResolvedValue({ count: 1 })
+    mockPrisma.productVariant.updateMany.mockResolvedValue({ count: 1 }) // reservation
     mockPrisma.shippingAddress.create.mockResolvedValueOnce({ id: 'sa1' })
     mockPrisma.order.create.mockResolvedValueOnce({ id: 'order-1' })
+    // releasePendingOrder rollback path:
     mockPrisma.order.updateMany.mockResolvedValue({ count: 1 })
+    mockPrisma.order.findUnique.mockResolvedValue({
+      id: 'order-1',
+      items: [{ variantId: 'v1', quantity: 2 }],
+    })
+    mockPrisma.productVariant.update.mockResolvedValue({})
     ;(stripe.checkout.sessions.create as jest.Mock).mockRejectedValueOnce(new Error('stripe down'))
 
     const result = await createCheckoutSession(validInput)
 
     expect(result).toEqual({ success: false, error: 'Failed to create checkout session' })
-    // Order cancelled (guarded) and stock returned.
+    // Order cancelled (guarded) via releasePendingOrder.
     expect(mockPrisma.order.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'order-1', status: 'PENDING' },
         data: expect.objectContaining({ status: 'CANCELLED' }),
       }),
     )
-    expect(mockPrisma.productVariant.updateMany).toHaveBeenCalledWith({
+    // Stock returned through the shared helper (productVariant.update, not updateMany).
+    expect(mockPrisma.productVariant.update).toHaveBeenCalledWith({
       where: { id: 'v1' },
       data: { stock: { increment: 2 } },
     })
