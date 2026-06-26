@@ -23,4 +23,10 @@ export async function register(rawValues: unknown) {
       role: 'USER',
     },
   })
+
+  // NOTE: guest orders are intentionally NOT linked here. Registration does not
+  // prove ownership of the email (there is no verification step), so linking on
+  // sign-up would let anyone claim a guest's order history + shipping PII just
+  // by registering with their email. Linking happens on LOGIN instead, where the
+  // password proves account control (see services/auth.ts authorize()).
 }

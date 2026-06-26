@@ -10,9 +10,11 @@ function modelMock() {
     findFirstOrThrow: jest.fn(),
     findMany: jest.fn(),
     update: jest.fn(),
+    updateMany: jest.fn(),
     delete: jest.fn(),
     deleteMany: jest.fn(),
     createManyAndReturn: jest.fn(),
+    count: jest.fn(),
   }
 }
 
@@ -29,6 +31,8 @@ export const mockPrisma: {
   inaccuracyReport: ModelMock
   material: ModelMock
   subCategory: ModelMock
+  customer: ModelMock
+  order: ModelMock
   $transaction: jest.Mock
 } = {
   barometer: modelMock(),
@@ -40,9 +44,12 @@ export const mockPrisma: {
   inaccuracyReport: modelMock(),
   material: modelMock(),
   subCategory: modelMock(),
-  $transaction: jest.fn((fn: (tx: Record<string, ModelMock>) => unknown) =>
-    fn({ image: mockPrisma.image, barometer: mockPrisma.barometer }),
-  ),
+  customer: modelMock(),
+  order: modelMock(),
+  // Pass the full mock as the transaction client — a superset of the previous
+  // `{ image, barometer }`, so existing suites keep working while transactions
+  // that touch customer/order are now supported.
+  $transaction: jest.fn((fn: (tx: typeof mockPrisma) => unknown) => fn(mockPrisma)),
 }
 
 export const mockRequireAdmin = jest.fn()
@@ -102,4 +109,7 @@ export function resetAllMocks() {
   mockHeadersMap.clear()
   mockRequireAdmin.mockResolvedValue({ user: { role: 'ADMIN', name: 'Test Admin' } })
   mockRequireAuth.mockResolvedValue({ user: { role: 'USER', name: 'Test User' } })
+  // Default: no guest customers to link, so account-linking is a no-op unless a
+  // test opts in. Keeps unrelated suites (e.g. register) green.
+  mockPrisma.customer.findMany.mockResolvedValue([])
 }

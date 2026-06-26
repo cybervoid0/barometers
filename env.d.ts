@@ -12,6 +12,27 @@ declare namespace NodeJS {
     MINIO_SECRET_KEY: string
     NEXT_PUBLIC_MINIO_BUCKET: string
     NEXT_PUBLIC_MINIO_URL: string
+    STRIPE_SECRET_KEY: string
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string
+    STRIPE_WEBHOOK_SECRET: string
+    /** Set to "true" only after Stripe Tax is fully configured (active + origin address). */
+    STRIPE_TAX_ENABLED?: string
+    /** Resend API key. When absent, transactional emails are skipped (logged no-op). */
+    RESEND_API_KEY?: string
+    /** Verified sender, e.g. "Barometers Realm <noreply@barometers.info>". */
+    EMAIL_FROM?: string
+    /** Optional reply-to address (e.g. a monitored support inbox). */
+    EMAIL_REPLY_TO?: string
+    /**
+     * Where new-order notifications are sent (admin inbox). Comma-separated for
+     * multiple recipients. Defaults to orders@barometers.info.
+     */
+    ORDER_NOTIFICATIONS_EMAIL?: string
+    /**
+     * Shared bearer token for cron-triggered endpoints (e.g. the stale-order
+     * sweep at /api/cron/release-stale-orders). Required at boot.
+     */
+    CRON_SECRET: string
   }
 }
 

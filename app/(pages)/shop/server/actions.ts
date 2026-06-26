@@ -1,0 +1,964 @@
+'use server'
+
+import type { OrderStatus, ProductVariant } from '@prisma/client'
+import { getServerSession } from 'next-auth'
+import slugify from 'slugify'
+import { z } from 'zod'
+import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
+import {
+  CHECKOUT_SESSION_TTL_SECONDS,
+  calculateShippingCents,
+  DEFAULT_VARIANT_WEIGHT_GRAMS,
+  getShippingZone,
+  SHIPPING_ZONE_LABEL,
+  VALID_ORDER_TRANSITIONS,
+} from '@/constants'
+import { prisma } from '@/prisma/prismaClient'
+import { sendOrderShippedEmail, sendTrackingUpdatedEmail } from '@/server/email/order-shipped'
+import { saveImage } from '@/server/files/images'
+import { authConfig } from '@/services/auth'
+import { stripe } from '@/services/stripe'
+import { ImageType } from '@/types'
+import { isAdminRole } from '@/utils/roles'
+import { releasePendingOrder } from './order-lifecycle'
+
+// --- Auth helpers ---
+
+/**
+ * Admin guard for the shop's client-facing server actions. Unlike the throwing
+ * `requireAdmin` in `server/auth.ts`, these actions are called from the client
+ * and must return a result object the UI can surface as a toast. Returns the
+ * bail-out result to `return` directly, or `null` when the caller is an
+ * admin/owner.
+ *
+ *   const denied = await adminGuard()
+ *   if (denied) return denied
+ */
+async function adminGuard(): Promise<{ success: false; error: string } | null> {
+  const session = await getServerSession(authConfig)
+  if (!isAdminRole(session?.user?.role)) {
+    return { success: false, error: 'Unauthorized' }
+  }
+  return null
+}
+
+// --- Checkout types ---
+
+interface CreateCheckoutSessionInput {
+  items: Array<{
+    variantId: string
+    quantity: number
+  }>
+  shippingAddress: {
+    firstName: string
+    lastName: string
+    email: string
+    phone?: string
+    address: string
+    city: string
+    state?: string
+    postalCode: string
+    country: string
+  }
+}
+
+// A server action is a public HTTP endpoint — validate the payload at runtime
+// rather than trusting the TS type. Crucially `quantity` must be a positive
+// integer so a tampered request can't corrupt totals or the stock decrement.
+const checkoutInputSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        variantId: z.string().min(1),
+        quantity: z.number().int().positive().max(100),
+      }),
+    )
+    .min(1, 'Cart is empty'),
+  shippingAddress: z.object({
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    email: z.email(),
+    phone: z.string().optional(),
+    address: z.string().min(1),
+    city: z.string().min(1),
+    state: z.string().optional(),
+    postalCode: z.string().min(1),
+    country: z.string().min(2),
+  }),
+})
+
+/**
+ * Create a product with variants in Stripe and local database
+ * Uses rollback pattern to clean up Stripe resources on failure
+ */
+export async function createProductWithVariants(input: TransformedProductData) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  let stripeProductId: string | undefined
+  const createdStripePriceIds: string[] = []
+
+  try {
+    const slug = slugify(input.name, { lower: true, strict: true })
+
+    // Save images to storage
+    const savedImages = await Promise.all(
+      input.images.map(async (img, order) => ({
+        url: await saveImage(img.url, ImageType.Product, slug),
+        name: img.name,
+        order,
+      })),
+    )
+
+    // Create product in Stripe first
+    const stripeProduct = await stripe.products.create({
+      name: input.name,
+      description: input.description,
+    })
+    stripeProductId = stripeProduct.id
+
+    // Create all Stripe prices before DB operations
+    const variantPrices: Array<{
+      variant: (typeof input.variants)[number]
+      stripePriceIdEUR?: string
+    }> = []
+
+    for (const variant of input.variants) {
+      let stripePriceIdEUR: string | undefined
+
+      if (variant.priceEUR !== undefined) {
+        const priceEUR = await stripe.prices.create({
+          product: stripeProduct.id,
+          unit_amount: variant.priceEUR,
+          currency: 'eur',
+          metadata: { sku: variant.sku },
+        })
+        stripePriceIdEUR = priceEUR.id
+        createdStripePriceIds.push(priceEUR.id)
+      }
+
+      variantPrices.push({ variant, stripePriceIdEUR })
+    }
+
+    // Now create everything in database within a transaction
+    const result = await prisma.$transaction(async tx => {
+      const product = await tx.product.create({
+        data: {
+          name: input.name,
+          slug,
+          description: input.description,
+          stripeProductId: stripeProduct.id,
+          isActive: true,
+          images: savedImages.length > 0 ? { createMany: { data: savedImages } } : undefined,
+          options:
+            input.options.length > 0
+              ? {
+                  createMany: {
+                    data: input.options.map(opt => ({
+                      name: opt.name,
+                      values: opt.values,
+                      position: opt.position,
+                    })),
+                  },
+                }
+              : undefined,
+        },
+      })
+
+      const createdVariants: ProductVariant[] = []
+
+      for (const { variant, stripePriceIdEUR } of variantPrices) {
+        const createdVariant = await tx.productVariant.create({
+          data: {
+            productId: product.id,
+            sku: variant.sku,
+            options: variant.options,
+            priceEUR: variant.priceEUR,
+            stock: variant.stock,
+            weight: variant.weight,
+            stripePriceIdEUR,
+            isActive: true,
+          },
+        })
+        createdVariants.push(createdVariant)
+      }
+
+      return { product, variants: createdVariants }
+    })
+
+    return {
+      success: true,
+      product: { ...result.product, variants: result.variants },
+    }
+  } catch (error) {
+    console.error('Error creating product with variants:', error)
+
+    // Rollback: archive Stripe prices and product
+    if (stripeProductId) {
+      try {
+        // Archive prices first (can't delete, only archive)
+        for (const priceId of createdStripePriceIds) {
+          await stripe.prices.update(priceId, { active: false })
+        }
+        // Archive the product
+        await stripe.products.update(stripeProductId, { active: false })
+        console.log(`Rolled back Stripe product ${stripeProductId}`)
+      } catch (rollbackError) {
+        console.error('Failed to rollback Stripe resources:', rollbackError)
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Create Stripe Checkout Session (works with variants)
+ * Supports both authenticated and guest checkout
+ */
+export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
+  const session = await getServerSession(authConfig)
+  const userId = session?.user?.id ?? null
+
+  const parsed = checkoutInputSchema.safeParse(input)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid checkout request' }
+  }
+
+  try {
+    const { email, firstName, lastName } = input.shippingAddress
+    const customerName = `${firstName} ${lastName}`.trim()
+
+    // Find existing customer: by userId for logged-in users, by email for guests
+    let customer = userId
+      ? await prisma.customer.findUnique({
+          where: { userId },
+          select: { id: true, stripeCustomerId: true },
+        })
+      : await prisma.customer.findFirst({
+          where: { email, userId: null },
+          select: { id: true, stripeCustomerId: true },
+        })
+
+    if (!customer) {
+      let stripeCustomer: { id: string }
+      try {
+        stripeCustomer = await stripe.customers.create({
+          email,
+          name: customerName,
+          metadata: userId ? { userId } : undefined,
+        })
+      } catch (error) {
+        console.error('Failed to create Stripe customer:', error)
+        return { success: false, error: 'Failed to create customer in payment system' }
+      }
+
+      try {
+        customer = await prisma.customer.create({
+          data: {
+            ...(userId ? { userId } : {}),
+            email,
+            name: customerName,
+            stripeCustomerId: stripeCustomer.id,
+          },
+          select: { id: true, stripeCustomerId: true },
+        })
+      } catch (error) {
+        console.error('Failed to save customer to database, rolling back Stripe customer:', error)
+        try {
+          await stripe.customers.del(stripeCustomer.id)
+        } catch (deleteError) {
+          console.error('Failed to delete Stripe customer during rollback:', deleteError)
+        }
+        return { success: false, error: 'Failed to create customer' }
+      }
+    }
+
+    // Load variants for pricing/validation. Stock is deliberately NOT trusted
+    // from this read — it is enforced atomically at reservation time below, so
+    // two concurrent checkouts can't both pass a stale check and oversell.
+    const variants = await prisma.productVariant.findMany({
+      where: { id: { in: input.items.map(item => item.variantId) } },
+      include: { product: true },
+    })
+
+    for (const item of input.items) {
+      const variant = variants.find(v => v.id === item.variantId)
+      if (!variant) {
+        throw new Error(`Variant ${item.variantId} not found`)
+      }
+      if (!variant.isActive || !variant.product.isActive) {
+        throw new Error(`Product ${variant.product.name} is not available`)
+      }
+      if (!variant.stripePriceIdEUR) {
+        throw new Error(`EUR price not configured for ${variant.product.name}`)
+      }
+    }
+
+    // Calculate totals (shop sells exclusively in EUR)
+    const subtotal = input.items.reduce((sum, item) => {
+      const variant = variants.find(v => v.id === item.variantId)
+      if (!variant) return sum
+      return sum + (variant.priceEUR || 0) * item.quantity
+    }, 0)
+
+    const country = input.shippingAddress.country
+    // Weight-based shipping: sum variant weights (defaulting missing ones) and
+    // price by destination zone. See calculateShippingCents in constants/shop.
+    const totalWeightGrams = input.items.reduce((sum, item) => {
+      const variant = variants.find(v => v.id === item.variantId)
+      const grams = variant?.weight ?? DEFAULT_VARIANT_WEIGHT_GRAMS
+      return sum + grams * item.quantity
+    }, 0)
+    const shippingCost = calculateShippingCents(totalWeightGrams, country)
+    const tax = 0 // Tax handled by Stripe automatic_tax
+    const total = subtotal + shippingCost + tax
+
+    // Generate order number
+    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
+
+    // Prepare order items data
+    const orderItemsData = input.items.map(item => {
+      const variant = variants.find(v => v.id === item.variantId)
+      if (!variant) throw new Error(`Variant ${item.variantId} not found`)
+      return {
+        productId: variant.productId,
+        variantId: variant.id,
+        quantity: item.quantity,
+        priceAtTime: variant.priceEUR || 0,
+        currency: 'EUR' as const,
+        variantInfo: variant.options as Record<string, string>,
+      }
+    })
+
+    // Reserve stock and create the order atomically. The guarded conditional
+    // decrement (updateMany ... where stock >= quantity) is what prevents two
+    // concurrent checkouts from overselling the last unit: only one updateMany
+    // can win the row, the other gets count 0 and the whole transaction rolls
+    // back. Reserved stock is released if the session expires, payment fails, or
+    // the order is refunded (see the webhook handlers).
+    const order = await prisma.$transaction(async tx => {
+      for (const item of input.items) {
+        const reserved = await tx.productVariant.updateMany({
+          where: { id: item.variantId, stock: { gte: item.quantity } },
+          data: { stock: { decrement: item.quantity } },
+        })
+        if (reserved.count !== 1) {
+          const variant = variants.find(v => v.id === item.variantId)
+          throw new Error(`Insufficient stock for ${variant?.product.name ?? item.variantId}`)
+        }
+      }
+
+      const shippingAddress = await tx.shippingAddress.create({
+        data: input.shippingAddress,
+      })
+
+      return tx.order.create({
+        data: {
+          orderNumber,
+          customerId: customer.id,
+          shippingAddressId: shippingAddress.id,
+          status: 'PENDING',
+          currency: 'EUR',
+          subtotal,
+          shippingCost,
+          tax,
+          total,
+          items: {
+            createMany: { data: orderItemsData },
+          },
+        },
+      })
+    })
+
+    // From here the order exists and stock is reserved. Any failure must release
+    // the reservation and cancel the order, otherwise a Stripe error would leak
+    // inventory and strand a PENDING order that never gets a Stripe lifecycle
+    // event to clean it up.
+    let createdSessionId: string | undefined
+    try {
+      // Prepare Stripe line items (EUR only; priceId presence validated above).
+      const lineItems = input.items.map(item => {
+        const variant = variants.find(v => v.id === item.variantId)
+        if (!variant?.stripePriceIdEUR) {
+          throw new Error(`EUR price not found for variant ${variant?.sku}`)
+        }
+        return { price: variant.stripePriceIdEUR, quantity: item.quantity }
+      })
+
+      // Create Stripe Checkout Session (external call, outside DB transaction)
+      const stripeSession = await stripe.checkout.sessions.create({
+        customer: customer.stripeCustomerId,
+        customer_update: { address: 'auto' },
+        line_items: lineItems,
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: 'fixed_amount',
+              fixed_amount: {
+                amount: shippingCost,
+                currency: 'eur',
+              },
+              display_name: SHIPPING_ZONE_LABEL[getShippingZone(country)],
+            },
+          },
+        ],
+        mode: 'payment',
+        // Stripe Tax must be fully configured (active + origin address) or the
+        // session create call fails. Gate it behind an env flag so the shop works
+        // before Tax is set up; flip STRIPE_TAX_ENABLED=true once it's ready.
+        automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
+        // Shorten the default 24h hold so reserved stock is returned (via the
+        // checkout.session.expired webhook) within the hour if the buyer never
+        // pays — important for low-stock / single-item collectibles.
+        expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_SESSION_TTL_SECONDS,
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
+        metadata: { orderId: order.id },
+        payment_intent_data: {
+          metadata: { orderId: order.id },
+        },
+      })
+      createdSessionId = stripeSession.id
+
+      if (!stripeSession.url) {
+        throw new Error('Stripe session created without a checkout URL')
+      }
+
+      // Link session to order
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { stripeSessionId: stripeSession.id },
+      })
+
+      return {
+        success: true,
+        sessionUrl: stripeSession.url,
+        orderId: order.id,
+      }
+    } catch (stripeError) {
+      console.error('Stripe checkout failed, rolling back order + stock:', stripeError)
+      // Expire the session if one was created, so a cancelled order can never be
+      // paid through a lingering live session.
+      if (createdSessionId) {
+        try {
+          await stripe.checkout.sessions.expire(createdSessionId)
+        } catch (expireError) {
+          console.error('Failed to expire Stripe session during rollback:', expireError)
+        }
+      }
+      // Release the reservation + cancel the order via the shared helper (reads
+      // the persisted order.items; idempotent and guarded on PENDING).
+      try {
+        await releasePendingOrder(order.id, 'stripe checkout failed')
+      } catch (rollbackError) {
+        console.error('Failed to release reserved stock after Stripe failure:', rollbackError)
+      }
+      return { success: false, error: 'Failed to create checkout session' }
+    }
+  } catch (error) {
+    console.error('Error creating checkout session:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Input for updating a product with variants
+ */
+interface UpdateProductInput {
+  id: string
+  name: string
+  description?: string
+  images: Array<{ url: string; name: string }>
+  options: Array<{ name: string; values: string[]; position: number }>
+  variants: Array<{
+    id?: string // existing variant ID (undefined = new variant)
+    sku: string
+    options: Record<string, string>
+    priceEUR?: number
+    stock: number
+    /**
+     * The stock value the edit form was loaded with. When present (existing
+     * variants), stock is updated as an atomic DELTA (new − original) so a
+     * concurrent sale's reservation isn't clobbered by an absolute write. Absent
+     * for new variants, where `stock` is set absolutely.
+     */
+    originalStock?: number
+    weight?: number
+  }>
+}
+
+/**
+ * Update a product with variants, syncing with Stripe
+ * - New variants: create Stripe prices
+ * - Deleted variants: archive Stripe prices and soft-delete in DB
+ * - Price changes: create new Stripe prices (prices are immutable), archive old ones
+ */
+export async function updateProductWithVariants(input: UpdateProductInput) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  // Track every Stripe mutation so the catch block can fully reverse them if the
+  // DB transaction fails — otherwise Stripe and the DB diverge (Stripe shows the
+  // new name / archived prices while the DB still has the old data).
+  const newStripePriceIds: string[] = []
+  const archivedStripePriceIds: string[] = []
+  let stripeProductId: string | undefined
+  let oldName: string | undefined
+  let oldDescription: string | null | undefined
+  let productMetadataChanged = false
+
+  try {
+    // Fetch existing product with variants
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: input.id },
+      include: {
+        variants: true,
+        options: true,
+        images: true,
+      },
+    })
+
+    if (!existingProduct) {
+      return { success: false, error: 'Product not found' }
+    }
+
+    // Snapshot for rollback (catch block can't see `existingProduct`).
+    stripeProductId = existingProduct.stripeProductId
+    oldName = existingProduct.name
+    oldDescription = existingProduct.description
+
+    // Determine which variants are new, updated, or deleted
+    const existingVariantIds = existingProduct.variants.map(v => v.id)
+    const inputVariantIds = input.variants.filter(v => v.id).map(v => v.id as string)
+    const deletedVariantIds = existingVariantIds.filter(id => !inputVariantIds.includes(id))
+
+    // Archive Stripe prices for deleted variants
+    for (const variantId of deletedVariantIds) {
+      const variant = existingProduct.variants.find(v => v.id === variantId)
+      if (variant) {
+        if (variant.stripePriceIdEUR) {
+          await stripe.prices.update(variant.stripePriceIdEUR, { active: false })
+          archivedStripePriceIds.push(variant.stripePriceIdEUR)
+        }
+      }
+    }
+
+    // Prepare variant updates with new Stripe prices where needed
+    const variantUpdates: Array<{
+      variant: (typeof input.variants)[number]
+      stripePriceIdEUR?: string
+      needsNewEURPrice: boolean
+    }> = []
+
+    for (const inputVariant of input.variants) {
+      const existingVariant = inputVariant.id
+        ? existingProduct.variants.find(v => v.id === inputVariant.id)
+        : undefined
+
+      let stripePriceIdEUR = existingVariant?.stripePriceIdEUR ?? undefined
+
+      // Check if EUR price changed or is new
+      const needsNewEURPrice =
+        inputVariant.priceEUR !== undefined &&
+        (!existingVariant || existingVariant.priceEUR !== inputVariant.priceEUR)
+
+      // Archive old prices and create new ones if price changed
+      if (needsNewEURPrice) {
+        if (stripePriceIdEUR) {
+          await stripe.prices.update(stripePriceIdEUR, { active: false })
+          archivedStripePriceIds.push(stripePriceIdEUR)
+        }
+        if (inputVariant.priceEUR) {
+          const newPrice = await stripe.prices.create({
+            product: existingProduct.stripeProductId,
+            unit_amount: inputVariant.priceEUR,
+            currency: 'eur',
+            metadata: { sku: inputVariant.sku },
+          })
+          stripePriceIdEUR = newPrice.id
+          newStripePriceIds.push(newPrice.id)
+        } else {
+          stripePriceIdEUR = undefined
+        }
+      }
+
+      variantUpdates.push({
+        variant: inputVariant,
+        stripePriceIdEUR,
+        needsNewEURPrice,
+      })
+    }
+
+    // Update Stripe product name/description if changed
+    if (existingProduct.name !== input.name || existingProduct.description !== input.description) {
+      await stripe.products.update(existingProduct.stripeProductId, {
+        name: input.name,
+        description: input.description ?? undefined,
+      })
+      productMetadataChanged = true
+    }
+
+    // Handle images - determine new and deleted
+    const existingImageUrls = existingProduct.images.map(i => i.url)
+    const inputImageUrls = input.images.map(i => i.url)
+    const newImages = input.images.filter(i => !existingImageUrls.includes(i.url))
+    const deletedImageIds = existingProduct.images
+      .filter(i => !inputImageUrls.includes(i.url))
+      .map(i => i.id)
+
+    // Base the new images' order on the count AFTER deletions so they don't
+    // collide with existing images' order values.
+    const remainingImagesCount = existingProduct.images.length - deletedImageIds.length
+
+    // Database transaction
+    const result = await prisma.$transaction(async tx => {
+      // Delete removed images
+      if (deletedImageIds.length > 0) {
+        await tx.productImage.deleteMany({
+          where: { id: { in: deletedImageIds } },
+        })
+      }
+
+      // Create new images
+      if (newImages.length > 0) {
+        await tx.productImage.createMany({
+          data: newImages.map((img, index) => ({
+            productId: input.id,
+            url: img.url,
+            name: img.name,
+            order: remainingImagesCount + index,
+          })),
+        })
+      }
+
+      // Delete old options and create new ones
+      await tx.productOption.deleteMany({
+        where: { productId: input.id },
+      })
+
+      if (input.options.length > 0) {
+        await tx.productOption.createMany({
+          data: input.options.map(opt => ({
+            productId: input.id,
+            name: opt.name,
+            values: opt.values,
+            position: opt.position,
+          })),
+        })
+      }
+
+      // Soft-delete removed variants
+      if (deletedVariantIds.length > 0) {
+        await tx.productVariant.updateMany({
+          where: { id: { in: deletedVariantIds } },
+          data: { isActive: false },
+        })
+      }
+
+      // Update or create variants
+      for (const { variant, stripePriceIdEUR } of variantUpdates) {
+        if (variant.id) {
+          // Apply stock as an atomic delta (new − original) when the form sent a
+          // baseline, so a sale that reserved stock while the admin was editing
+          // isn't overwritten. Absolute set only as a fallback (no baseline).
+          const stockUpdate =
+            variant.originalStock !== undefined
+              ? { increment: variant.stock - variant.originalStock }
+              : variant.stock
+
+          // Update existing variant
+          await tx.productVariant.update({
+            where: { id: variant.id },
+            data: {
+              sku: variant.sku,
+              options: variant.options,
+              priceEUR: variant.priceEUR,
+              stock: stockUpdate,
+              weight: variant.weight,
+              stripePriceIdEUR,
+            },
+          })
+        } else {
+          // Create new variant
+          await tx.productVariant.create({
+            data: {
+              productId: input.id,
+              sku: variant.sku,
+              options: variant.options,
+              priceEUR: variant.priceEUR,
+              stock: variant.stock,
+              weight: variant.weight,
+              stripePriceIdEUR,
+              isActive: true,
+            },
+          })
+        }
+      }
+
+      // Keep the slug in sync when the product name changes
+      const updatedProduct = await tx.product.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          slug: slugify(input.name, { lower: true, strict: true }),
+          description: input.description,
+        },
+        include: {
+          images: { orderBy: { order: 'asc' } },
+          variants: { where: { isActive: true }, orderBy: { createdAt: 'asc' } },
+          options: { orderBy: { position: 'asc' } },
+        },
+      })
+
+      return updatedProduct
+    })
+
+    return { success: true, product: result }
+  } catch (error) {
+    console.error('Error updating product with variants:', error)
+
+    // Rollback Stripe to match the DB, which already rolled back. Best-effort:
+    // archive prices we created, reactivate prices we archived, and restore the
+    // product name/description if we changed it.
+    for (const priceId of newStripePriceIds) {
+      try {
+        await stripe.prices.update(priceId, { active: false })
+      } catch (rollbackError) {
+        console.error('Failed to archive new Stripe price during rollback:', rollbackError)
+      }
+    }
+    for (const priceId of archivedStripePriceIds) {
+      try {
+        await stripe.prices.update(priceId, { active: true })
+      } catch (rollbackError) {
+        console.error('Failed to reactivate Stripe price during rollback:', rollbackError)
+      }
+    }
+    if (productMetadataChanged && stripeProductId) {
+      try {
+        await stripe.products.update(stripeProductId, {
+          name: oldName,
+          description: oldDescription ?? undefined,
+        })
+      } catch (rollbackError) {
+        console.error('Failed to restore Stripe product metadata during rollback:', rollbackError)
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Update order status with transition validation
+ */
+export async function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  trackingNumber?: string,
+) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  // Validate the incoming status against the known enum instead of relying on
+  // the transition lookup to incidentally reject garbage.
+  if (!orderId || !(status in VALID_ORDER_TRANSITIONS)) {
+    return { success: false, error: 'Invalid order or status' }
+  }
+
+  try {
+    // Validate status transition
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { status: true },
+    })
+
+    if (!currentOrder) {
+      return { success: false, error: 'Order not found' }
+    }
+
+    const allowed: readonly OrderStatus[] = VALID_ORDER_TRANSITIONS[currentOrder.status]
+    if (!allowed.includes(status)) {
+      return {
+        success: false,
+        error: `Cannot transition from ${currentOrder.status} to ${status}`,
+      }
+    }
+
+    const data: {
+      status: OrderStatus
+      trackingNumber?: string
+      shippedAt?: Date
+      deliveredAt?: Date
+      cancelledAt?: Date
+    } = { status }
+
+    if (trackingNumber) {
+      data.trackingNumber = trackingNumber
+    }
+
+    if (status === 'SHIPPED') {
+      data.shippedAt = new Date()
+    } else if (status === 'DELIVERED') {
+      data.deliveredAt = new Date()
+    } else if (status === 'CANCELLED') {
+      data.cancelledAt = new Date()
+    }
+
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data,
+    })
+
+    // Notify the customer (guest or registered) once the order ships. Sent
+    // outside the update and non-fatally — a mail failure must not fail the
+    // status change; the idempotency key guards against duplicate sends.
+    if (status === 'SHIPPED') {
+      try {
+        await sendOrderShippedEmail(orderId)
+      } catch (emailError) {
+        console.error('Failed to send order shipped email:', emailError)
+      }
+    }
+
+    return { success: true, order }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to update order',
+    }
+  }
+}
+
+/**
+ * Add, correct, or clear the tracking number on an already-shipped order,
+ * independently of any status transition. When the value actually changes to a
+ * non-empty number, the customer (guest or registered) is notified by email.
+ */
+export async function updateTrackingNumber(orderId: string, trackingNumber: string) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { status: true, trackingNumber: true },
+    })
+
+    if (!order) {
+      return { success: false, error: 'Order not found' }
+    }
+
+    // Tracking only makes sense once the parcel is on its way.
+    if (!['SHIPPED', 'DELIVERED'].includes(order.status)) {
+      return {
+        success: false,
+        error: 'Tracking can only be edited after the order has shipped',
+      }
+    }
+
+    // Normalise: trim, and treat an empty string as "no tracking" (null).
+    const next = trackingNumber.trim() || null
+    if (next === order.trackingNumber) {
+      return { success: true, unchanged: true }
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { trackingNumber: next },
+    })
+
+    // Notify only when a real tracking number is now set (not when cleared).
+    // Non-fatal and keyed by value, so a mail failure never blocks the edit
+    // and re-saving the same number does not re-send.
+    if (next) {
+      try {
+        await sendTrackingUpdatedEmail(orderId)
+      } catch (emailError) {
+        console.error('Failed to send tracking updated email:', emailError)
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to update tracking number',
+    }
+  }
+}
+
+/**
+ * Issue a full refund for an order via Stripe
+ * Derives stripePaymentIntentId from the order internally
+ */
+export async function refundOrder(orderId: string) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { status: true, stripePaymentIntentId: true },
+    })
+
+    if (!order) {
+      return { success: false, error: 'Order not found' }
+    }
+
+    if (!order.stripePaymentIntentId) {
+      return { success: false, error: 'No payment intent for this order' }
+    }
+
+    if (!['PAID', 'PROCESSING', 'SHIPPED'].includes(order.status)) {
+      return { success: false, error: `Cannot refund order in ${order.status} status` }
+    }
+
+    await stripe.refunds.create(
+      { payment_intent: order.stripePaymentIntentId },
+      // Stable key so a double-click or retry can't create a second refund — we
+      // rely on Stripe to dedupe rather than racing two refund requests.
+      { idempotencyKey: `refund/${orderId}` },
+    )
+
+    // The webhook handler (handleChargeRefunded) will update the order status and restore stock
+    return { success: true }
+  } catch (error) {
+    console.error('Error refunding order:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to process refund',
+    }
+  }
+}
+
+/**
+ * Read the current status of an order (admin-only). Used by the admin UI to
+ * poll for the refund webhook (`charge.refunded`) flipping the order to
+ * REFUNDED, since the refund itself is processed asynchronously by Stripe.
+ */
+export async function getOrderStatus(orderId: string) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { status: true },
+  })
+
+  if (!order) {
+    return { success: false as const, error: 'Order not found' }
+  }
+
+  return { success: true as const, status: order.status }
+}

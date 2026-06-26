@@ -25,7 +25,6 @@ import { updateBarometer } from '@/server/barometers/actions'
 import type { BarometerDTO } from '@/server/barometers/queries'
 
 interface EstimatedPriceEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
   barometer: NonNullable<BarometerDTO>
 }
 
@@ -77,7 +76,7 @@ export function EstimatedPriceEdit({ barometer }: EstimatedPriceEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit estimated price" />
+      <EditButton title="Edit estimated price" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

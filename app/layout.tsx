@@ -3,7 +3,7 @@ import 'server-only'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Viewport } from 'next'
 import { Cinzel, Raleway } from 'next/font/google'
-import type { PropsWithChildren } from 'react'
+import { type PropsWithChildren, Suspense } from 'react'
 import { Toaster } from 'sonner'
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './globals.css'
@@ -102,9 +102,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
         >
           <Providers>
             <ChunkErrorRecovery />
-            <ScrollToTop />
+            <Suspense fallback={null}>
+              <ScrollToTop />
+            </Suspense>
             <CookieConsent />
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-center" richColors closeButton />
             <div className="flex h-screen flex-col">
               <Header />
               <main className="xs:px-0 container max-w-6xl mx-auto grow pb-12 pt-24 ">

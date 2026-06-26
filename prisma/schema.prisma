@@ -173,6 +173,7 @@ model User {
   avatarURL String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  Customer  Customer?
 }
 
 model Document {
@@ -238,4 +239,184 @@ enum EssayTopic {
   Materials
   Conservation
   Collecting
+}
+
+/// SHOP
+
+model Customer {
+  id               String   @id @default(uuid())
+  userId           String?  @unique
+  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email            String
+  name             String?
+  stripeCustomerId String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  orders           Order[]
+}
+
+model Product {
+  id              String           @id @default(uuid())
+  name            String
+  slug            String           @unique
+  description     String?
+  stripeProductId String           @unique
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  images          ProductImage[]
+  options         ProductOption[]
+  variants        ProductVariant[]
+  orderItems      OrderItem[]
+}
+
+model ProductOption {
+  id        String   @id @default(uuid())
+  productId String
+  name      String
+  values    Json
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, name])
+  @@index([productId])
+}
+
+model ProductVariant {
+  id               String         @id @default(uuid())
+  productId        String
+  sku              String         @unique
+  options          Json
+  priceEUR         Int?
+  stock            Int            @default(0)
+  stripePriceIdEUR String?        @unique
+  weight           Int?
+  dimensions       Json?
+  isActive         Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  product          Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems       OrderItem[]
+  images           ProductImage[]
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model ProductImage {
+  id        String          @id @default(uuid())
+  productId String
+  variantId String?
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  url       String
+  name      String?
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+
+  @@index([productId])
+  @@index([variantId])
+}
+
+model Order {
+  id                    String          @id @default(uuid())
+  orderNumber           String          @unique
+  customerId            String
+  customer              Customer        @relation(fields: [customerId], references: [id])
+  shippingAddressId     String
+  shippingAddress       ShippingAddress @relation(fields: [shippingAddressId], references: [id])
+  status                OrderStatus     @default(PENDING)
+  currency              Currency
+  subtotal              Int // Сумма в центах
+  shippingCost          Int             @default(0) // В центах
+  tax                   Int             @default(0) // В центах
+  total                 Int // Итого в центах
+  stripeSessionId       String?         @unique
+  stripePaymentIntentId String?         @unique
+  notes                 String?
+  trackingNumber        String?
+  shippedAt             DateTime?
+  deliveredAt           DateTime?
+  cancelledAt           DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  items                 OrderItem[]
+  payment               Payment?
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String          @id @default(uuid())
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id])
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity    Int
+  priceAtTime Int // Price in cents at time of purchase
+  currency    Currency
+  variantInfo Json? // Snapshot of variant options at time of purchase
+  createdAt   DateTime        @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model ShippingAddress {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  address    String
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  orderId               String        @unique
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  stripePaymentIntentId String        @unique
+  amount                Int // sum in cents
+  currency              Currency
+  status                PaymentStatus @default(PENDING)
+  paidAt                DateTime?
+  refundedAt            DateTime?
+  refundAmount          Int? // in cents
+  failureMessage        String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+enum OrderStatus {
+  PENDING // created, waiting for payment
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum Currency {
+  EUR
 }

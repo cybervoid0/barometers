@@ -42,4 +42,16 @@ describe('register', () => {
       expect.objectContaining({ data: expect.objectContaining({ role: 'USER' }) }),
     )
   })
+
+  it('does NOT link guest orders on registration (email is unverified)', async () => {
+    // Security: registration does not prove email ownership, so guest orders
+    // must never be claimed here. Linking happens on login instead.
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({ id: 'u-new' })
+
+    await register({ name: 'Test', email: 'guest@test.com', password: 'pass' })
+
+    expect(mockPrisma.customer.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.customer.update).not.toHaveBeenCalled()
+  })
 })

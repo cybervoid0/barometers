@@ -133,7 +133,7 @@ function EssayEditDialog({ essay }: { essay: Essay }) {
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <EditButton label="Edit essay" />
+      <EditButton title="Edit essay" />
       <DialogContent
         className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', { 'overflow-hidden': loading })}
       >

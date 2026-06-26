@@ -96,7 +96,7 @@ function BrandEdit({ brands, barometer }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit brand" />
+      <EditButton title="Change brand" />
       <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-visible">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

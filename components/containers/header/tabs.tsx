@@ -17,6 +17,8 @@ import {
 } from '@/components/ui'
 import type { MenuItem } from '@/types'
 import { cn, trimSlashes } from '@/utils'
+import { CartButton } from './cart-button'
+import { UserMenu } from './user-menu'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   menu: MenuItem[]
@@ -93,6 +95,8 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
             <Search size="18" />
           </Link>
         </div>
+        <CartButton className={cn(menuItemStyle, 'flex items-center')} />
+        <UserMenu className={cn(menuItemStyle, 'flex items-center')} />
       </div>
     </nav>
   )

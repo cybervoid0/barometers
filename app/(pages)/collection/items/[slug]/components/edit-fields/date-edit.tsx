@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { type ComponentProps, useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -27,8 +27,7 @@ import type { BarometerDTO } from '@/server/barometers/queries'
 
 dayjs.extend(utc)
 
-interface DateEditProps extends ComponentProps<'button'> {
-  size?: string | number | undefined
+interface DateEditProps {
   barometer: NonNullable<BarometerDTO>
 }
 
@@ -84,7 +83,7 @@ export function DateEdit({ barometer }: DateEditProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <EditButton label="Edit year" />
+      <EditButton title="Edit year" />
       <DialogContent className="sm:max-w-md">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(update)} noValidate>

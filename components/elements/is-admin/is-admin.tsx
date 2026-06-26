@@ -1,13 +1,14 @@
 'use client'
 
-import { AccessRole } from '@prisma/client'
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import type { PropsWithChildren } from 'react'
+import { isAdminRole } from '@/utils/roles'
 
 export function isAdmin(session: Session | null): boolean {
-  const user = session?.user
-  return user?.role === AccessRole.ADMIN
+  // Shared predicate so OWNER (not just ADMIN) sees admin nav, matching the
+  // server-side guards. See utils/roles.ts.
+  return isAdminRole(session?.user?.role)
 }
 
 export function IsAdmin({ children }: PropsWithChildren) {

@@ -17,9 +17,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui'
+import { Route } from '@/constants'
 import type { MenuItem } from '@/types'
 import { cn } from '@/utils'
 import { SocialButtons } from '../footer'
+import { useSignOut } from './use-sign-out'
 
 interface Props extends ComponentProps<'div'> {
   menu: MenuItem[]
@@ -30,6 +32,10 @@ const menuItemTextStyle =
 
 function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }) {
   const { data: session } = useSession()
+  const signOutAndCleanup = useSignOut()
+
+  const handleSignOut = () => signOutAndCleanup(closeMenu)
+
   return (
     <SheetContent
       side="left"
@@ -87,7 +93,36 @@ function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }
         </nav>
 
         {/* Footer */}
-        <div className="border-t px-6 py-4">
+        <div className="space-y-4 border-t px-6 py-4">
+          {/* Account */}
+          <div className="space-y-4">
+            {session?.user ? (
+              <>
+                <Link
+                  href={Route.Orders}
+                  onClick={closeMenu}
+                  className={cn('block no-underline', menuItemTextStyle)}
+                >
+                  My Orders
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className={cn('block text-left no-underline', menuItemTextStyle)}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href={Route.Signin}
+                onClick={closeMenu}
+                className={cn('block no-underline', menuItemTextStyle)}
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
           <SocialButtons className="mx-auto" />
         </div>
       </div>

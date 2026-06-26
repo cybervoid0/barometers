@@ -1,9 +1,11 @@
 import 'server-only'
 
 import NextLink from 'next/link'
+import { Suspense } from 'react'
 import { Image } from '@/components/elements'
 import { getMenuData } from '@/server/menu/queries'
 import { AnimatedHeader } from './animated-header'
+import { CartButton } from './cart-button'
 import { MobileMenu } from './mobile-menu'
 import { WideScreenTabs } from './tabs'
 
@@ -12,8 +14,13 @@ export async function Header() {
   return (
     <AnimatedHeader>
       <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">
-        <WideScreenTabs menu={menu} className="hidden md:block" />
-        <MobileMenu menu={menu} className="md:hidden" />
+        <Suspense fallback={<div className="hidden md:block" />}>
+          <WideScreenTabs menu={menu} className="hidden md:block" />
+        </Suspense>
+        <div className="flex items-center gap-4 md:hidden">
+          <MobileMenu menu={menu} />
+          <CartButton />
+        </div>
         <NextLink className="no-underline" href="/">
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2">
@@ -30,6 +37,9 @@ export async function Header() {
                 src="/shared/compass-logo.svg"
                 alt="logo"
                 className="object-contain"
+                // SVG — no point running it through the image optimizer, and
+                // the default (local) optimizer rejects SVG with a 400.
+                unoptimized
               />
             </div>
           </div>

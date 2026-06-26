@@ -1,4 +1,4 @@
-import type { AccessRole } from '@prisma/client'
+import type { AccessRole, Prisma } from '@prisma/client'
 
 export interface MenuItem {
   id: number | string
@@ -46,9 +46,18 @@ export enum ImageType {
   Brand = 'm',
   Category = 'c',
   Document = 'd',
+  Product = 'p',
 }
 
 export interface MediaFile {
   url: string
   name: string
 }
+
+export type ProductWithImages = Prisma.ProductGetPayload<{
+  include: { images: true; variants: true; options: true }
+}>
+
+export type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
+  include: { product: { include: { images: true } }; images: true }
+}>
