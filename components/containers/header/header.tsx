@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 import { Image } from '@/components/elements'
 import { getMenuData } from '@/server/menu/queries'
 import { AnimatedHeader } from './animated-header'
+import { CartButton } from './cart-button'
 import { MobileMenu } from './mobile-menu'
 import { WideScreenTabs } from './tabs'
 
@@ -16,7 +17,10 @@ export async function Header() {
         <Suspense fallback={<div className="hidden md:block" />}>
           <WideScreenTabs menu={menu} className="hidden md:block" />
         </Suspense>
-        <MobileMenu menu={menu} className="md:hidden" />
+        <div className="flex items-center gap-4 md:hidden">
+          <MobileMenu menu={menu} />
+          <CartButton />
+        </div>
         <NextLink className="no-underline" href="/">
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2">

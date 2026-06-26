@@ -46,7 +46,10 @@ export function UserMenu({ className }: { className?: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger aria-label="Account" className={cn('outline-none', className)}>
+      <DropdownMenuTrigger
+        aria-label="Account"
+        className={cn('cursor-pointer outline-none', className)}
+      >
         <User size={18} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
