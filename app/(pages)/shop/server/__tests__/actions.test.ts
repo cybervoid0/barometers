@@ -33,6 +33,19 @@ jest.mock('@/prisma/prismaClient', () => {
       findMany: jest.fn(),
       updateMany: jest.fn(),
       update: jest.fn(),
+      create: jest.fn(),
+    },
+    product: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    productImage: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+    },
+    productOption: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
     },
     shippingAddress: {
       create: jest.fn(),
@@ -50,6 +63,8 @@ jest.mock('@/services/stripe', () => ({
     refunds: { create: jest.fn() },
     customers: { create: jest.fn(), del: jest.fn() },
     checkout: { sessions: { create: jest.fn(), expire: jest.fn() } },
+    prices: { create: jest.fn(), update: jest.fn() },
+    products: { create: jest.fn(), update: jest.fn() },
   },
 }))
 
@@ -75,6 +90,7 @@ import {
   createCheckoutSession,
   refundOrder,
   updateOrderStatus,
+  updateProductWithVariants,
   updateTrackingNumber,
 } from '../actions'
 
@@ -84,6 +100,9 @@ const mockPrisma = prisma as unknown as {
   order: Record<string, jest.Mock>
   customer: Record<string, jest.Mock>
   productVariant: Record<string, jest.Mock>
+  product: Record<string, jest.Mock>
+  productImage: Record<string, jest.Mock>
+  productOption: Record<string, jest.Mock>
   shippingAddress: Record<string, jest.Mock>
   $transaction: jest.Mock
 }
@@ -644,5 +663,74 @@ describe('createCheckoutSession', () => {
       where: { id: 'v1' },
       data: { stock: { increment: 2 } },
     })
+  })
+})
+
+// --- updateProductWithVariants (stock delta) ---
+
+describe('updateProductWithVariants — stock delta', () => {
+  const adminSession = { user: { id: 'u1', role: 'ADMIN' } }
+
+  const existingProduct = {
+    id: 'p1',
+    name: 'Barometer Mug',
+    description: 'A mug',
+    stripeProductId: 'prod_1',
+    images: [],
+    options: [],
+    variants: [
+      {
+        id: 'v1',
+        sku: 'SKU-1',
+        options: { Size: 'L' },
+        priceEUR: 1500,
+        stock: 5,
+        weight: 500,
+        stripePriceIdEUR: 'price_1',
+      },
+    ],
+  }
+
+  // Edit form: same name/price/options (no Stripe price or product mutation),
+  // admin bumps stock 5 → 10 with originalStock baseline 5.
+  const editInput = {
+    id: 'p1',
+    name: 'Barometer Mug',
+    description: 'A mug',
+    images: [],
+    options: [],
+    variants: [
+      {
+        id: 'v1',
+        sku: 'SKU-1',
+        options: { Size: 'L' },
+        priceEUR: 1500,
+        stock: 10,
+        originalStock: 5,
+        weight: 500,
+      },
+    ],
+  }
+
+  it('updates stock as an atomic delta (new − original), not an absolute set', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce(existingProduct)
+    mockPrisma.productOption.deleteMany.mockResolvedValue({})
+    mockPrisma.productVariant.update.mockResolvedValue({})
+    mockPrisma.product.update.mockResolvedValueOnce({ id: 'p1', name: 'Barometer Mug' })
+
+    const result = await updateProductWithVariants(editInput)
+
+    expect(result.success).toBe(true)
+    // The whole point: a concurrent sale's decrement isn't clobbered.
+    expect(mockPrisma.productVariant.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'v1' },
+        data: expect.objectContaining({ stock: { increment: 5 } }),
+      }),
+    )
+    // No Stripe price/product mutation when nothing pricing-related changed.
+    expect(stripe.prices.create).not.toHaveBeenCalled()
+    expect(stripe.products.update).not.toHaveBeenCalled()
   })
 })

@@ -483,6 +483,13 @@ interface UpdateProductInput {
     options: Record<string, string>
     priceEUR?: number
     stock: number
+    /**
+     * The stock value the edit form was loaded with. When present (existing
+     * variants), stock is updated as an atomic DELTA (new − original) so a
+     * concurrent sale's reservation isn't clobbered by an absolute write. Absent
+     * for new variants, where `stock` is set absolutely.
+     */
+    originalStock?: number
     weight?: number
   }>
 }
@@ -658,6 +665,14 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       // Update or create variants
       for (const { variant, stripePriceIdEUR } of variantUpdates) {
         if (variant.id) {
+          // Apply stock as an atomic delta (new − original) when the form sent a
+          // baseline, so a sale that reserved stock while the admin was editing
+          // isn't overwritten. Absolute set only as a fallback (no baseline).
+          const stockUpdate =
+            variant.originalStock !== undefined
+              ? { increment: variant.stock - variant.originalStock }
+              : variant.stock
+
           // Update existing variant
           await tx.productVariant.update({
             where: { id: variant.id },
@@ -665,7 +680,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
               sku: variant.sku,
               options: variant.options,
               priceEUR: variant.priceEUR,
-              stock: variant.stock,
+              stock: stockUpdate,
               weight: variant.weight,
               stripePriceIdEUR,
             },

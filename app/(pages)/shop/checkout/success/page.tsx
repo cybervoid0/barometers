@@ -41,7 +41,6 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   }
 
   const isGuest = order.customer.userId === null
-  const guestEmail = order.shippingAddress.email
 
   return (
     <div className="container mx-auto py-16 max-w-2xl">
@@ -114,8 +113,8 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         <div className="mt-8 rounded-lg border bg-muted/30 p-6 text-center">
           <h3 className="font-semibold mb-1">Keep track of your order</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Create an account with <span className="font-medium">{guestEmail}</span> to see this
-            order under My Orders — or look it up any time with your order number.
+            Create an account to see this order under My Orders — or look it up any time with your
+            order number.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href={Route.Register}>

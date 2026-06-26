@@ -77,14 +77,23 @@ function ProductEditForm({ product }: Props) {
               values: opt.values,
               position: index,
             })),
-            variants: values.variants.map(v => ({
-              id: (v as { id?: string }).id,
-              sku: v.sku,
-              options: v.options,
-              priceEUR: v.priceEUR ? Math.round(Number.parseFloat(v.priceEUR) * 100) : undefined,
-              stock: Number.parseInt(v.stock, 10),
-              weight: v.weight ? Number.parseInt(v.weight, 10) : undefined,
-            })),
+            variants: values.variants.map(v => {
+              const id = (v as { id?: string }).id
+              // Baseline the server uses to apply stock as a delta (avoids
+              // clobbering reservations made while this form was open).
+              const originalStock = id
+                ? product.variants.find(pv => pv.id === id)?.stock
+                : undefined
+              return {
+                id,
+                sku: v.sku,
+                options: v.options,
+                priceEUR: v.priceEUR ? Math.round(Number.parseFloat(v.priceEUR) * 100) : undefined,
+                stock: Number.parseInt(v.stock, 10),
+                originalStock,
+                weight: v.weight ? Number.parseInt(v.weight, 10) : undefined,
+              }
+            }),
           })
 
           if (!result.success) {
@@ -102,7 +111,7 @@ function ProductEditForm({ product }: Props) {
         }
       })
     },
-    [product.id, router],
+    [product.id, product.variants, router],
   )
 
   return (
