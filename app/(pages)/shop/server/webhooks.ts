@@ -1,5 +1,6 @@
 import type Stripe from 'stripe'
 import { prisma } from '@/prisma/prismaClient'
+import { sendOrderAdminNotification } from '@/server/email/order-admin-notification'
 import { sendOrderConfirmationEmail } from '@/server/email/order-confirmation'
 import { stripe } from '@/services/stripe'
 
@@ -95,11 +96,15 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 
     console.log(`Order ${orderId} marked as PAID`)
 
-    // Send the confirmation email outside the transaction — a mail failure must
-    // never roll back a paid order. `sendOrderConfirmationEmail` never throws,
-    // and its idempotency key prevents duplicates on webhook retries.
+    // Notify the customer and the shop admin outside the transaction — a mail
+    // failure must never roll back a paid order nor fail the webhook (which would
+    // trigger Stripe retries). allSettled swallows errors; idempotency keys
+    // prevent duplicates on retries.
     if (newlyPaid) {
-      await sendOrderConfirmationEmail(orderId)
+      await Promise.allSettled([
+        sendOrderConfirmationEmail(orderId),
+        sendOrderAdminNotification(orderId),
+      ])
     }
   } catch (error) {
     console.error('Error handling checkout.session.completed:', error)

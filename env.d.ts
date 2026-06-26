@@ -23,6 +23,11 @@ declare namespace NodeJS {
     EMAIL_FROM?: string
     /** Optional reply-to address (e.g. a monitored support inbox). */
     EMAIL_REPLY_TO?: string
+    /**
+     * Where new-order notifications are sent (admin inbox). Comma-separated for
+     * multiple recipients. Defaults to orders@barometers.info.
+     */
+    ORDER_NOTIFICATIONS_EMAIL?: string
   }
 }
 

@@ -5,9 +5,10 @@ import { getServerSession } from 'next-auth'
 import slugify from 'slugify'
 import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
 import {
-  EU_ALPHA2,
-  SHIPPING_COST_EU,
-  SHIPPING_COST_INTERNATIONAL,
+  calculateShippingCents,
+  DEFAULT_VARIANT_WEIGHT_GRAMS,
+  getShippingZone,
+  SHIPPING_ZONE_LABEL,
   VALID_ORDER_TRANSITIONS,
 } from '@/constants'
 import { prisma } from '@/prisma/prismaClient'
@@ -278,8 +279,15 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       return sum + (variant.priceEUR || 0) * item.quantity
     }, 0)
 
-    const isEU = EU_ALPHA2.has(input.shippingAddress.country)
-    const shippingCost = isEU ? SHIPPING_COST_EU : SHIPPING_COST_INTERNATIONAL
+    const country = input.shippingAddress.country
+    // Weight-based shipping: sum variant weights (defaulting missing ones) and
+    // price by destination zone. See calculateShippingCents in constants/shop.
+    const totalWeightGrams = input.items.reduce((sum, item) => {
+      const variant = variants.find(v => v.id === item.variantId)
+      const grams = variant?.weight ?? DEFAULT_VARIANT_WEIGHT_GRAMS
+      return sum + grams * item.quantity
+    }, 0)
+    const shippingCost = calculateShippingCents(totalWeightGrams, country)
     const tax = 0 // Tax handled by Stripe automatic_tax
     const total = subtotal + shippingCost + tax
 
@@ -354,7 +362,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
               amount: shippingCost,
               currency: 'eur',
             },
-            display_name: isEU ? 'EU Standard Shipping' : 'International Shipping',
+            display_name: SHIPPING_ZONE_LABEL[getShippingZone(country)],
           },
         },
       ],
@@ -653,7 +661,7 @@ export async function updateOrderStatus(
       return { success: false, error: 'Order not found' }
     }
 
-    const allowed = VALID_ORDER_TRANSITIONS[currentOrder.status]
+    const allowed: readonly OrderStatus[] = VALID_ORDER_TRANSITIONS[currentOrder.status]
     if (!allowed.includes(status)) {
       return {
         success: false,

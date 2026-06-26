@@ -43,6 +43,10 @@ const mockSendOrderConfirmationEmail = jest.fn()
 jest.mock('@/server/email/order-confirmation', () => ({
   sendOrderConfirmationEmail: (...args: unknown[]) => mockSendOrderConfirmationEmail(...args),
 }))
+const mockSendOrderAdminNotification = jest.fn()
+jest.mock('@/server/email/order-admin-notification', () => ({
+  sendOrderAdminNotification: (...args: unknown[]) => mockSendOrderAdminNotification(...args),
+}))
 
 import { prisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
@@ -113,6 +117,9 @@ describe('handleCheckoutSessionCompleted', () => {
 
     expect(mockSendOrderConfirmationEmail).toHaveBeenCalledTimes(1)
     expect(mockSendOrderConfirmationEmail).toHaveBeenCalledWith('order-1')
+    // Admin is notified of the new paid order too.
+    expect(mockSendOrderAdminNotification).toHaveBeenCalledTimes(1)
+    expect(mockSendOrderAdminNotification).toHaveBeenCalledWith('order-1')
   })
 
   it('skips if order already PAID (idempotency)', async () => {
@@ -122,8 +129,9 @@ describe('handleCheckoutSessionCompleted', () => {
 
     expect(mockTx.order.update).not.toHaveBeenCalled()
     expect(mockTx.payment.upsert).not.toHaveBeenCalled()
-    // No duplicate email on webhook retries of an already-paid order.
+    // No duplicate emails on webhook retries of an already-paid order.
     expect(mockSendOrderConfirmationEmail).not.toHaveBeenCalled()
+    expect(mockSendOrderAdminNotification).not.toHaveBeenCalled()
   })
 
   it('returns early when no orderId in metadata', async () => {
