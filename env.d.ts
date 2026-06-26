@@ -28,6 +28,11 @@ declare namespace NodeJS {
      * multiple recipients. Defaults to orders@barometers.info.
      */
     ORDER_NOTIFICATIONS_EMAIL?: string
+    /**
+     * Shared bearer token for cron-triggered endpoints (e.g. the stale-order
+     * sweep at /api/cron/release-stale-orders). Required at boot.
+     */
+    CRON_SECRET: string
   }
 }
 

@@ -343,6 +343,10 @@ model Order {
   updatedAt             DateTime        @updatedAt
   items                 OrderItem[]
   payment               Payment?
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {
