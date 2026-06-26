@@ -304,15 +304,15 @@ function ProductForm({ onSubmit, children = null }: Props) {
             <p className="text-muted-foreground mb-4">
               {optionFields.length > 0
                 ? 'Click "Generate Variants" to create variant combinations'
-                : 'Add options above or a default variant will be created'}
+                : 'This product has no options — create a single default variant to set its price and stock.'}
             </p>
             <Button
               type="button"
               variant="outline"
               onClick={handleGenerateVariants}
-              disabled={optionFields.length === 0}
+              disabled={optionFields.length > 0 && !hasAnyOptionValues}
             >
-              Generate Variants
+              {optionFields.length > 0 ? 'Generate Variants' : 'Create Default Variant'}
             </Button>
           </div>
         ) : (
