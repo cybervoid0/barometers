@@ -8,6 +8,19 @@ import {
 } from '@/app/(pages)/shop/server/webhooks'
 import { stripe } from '@/services/stripe'
 
+// Fail loudly at boot rather than silently passing '' to constructEvent, which
+// would reject every real event (Stripe disables the endpoint after repeated
+// failures) and leave orders stuck unpaid with nothing obviously wrong. Wrapped
+// in a function so the resolved value is typed `string` inside the handler.
+function requireWebhookSecret(): string {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not defined in environment variables')
+  }
+  return secret
+}
+const webhookSecret = requireWebhookSecret()
+
 export async function POST(req: Request) {
   const body = await req.text()
   const signature = (await headers()).get('stripe-signature')
@@ -19,7 +32,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET || '')
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
     return new Response(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`, {

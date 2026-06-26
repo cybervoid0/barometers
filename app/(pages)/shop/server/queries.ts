@@ -222,8 +222,21 @@ export async function getAllOrders(status?: OrderStatus) {
  * leak order details. Email comparison is case-insensitive and trimmed.
  */
 export async function getOrderByNumberAndEmail(orderNumber: string, email: string) {
-  const order = await prisma.order.findUnique({
+  // Cheap existence + email check first. Doing the full include only AFTER the
+  // email matches keeps the "wrong order number" and "right number, wrong email"
+  // paths the same cost, so timing can't be used as an oracle to confirm which
+  // order numbers exist.
+  const match = await prisma.order.findUnique({
     where: { orderNumber: orderNumber.trim() },
+    select: { id: true, shippingAddress: { select: { email: true } } },
+  })
+
+  if (!match) return null
+  if (match.shippingAddress.email.toLowerCase() !== email.trim().toLowerCase()) return null
+
+  // Email verified — load the full order for the legitimate owner.
+  return prisma.order.findUnique({
+    where: { id: match.id },
     include: {
       items: {
         include: {
@@ -235,11 +248,6 @@ export async function getOrderByNumberAndEmail(orderNumber: string, email: strin
       payment: true,
     },
   })
-
-  if (!order) return null
-  if (order.shippingAddress.email.toLowerCase() !== email.trim().toLowerCase()) return null
-
-  return order
 }
 
 /**

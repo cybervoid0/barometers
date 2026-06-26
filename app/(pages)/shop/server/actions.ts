@@ -3,6 +3,7 @@
 import type { OrderStatus, ProductVariant } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import slugify from 'slugify'
+import { z } from 'zod'
 import type { TransformedProductData } from '@/app/(pages)/admin/add-product/product-add-schema'
 import {
   calculateShippingCents,
@@ -58,6 +59,31 @@ interface CreateCheckoutSessionInput {
     country: string
   }
 }
+
+// A server action is a public HTTP endpoint — validate the payload at runtime
+// rather than trusting the TS type. Crucially `quantity` must be a positive
+// integer so a tampered request can't corrupt totals or the stock decrement.
+const checkoutInputSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        variantId: z.string().min(1),
+        quantity: z.number().int().positive().max(100),
+      }),
+    )
+    .min(1, 'Cart is empty'),
+  shippingAddress: z.object({
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    email: z.email(),
+    phone: z.string().optional(),
+    address: z.string().min(1),
+    city: z.string().min(1),
+    state: z.string().optional(),
+    postalCode: z.string().min(1),
+    country: z.string().min(2),
+  }),
+})
 
 /**
  * Create a product with variants in Stripe and local database
@@ -194,6 +220,11 @@ export async function createProductWithVariants(input: TransformedProductData) {
 export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
   const session = await getServerSession(authConfig)
   const userId = session?.user?.id ?? null
+
+  const parsed = checkoutInputSchema.safeParse(input)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid checkout request' }
+  }
 
   try {
     const { email, firstName, lastName } = input.shippingAddress
@@ -683,6 +714,12 @@ export async function updateOrderStatus(
   const denied = await adminGuard()
   if (denied) return denied
 
+  // Validate the incoming status against the known enum instead of relying on
+  // the transition lookup to incidentally reject garbage.
+  if (!orderId || !(status in VALID_ORDER_TRANSITIONS)) {
+    return { success: false, error: 'Invalid order or status' }
+  }
+
   try {
     // Validate status transition
     const currentOrder = await prisma.order.findUnique({
@@ -831,9 +868,12 @@ export async function refundOrder(orderId: string) {
       return { success: false, error: `Cannot refund order in ${order.status} status` }
     }
 
-    await stripe.refunds.create({
-      payment_intent: order.stripePaymentIntentId,
-    })
+    await stripe.refunds.create(
+      { payment_intent: order.stripePaymentIntentId },
+      // Stable key so a double-click or retry can't create a second refund — we
+      // rely on Stripe to dedupe rather than racing two refund requests.
+      { idempotencyKey: `refund/${orderId}` },
+    )
 
     // The webhook handler (handleChargeRefunded) will update the order status and restore stock
     return { success: true }

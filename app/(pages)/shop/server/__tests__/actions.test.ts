@@ -12,20 +12,43 @@ jest.mock('@/services/auth', () => ({
 }))
 
 // --- Mock Prisma ---
-jest.mock('@/prisma/prismaClient', () => ({
-  prisma: {
+// `$transaction` runs the callback against the same mock object, so a tx call
+// like `tx.productVariant.updateMany` resolves to the same jest.fn the test set
+// up. Defined inside the factory to avoid the jest-hoist TDZ; tests reach the
+// mocks through the `mockPrisma` alias below.
+jest.mock('@/prisma/prismaClient', () => {
+  const prisma = {
     order: {
       findUnique: jest.fn(),
       update: jest.fn(),
+      updateMany: jest.fn(),
+      create: jest.fn(),
+    },
+    customer: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      create: jest.fn(),
+    },
+    productVariant: {
+      findMany: jest.fn(),
+      updateMany: jest.fn(),
+    },
+    shippingAddress: {
+      create: jest.fn(),
     },
     $transaction: jest.fn(),
-  },
-}))
+  }
+  // Set after construction to avoid a self-reference in the initializer.
+  prisma.$transaction.mockImplementation((fn: (tx: unknown) => Promise<unknown>) => fn(prisma))
+  return { prisma }
+})
 
 // --- Mock Stripe ---
 jest.mock('@/services/stripe', () => ({
   stripe: {
     refunds: { create: jest.fn() },
+    customers: { create: jest.fn(), del: jest.fn() },
+    checkout: { sessions: { create: jest.fn() } },
   },
 }))
 
@@ -47,7 +70,22 @@ jest.mock('@/server/email/order-shipped', () => ({
 
 import { prisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
-import { refundOrder, updateOrderStatus, updateTrackingNumber } from '../actions'
+import {
+  createCheckoutSession,
+  refundOrder,
+  updateOrderStatus,
+  updateTrackingNumber,
+} from '../actions'
+
+// Typed view of the Prisma mock for the createCheckoutSession tests (same object
+// the action imports — `prisma` and `mockPrisma` are identical at runtime).
+const mockPrisma = prisma as unknown as {
+  order: Record<string, jest.Mock>
+  customer: Record<string, jest.Mock>
+  productVariant: Record<string, jest.Mock>
+  shippingAddress: Record<string, jest.Mock>
+  $transaction: jest.Mock
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -485,9 +523,118 @@ describe('refundOrder — validation', () => {
       const result = await refundOrder('order-1')
 
       expect(result.success).toBe(true)
-      expect(stripe.refunds.create).toHaveBeenCalledWith({
-        payment_intent: 'pi_123',
-      })
+      expect(stripe.refunds.create).toHaveBeenCalledWith(
+        { payment_intent: 'pi_123' },
+        { idempotencyKey: 'refund/order-1' },
+      )
     })
   }
+})
+
+// --- createCheckoutSession ---
+
+describe('createCheckoutSession', () => {
+  const validInput = {
+    items: [{ variantId: 'v1', quantity: 2 }],
+    shippingAddress: {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      email: 'jane@example.com',
+      address: '1 High St',
+      city: 'Amsterdam',
+      postalCode: '1011',
+      country: 'NL',
+    },
+  }
+
+  const activeVariant = {
+    id: 'v1',
+    isActive: true,
+    product: { isActive: true, name: 'Barometer Mug' },
+    productId: 'p1',
+    priceEUR: 1500,
+    weight: 500,
+    stripePriceIdEUR: 'price_1',
+    options: { Size: 'L' },
+    sku: 'SKU-1',
+  }
+
+  it('rejects a non-positive quantity before any DB work (input validation)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(null)
+
+    const result = await createCheckoutSession({
+      ...validInput,
+      items: [{ variantId: 'v1', quantity: 0 }],
+    })
+
+    expect(result.success).toBe(false)
+    expect(mockPrisma.customer.findUnique).not.toHaveBeenCalled()
+    expect(mockPrisma.productVariant.findMany).not.toHaveBeenCalled()
+  })
+
+  it('reserves stock with a guarded decrement and returns the Stripe URL', async () => {
+    mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1' } })
+    mockPrisma.customer.findUnique.mockResolvedValueOnce({ id: 'c1', stripeCustomerId: 'cus_1' })
+    mockPrisma.productVariant.findMany.mockResolvedValueOnce([activeVariant])
+    mockPrisma.productVariant.updateMany.mockResolvedValue({ count: 1 })
+    mockPrisma.shippingAddress.create.mockResolvedValueOnce({ id: 'sa1' })
+    mockPrisma.order.create.mockResolvedValueOnce({ id: 'order-1' })
+    mockPrisma.order.update.mockResolvedValueOnce({})
+    ;(stripe.checkout.sessions.create as jest.Mock).mockResolvedValueOnce({
+      id: 'cs_1',
+      url: 'https://stripe.test/checkout',
+    })
+
+    const result = await createCheckoutSession(validInput)
+
+    expect(result).toEqual({
+      success: true,
+      sessionUrl: 'https://stripe.test/checkout',
+      orderId: 'order-1',
+    })
+    // Guarded conditional decrement — only succeeds if enough stock remains.
+    expect(mockPrisma.productVariant.updateMany).toHaveBeenCalledWith({
+      where: { id: 'v1', stock: { gte: 2 } },
+      data: { stock: { decrement: 2 } },
+    })
+  })
+
+  it('aborts and does not call Stripe when stock cannot be reserved', async () => {
+    mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1' } })
+    mockPrisma.customer.findUnique.mockResolvedValueOnce({ id: 'c1', stripeCustomerId: 'cus_1' })
+    mockPrisma.productVariant.findMany.mockResolvedValueOnce([activeVariant])
+    // Reservation loses the row → count 0 → throws inside the transaction.
+    mockPrisma.productVariant.updateMany.mockResolvedValue({ count: 0 })
+
+    const result = await createCheckoutSession(validInput)
+
+    expect(result.success).toBe(false)
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
+  })
+
+  it('rolls back the reservation and cancels the order if Stripe fails', async () => {
+    mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1' } })
+    mockPrisma.customer.findUnique.mockResolvedValueOnce({ id: 'c1', stripeCustomerId: 'cus_1' })
+    mockPrisma.productVariant.findMany.mockResolvedValueOnce([activeVariant])
+    mockPrisma.productVariant.updateMany.mockResolvedValue({ count: 1 })
+    mockPrisma.shippingAddress.create.mockResolvedValueOnce({ id: 'sa1' })
+    mockPrisma.order.create.mockResolvedValueOnce({ id: 'order-1' })
+    mockPrisma.order.updateMany.mockResolvedValue({ count: 1 })
+    ;(stripe.checkout.sessions.create as jest.Mock).mockRejectedValueOnce(new Error('stripe down'))
+
+    const result = await createCheckoutSession(validInput)
+
+    expect(result).toEqual({ success: false, error: 'Failed to create checkout session' })
+    // Order cancelled (guarded) and stock returned.
+    expect(mockPrisma.order.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'order-1', status: 'PENDING' },
+        data: expect.objectContaining({ status: 'CANCELLED' }),
+      }),
+    )
+    expect(mockPrisma.productVariant.updateMany).toHaveBeenCalledWith({
+      where: { id: 'v1' },
+      data: { stock: { increment: 2 } },
+    })
+  })
 })
