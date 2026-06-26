@@ -2,6 +2,7 @@ import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
 import { Route } from '@/constants'
+import { formatPrice } from '@/utils'
 import { getOrderBySessionId } from '../../server/queries'
 import { ClearCartOnMount } from './clear-cart'
 
@@ -68,12 +69,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             </div>
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Total:</dt>
-              <dd className="font-medium">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: order.currency,
-                }).format(order.total / 100)}
-              </dd>
+              <dd className="font-medium">{formatPrice(order.total, order.currency)}</dd>
             </div>
           </dl>
         </div>
@@ -92,12 +88,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
                   )}
                   <span className="text-muted-foreground"> × {item.quantity}</span>
                 </span>
-                <span>
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: order.currency,
-                  }).format(item.priceAtTime / 100)}
-                </span>
+                <span>{formatPrice(item.priceAtTime, order.currency)}</span>
               </li>
             ))}
           </ul>

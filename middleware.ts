@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { withAuth } from 'next-auth/middleware'
+import { isAdminRole } from '@/utils/roles'
 
 // Protects admin routes and checks user role
 export default withAuth(
@@ -7,7 +8,7 @@ export default withAuth(
     const token = req.nextauth.token
 
     // User is authenticated but doesn't have admin role
-    if (token && token.role !== 'ADMIN' && token.role !== 'OWNER') {
+    if (token && !isAdminRole(token.role)) {
       return NextResponse.redirect(new URL('/unauthorized', req.url))
     }
 

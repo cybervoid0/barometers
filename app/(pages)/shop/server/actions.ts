@@ -18,6 +18,7 @@ import { saveImage } from '@/server/files/images'
 import { authConfig } from '@/services/auth'
 import { stripe } from '@/services/stripe'
 import { ImageType } from '@/types'
+import { isAdminRole } from '@/utils/roles'
 
 // --- Auth helpers ---
 
@@ -33,8 +34,7 @@ import { ImageType } from '@/types'
  */
 async function adminGuard(): Promise<{ success: false; error: string } | null> {
   const session = await getServerSession(authConfig)
-  const role = session?.user?.role
-  if (!role || !['ADMIN', 'OWNER'].includes(role)) {
+  if (!isAdminRole(session?.user?.role)) {
     return { success: false, error: 'Unauthorized' }
   }
   return null
@@ -492,7 +492,15 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
   const denied = await adminGuard()
   if (denied) return denied
 
+  // Track every Stripe mutation so the catch block can fully reverse them if the
+  // DB transaction fails — otherwise Stripe and the DB diverge (Stripe shows the
+  // new name / archived prices while the DB still has the old data).
   const newStripePriceIds: string[] = []
+  const archivedStripePriceIds: string[] = []
+  let stripeProductId: string | undefined
+  let oldName: string | undefined
+  let oldDescription: string | null | undefined
+  let productMetadataChanged = false
 
   try {
     // Fetch existing product with variants
@@ -509,6 +517,11 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       return { success: false, error: 'Product not found' }
     }
 
+    // Snapshot for rollback (catch block can't see `existingProduct`).
+    stripeProductId = existingProduct.stripeProductId
+    oldName = existingProduct.name
+    oldDescription = existingProduct.description
+
     // Determine which variants are new, updated, or deleted
     const existingVariantIds = existingProduct.variants.map(v => v.id)
     const inputVariantIds = input.variants.filter(v => v.id).map(v => v.id as string)
@@ -520,6 +533,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       if (variant) {
         if (variant.stripePriceIdEUR) {
           await stripe.prices.update(variant.stripePriceIdEUR, { active: false })
+          archivedStripePriceIds.push(variant.stripePriceIdEUR)
         }
       }
     }
@@ -547,6 +561,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
       if (needsNewEURPrice) {
         if (stripePriceIdEUR) {
           await stripe.prices.update(stripePriceIdEUR, { active: false })
+          archivedStripePriceIds.push(stripePriceIdEUR)
         }
         if (inputVariant.priceEUR) {
           const newPrice = await stripe.prices.create({
@@ -575,6 +590,7 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
         name: input.name,
         description: input.description ?? undefined,
       })
+      productMetadataChanged = true
     }
 
     // Handle images - determine new and deleted
@@ -687,12 +703,31 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
   } catch (error) {
     console.error('Error updating product with variants:', error)
 
-    // Rollback: archive newly created Stripe prices
+    // Rollback Stripe to match the DB, which already rolled back. Best-effort:
+    // archive prices we created, reactivate prices we archived, and restore the
+    // product name/description if we changed it.
     for (const priceId of newStripePriceIds) {
       try {
         await stripe.prices.update(priceId, { active: false })
       } catch (rollbackError) {
-        console.error('Failed to rollback Stripe price:', rollbackError)
+        console.error('Failed to archive new Stripe price during rollback:', rollbackError)
+      }
+    }
+    for (const priceId of archivedStripePriceIds) {
+      try {
+        await stripe.prices.update(priceId, { active: true })
+      } catch (rollbackError) {
+        console.error('Failed to reactivate Stripe price during rollback:', rollbackError)
+      }
+    }
+    if (productMetadataChanged && stripeProductId) {
+      try {
+        await stripe.products.update(stripeProductId, {
+          name: oldName,
+          description: oldDescription ?? undefined,
+        })
+      } catch (rollbackError) {
+        console.error('Failed to restore Stripe product metadata during rollback:', rollbackError)
       }
     }
 

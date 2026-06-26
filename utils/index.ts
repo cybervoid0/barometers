@@ -5,5 +5,7 @@ export { cn } from './cn'
 export * from './currency'
 // Image utilities
 export { bufferToBase64Url, generateIcon, getIconBuffer } from './images'
+// Role helpers
+export { isAdminRole } from './roles'
 // Text utilities
 export * from './text'

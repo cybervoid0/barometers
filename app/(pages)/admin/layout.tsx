@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
 import type { FC, PropsWithChildren } from 'react'
 import { getSession } from '@/server/auth'
+import { isAdminRole } from '@/utils/roles'
 import { LogoutButton } from './logout-button'
 
 const Layout: FC<PropsWithChildren> = async ({ children }) => {
   const session = await getSession()
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !isAdminRole(session.user.role)) {
     redirect('/signin')
   }
 
