@@ -2,9 +2,7 @@
 
 import { LogOut, Package, User } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
-import { toast } from 'sonner'
+import { useSession } from 'next-auth/react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +13,7 @@ import {
 } from '@/components/ui'
 import { Route } from '@/constants'
 import { cn } from '@/utils'
+import { useSignOut } from './use-sign-out'
 
 /**
  * Account control for the header. Shows a sign-in link when logged out, and a
@@ -22,17 +21,7 @@ import { cn } from '@/utils'
  */
 export function UserMenu({ className }: { className?: string }) {
   const { data: session, status } = useSession()
-  const router = useRouter()
-
-  const handleSignOut = async () => {
-    const who = session?.user?.email ?? session?.user?.name ?? 'You'
-    // redirect:false keeps us on a client navigation so the toast survives
-    // (a full callbackUrl redirect would reload the page and drop it).
-    await signOut({ redirect: false })
-    toast.success(`${who} signed out`)
-    router.push('/')
-    router.refresh()
-  }
+  const handleSignOut = useSignOut()
 
   if (status === 'loading') return null
 
@@ -63,7 +52,7 @@ export function UserMenu({ className }: { className?: string }) {
             My Orders
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer" onSelect={handleSignOut}>
+        <DropdownMenuItem className="cursor-pointer" onSelect={() => handleSignOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
