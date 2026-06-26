@@ -54,6 +54,9 @@ export async function getMenuData(): Promise<MenuItem[]> {
       id: 9,
       label: 'Shop',
       link: Route.Shop,
+      // Soft launch: only admins/owners see the Shop link while we test on
+      // production. Remove `visibleFor` to open the shop to everyone.
+      visibleFor: AccessRole.ADMIN,
     },
     {
       id: 4,
