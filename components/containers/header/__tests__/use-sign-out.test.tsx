@@ -1,4 +1,8 @@
 import { act, renderHook } from '@testing-library/react'
+import {
+  EMPTY_CHECKOUT_FORM,
+  useCheckoutFormStore,
+} from '@/app/(pages)/shop/stores/checkout-form-store'
 import { useShopCartStore } from '@/app/(pages)/shop/stores/shop-cart-store'
 import { useSignOut } from '../use-sign-out'
 
@@ -24,11 +28,18 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockSignOut.mockResolvedValue(undefined)
   useShopCartStore.setState({ items: [] })
+  useCheckoutFormStore.getState().reset()
 })
 
 describe('useSignOut', () => {
-  it('clears the persisted cart on sign-out', async () => {
+  it('clears the persisted cart and checkout draft on sign-out', async () => {
     useShopCartStore.getState().addItem({ variantId: 'v1', productId: 'p1', quantity: 2 })
+    useCheckoutFormStore.getState().setValues({
+      ...EMPTY_CHECKOUT_FORM,
+      firstName: 'Jane',
+      address: '1 High St',
+      email: 'jane@example.com',
+    })
     expect(useShopCartStore.getState().items).toHaveLength(1)
 
     const { result } = renderHook(() => useSignOut())
@@ -37,6 +48,7 @@ describe('useSignOut', () => {
     })
 
     expect(useShopCartStore.getState().items).toEqual([])
+    expect(useCheckoutFormStore.getState().values).toEqual(EMPTY_CHECKOUT_FORM)
   })
 
   it('signs out without redirect so the toast survives', async () => {

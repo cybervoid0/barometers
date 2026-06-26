@@ -28,11 +28,19 @@ import {
   SelectValue,
   Separator,
 } from '@/components/ui'
-import { Route, SHIPPING_COUNTRIES } from '@/constants'
+import {
+  calculateShippingCents,
+  DEFAULT_VARIANT_WEIGHT_GRAMS,
+  getShippingZone,
+  Route,
+  SHIPPING_COUNTRIES,
+  SHIPPING_ZONE_LABEL,
+} from '@/constants'
 import type { ProductVariantWithProduct } from '@/types'
 import { formatPrice } from '@/utils'
 import { createCheckoutSession } from '../server/actions'
 import { fetchVariantsByIds } from '../server/query-actions'
+import { useCheckoutFormStore } from '../stores/checkout-form-store'
 import { useShopCartStore } from '../stores/shop-cart-store'
 import { type CheckoutFormData, checkoutSchema } from './checkout-schema'
 
@@ -70,9 +78,27 @@ export default function CheckoutPage() {
     }
   }, [isLoading, items.length, router])
 
-  // Prefill email from session
+  // Restore the form from the persisted store once it has hydrated, so leaving
+  // the checkout page and coming back doesn't wipe what was typed. The store
+  // uses skipHydration (rehydrated in the shop layout), so we wait for it.
   useEffect(() => {
-    if (session?.user?.email) {
+    const apply = () => form.reset(useCheckoutFormStore.getState().values)
+    if (useCheckoutFormStore.persist.hasHydrated()) apply()
+    return useCheckoutFormStore.persist.onFinishHydration(apply)
+  }, [form])
+
+  // Persist every change so a mid-checkout navigation is non-destructive.
+  useEffect(() => {
+    const subscription = form.watch(values => {
+      useCheckoutFormStore.getState().setValues(values as CheckoutFormData)
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
+  // Prefill email from session, but only when the field is still empty so we
+  // never clobber a restored or hand-edited value.
+  useEffect(() => {
+    if (session?.user?.email && !form.getValues('email')) {
       form.setValue('email', session.user.email)
     }
   }, [session, form])
@@ -106,7 +132,7 @@ export default function CheckoutPage() {
       .finally(() => setIsLoading(false))
   }, [variantIds])
 
-  const totals = useMemo(() => {
+  const subtotal = useMemo(() => {
     let amount = 0
     for (const item of items) {
       const variant = variants.find(v => v.id === item.variantId)
@@ -116,6 +142,29 @@ export default function CheckoutPage() {
     }
     return amount
   }, [items, variants])
+
+  // Shipping is weight × destination zone — the same formula the server applies
+  // when building the Stripe session (calculateShippingCents). We recompute it
+  // here so the summary isn't a surprise at the payment step. It stays null
+  // until a country is chosen, since the zone is unknown before then.
+  const country = form.watch('country')
+
+  const totalWeightGrams = useMemo(
+    () =>
+      items.reduce((sum, item) => {
+        const variant = variants.find(v => v.id === item.variantId)
+        const grams = variant?.weight ?? DEFAULT_VARIANT_WEIGHT_GRAMS
+        return sum + grams * item.quantity
+      }, 0),
+    [items, variants],
+  )
+
+  const shippingCents = useMemo(
+    () => (country ? calculateShippingCents(totalWeightGrams, country) : null),
+    [country, totalWeightGrams],
+  )
+
+  const grandTotal = subtotal + (shippingCents ?? 0)
 
   const onSubmit = useCallback(
     (values: CheckoutFormData) => {
@@ -342,7 +391,7 @@ export default function CheckoutPage() {
                 <Button type="submit" size="lg" className="w-full" disabled={isPending}>
                   {isPending
                     ? 'Redirecting to Stripe...'
-                    : `Pay with Stripe — ${formatPrice(totals)}`}
+                    : `Pay with Stripe — ${formatPrice(grandTotal)}`}
                 </Button>
               </form>
             </RequiredFieldsProvider>
@@ -402,9 +451,30 @@ export default function CheckoutPage() {
 
             <Separator />
 
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span>{formatPrice(subtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {country ? SHIPPING_ZONE_LABEL[getShippingZone(country)] : 'Shipping'}
+                </span>
+                <span>
+                  {shippingCents === null ? (
+                    <span className="text-muted-foreground">Select country</span>
+                  ) : (
+                    formatPrice(shippingCents)
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <Separator />
+
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span>{formatPrice(totals)}</span>
+              <span>{formatPrice(grandTotal)}</span>
             </div>
 
             <Link href={Route.Cart} className="text-sm text-muted-foreground hover:underline block">
