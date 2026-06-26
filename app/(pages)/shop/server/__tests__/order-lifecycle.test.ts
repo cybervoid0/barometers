@@ -112,6 +112,18 @@ describe('releaseStalePendingOrders', () => {
     expect(mockPrisma.order.updateMany).toHaveBeenCalledTimes(2)
   })
 
+  it('counts only orders that actually transitioned, not no-ops', async () => {
+    mockPrisma.order.findMany.mockResolvedValue([{ id: 'o1' }, { id: 'o2' }])
+    // o1 transitions (count 1); o2 already advanced between query and update (count 0).
+    mockPrisma.order.updateMany
+      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })
+
+    const result = await releaseStalePendingOrders(NOW)
+
+    expect(result).toEqual({ released: 1 })
+  })
+
   it('continues the sweep when one order fails to release', async () => {
     mockPrisma.order.findMany.mockResolvedValue([{ id: 'o1' }, { id: 'o2' }])
     // First release throws (transaction rejects), second succeeds.

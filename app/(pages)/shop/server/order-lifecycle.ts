@@ -24,9 +24,13 @@ const STALE_ORDER_BUFFER_MS = 60 * 60 * 1000
  * Stock is read back from the persisted `order.items` (the source of truth)
  * rather than any in-memory input, so the webhook and rollback callers share
  * one correct implementation.
+ *
+ * @returns `true` if THIS call performed the PENDING→CANCELLED transition,
+ * `false` if the order had already advanced (no-op). Lets callers count only
+ * real releases rather than every order they attempted.
  */
-export async function releasePendingOrder(orderId: string, reason: string) {
-  await prisma.$transaction(async tx => {
+export async function releasePendingOrder(orderId: string, reason: string): Promise<boolean> {
+  return prisma.$transaction(async tx => {
     const cancelled = await tx.order.updateMany({
       where: { id: orderId, status: 'PENDING' },
       data: { status: 'CANCELLED', cancelledAt: new Date() },
@@ -34,7 +38,7 @@ export async function releasePendingOrder(orderId: string, reason: string) {
 
     if (cancelled.count !== 1) {
       console.log(`Order ${orderId} not PENDING — no stock to release (${reason})`)
-      return
+      return false
     }
 
     const order = await tx.order.findUnique({
@@ -50,6 +54,7 @@ export async function releasePendingOrder(orderId: string, reason: string) {
       }
     }
     console.log(`Order ${orderId} CANCELLED, stock released (${reason})`)
+    return true
   })
 }
 
@@ -78,8 +83,9 @@ export async function releaseStalePendingOrders(now = Date.now()): Promise<{ rel
   let released = 0
   for (const { id } of stale) {
     try {
-      await releasePendingOrder(id, 'stale-order sweep')
-      released += 1
+      // Count only orders this sweep actually cancelled — an order that
+      // advanced between the query and the guarded update is a no-op.
+      if (await releasePendingOrder(id, 'stale-order sweep')) released += 1
     } catch (error) {
       // Never let one bad order abort the whole sweep.
       console.error(`Failed to release stale order ${id}:`, error)

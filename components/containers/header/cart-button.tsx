@@ -15,7 +15,13 @@ import { cn } from '@/utils'
 export function CartButton({ className }: { className?: string }) {
   const items = useShopCartStore(state => state.items)
   const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    // The cart store uses `skipHydration`, and the shop layout only rehydrates
+    // it under `/shop`. This button is global, so rehydrate here too — otherwise
+    // a fresh load of any non-shop page would always see an empty cart.
+    void useShopCartStore.persist.rehydrate()
+    setMounted(true)
+  }, [])
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0)
 

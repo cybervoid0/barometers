@@ -44,7 +44,7 @@ function productToFormData(product: ProductWithRelations): ProductFormData {
       id: v.id,
       sku: v.sku,
       options: v.options as Record<string, string>,
-      priceEUR: v.priceEUR ? (v.priceEUR / 100).toFixed(2) : '',
+      priceEUR: v.priceEUR != null ? (v.priceEUR / 100).toFixed(2) : '',
       stock: v.stock.toString(),
       weight: v.weight?.toString() ?? '',
     })),
