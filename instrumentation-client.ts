@@ -2,6 +2,8 @@ import * as Sentry from '@sentry/nextjs'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  // Only report from production — local dev errors must not reach Sentry.
+  enabled: process.env.NODE_ENV === 'production',
   integrations: [Sentry.replayIntegration()],
   // Non-actionable noise — none of these originate from our application logic:
   ignoreErrors: [
