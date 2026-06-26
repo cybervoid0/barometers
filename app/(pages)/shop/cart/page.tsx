@@ -161,7 +161,6 @@ export default function Cart() {
                     <h3 className="font-medium hover:underline">{variant.product.name}</h3>
                   </Link>
                   {optionsLabel && <p className="text-sm text-muted-foreground">{optionsLabel}</p>}
-                  <p className="text-xs text-muted-foreground">SKU: {variant.sku}</p>
                   <div className="mt-1">
                     {variant.priceEUR && (
                       <span className="font-medium">{formatPrice(variant.priceEUR)}</span>
