@@ -33,14 +33,9 @@ function generateVariantCombinations(
   const [first, ...rest] = options
   const restCombinations = generateVariantCombinations(rest)
 
-  const combinations: Array<Record<string, string>> = []
-  for (const value of first.values) {
-    for (const combo of restCombinations) {
-      combinations.push({ [first.name]: value, ...combo })
-    }
-  }
-
-  return combinations
+  return first.values.flatMap(value =>
+    restCombinations.map(combo => ({ [first.name]: value, ...combo })),
+  )
 }
 
 /**

@@ -29,14 +29,12 @@ function VariantSelector({ product, variants, options, defaultVariantId }: Props
       }
     }
     // Or with first available values
-    const initial: Record<string, string> = {}
-    for (const opt of options) {
-      const values = opt.values as string[]
-      if (values.length > 0) {
-        initial[opt.name] = values[0]
-      }
-    }
-    return initial
+    return Object.fromEntries(
+      options.flatMap(opt => {
+        const values = opt.values as string[]
+        return values.length > 0 ? [[opt.name, values[0]] as const] : []
+      }),
+    )
   })
 
   const [quantity, setQuantity] = useState(1)

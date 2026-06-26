@@ -132,16 +132,14 @@ export default function CheckoutPage() {
       .finally(() => setIsLoading(false))
   }, [variantIds])
 
-  const subtotal = useMemo(() => {
-    let amount = 0
-    for (const item of items) {
-      const variant = variants.find(v => v.id === item.variantId)
-      if (variant) {
-        amount += (variant.priceEUR ?? 0) * item.quantity
-      }
-    }
-    return amount
-  }, [items, variants])
+  const subtotal = useMemo(
+    () =>
+      items.reduce((amount, item) => {
+        const variant = variants.find(v => v.id === item.variantId)
+        return variant ? amount + (variant.priceEUR ?? 0) * item.quantity : amount
+      }, 0),
+    [items, variants],
+  )
 
   // Shipping is weight × destination zone — the same formula the server applies
   // when building the Stripe session (calculateShippingCents). We recompute it

@@ -54,18 +54,14 @@ export default function Cart() {
       .finally(() => setIsLoading(false))
   }, [variantIds])
 
-  const totals = useMemo(() => {
-    let eur = 0
-
-    for (const item of items) {
-      const variant = variants.find(v => v.id === item.variantId)
-      if (variant) {
-        eur += (variant.priceEUR ?? 0) * item.quantity
-      }
-    }
-
-    return { eur }
-  }, [items, variants])
+  const totals = useMemo(
+    () =>
+      items.reduce((eur, item) => {
+        const variant = variants.find(v => v.id === item.variantId)
+        return variant ? eur + (variant.priceEUR ?? 0) * item.quantity : eur
+      }, 0),
+    [items, variants],
+  )
 
   const handleClearCart = () => {
     if (confirm('Are you sure you want to clear the cart?')) {
@@ -227,7 +223,7 @@ export default function Cart() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="font-semibold">Total:</span>
-                <span className="text-xl font-bold">{formatPrice(totals.eur)}</span>
+                <span className="text-xl font-bold">{formatPrice(totals)}</span>
               </div>
             </div>
 
