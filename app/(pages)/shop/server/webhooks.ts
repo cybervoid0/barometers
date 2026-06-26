@@ -69,28 +69,10 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
         },
       })
 
-      // Decrease stock for ordered items (on variants)
-      const order = await tx.order.findUnique({
-        where: { id: orderId },
-        include: { items: true },
-      })
-
-      if (order) {
-        for (const item of order.items) {
-          // Update variant stock if variantId exists
-          if (item.variantId) {
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: {
-                stock: {
-                  decrement: item.quantity,
-                },
-              },
-            })
-          }
-        }
-      }
-
+      // Stock was already reserved when the checkout session was created (the
+      // guarded decrement in createCheckoutSession). Decrementing again here
+      // would double-count. Reserved stock is only released on
+      // expiry/failure/refund.
       return true
     })
 
@@ -113,6 +95,44 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 }
 
 /**
+ * Cancel a still-PENDING order and release the stock it reserved at checkout.
+ *
+ * The status transition is guarded (`updateMany ... where status: 'PENDING'`)
+ * so this never clobbers an order that already advanced — e.g. a late
+ * `checkout.session.expired` arriving after `checkout.session.completed`, which
+ * Stripe does not guarantee the ordering of. Stock is only returned when THIS
+ * call performed the transition, which makes it idempotent across webhook
+ * retries and duplicate deliveries (no double-restore).
+ */
+async function releasePendingOrder(orderId: string, reason: string) {
+  await prisma.$transaction(async tx => {
+    const cancelled = await tx.order.updateMany({
+      where: { id: orderId, status: 'PENDING' },
+      data: { status: 'CANCELLED', cancelledAt: new Date() },
+    })
+
+    if (cancelled.count !== 1) {
+      console.log(`Order ${orderId} not PENDING — no stock to release (${reason})`)
+      return
+    }
+
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    })
+    for (const item of order?.items ?? []) {
+      if (item.variantId) {
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { increment: item.quantity } },
+        })
+      }
+    }
+    console.log(`Order ${orderId} CANCELLED, stock released (${reason})`)
+  })
+}
+
+/**
  * Handle checkout.session.expired event
  */
 export async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session) {
@@ -124,15 +144,7 @@ export async function handleCheckoutSessionExpired(session: Stripe.Checkout.Sess
   }
 
   try {
-    await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-      },
-    })
-
-    console.log(`Order ${orderId} marked as CANCELLED (session expired)`)
+    await releasePendingOrder(orderId, 'session expired')
   } catch (error) {
     console.error('Error handling checkout.session.expired:', error)
     throw error
@@ -179,33 +191,26 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
       return
     }
 
-    // Use transaction to ensure all operations succeed or fail together
-    await prisma.$transaction(async tx => {
-      await tx.order.update({
-        where: { id: order.id },
-        data: {
-          status: 'CANCELLED',
-          cancelledAt: new Date(),
-        },
-      })
-
-      // Update or create payment record
-      await tx.payment.upsert({
-        where: { stripePaymentIntentId: paymentIntent.id },
-        update: {
-          status: 'FAILED',
-          failureMessage: paymentIntent.last_payment_error?.message,
-        },
-        create: {
-          orderId: order.id,
-          stripePaymentIntentId: paymentIntent.id,
-          amount: paymentIntent.amount,
-          currency: 'EUR',
-          status: 'FAILED',
-          failureMessage: paymentIntent.last_payment_error?.message,
-        },
-      })
+    // Record the failed payment regardless of the order's current state.
+    await prisma.payment.upsert({
+      where: { stripePaymentIntentId: paymentIntent.id },
+      update: {
+        status: 'FAILED',
+        failureMessage: paymentIntent.last_payment_error?.message,
+      },
+      create: {
+        orderId: order.id,
+        stripePaymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: 'EUR',
+        status: 'FAILED',
+        failureMessage: paymentIntent.last_payment_error?.message,
+      },
     })
+
+    // Cancel + release reserved stock only if the order is still PENDING, so a
+    // failed retry can never revert an order another session already paid.
+    await releasePendingOrder(order.id, 'payment failed')
 
     console.log(`Payment failed for order ${order.id}`)
   } catch (error) {

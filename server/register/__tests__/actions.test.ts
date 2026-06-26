@@ -43,32 +43,15 @@ describe('register', () => {
     )
   })
 
-  it('links prior guest orders for the new user (by email)', async () => {
+  it('does NOT link guest orders on registration (email is unverified)', async () => {
+    // Security: registration does not prove email ownership, so guest orders
+    // must never be claimed here. Linking happens on login instead.
     mockPrisma.user.findUnique.mockResolvedValue(null)
     mockPrisma.user.create.mockResolvedValue({ id: 'u-new' })
-    mockPrisma.customer.findMany.mockResolvedValue([{ id: 'guest-1' }])
-    mockPrisma.customer.findUnique.mockResolvedValue(null)
-    mockPrisma.order.count.mockResolvedValue(1)
 
     await register({ name: 'Test', email: 'guest@test.com', password: 'pass' })
 
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith({
-      where: { email: 'guest@test.com', userId: null },
-      select: { id: true },
-    })
-    expect(mockPrisma.customer.update).toHaveBeenCalledWith({
-      where: { id: 'guest-1' },
-      data: { userId: 'u-new' },
-    })
-  })
-
-  it('still succeeds when guest-order linking throws (non-fatal)', async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(null)
-    mockPrisma.user.create.mockResolvedValue({ id: 'u-new' })
-    mockPrisma.customer.findMany.mockRejectedValue(new Error('db down'))
-
-    await expect(
-      register({ name: 'Test', email: 'guest@test.com', password: 'pass' }),
-    ).resolves.toBeUndefined()
+    expect(mockPrisma.customer.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.customer.update).not.toHaveBeenCalled()
   })
 })

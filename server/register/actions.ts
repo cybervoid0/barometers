@@ -3,7 +3,6 @@
 import { hash } from 'bcrypt'
 import { z } from 'zod'
 import { prisma } from '@/prisma/prismaClient'
-import { linkGuestOrdersToUser } from '@/server/customers/link-guest-orders'
 
 const RegisterSchema = z.object({
   name: z.string().min(1, 'Name is not defined'),
@@ -16,7 +15,7 @@ export async function register(rawValues: unknown) {
   const userFound = await prisma.user.findUnique({ where: { email } })
   if (userFound) throw new Error('Email already exists!')
   const hashedPassword = await hash(password, 10)
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name,
       email,
@@ -25,11 +24,9 @@ export async function register(rawValues: unknown) {
     },
   })
 
-  // Attach any prior guest checkouts (same email) to the new account.
-  // Non-fatal: a linking failure must never break registration.
-  try {
-    await linkGuestOrdersToUser(user.id, email)
-  } catch (error) {
-    console.error('Failed to link guest orders on register:', error)
-  }
+  // NOTE: guest orders are intentionally NOT linked here. Registration does not
+  // prove ownership of the email (there is no verification step), so linking on
+  // sign-up would let anyone claim a guest's order history + shipping PII just
+  // by registering with their email. Linking happens on LOGIN instead, where the
+  // password proves account control (see services/auth.ts authorize()).
 }

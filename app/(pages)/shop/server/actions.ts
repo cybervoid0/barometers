@@ -244,33 +244,26 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       }
     }
 
-    // Validate variants and check stock (read-only, can be separate transaction)
-    const variants = await prisma.$transaction(async tx => {
-      const found = await tx.productVariant.findMany({
-        where: {
-          id: { in: input.items.map(item => item.variantId) },
-        },
-        include: { product: true },
-      })
-
-      // Check stock availability
-      for (const item of input.items) {
-        const variant = found.find(v => v.id === item.variantId)
-        if (!variant) {
-          throw new Error(`Variant ${item.variantId} not found`)
-        }
-        if (!variant.isActive || !variant.product.isActive) {
-          throw new Error(`Product ${variant.product.name} is not available`)
-        }
-        if (variant.stock < item.quantity) {
-          throw new Error(
-            `Insufficient stock for ${variant.product.name} (${JSON.stringify(variant.options)}). Available: ${variant.stock}`,
-          )
-        }
-      }
-
-      return found
+    // Load variants for pricing/validation. Stock is deliberately NOT trusted
+    // from this read — it is enforced atomically at reservation time below, so
+    // two concurrent checkouts can't both pass a stale check and oversell.
+    const variants = await prisma.productVariant.findMany({
+      where: { id: { in: input.items.map(item => item.variantId) } },
+      include: { product: true },
     })
+
+    for (const item of input.items) {
+      const variant = variants.find(v => v.id === item.variantId)
+      if (!variant) {
+        throw new Error(`Variant ${item.variantId} not found`)
+      }
+      if (!variant.isActive || !variant.product.isActive) {
+        throw new Error(`Product ${variant.product.name} is not available`)
+      }
+      if (!variant.stripePriceIdEUR) {
+        throw new Error(`EUR price not configured for ${variant.product.name}`)
+      }
+    }
 
     // Calculate totals (shop sells exclusively in EUR)
     const subtotal = input.items.reduce((sum, item) => {
@@ -308,13 +301,29 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
       }
     })
 
-    // Create all DB records atomically in a single transaction
+    // Reserve stock and create the order atomically. The guarded conditional
+    // decrement (updateMany ... where stock >= quantity) is what prevents two
+    // concurrent checkouts from overselling the last unit: only one updateMany
+    // can win the row, the other gets count 0 and the whole transaction rolls
+    // back. Reserved stock is released if the session expires, payment fails, or
+    // the order is refunded (see the webhook handlers).
     const order = await prisma.$transaction(async tx => {
+      for (const item of input.items) {
+        const reserved = await tx.productVariant.updateMany({
+          where: { id: item.variantId, stock: { gte: item.quantity } },
+          data: { stock: { decrement: item.quantity } },
+        })
+        if (reserved.count !== 1) {
+          const variant = variants.find(v => v.id === item.variantId)
+          throw new Error(`Insufficient stock for ${variant?.product.name ?? item.variantId}`)
+        }
+      }
+
       const shippingAddress = await tx.shippingAddress.create({
         data: input.shippingAddress,
       })
 
-      const createdOrder = await tx.order.create({
+      return tx.order.create({
         data: {
           orderNumber,
           customerId: customer.id,
@@ -330,65 +339,89 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
           },
         },
       })
-
-      return createdOrder
     })
 
-    // Prepare Stripe line items (EUR only)
-    const lineItems = input.items.map(item => {
-      const variant = variants.find(v => v.id === item.variantId)
-      const priceId = variant?.stripePriceIdEUR
+    // From here the order exists and stock is reserved. Any failure must release
+    // the reservation and cancel the order, otherwise a Stripe error would leak
+    // inventory and strand a PENDING order that never gets a Stripe lifecycle
+    // event to clean it up.
+    try {
+      // Prepare Stripe line items (EUR only; priceId presence validated above).
+      const lineItems = input.items.map(item => {
+        const variant = variants.find(v => v.id === item.variantId)
+        if (!variant?.stripePriceIdEUR) {
+          throw new Error(`EUR price not found for variant ${variant?.sku}`)
+        }
+        return { price: variant.stripePriceIdEUR, quantity: item.quantity }
+      })
 
-      if (!priceId) {
-        throw new Error(`EUR price not found for variant ${variant?.sku}`)
+      // Create Stripe Checkout Session (external call, outside DB transaction)
+      const stripeSession = await stripe.checkout.sessions.create({
+        customer: customer.stripeCustomerId,
+        customer_update: { address: 'auto' },
+        line_items: lineItems,
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: 'fixed_amount',
+              fixed_amount: {
+                amount: shippingCost,
+                currency: 'eur',
+              },
+              display_name: SHIPPING_ZONE_LABEL[getShippingZone(country)],
+            },
+          },
+        ],
+        mode: 'payment',
+        // Stripe Tax must be fully configured (active + origin address) or the
+        // session create call fails. Gate it behind an env flag so the shop works
+        // before Tax is set up; flip STRIPE_TAX_ENABLED=true once it's ready.
+        automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
+        metadata: { orderId: order.id },
+        payment_intent_data: {
+          metadata: { orderId: order.id },
+        },
+      })
+
+      if (!stripeSession.url) {
+        throw new Error('Stripe session created without a checkout URL')
       }
+
+      // Link session to order
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { stripeSessionId: stripeSession.id },
+      })
 
       return {
-        price: priceId,
-        quantity: item.quantity,
+        success: true,
+        sessionUrl: stripeSession.url,
+        orderId: order.id,
       }
-    })
-
-    // Create Stripe Checkout Session (external call, outside DB transaction)
-    const stripeSession = await stripe.checkout.sessions.create({
-      customer: customer.stripeCustomerId,
-      customer_update: { address: 'auto' },
-      line_items: lineItems,
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: shippingCost,
-              currency: 'eur',
-            },
-            display_name: SHIPPING_ZONE_LABEL[getShippingZone(country)],
-          },
-        },
-      ],
-      mode: 'payment',
-      // Stripe Tax must be fully configured (active + origin address) or the
-      // session create call fails. Gate it behind an env flag so the shop works
-      // before Tax is set up; flip STRIPE_TAX_ENABLED=true once it's ready.
-      automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/checkout/cancel`,
-      metadata: { orderId: order.id },
-      payment_intent_data: {
-        metadata: { orderId: order.id },
-      },
-    })
-
-    // Link session to order
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { stripeSessionId: stripeSession.id },
-    })
-
-    return {
-      success: true,
-      sessionUrl: stripeSession.url,
-      orderId: order.id,
+    } catch (stripeError) {
+      console.error('Stripe checkout failed, rolling back order + stock:', stripeError)
+      try {
+        await prisma.$transaction(async tx => {
+          const cancelled = await tx.order.updateMany({
+            where: { id: order.id, status: 'PENDING' },
+            data: { status: 'CANCELLED', cancelledAt: new Date() },
+          })
+          // Only return stock if this call performed the cancellation.
+          if (cancelled.count === 1) {
+            for (const item of input.items) {
+              await tx.productVariant.updateMany({
+                where: { id: item.variantId },
+                data: { stock: { increment: item.quantity } },
+              })
+            }
+          }
+        })
+      } catch (rollbackError) {
+        console.error('Failed to release reserved stock after Stripe failure:', rollbackError)
+      }
+      return { success: false, error: 'Failed to create checkout session' }
     }
   } catch (error) {
     console.error('Error creating checkout session:', error)

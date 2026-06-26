@@ -5,6 +5,7 @@ const mockTx = {
   order: {
     findUnique: jest.fn(),
     update: jest.fn(),
+    updateMany: jest.fn(),
   },
   payment: {
     upsert: jest.fn(),
@@ -20,6 +21,9 @@ jest.mock('@/prisma/prismaClient', () => ({
     order: {
       findUnique: jest.fn(),
       update: jest.fn(),
+    },
+    payment: {
+      upsert: jest.fn(),
     },
     $transaction: jest.fn((fn: (tx: typeof mockTx) => Promise<void>) => fn(mockTx)),
   },
@@ -72,17 +76,10 @@ describe('handleCheckoutSessionCompleted', () => {
     currency: 'eur',
   } as unknown as Stripe.Checkout.Session
 
-  it('marks order as PAID, creates payment, decrements stock', async () => {
-    mockTx.order.findUnique
-      .mockResolvedValueOnce({ status: 'PENDING' }) // idempotency check
-      .mockResolvedValueOnce({
-        // stock decrement fetch
-        id: 'order-1',
-        items: [{ variantId: 'v1', quantity: 2 }],
-      })
+  it('marks order as PAID and creates payment (stock already reserved at checkout)', async () => {
+    mockTx.order.findUnique.mockResolvedValueOnce({ status: 'PENDING' }) // idempotency check
     mockTx.order.update.mockResolvedValue({})
     mockTx.payment.upsert.mockResolvedValue({})
-    mockTx.productVariant.update.mockResolvedValue({})
 
     await handleCheckoutSessionCompleted(baseSession)
 
@@ -97,21 +94,15 @@ describe('handleCheckoutSessionCompleted', () => {
         create: expect.objectContaining({ status: 'SUCCEEDED' }),
       }),
     )
-    expect(mockTx.productVariant.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'v1' },
-        data: { stock: { decrement: 2 } },
-      }),
-    )
+    // Stock is reserved at checkout — the completed handler must NOT decrement
+    // again, otherwise paid orders would double-count inventory.
+    expect(mockTx.productVariant.update).not.toHaveBeenCalled()
   })
 
   it('sends the confirmation email once after a newly paid order', async () => {
-    mockTx.order.findUnique
-      .mockResolvedValueOnce({ status: 'PENDING' })
-      .mockResolvedValueOnce({ id: 'order-1', items: [{ variantId: 'v1', quantity: 1 }] })
+    mockTx.order.findUnique.mockResolvedValueOnce({ status: 'PENDING' })
     mockTx.order.update.mockResolvedValue({})
     mockTx.payment.upsert.mockResolvedValue({})
-    mockTx.productVariant.update.mockResolvedValue({})
 
     await handleCheckoutSessionCompleted(baseSession)
 
@@ -158,19 +149,39 @@ describe('handleCheckoutSessionCompleted', () => {
 // --- handleCheckoutSessionExpired ---
 
 describe('handleCheckoutSessionExpired', () => {
-  it('marks order as CANCELLED', async () => {
-    ;(prisma.order.update as jest.Mock).mockResolvedValue({})
+  it('cancels a PENDING order and releases its reserved stock', async () => {
+    mockTx.order.updateMany.mockResolvedValue({ count: 1 })
+    mockTx.order.findUnique.mockResolvedValue({
+      id: 'order-1',
+      items: [{ variantId: 'v1', quantity: 2 }],
+    })
+    mockTx.productVariant.update.mockResolvedValue({})
 
     await handleCheckoutSessionExpired({
       metadata: { orderId: 'order-1' },
     } as unknown as Stripe.Checkout.Session)
 
-    expect(prisma.order.update).toHaveBeenCalledWith(
+    // Guarded transition: only acts while the order is still PENDING.
+    expect(mockTx.order.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 'order-1' },
+        where: { id: 'order-1', status: 'PENDING' },
         data: expect.objectContaining({ status: 'CANCELLED' }),
       }),
     )
+    expect(mockTx.productVariant.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 'v1' }, data: { stock: { increment: 2 } } }),
+    )
+  })
+
+  it('does NOT release stock when the order already advanced (not PENDING)', async () => {
+    // e.g. a late `expired` arriving after `completed` must not revert/refund.
+    mockTx.order.updateMany.mockResolvedValue({ count: 0 })
+
+    await handleCheckoutSessionExpired({
+      metadata: { orderId: 'order-1' },
+    } as unknown as Stripe.Checkout.Session)
+
+    expect(mockTx.productVariant.update).not.toHaveBeenCalled()
   })
 
   it('returns early when no orderId in metadata', async () => {
@@ -178,7 +189,7 @@ describe('handleCheckoutSessionExpired', () => {
       metadata: {},
     } as unknown as Stripe.Checkout.Session)
 
-    expect(prisma.order.update).not.toHaveBeenCalled()
+    expect(prisma.$transaction).not.toHaveBeenCalled()
   })
 })
 
@@ -193,10 +204,15 @@ describe('handlePaymentIntentFailed', () => {
     metadata: { orderId: 'order-1' },
   } as unknown as Stripe.PaymentIntent
 
-  it('finds order via metadata and cancels it', async () => {
+  it('records the FAILED payment and cancels a PENDING order, releasing stock', async () => {
     ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({ id: 'order-1' })
-    mockTx.order.update.mockResolvedValue({})
-    mockTx.payment.upsert.mockResolvedValue({})
+    ;(prisma.payment.upsert as jest.Mock).mockResolvedValue({})
+    mockTx.order.updateMany.mockResolvedValue({ count: 1 })
+    mockTx.order.findUnique.mockResolvedValue({
+      id: 'order-1',
+      items: [{ variantId: 'v1', quantity: 1 }],
+    })
+    mockTx.productVariant.update.mockResolvedValue({})
 
     await handlePaymentIntentFailed(basePI)
 
@@ -204,23 +220,28 @@ describe('handlePaymentIntentFailed', () => {
     expect(prisma.order.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'order-1' } }),
     )
-    expect(mockTx.order.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: 'CANCELLED' }),
-      }),
-    )
-    expect(mockTx.payment.upsert).toHaveBeenCalledWith(
+    expect(prisma.payment.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         create: expect.objectContaining({ status: 'FAILED' }),
       }),
+    )
+    // Guarded cancel + stock release.
+    expect(mockTx.order.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'order-1', status: 'PENDING' },
+        data: expect.objectContaining({ status: 'CANCELLED' }),
+      }),
+    )
+    expect(mockTx.productVariant.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 'v1' }, data: { stock: { increment: 1 } } }),
     )
   })
 
   it('falls back to stripePaymentIntentId lookup', async () => {
     const piNoMeta = { ...basePI, metadata: {} } as unknown as Stripe.PaymentIntent
     ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({ id: 'order-2' })
-    mockTx.order.update.mockResolvedValue({})
-    mockTx.payment.upsert.mockResolvedValue({})
+    ;(prisma.payment.upsert as jest.Mock).mockResolvedValue({})
+    mockTx.order.updateMany.mockResolvedValue({ count: 0 })
 
     await handlePaymentIntentFailed(piNoMeta)
 
@@ -237,15 +258,15 @@ describe('handlePaymentIntentFailed', () => {
     ;(stripe.checkout.sessions.list as jest.Mock).mockResolvedValueOnce({
       data: [{ metadata: { orderId: 'order-3' } }],
     })
-    mockTx.order.update.mockResolvedValue({})
-    mockTx.payment.upsert.mockResolvedValue({})
+    ;(prisma.payment.upsert as jest.Mock).mockResolvedValue({})
+    mockTx.order.updateMany.mockResolvedValue({ count: 0 })
 
     await handlePaymentIntentFailed(piNoMeta)
 
     expect(stripe.checkout.sessions.list).toHaveBeenCalledWith(
       expect.objectContaining({ payment_intent: 'pi_fail' }),
     )
-    expect(mockTx.order.update).toHaveBeenCalled()
+    expect(prisma.payment.upsert).toHaveBeenCalled()
   })
 
   it('logs error and returns when order not found at all', async () => {
@@ -260,6 +281,7 @@ describe('handlePaymentIntentFailed', () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('Order not found for payment intent'),
     )
+    expect(prisma.payment.upsert).not.toHaveBeenCalled()
     expect(prisma.$transaction).not.toHaveBeenCalled()
     consoleSpy.mockRestore()
   })
