@@ -225,14 +225,19 @@ export async function handleChargeRefunded(charge: Stripe.Charge) {
       // Check if full refund (Stripe sends amount_refunded in cents)
       const isFullRefund = charge.amount_refunded === charge.amount
 
-      // Update order status only if full refund
+      // Flip to REFUNDED guarded on the current status. The conditional
+      // updateMany means only the delivery that actually performs the
+      // (non-REFUNDED)→REFUNDED transition restores stock below, so two
+      // concurrent or duplicated charge.refunded events can't double-count
+      // inventory. The early `status === 'REFUNDED'` check above handles the
+      // common sequential-retry case; this closes the concurrent-delivery race.
+      let claimedRefund = false
       if (isFullRefund) {
-        await tx.order.update({
-          where: { id: order.id },
-          data: {
-            status: 'REFUNDED',
-          },
+        const claimed = await tx.order.updateMany({
+          where: { id: order.id, status: { not: 'REFUNDED' } },
+          data: { status: 'REFUNDED' },
         })
+        claimedRefund = claimed.count === 1
       }
 
       // Update payment record. Upsert (not update) so a refund of a charge
@@ -256,8 +261,9 @@ export async function handleChargeRefunded(charge: Stripe.Charge) {
         },
       })
 
-      // Restore stock only for full refund (on variants)
-      if (isFullRefund) {
+      // Restore stock only when THIS event performed the refund transition
+      // (guards against double-restore on duplicate/concurrent deliveries).
+      if (claimedRefund) {
         for (const item of order.items) {
           if (item.variantId) {
             await tx.productVariant.update({

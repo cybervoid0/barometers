@@ -228,8 +228,19 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid checkout request' }
   }
 
+  // Use the validated payload from here on, never the raw `input` (Zod strips any
+  // unknown fields). Normalise the email once — trim + lowercase — so guest
+  // customer dedup and later guest order lookup are case-insensitive, and a
+  // stray-cased address can't spawn a duplicate Customer / Stripe Customer or
+  // hide a returning buyer's past orders from their new account.
+  const { items } = parsed.data
+  const shippingAddress = {
+    ...parsed.data.shippingAddress,
+    email: parsed.data.shippingAddress.email.trim().toLowerCase(),
+  }
+
   try {
-    const { email, firstName, lastName } = input.shippingAddress
+    const { email, firstName, lastName } = shippingAddress
     const customerName = `${firstName} ${lastName}`.trim()
 
     // Find existing customer: by userId for logged-in users, by email for guests
@@ -281,11 +292,11 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     // from this read — it is enforced atomically at reservation time below, so
     // two concurrent checkouts can't both pass a stale check and oversell.
     const variants = await prisma.productVariant.findMany({
-      where: { id: { in: input.items.map(item => item.variantId) } },
+      where: { id: { in: items.map(item => item.variantId) } },
       include: { product: true },
     })
 
-    for (const item of input.items) {
+    for (const item of items) {
       const variant = variants.find(v => v.id === item.variantId)
       if (!variant) {
         throw new Error(`Variant ${item.variantId} not found`)
@@ -299,16 +310,16 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     }
 
     // Calculate totals (shop sells exclusively in EUR)
-    const subtotal = input.items.reduce((sum, item) => {
+    const subtotal = items.reduce((sum, item) => {
       const variant = variants.find(v => v.id === item.variantId)
       if (!variant) return sum
       return sum + (variant.priceEUR || 0) * item.quantity
     }, 0)
 
-    const country = input.shippingAddress.country
+    const country = shippingAddress.country
     // Weight-based shipping: sum variant weights (defaulting missing ones) and
     // price by destination zone. See calculateShippingCents in constants/shop.
-    const totalWeightGrams = input.items.reduce((sum, item) => {
+    const totalWeightGrams = items.reduce((sum, item) => {
       const variant = variants.find(v => v.id === item.variantId)
       const grams = variant?.weight ?? DEFAULT_VARIANT_WEIGHT_GRAMS
       return sum + grams * item.quantity
@@ -321,7 +332,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
     // Prepare order items data
-    const orderItemsData = input.items.map(item => {
+    const orderItemsData = items.map(item => {
       const variant = variants.find(v => v.id === item.variantId)
       if (!variant) throw new Error(`Variant ${item.variantId} not found`)
       return {
@@ -341,7 +352,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     // back. Reserved stock is released if the session expires, payment fails, or
     // the order is refunded (see the webhook handlers).
     const order = await prisma.$transaction(async tx => {
-      for (const item of input.items) {
+      for (const item of items) {
         const reserved = await tx.productVariant.updateMany({
           where: { id: item.variantId, stock: { gte: item.quantity } },
           data: { stock: { decrement: item.quantity } },
@@ -352,15 +363,15 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
         }
       }
 
-      const shippingAddress = await tx.shippingAddress.create({
-        data: input.shippingAddress,
+      const createdShippingAddress = await tx.shippingAddress.create({
+        data: shippingAddress,
       })
 
       return tx.order.create({
         data: {
           orderNumber,
           customerId: customer.id,
-          shippingAddressId: shippingAddress.id,
+          shippingAddressId: createdShippingAddress.id,
           status: 'PENDING',
           currency: 'EUR',
           subtotal,
@@ -381,7 +392,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput) {
     let createdSessionId: string | undefined
     try {
       // Prepare Stripe line items (EUR only; priceId presence validated above).
-      const lineItems = input.items.map(item => {
+      const lineItems = items.map(item => {
         const variant = variants.find(v => v.id === item.variantId)
         if (!variant?.stripePriceIdEUR) {
           throw new Error(`EUR price not found for variant ${variant?.sku}`)
