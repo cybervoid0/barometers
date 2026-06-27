@@ -13,7 +13,7 @@ export async function Header() {
   const menu = await getMenuData()
   return (
     <AnimatedHeader>
-      <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-1 pr-2">
+      <div className="container mx-auto flex h-full flex-nowrap items-center justify-between gap-4 pr-2">
         <Suspense fallback={<div className="hidden md:block" />}>
           <WideScreenTabs menu={menu} className="hidden md:block" />
         </Suspense>
