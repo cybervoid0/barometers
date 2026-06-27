@@ -89,6 +89,12 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             </p>
           </>
         )}
+
+        {(isPaid || isPending) && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Didn&apos;t get our confirmation email? Please check your spam folder.
+          </p>
+        )}
       </div>
 
       <div className="border rounded-lg p-6 space-y-4">
