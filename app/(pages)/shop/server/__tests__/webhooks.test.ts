@@ -317,14 +317,17 @@ describe('handleChargeRefunded', () => {
         { variantId: 'v2', quantity: 1 },
       ],
     })
-    mockTx.order.update.mockResolvedValue({})
+    // Guarded transition: only the delivery that flips (non-REFUNDED)→REFUNDED
+    // (count === 1) restores stock.
+    mockTx.order.updateMany.mockResolvedValue({ count: 1 })
     mockTx.payment.upsert.mockResolvedValue({})
     mockTx.productVariant.update.mockResolvedValue({})
 
     await handleChargeRefunded(baseCharge)
 
-    expect(mockTx.order.update).toHaveBeenCalledWith(
+    expect(mockTx.order.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
+        where: { id: 'order-1', status: { not: 'REFUNDED' } },
         data: { status: 'REFUNDED' },
       }),
     )
@@ -341,6 +344,23 @@ describe('handleChargeRefunded', () => {
         data: { stock: { increment: 2 } },
       }),
     )
+  })
+
+  it('does NOT restore stock when a concurrent delivery already refunded (guard count 0)', async () => {
+    // Order not yet REFUNDED at read time, but the guarded updateMany loses the
+    // race (another delivery flipped it first) → count 0 → stock must NOT be
+    // restored a second time.
+    mockTx.order.findUnique.mockResolvedValueOnce({
+      id: 'order-1',
+      status: 'PAID',
+      items: [{ variantId: 'v1', quantity: 2 }],
+    })
+    mockTx.order.updateMany.mockResolvedValue({ count: 0 })
+    mockTx.payment.upsert.mockResolvedValue({})
+
+    await handleChargeRefunded(baseCharge)
+
+    expect(mockTx.productVariant.update).not.toHaveBeenCalled()
   })
 
   it('handles partial refund: order stays same status, stock NOT restored', async () => {
