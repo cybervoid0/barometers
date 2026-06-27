@@ -29,7 +29,7 @@ export async function BarometerCard({
       <Link
         className={cn(
           'flex h-full w-full flex-col gap-1 rounded-md p-2 text-center no-underline',
-          'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
+          'bg-card-gradient',
         )}
         href={link}
       >

@@ -140,6 +140,11 @@
     0 0 40px color-mix(in srgb, var(--card-gradient-to) 8%, transparent);
 }
 
+@utility bg-card-gradient {
+  /* Top-to-bottom card background gradient, theme-aware via CSS vars */
+  background-image: linear-gradient(to bottom, var(--card-gradient-from), var(--card-gradient-to));
+}
+
 @utility animation-delay-200 {
   /* Loading animation delays */
   animation-delay: 0.2s;

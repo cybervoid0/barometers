@@ -114,13 +114,22 @@ function MenuContent({ menu = [], closeMenu }: Props & { closeMenu: () => void }
                 </button>
               </>
             ) : (
-              <Link
-                href={Route.Signin}
-                onClick={closeMenu}
-                className={cn('block no-underline', menuItemTextStyle)}
-              >
-                Sign in
-              </Link>
+              <>
+                <Link
+                  href={Route.Signin}
+                  onClick={closeMenu}
+                  className={cn('block no-underline', menuItemTextStyle)}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href={Route.TrackOrder}
+                  onClick={closeMenu}
+                  className={cn('block no-underline', menuItemTextStyle)}
+                >
+                  Track an order
+                </Link>
+              </>
             )}
           </div>
           <SocialButtons className="mx-auto" />

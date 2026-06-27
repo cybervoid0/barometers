@@ -30,7 +30,7 @@ function PropertyCardCore({
       className={cn(
         className,
         'bg-secondary flex h-full min-h-20 flex-row flex-nowrap justify-center gap-0 overflow-hidden py-0',
-        'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
+        'bg-card-gradient',
       )}
       {...props}
     >

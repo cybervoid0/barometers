@@ -76,20 +76,23 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         <div className="border-t pt-4">
           <h3 className="font-semibold mb-2">Items:</h3>
           <ul className="space-y-2">
-            {order.items.map(item => (
-              <li key={item.id} className="flex justify-between">
-                <span>
-                  {item.product.name}
-                  {item.variant && item.variantInfo && (
-                    <span className="text-muted-foreground text-sm ml-1">
-                      ({formatVariantInfo(item.variantInfo as Record<string, string>)})
-                    </span>
-                  )}
-                  <span className="text-muted-foreground"> × {item.quantity}</span>
-                </span>
-                <span>{formatPrice(item.priceAtTime, order.currency)}</span>
-              </li>
-            ))}
+            {order.items.map(item => {
+              const variantInfo = item.variant
+                ? formatVariantInfo(item.variantInfo as Record<string, string> | null)
+                : ''
+              return (
+                <li key={item.id} className="flex justify-between">
+                  <span>
+                    {item.product.name}
+                    {variantInfo && (
+                      <span className="text-muted-foreground text-sm ml-1">({variantInfo})</span>
+                    )}
+                    <span className="text-muted-foreground"> × {item.quantity}</span>
+                  </span>
+                  <span>{formatPrice(item.priceAtTime, order.currency)}</span>
+                </li>
+              )
+            })}
           </ul>
         </div>
 
@@ -141,7 +144,8 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   )
 }
 
-function formatVariantInfo(info: Record<string, string>): string {
+function formatVariantInfo(info: Record<string, string> | null): string {
+  if (!info) return ''
   return Object.entries(info)
     .map(([key, value]) => `${key}: ${value}`)
     .join(', ')

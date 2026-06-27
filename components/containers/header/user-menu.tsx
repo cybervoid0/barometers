@@ -1,6 +1,6 @@
 'use client'
 
-import { LogOut, Package, User } from 'lucide-react'
+import { LogOut, Package, PackageSearch, User } from 'lucide-react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import {
@@ -27,9 +27,28 @@ export function UserMenu({ className }: { className?: string }) {
 
   if (!session?.user) {
     return (
-      <Link href={Route.Signin} aria-label="Sign in" className={className}>
-        <User size={18} />
-      </Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          aria-label="Account"
+          className={cn('cursor-pointer outline-none', className)}
+        >
+          <User size={18} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuItem asChild>
+            <Link href={Route.Signin} className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              Sign in
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={Route.TrackOrder} className="cursor-pointer">
+              <PackageSearch className="mr-2 h-4 w-4" />
+              Track an order
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
 

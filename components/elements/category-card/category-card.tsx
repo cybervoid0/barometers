@@ -22,7 +22,7 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
         <div
           className={cn(
             '@container relative h-full w-full overflow-hidden rounded-md',
-            'from-card-gradient-from to-card-gradient-to bg-linear-to-b',
+            'bg-card-gradient',
           )}
         >
           <CategoryIcon category={name} className="absolute top-4 right-4 z-10" />
@@ -30,7 +30,6 @@ export const CategoryCard: FC<CategoryCardProps> = ({ name, link, image, priorit
             <Image
               width={509}
               height={509}
-              priority={priority}
               fetchPriority={priority ? 'high' : 'auto'}
               loading={priority ? 'eager' : 'lazy'}
               src={image.url}

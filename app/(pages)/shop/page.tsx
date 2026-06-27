@@ -2,15 +2,11 @@ import 'server-only'
 
 import Link from 'next/link'
 import { connection } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { getProducts } from '@/app/(pages)/shop/server/queries'
-import { Image, IsAdmin } from '@/components/elements'
+import { Image, IsAdmin, ShowMore } from '@/components/elements'
 import { Button } from '@/components/ui'
-import { Route } from '@/constants'
-import { authConfig } from '@/services/auth'
 import { formatPrice } from '@/utils/currency'
 import { StockStatus } from './components/stock-status'
-import { ViewShoppingCart } from './components/view-shopping-cart'
 import { EditProduct } from './edit-product'
 
 /**
@@ -50,23 +46,32 @@ function formatPriceRange(range: { min: number; max: number } | null): string {
 export default async function ShopPage() {
   await connection()
   const products = await getProducts()
-  const session = await getServerSession(authConfig)
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-4">Shop</h1>
-      <div className="flex flex-wrap gap-3 mb-6">
-        <ViewShoppingCart />
-        {session?.user ? (
-          <Link href={Route.Orders}>
-            <Button variant="outline">My Orders</Button>
-          </Link>
-        ) : (
-          <Link href={Route.TrackOrder}>
-            <Button variant="outline">Track an order</Button>
-          </Link>
-        )}
-      </div>
+      <header className="mb-8 max-w-3xl">
+        <h2 className="text-secondary tracking-tight">Shop</h2>
+        <ShowMore maxHeight={120} className="mt-3">
+          <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+            <p>Welcome to the Barometers.info Shop.</p>
+            <p>
+              Here you will find a carefully curated selection of books, exclusive merchandise, and
+              unusual barometer-related curiosities inspired by the history of weather instruments.
+              Some items have been created especially for collectors and enthusiasts, while others
+              are simply meant to bring a smile to those who share a passion for scientific
+              heritage.
+            </p>
+            <p>
+              Every purchase directly supports The Art of Weather Instruments Foundation. All
+              proceeds are transferred to the Foundation and are used to preserve, restore,
+              research, document, and share the history of weather instruments with the public.
+            </p>
+            <p>
+              Thank you for helping to preserve this remarkable scientific and cultural heritage.
+            </p>
+          </div>
+        </ShowMore>
+      </header>
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">No products available yet.</p>
@@ -88,25 +93,28 @@ export default async function ShopPage() {
                 <IsAdmin>
                   <EditProduct product={product} />
                 </IsAdmin>
-                <div className="relative aspect-square bg-muted flex items-center justify-center">
+                <Link
+                  href={`/shop/${product.slug}`}
+                  className="relative aspect-square bg-muted flex items-center justify-center bg-card-gradient"
+                >
                   {image ? (
                     <Image
                       src={image.url}
                       alt={image.name || product.name}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
                     <div className="text-muted-foreground">No image</div>
                   )}
-                </div>
+                </Link>
 
                 <div className="flex flex-1 flex-col p-4">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
 
                   {product.description && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
                       {product.description}
                     </p>
                   )}

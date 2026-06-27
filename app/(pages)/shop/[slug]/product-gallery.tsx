@@ -29,13 +29,13 @@ export function ProductGallery({ images, productName }: Props) {
   return (
     <div className="space-y-3">
       <ImageLightbox src={main.url} name={main.name ?? productName}>
-        <button type="button" className="block w-full cursor-zoom-in">
+        <button type="button" className="block w-full cursor-zoom-in bg-card-gradient rounded-md">
           <Image
             src={main.url}
             alt={main.name ?? productName}
             width={600}
             height={600}
-            className="aspect-square w-full select-none rounded-lg object-cover"
+            className="aspect-square w-full select-none rounded-lg object-contain"
           />
         </button>
       </ImageLightbox>
