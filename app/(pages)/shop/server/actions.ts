@@ -819,10 +819,33 @@ export async function updateOrderStatus(
     // cancelledAt.
     if (status === 'CANCELLED') {
       if (currentOrder.stripeSessionId) {
+        // A PENDING order can race a payment: the buyer may have just completed the
+        // Checkout Session while our completed-webhook hasn't landed yet (order still
+        // PENDING). Verify with Stripe first. If it's already paid/complete, refuse —
+        // cancelling would strand captured funds with no refund path (the completed
+        // handler would then skip the no-longer-PENDING order). Expiring is the
+        // synchronization point: once an open session is expired it can't be paid, so
+        // the subsequent release is safe. If we can't verify or expire it, abort
+        // rather than risk the strand.
         try {
-          await stripe.checkout.sessions.expire(currentOrder.stripeSessionId)
-        } catch (expireError) {
-          console.error('Failed to expire Stripe session on manual cancel:', expireError)
+          const stripeSession = await stripe.checkout.sessions.retrieve(
+            currentOrder.stripeSessionId,
+          )
+          if (stripeSession.status === 'complete' || stripeSession.payment_status === 'paid') {
+            return {
+              success: false,
+              error: 'This order has been paid — issue a refund instead of cancelling it.',
+            }
+          }
+          if (stripeSession.status === 'open') {
+            await stripe.checkout.sessions.expire(currentOrder.stripeSessionId)
+          }
+        } catch (sessionError) {
+          console.error('Stripe session check failed on manual cancel:', sessionError)
+          return {
+            success: false,
+            error: 'Could not verify the payment session. Order not cancelled — please try again.',
+          }
         }
       }
       const released = await releasePendingOrder(orderId, 'admin manual cancel')
