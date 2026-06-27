@@ -94,8 +94,14 @@ PENDING ──pay──▶ PAID ──▶ PROCESSING ──▶ SHIPPED ──▶
    │              │            │
    │              └─ refund ───┴──▶ REFUNDED
    │
-   └─ expire / payment fail / rollback ──▶ CANCELLED
+   └─ expire / payment fail / rollback / admin cancel ──▶ CANCELLED
 ```
+
+**CANCELLED is reachable only from PENDING.** Once an order is PAID the money is
+captured, so the way to undo it is a **refund** (→ REFUNDED, which restores stock via
+the `charge.refunded` webhook) — never a plain cancel that would strand captured funds.
+A manual admin cancel of a PENDING order goes through the same guarded release as the
+expiry webhook (returns stock, expires the live Stripe session).
 
 Allowed transitions are enforced in code (`VALID_ORDER_TRANSITIONS` in
 [`constants/shop.ts`](constants/shop.ts)). `DELIVERED`, `CANCELLED`, and `REFUNDED` are

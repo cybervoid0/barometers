@@ -62,7 +62,7 @@ jest.mock('@/services/stripe', () => ({
   stripe: {
     refunds: { create: jest.fn() },
     customers: { create: jest.fn(), del: jest.fn() },
-    checkout: { sessions: { create: jest.fn(), expire: jest.fn() } },
+    checkout: { sessions: { create: jest.fn(), expire: jest.fn(), retrieve: jest.fn() } },
     prices: { create: jest.fn(), update: jest.fn() },
     products: { create: jest.fn(), update: jest.fn() },
   },
@@ -190,14 +190,13 @@ describe('refundOrder — auth', () => {
 describe('updateOrderStatus — transitions', () => {
   const adminSession = { user: { id: 'u1', role: 'ADMIN' } }
 
+  // CANCELLED is handled separately (it routes through releasePendingOrder, not a
+  // plain status update) — see the dedicated cancel tests below.
   const validTransitions: Array<[OrderStatus, OrderStatus]> = [
     ['PENDING', 'PAID'],
-    ['PENDING', 'CANCELLED'],
     ['PAID', 'PROCESSING'],
-    ['PAID', 'CANCELLED'],
     ['PAID', 'REFUNDED'],
     ['PROCESSING', 'SHIPPED'],
-    ['PROCESSING', 'CANCELLED'],
     ['PROCESSING', 'REFUNDED'],
     ['SHIPPED', 'DELIVERED'],
   ]
@@ -210,9 +209,11 @@ describe('updateOrderStatus — transitions', () => {
     ['PAID', 'PENDING'],
     ['PAID', 'SHIPPED'],
     ['PAID', 'DELIVERED'],
+    ['PAID', 'CANCELLED'],
     ['PROCESSING', 'PENDING'],
     ['PROCESSING', 'PAID'],
     ['PROCESSING', 'DELIVERED'],
+    ['PROCESSING', 'CANCELLED'],
     ['SHIPPED', 'PENDING'],
     ['SHIPPED', 'PAID'],
     ['SHIPPED', 'PROCESSING'],
@@ -307,24 +308,81 @@ describe('updateOrderStatus — transitions', () => {
     )
   })
 
-  it('sets cancelledAt when transitioning to CANCELLED', async () => {
+  it('cancels a PENDING order via releasePendingOrder and expires the open Stripe session', async () => {
     mockGetServerSession.mockResolvedValueOnce(adminSession)
-    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({ status: 'PAID' })
-    ;(prisma.order.update as jest.Mock).mockResolvedValueOnce({
-      id: 'order-1',
-      status: 'CANCELLED',
+    ;(prisma.order.findUnique as jest.Mock)
+      // updateOrderStatus reads the current order...
+      .mockResolvedValueOnce({ status: 'PENDING', stripeSessionId: 'sess_1' })
+      // ...then releasePendingOrder reads it back (with items) inside its tx.
+      .mockResolvedValueOnce({ id: 'order-1', items: [] })
+    ;(stripe.checkout.sessions.retrieve as jest.Mock).mockResolvedValueOnce({
+      status: 'open',
+      payment_status: 'unpaid',
     })
+    ;(prisma.order.updateMany as jest.Mock).mockResolvedValueOnce({ count: 1 })
 
-    await updateOrderStatus('order-1', 'CANCELLED')
+    const result = await updateOrderStatus('order-1', 'CANCELLED')
 
-    expect(prisma.order.update).toHaveBeenCalledWith(
+    expect(result.success).toBe(true)
+    expect(stripe.checkout.sessions.expire).toHaveBeenCalledWith('sess_1')
+    // Guarded cancel (updateMany where status PENDING), never a plain status flip.
+    expect(prisma.order.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({
-          status: 'CANCELLED',
-          cancelledAt: expect.any(Date),
-        }),
+        where: { id: 'order-1', status: 'PENDING' },
+        data: expect.objectContaining({ status: 'CANCELLED' }),
       }),
     )
+    expect(prisma.order.update).not.toHaveBeenCalled()
+  })
+
+  it('refuses to cancel when the Stripe session is already paid (no fund strand)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'PENDING',
+      stripeSessionId: 'sess_1',
+    })
+    // Buyer paid in the race window before the completed-webhook landed.
+    ;(stripe.checkout.sessions.retrieve as jest.Mock).mockResolvedValueOnce({
+      status: 'complete',
+      payment_status: 'paid',
+    })
+
+    const result = await updateOrderStatus('order-1', 'CANCELLED')
+
+    expect(result.success).toBe(false)
+    // Must NOT expire or release — the order would otherwise be cancelled with funds captured.
+    expect(stripe.checkout.sessions.expire).not.toHaveBeenCalled()
+    expect(prisma.order.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('aborts the cancel when the Stripe session cannot be verified', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'PENDING',
+      stripeSessionId: 'sess_1',
+    })
+    ;(stripe.checkout.sessions.retrieve as jest.Mock).mockRejectedValueOnce(new Error('boom'))
+
+    const result = await updateOrderStatus('order-1', 'CANCELLED')
+
+    expect(result.success).toBe(false)
+    expect(prisma.order.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('fails to cancel when the order is no longer PENDING (guard no-op)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    ;(prisma.order.findUnique as jest.Mock).mockResolvedValueOnce({
+      status: 'PENDING',
+      stripeSessionId: null,
+    })
+    // releasePendingOrder's guarded updateMany matches nothing → no-op release.
+    ;(prisma.order.updateMany as jest.Mock).mockResolvedValueOnce({ count: 0 })
+
+    const result = await updateOrderStatus('order-1', 'CANCELLED')
+
+    expect(result.success).toBe(false)
+    expect(stripe.checkout.sessions.expire).not.toHaveBeenCalled()
+    expect(prisma.order.update).not.toHaveBeenCalled()
   })
 
   it('sends the shipped notification when transitioning to SHIPPED', async () => {

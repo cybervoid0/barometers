@@ -99,6 +99,26 @@ describe('handleCheckoutSessionCompleted', () => {
     expect(mockTx.productVariant.update).not.toHaveBeenCalled()
   })
 
+  it('reconciles order total and tax from the Stripe session', async () => {
+    mockTx.order.findUnique.mockResolvedValueOnce({ status: 'PENDING' })
+    mockTx.order.update.mockResolvedValue({})
+    mockTx.payment.upsert.mockResolvedValue({})
+
+    const taxedSession = {
+      ...baseSession,
+      amount_total: 3299,
+      total_details: { amount_tax: 300 },
+    } as unknown as Stripe.Checkout.Session
+
+    await handleCheckoutSessionCompleted(taxedSession)
+
+    expect(mockTx.order.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ total: 3299, tax: 300 }),
+      }),
+    )
+  })
+
   it('sends the confirmation email once after a newly paid order', async () => {
     mockTx.order.findUnique.mockResolvedValueOnce({ status: 'PENDING' })
     mockTx.order.update.mockResolvedValue({})
