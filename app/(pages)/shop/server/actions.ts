@@ -807,13 +807,16 @@ export async function setProductActive(productId: string, isActive: boolean) {
   }
 
   // Reverse the Stripe mutation if the DB write fails, so the two never diverge.
+  // Roll back to the *captured* prior state, not `!requested` — the two only
+  // coincide when the value is actually changing, and we don't want to assume it.
   let stripeProductId: string | undefined
+  let priorActive: boolean | undefined
   let stripeUpdated = false
 
   try {
     const product = await prisma.product.findUnique({
       where: { id: parsed.data.productId },
-      select: { stripeProductId: true, slug: true, deletedAt: true },
+      select: { stripeProductId: true, slug: true, deletedAt: true, isActive: true },
     })
 
     if (!product) {
@@ -822,7 +825,13 @@ export async function setProductActive(productId: string, isActive: boolean) {
     if (product.deletedAt) {
       return { success: false, error: 'This product has been deleted and can no longer be shown' }
     }
+    // Nothing to change — avoid a pointless Stripe write (and a rollback that
+    // could flip Stripe to the wrong value).
+    if (product.isActive === parsed.data.isActive) {
+      return { success: true, isActive: product.isActive }
+    }
     stripeProductId = product.stripeProductId
+    priorActive = product.isActive
 
     // Stripe first, then DB. If the DB write throws, the catch reverts Stripe.
     await stripe.products.update(stripeProductId, { active: parsed.data.isActive })
@@ -837,9 +846,9 @@ export async function setProductActive(productId: string, isActive: boolean) {
     return { success: true, isActive: parsed.data.isActive }
   } catch (error) {
     console.error('Error updating product visibility:', error)
-    if (stripeUpdated && stripeProductId) {
+    if (stripeUpdated && stripeProductId && priorActive !== undefined) {
       try {
-        await stripe.products.update(stripeProductId, { active: !parsed.data.isActive })
+        await stripe.products.update(stripeProductId, { active: priorActive })
       } catch (rollbackError) {
         console.error('Failed to revert Stripe product active flag during rollback:', rollbackError)
       }
@@ -889,7 +898,11 @@ export async function deleteProduct(productId: string) {
         slug: true,
         isActive: true,
         stripeProductId: true,
-        variants: { select: { stripePriceIdEUR: true } },
+        // Only active variants — a soft-deleted variant's Stripe price was already
+        // archived by a prior edit, so re-archiving (and, worse, reactivating it on
+        // rollback) would resurrect a price that must stay inactive. An active
+        // variant's stripePriceIdEUR always points to its current active price.
+        variants: { where: { isActive: true }, select: { stripePriceIdEUR: true } },
       },
     })
 
