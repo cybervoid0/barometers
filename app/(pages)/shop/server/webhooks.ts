@@ -50,12 +50,19 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
         return false
       }
 
-      // Update order status
+      // Update order status, and reconcile the money with what Stripe actually
+      // charged. With automatic_tax the captured amount_total includes tax our
+      // pre-checkout total didn't account for; syncing keeps the order record (and
+      // the totals shown to the customer) matching the Payment. When tax is off these
+      // equal the values we already stored, so it's a no-op. `?? undefined` leaves a
+      // field untouched if Stripe omitted it.
       await tx.order.update({
         where: { id: orderId },
         data: {
           status: 'PAID',
           stripePaymentIntentId: paymentIntentId,
+          total: session.amount_total ?? undefined,
+          tax: session.total_details?.amount_tax ?? undefined,
         },
       })
 

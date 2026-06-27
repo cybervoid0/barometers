@@ -107,10 +107,19 @@ export const SHIPPING_COUNTRIES = [
   { code: 'US', name: 'United States' },
 ] as const satisfies { code: string; name: string }[]
 
+/** Allowlisted destination country codes, for server-side checkout validation. */
+export const SHIPPING_COUNTRY_CODES: ReadonlySet<string> = new Set(
+  SHIPPING_COUNTRIES.map(c => c.code),
+)
+
+// CANCELLED is intentionally reachable ONLY from PENDING. Once an order is PAID the
+// money is captured, so the correct way to undo it is REFUNDED (Stripe refund +
+// stock restore via the charge.refunded webhook), never a plain status flip that
+// would leave funds captured. See updateOrderStatus / refundOrder.
 export const VALID_ORDER_TRANSITIONS = {
   PENDING: ['PAID', 'CANCELLED'],
-  PAID: ['PROCESSING', 'CANCELLED', 'REFUNDED'],
-  PROCESSING: ['SHIPPED', 'CANCELLED', 'REFUNDED'],
+  PAID: ['PROCESSING', 'REFUNDED'],
+  PROCESSING: ['SHIPPED', 'REFUNDED'],
   SHIPPED: ['DELIVERED'],
   DELIVERED: [],
   CANCELLED: [],

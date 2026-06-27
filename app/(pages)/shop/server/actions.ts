@@ -10,6 +10,7 @@ import {
   calculateShippingCents,
   DEFAULT_VARIANT_WEIGHT_GRAMS,
   getShippingZone,
+  SHIPPING_COUNTRY_CODES,
   SHIPPING_ZONE_LABEL,
   VALID_ORDER_TRANSITIONS,
 } from '@/constants'
@@ -83,7 +84,12 @@ const checkoutInputSchema = z.object({
     city: z.string().min(1),
     state: z.string().optional(),
     postalCode: z.string().min(1),
-    country: z.string().min(2),
+    // Restrict to the shipping allowlist server-side — the client only offers these,
+    // but a tampered request must not create an order for a country we don't ship to
+    // (which would otherwise be silently priced as the `world` zone).
+    country: z.string().refine(c => SHIPPING_COUNTRY_CODES.has(c), {
+      message: 'We do not ship to the selected country',
+    }),
   }),
 })
 
@@ -791,7 +797,7 @@ export async function updateOrderStatus(
     // Validate status transition
     const currentOrder = await prisma.order.findUnique({
       where: { id: orderId },
-      select: { status: true },
+      select: { status: true, stripeSessionId: true },
     })
 
     if (!currentOrder) {
@@ -806,12 +812,30 @@ export async function updateOrderStatus(
       }
     }
 
+    // Cancelling is only reachable from PENDING (paid orders go through refund).
+    // Don't just flip the status: mirror the checkout-rollback path so reserved
+    // stock is returned and the live Stripe session can't still be paid into a
+    // cancelled order. releasePendingOrder is guarded + idempotent and also sets
+    // cancelledAt.
+    if (status === 'CANCELLED') {
+      if (currentOrder.stripeSessionId) {
+        try {
+          await stripe.checkout.sessions.expire(currentOrder.stripeSessionId)
+        } catch (expireError) {
+          console.error('Failed to expire Stripe session on manual cancel:', expireError)
+        }
+      }
+      const released = await releasePendingOrder(orderId, 'admin manual cancel')
+      return released
+        ? { success: true }
+        : { success: false, error: 'Order is no longer pending and cannot be cancelled' }
+    }
+
     const data: {
       status: OrderStatus
       trackingNumber?: string
       shippedAt?: Date
       deliveredAt?: Date
-      cancelledAt?: Date
     } = { status }
 
     if (trackingNumber) {
@@ -822,8 +846,6 @@ export async function updateOrderStatus(
       data.shippedAt = new Date()
     } else if (status === 'DELIVERED') {
       data.deliveredAt = new Date()
-    } else if (status === 'CANCELLED') {
-      data.cancelledAt = new Date()
     }
 
     const order = await prisma.order.update({
