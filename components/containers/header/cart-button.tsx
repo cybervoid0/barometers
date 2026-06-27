@@ -1,8 +1,9 @@
 'use client'
 
 import { ShoppingCart } from 'lucide-react'
+import { motion, useAnimationControls } from 'motion/react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useShopCartStore } from '@/app/(pages)/shop/stores/shop-cart-store'
 import { Route } from '@/constants'
 import { cn } from '@/utils'
@@ -25,6 +26,20 @@ export function CartButton({ className }: { className?: string }) {
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0)
 
+  // Pop the badge whenever the total count grows. Imperative controls instead of
+  // a `key` remount, which would tear down the element and read as a jitter.
+  const badgeControls = useAnimationControls()
+  const prevCount = useRef(count)
+  useEffect(() => {
+    if (count > prevCount.current) {
+      void badgeControls.start({
+        scale: [1, 1.4, 1],
+        transition: { duration: 0.35, ease: 'easeOut' },
+      })
+    }
+    prevCount.current = count
+  }, [count, badgeControls])
+
   if (!mounted || count === 0) return null
 
   return (
@@ -34,9 +49,12 @@ export function CartButton({ className }: { className?: string }) {
       className={cn('relative inline-flex items-center', className)}
     >
       <ShoppingCart size={18} />
-      <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-semibold leading-none text-secondary-foreground">
+      <motion.span
+        animate={badgeControls}
+        className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-semibold leading-none text-secondary-foreground"
+      >
         {count}
-      </span>
+      </motion.span>
     </Link>
   )
 }

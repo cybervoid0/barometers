@@ -151,57 +151,65 @@ export default function Cart() {
                   )}
                 </Link>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <Link href={`${Route.Shop}/${variant.product.slug}`}>
-                    <h3 className="font-medium hover:underline">{variant.product.name}</h3>
-                  </Link>
-                  {optionsLabel && <p className="text-sm text-muted-foreground">{optionsLabel}</p>}
-                  <div className="mt-1">
-                    {variant.priceEUR && (
-                      <span className="font-medium">{formatPrice(variant.priceEUR)}</span>
+                {/* Details: stacked on mobile, single row on desktop */}
+                <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                  {/* Info */}
+                  <div className="min-w-0 flex-1">
+                    <Link href={`${Route.Shop}/${variant.product.slug}`}>
+                      <h3 className="font-medium hover:underline">{variant.product.name}</h3>
+                    </Link>
+                    {optionsLabel && (
+                      <p className="text-sm text-muted-foreground">{optionsLabel}</p>
                     )}
+                    <div className="mt-1">
+                      {variant.priceEUR && (
+                        <span className="font-medium">{formatPrice(variant.priceEUR)}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Controls: quantity, subtotal, remove */}
+                  <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-4">
+                    {/* Quantity */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        disabled={item.quantity >= variant.stock}
+                        onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+
+                    {/* Subtotal */}
+                    <div className="text-right sm:min-w-[100px]">
+                      {variant.priceEUR && (
+                        <p className="font-bold">{formatPrice(variant.priceEUR * item.quantity)}</p>
+                      )}
+                    </div>
+
+                    {/* Remove */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        removeItem(item.variantId)
+                        toast.success(`${variant.product.name} removed from cart`)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </div>
                 </div>
-
-                {/* Quantity */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                  >
-                    -
-                  </Button>
-                  <span className="w-8 text-center">{item.quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={item.quantity >= variant.stock}
-                    onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                  >
-                    +
-                  </Button>
-                </div>
-
-                {/* Subtotal */}
-                <div className="text-right min-w-[100px]">
-                  {variant.priceEUR && (
-                    <p className="font-bold">{formatPrice(variant.priceEUR * item.quantity)}</p>
-                  )}
-                </div>
-
-                {/* Remove */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    removeItem(item.variantId)
-                    toast.success(`${variant.product.name} removed from cart`)
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
               </div>
             )
           })}
@@ -209,10 +217,10 @@ export default function Cart() {
 
         <Separator />
 
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <ContinueShopping />
 
-          <div className="space-y-3 min-w-[300px]">
+          <div className="w-full space-y-3 sm:w-auto sm:min-w-[300px]">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total items:</span>
               <span className="font-medium">{getTotalItems()}</span>
