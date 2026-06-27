@@ -8,7 +8,7 @@ import { prisma } from '@/prisma/prismaClient'
  */
 export async function getProducts() {
   return prisma.product.findMany({
-    where: { isActive: true },
+    where: { isActive: true, deletedAt: null },
     include: {
       images: {
         orderBy: { order: 'asc' },
@@ -33,6 +33,7 @@ export async function getProductsByIds(productIds: string[]) {
     where: {
       id: { in: productIds },
       isActive: true,
+      deletedAt: null,
     },
     include: {
       images: {
@@ -58,7 +59,7 @@ export async function getVariantsByIds(variantIds: string[]) {
     where: {
       id: { in: variantIds },
       isActive: true,
-      product: { isActive: true },
+      product: { isActive: true, deletedAt: null },
     },
     include: {
       product: {
@@ -78,11 +79,15 @@ export async function getVariantsByIds(variantIds: string[]) {
 }
 
 /**
- * Get product by ID with variants and options
+ * Get product by ID with variants and options (admin edit form).
+ *
+ * Deliberately does NOT filter `isActive` — an admin must be able to open and
+ * edit a *hidden* product. It does exclude soft-`deletedAt` products so a deleted
+ * product's edit page 404s.
  */
 export async function getProductById(id: string) {
-  return prisma.product.findUnique({
-    where: { id },
+  return prisma.product.findFirst({
+    where: { id, deletedAt: null },
     include: {
       images: {
         orderBy: { order: 'asc' },
@@ -104,11 +109,15 @@ export async function getProductById(id: string) {
 }
 
 /**
- * Get product by slug with variants and options
+ * Get product by slug with variants and options (public storefront page).
+ *
+ * Excludes both hidden (`isActive:false`) and soft-deleted (`deletedAt`) products
+ * so their `/shop/[slug]` page 404s. `findFirst` (not `findUnique`) because we add
+ * non-unique filters; `slug` is still unique so at most one row matches.
  */
 export async function getProductBySlug(slug: string) {
-  return prisma.product.findUnique({
-    where: { slug },
+  return prisma.product.findFirst({
+    where: { slug, isActive: true, deletedAt: null },
     include: {
       images: {
         orderBy: { order: 'asc' },
@@ -126,6 +135,29 @@ export async function getProductBySlug(slug: string) {
         orderBy: { position: 'asc' },
       },
     },
+  })
+}
+
+/**
+ * Get every product for the admin products list — including hidden
+ * (`isActive:false`) ones, so a hidden product can still be found and un-hidden.
+ * Only soft-`deletedAt` products are excluded (they're gone for good). Active
+ * variants only, so a soft-deleted variant doesn't inflate the stock/price shown.
+ */
+export async function getAdminProducts() {
+  return prisma.product.findMany({
+    where: { deletedAt: null },
+    include: {
+      images: {
+        orderBy: { order: 'asc' },
+        take: 1,
+      },
+      variants: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
   })
 }
 

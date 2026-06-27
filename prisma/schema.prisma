@@ -262,6 +262,11 @@ model Product {
   description     String?
   stripeProductId String           @unique
   isActive        Boolean          @default(true)
+  // Soft-delete marker. Hidden products keep this null (isActive=false,
+  // reversible); deleted products set it (and isActive=false) so they're
+  // excluded everywhere — including the admin list — while orders that reference
+  // them survive (OrderItem.product is Restrict, not Cascade).
+  deletedAt       DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   images          ProductImage[]
