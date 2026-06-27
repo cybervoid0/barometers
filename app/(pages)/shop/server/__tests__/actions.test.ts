@@ -38,6 +38,10 @@ jest.mock('@/prisma/prismaClient', () => {
     product: {
       findUnique: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
+    },
+    orderItem: {
+      count: jest.fn(),
     },
     productImage: {
       deleteMany: jest.fn(),
@@ -68,6 +72,12 @@ jest.mock('@/services/stripe', () => ({
   },
 }))
 
+// --- Mock next/cache (storefront revalidation after product mutations) ---
+const mockRevalidatePath = jest.fn()
+jest.mock('next/cache', () => ({
+  revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
+}))
+
 // --- Mock slugify ---
 jest.mock('slugify', () => jest.fn((s: string) => s.toLowerCase().replace(/\s+/g, '-')))
 
@@ -88,7 +98,9 @@ import { prisma } from '@/prisma/prismaClient'
 import { stripe } from '@/services/stripe'
 import {
   createCheckoutSession,
+  deleteProduct,
   refundOrder,
+  setProductActive,
   updateOrderStatus,
   updateProductWithVariants,
   updateTrackingNumber,
@@ -101,6 +113,7 @@ const mockPrisma = prisma as unknown as {
   customer: Record<string, jest.Mock>
   productVariant: Record<string, jest.Mock>
   product: Record<string, jest.Mock>
+  orderItem: Record<string, jest.Mock>
   productImage: Record<string, jest.Mock>
   productOption: Record<string, jest.Mock>
   shippingAddress: Record<string, jest.Mock>
@@ -789,6 +802,210 @@ describe('updateProductWithVariants — stock delta', () => {
     )
     // No Stripe price/product mutation when nothing pricing-related changed.
     expect(stripe.prices.create).not.toHaveBeenCalled()
+    expect(stripe.products.update).not.toHaveBeenCalled()
+  })
+})
+
+// --- setProductActive (hide / show) ---
+
+describe('setProductActive', () => {
+  const adminSession = { user: { id: 'u1', role: 'ADMIN' } }
+
+  it('returns Unauthorized for non-admin', async () => {
+    mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1', role: 'USER' } })
+
+    const result = await setProductActive('p1', false)
+
+    expect(result).toEqual({ success: false, error: 'Unauthorized' })
+    expect(mockPrisma.product.findUnique).not.toHaveBeenCalled()
+    expect(stripe.products.update).not.toHaveBeenCalled()
+  })
+
+  it('hides a product: archives it on Stripe (active:false) and flips isActive in DB', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce({
+      stripeProductId: 'prod_1',
+      slug: 'barometer-mug',
+      deletedAt: null,
+      isActive: true,
+    })
+    ;(stripe.products.update as jest.Mock).mockResolvedValueOnce({})
+    mockPrisma.product.update.mockResolvedValueOnce({})
+
+    const result = await setProductActive('p1', false)
+
+    expect(result).toEqual({ success: true, isActive: false })
+    expect(stripe.products.update).toHaveBeenCalledWith('prod_1', { active: false })
+    expect(mockPrisma.product.update).toHaveBeenCalledWith({
+      where: { id: 'p1' },
+      data: { isActive: false },
+    })
+    expect(mockRevalidatePath).toHaveBeenCalledWith('/shop')
+    expect(mockRevalidatePath).toHaveBeenCalledWith('/shop/barometer-mug')
+  })
+
+  it('shows a product again (active:true)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce({
+      stripeProductId: 'prod_1',
+      slug: 'barometer-mug',
+      deletedAt: null,
+      isActive: false,
+    })
+    ;(stripe.products.update as jest.Mock).mockResolvedValueOnce({})
+    mockPrisma.product.update.mockResolvedValueOnce({})
+
+    const result = await setProductActive('p1', true)
+
+    expect(result).toEqual({ success: true, isActive: true })
+    expect(stripe.products.update).toHaveBeenCalledWith('prod_1', { active: true })
+  })
+
+  it('is a no-op when the requested visibility already matches (no Stripe/DB write)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce({
+      stripeProductId: 'prod_1',
+      slug: 'barometer-mug',
+      deletedAt: null,
+      isActive: true,
+    })
+
+    const result = await setProductActive('p1', true)
+
+    expect(result).toEqual({ success: true, isActive: true })
+    expect(stripe.products.update).not.toHaveBeenCalled()
+    expect(mockPrisma.product.update).not.toHaveBeenCalled()
+  })
+
+  it('refuses to show a soft-deleted product', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce({
+      stripeProductId: 'prod_1',
+      slug: 'barometer-mug',
+      deletedAt: new Date('2026-01-01'),
+      isActive: false,
+    })
+
+    const result = await setProductActive('p1', true)
+
+    expect(result.success).toBe(false)
+    expect(stripe.products.update).not.toHaveBeenCalled()
+    expect(mockPrisma.product.update).not.toHaveBeenCalled()
+  })
+
+  it('reverts the Stripe change to the captured prior state when the DB write fails', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce({
+      stripeProductId: 'prod_1',
+      slug: 'barometer-mug',
+      deletedAt: null,
+      isActive: true,
+    })
+    ;(stripe.products.update as jest.Mock)
+      .mockResolvedValueOnce({}) // the hide
+      .mockResolvedValueOnce({}) // the rollback
+    mockPrisma.product.update.mockRejectedValueOnce(new Error('db down'))
+
+    const result = await setProductActive('p1', false)
+
+    expect(result.success).toBe(false)
+    // First archives (false), then reverts to the *captured* prior state (true).
+    expect(stripe.products.update).toHaveBeenNthCalledWith(1, 'prod_1', { active: false })
+    expect(stripe.products.update).toHaveBeenNthCalledWith(2, 'prod_1', { active: true })
+  })
+})
+
+// --- deleteProduct ---
+
+describe('deleteProduct', () => {
+  const adminSession = { user: { id: 'u1', role: 'ADMIN' } }
+
+  const productWithPrice = {
+    slug: 'barometer-mug',
+    isActive: true,
+    stripeProductId: 'prod_1',
+    variants: [{ stripePriceIdEUR: 'price_1' }, { stripePriceIdEUR: null }],
+  }
+
+  it('returns Unauthorized for non-admin', async () => {
+    mockGetServerSession.mockResolvedValueOnce({ user: { id: 'u1', role: 'USER' } })
+
+    const result = await deleteProduct('p1')
+
+    expect(result).toEqual({ success: false, error: 'Unauthorized' })
+    expect(mockPrisma.product.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('hard-deletes when no order references it (and archives Stripe prices + product)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce(productWithPrice)
+    mockPrisma.orderItem.count.mockResolvedValueOnce(0)
+    ;(stripe.prices.update as jest.Mock).mockResolvedValueOnce({})
+    ;(stripe.products.update as jest.Mock).mockResolvedValueOnce({})
+    mockPrisma.product.delete.mockResolvedValueOnce({})
+
+    const result = await deleteProduct('p1')
+
+    expect(result).toEqual({ success: true, softDeleted: false })
+    // Only *active* variants' prices are considered — an already-archived price
+    // from a soft-deleted variant must not be reactivated on rollback.
+    expect(mockPrisma.product.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          variants: { where: { isActive: true }, select: { stripePriceIdEUR: true } },
+        }),
+      }),
+    )
+    // Prices archived first, then the product.
+    expect(stripe.prices.update).toHaveBeenCalledWith('price_1', { active: false })
+    expect(stripe.products.update).toHaveBeenCalledWith('prod_1', { active: false })
+    expect(mockPrisma.product.delete).toHaveBeenCalledWith({ where: { id: 'p1' } })
+    expect(mockPrisma.product.update).not.toHaveBeenCalled()
+  })
+
+  it('soft-deletes (sets deletedAt) when an order references it', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce(productWithPrice)
+    mockPrisma.orderItem.count.mockResolvedValueOnce(3)
+    ;(stripe.prices.update as jest.Mock).mockResolvedValueOnce({})
+    ;(stripe.products.update as jest.Mock).mockResolvedValueOnce({})
+    mockPrisma.product.update.mockResolvedValueOnce({})
+
+    const result = await deleteProduct('p1')
+
+    expect(result).toEqual({ success: true, softDeleted: true })
+    expect(mockPrisma.product.delete).not.toHaveBeenCalled()
+    expect(mockPrisma.product.update).toHaveBeenCalledWith({
+      where: { id: 'p1' },
+      data: { isActive: false, deletedAt: expect.any(Date) },
+    })
+    // Stripe still archived to keep it off Stripe's active catalogue.
+    expect(stripe.products.update).toHaveBeenCalledWith('prod_1', { active: false })
+  })
+
+  it('reverses Stripe archival when the DB write fails (no divergence)', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce(productWithPrice)
+    mockPrisma.orderItem.count.mockResolvedValueOnce(0)
+    ;(stripe.prices.update as jest.Mock).mockResolvedValue({})
+    ;(stripe.products.update as jest.Mock).mockResolvedValue({})
+    mockPrisma.product.delete.mockRejectedValueOnce(new Error('db down'))
+
+    const result = await deleteProduct('p1')
+
+    expect(result.success).toBe(false)
+    // Price reactivated and product restored to its prior active state.
+    expect(stripe.prices.update).toHaveBeenCalledWith('price_1', { active: true })
+    expect(stripe.products.update).toHaveBeenCalledWith('prod_1', { active: true })
+  })
+
+  it('returns an error when the product does not exist', async () => {
+    mockGetServerSession.mockResolvedValueOnce(adminSession)
+    mockPrisma.product.findUnique.mockResolvedValueOnce(null)
+
+    const result = await deleteProduct('p1')
+
+    expect(result).toEqual({ success: false, error: 'Product not found' })
     expect(stripe.products.update).not.toHaveBeenCalled()
   })
 })

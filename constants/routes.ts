@@ -43,6 +43,7 @@ const adminRoutes = {
   AddBrand: `${admin}/add-brand/`,
   AddDocument: `${admin}/add-document/`,
   AddProduct: `${admin}/add-product/`,
+  AdminProducts: `${admin}/products/`,
   EditProduct: `${admin}/edit-product/`,
   AddEssay: `${admin}/add-essay/`,
   Reports: `${admin}/reports/`,

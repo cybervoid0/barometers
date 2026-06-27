@@ -73,12 +73,22 @@ on login.
 
 All admin actions are gated to `ADMIN`/`OWNER` roles.
 
-- **Products** — [`/admin/add-product`](app/(pages)/admin/add-product/page.tsx) and
-  [`/admin/edit-product/[id]`](app/(pages)/admin/edit-product/[id]/page.tsx). Creating
-  or editing a product also creates/updates the matching Stripe Product and Prices.
-  Stripe Prices are immutable, so a price change archives the old Price and creates a
-  new one. Both create and update use a **rollback pattern**: if the DB write fails,
-  the Stripe changes are reversed so the two never drift.
+- **Products** — [`/admin/products`](app/(pages)/admin/products/page.tsx) lists **every**
+  product (including hidden ones — the only place to find and un-hide them) with a
+  status badge and a link to each edit page;
+  [`/admin/add-product`](app/(pages)/admin/add-product/page.tsx) and
+  [`/admin/edit-product/[id]`](app/(pages)/admin/edit-product/[id]/page.tsx) create and
+  edit. Creating or editing a product also creates/updates the matching Stripe Product
+  and Prices. Stripe Prices are immutable, so a price change archives the old Price and
+  creates a new one. Both create and update use a **rollback pattern**: if the DB write
+  fails, the Stripe changes are reversed so the two never drift.
+- **Hide / show & delete** — the edit form also has a **Hide from shop / Show in shop**
+  toggle (reversible: flips `isActive` and the Stripe Product's `active` flag; a hidden
+  product leaves `/shop`, 404s at `/shop/[slug]`, and can't be bought) and a **Delete**
+  button behind a confirm dialog. Delete archives the product + its prices on Stripe and
+  then either hard-deletes the row (no orders reference it) or **soft-deletes** it
+  (`deletedAt` set — when orders reference it, so history survives). Both are admin-gated,
+  reverse their Stripe changes if the DB write fails, and revalidate the storefront.
 - **Orders** — [`/admin/orders`](app/(pages)/admin/orders/page.tsx) lists orders with a
   status filter; [`/admin/orders/[id]`](app/(pages)/admin/orders/[id]/page.tsx) lets an
   admin advance status, set/correct a tracking number, and issue a **full refund**.

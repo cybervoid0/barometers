@@ -1,6 +1,7 @@
 'use server'
 
 import type { OrderStatus, ProductVariant } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
 import { getServerSession } from 'next-auth'
 import slugify from 'slugify'
 import { z } from 'zod'
@@ -772,6 +773,194 @@ export async function updateProductWithVariants(input: UpdateProductInput) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Revalidate the storefront after a product mutation. Shop queries don't use
+ * `'use cache'`/`cacheTag`, so a plain path revalidation is what makes the change
+ * show up: the listing (`/shop`) and the product's own page (`/shop/[slug]`).
+ */
+function revalidateStorefront(slug: string) {
+  revalidatePath('/shop')
+  revalidatePath(`/shop/${slug}`)
+}
+
+const setProductActiveSchema = z.object({
+  productId: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+/**
+ * Hide or show a product on the storefront (reversible). Flips `Product.isActive`
+ * and keeps the Stripe Product's `active` flag in sync. Stripe *prices* are left
+ * untouched so the operation is cleanly reversible.
+ */
+export async function setProductActive(productId: string, isActive: boolean) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  const parsed = setProductActiveSchema.safeParse({ productId, isActive })
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }
+  }
+
+  // Reverse the Stripe mutation if the DB write fails, so the two never diverge.
+  // Roll back to the *captured* prior state, not `!requested` — the two only
+  // coincide when the value is actually changing, and we don't want to assume it.
+  let stripeProductId: string | undefined
+  let priorActive: boolean | undefined
+  let stripeUpdated = false
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: parsed.data.productId },
+      select: { stripeProductId: true, slug: true, deletedAt: true, isActive: true },
+    })
+
+    if (!product) {
+      return { success: false, error: 'Product not found' }
+    }
+    if (product.deletedAt) {
+      return { success: false, error: 'This product has been deleted and can no longer be shown' }
+    }
+    // Nothing to change — avoid a pointless Stripe write (and a rollback that
+    // could flip Stripe to the wrong value).
+    if (product.isActive === parsed.data.isActive) {
+      return { success: true, isActive: product.isActive }
+    }
+    stripeProductId = product.stripeProductId
+    priorActive = product.isActive
+
+    // Stripe first, then DB. If the DB write throws, the catch reverts Stripe.
+    await stripe.products.update(stripeProductId, { active: parsed.data.isActive })
+    stripeUpdated = true
+
+    await prisma.product.update({
+      where: { id: parsed.data.productId },
+      data: { isActive: parsed.data.isActive },
+    })
+
+    revalidateStorefront(product.slug)
+    return { success: true, isActive: parsed.data.isActive }
+  } catch (error) {
+    console.error('Error updating product visibility:', error)
+    if (stripeUpdated && stripeProductId && priorActive !== undefined) {
+      try {
+        await stripe.products.update(stripeProductId, { active: priorActive })
+      } catch (rollbackError) {
+        console.error('Failed to revert Stripe product active flag during rollback:', rollbackError)
+      }
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to update product visibility',
+    }
+  }
+}
+
+const deleteProductSchema = z.object({
+  productId: z.string().min(1),
+})
+
+/**
+ * Permanently delete a product.
+ * - No order references it → hard-delete the row (variants/options/images cascade).
+ * - Any order references it → soft-delete (`deletedAt` + `isActive:false`) so order
+ *   history survives (`OrderItem.product` is Restrict, and a hard delete would be
+ *   blocked by the FK anyway).
+ *
+ * On Stripe the product can't be deleted while it has prices, so "delete" means
+ * archive: archive the prices, then the product. Every Stripe mutation is reversed
+ * if the DB write fails so the two never diverge.
+ */
+export async function deleteProduct(productId: string) {
+  const denied = await adminGuard()
+  if (denied) return denied
+
+  const parsed = deleteProductSchema.safeParse({ productId })
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }
+  }
+  const id = parsed.data.productId
+
+  // Track Stripe mutations for rollback if the DB write fails.
+  const archivedStripePriceIds: string[] = []
+  let stripeProductId: string | undefined
+  let stripeProductArchived = false
+  let productWasActive = false
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: {
+        slug: true,
+        isActive: true,
+        stripeProductId: true,
+        // Only active variants — a soft-deleted variant's Stripe price was already
+        // archived by a prior edit, so re-archiving (and, worse, reactivating it on
+        // rollback) would resurrect a price that must stay inactive. An active
+        // variant's stripePriceIdEUR always points to its current active price.
+        variants: { where: { isActive: true }, select: { stripePriceIdEUR: true } },
+      },
+    })
+
+    if (!product) {
+      return { success: false, error: 'Product not found' }
+    }
+    stripeProductId = product.stripeProductId
+    productWasActive = product.isActive
+
+    // A product any order references must keep its row (order history must
+    // survive) → soft-delete. Otherwise it can be hard-deleted.
+    const orderRefs = await prisma.orderItem.count({ where: { productId: id } })
+
+    // Archive on Stripe: prices first (Stripe can't archive/delete a product that
+    // still has active prices), then the product. Tracked for rollback.
+    for (const variant of product.variants) {
+      if (variant.stripePriceIdEUR) {
+        await stripe.prices.update(variant.stripePriceIdEUR, { active: false })
+        archivedStripePriceIds.push(variant.stripePriceIdEUR)
+      }
+    }
+    await stripe.products.update(stripeProductId, { active: false })
+    stripeProductArchived = true
+
+    if (orderRefs === 0) {
+      await prisma.product.delete({ where: { id } })
+    } else {
+      await prisma.product.update({
+        where: { id },
+        data: { isActive: false, deletedAt: new Date() },
+      })
+    }
+
+    revalidateStorefront(product.slug)
+    return { success: true, softDeleted: orderRefs > 0 }
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    // Reverse Stripe to match the DB, which didn't change.
+    for (const priceId of archivedStripePriceIds) {
+      try {
+        await stripe.prices.update(priceId, { active: true })
+      } catch (rollbackError) {
+        console.error('Failed to reactivate Stripe price during rollback:', rollbackError)
+      }
+    }
+    if (stripeProductArchived && stripeProductId) {
+      try {
+        await stripe.products.update(stripeProductId, { active: productWasActive })
+      } catch (rollbackError) {
+        console.error(
+          'Failed to restore Stripe product active flag during rollback:',
+          rollbackError,
+        )
+      }
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unable to delete product',
     }
   }
 }
