@@ -83,18 +83,22 @@ export function WideScreenTabs({ menu: menuData = [], ...props }: Props) {
                 </NavigationMenuList>
               </NavigationMenu>
             ) : (
-              <div key={menuItem.id} className={cn(menuStyle, underline(menuItem.link))}>
-                <Link href={menuItem.link} className="no-underline">
-                  <p>{menuItem.label}</p>
-                </Link>
-              </div>
+              <Link
+                key={menuItem.id}
+                href={menuItem.link}
+                className={cn(menuStyle, underline(menuItem.link), 'block no-underline')}
+              >
+                {menuItem.label}
+              </Link>
             ),
           )}
-        <div className={cn(menuItemStyle, underline('/search'))}>
-          <Link href="/search" aria-label="Search barometer">
-            <Search size="18" />
-          </Link>
-        </div>
+        <Link
+          href="/search"
+          aria-label="Search barometer"
+          className={cn(menuItemStyle, underline('/search'), 'block')}
+        >
+          <Search size="18" />
+        </Link>
         <CartButton className={cn(menuItemStyle, 'flex items-center')} />
         <UserMenu className={cn(menuItemStyle, 'flex items-center')} />
       </div>
