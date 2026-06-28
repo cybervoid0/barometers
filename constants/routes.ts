@@ -8,7 +8,6 @@ const root = {
   Terms: '/terms-and-conditions/',
   CookiePolicy: '/cookies/',
   PrivacyPolicy: '/privacy/',
-  Documents: '/documents/',
   Signin: '/signin/',
   Register: '/register/',
 } as const

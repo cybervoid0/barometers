@@ -10,7 +10,6 @@ import {
   Layers,
   LibraryBig,
   type LucideIcon,
-  Newspaper,
   Package,
   PenLine,
   Plus,
@@ -52,9 +51,8 @@ const groups: AdminGroup[] = [
     icon: BookOpen,
     links: [
       { href: Route.AddDocument, label: 'Add new document', icon: FilePlus2 },
+      { href: Route.Ephemera, label: 'View documents', icon: FileText },
       { href: Route.AddEssay, label: 'Add new essay', icon: PenLine },
-      { href: Route.Documents, label: 'View documents', icon: FileText },
-      { href: Route.Ephemera, label: 'View ephemera', icon: Newspaper },
     ],
   },
   {
